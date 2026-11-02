@@ -1,0 +1,28 @@
+/* The Workspace .gitignore hides every file from the automatic scan, even under a ** glob,
+   so each source folder is listed here. Add a line for a new folder. */
+@import "tailwindcss" source(none);
+@source "./*.tsx";
+@source "./pages/*.tsx";
+@source "./components/*.tsx";
+
+body {
+  background: #16181d;
+  color: #e6e8ec;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+}
+
+.button {
+  @apply rounded-md bg-zinc-700 px-3 py-1.5 text-sm font-medium hover:bg-zinc-600 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.button-primary {
+  @apply rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.field {
+  @apply w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 py-1.5 text-sm outline-none focus:border-zinc-400;
+}

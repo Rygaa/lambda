@@ -1,0 +1,21 @@
+{
+  "name": "@lambda/asset-format",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lambda/renderer": "workspace:*",
+    "three": "0.187.0",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/three": "0.187.0",
+    "typescript": "7.0.2"
+  }
+}

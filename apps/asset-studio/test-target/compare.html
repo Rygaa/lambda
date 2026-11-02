@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Shape compare</title>
+    <style>
+      body { margin: 0; padding: 12px; background: #18181b; color: #e4e4e7; font: 13px system-ui, sans-serif; }
+      .row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+      .row b { width: 70px; }
+      img { width: 360px; height: 360px; }
+    </style>
+  </head>
+  <body>
+    <!-- Only for tuning: flat renders of the hand-built target and of an Infer plan, same cameras.
+         ?id=<asset id>, and ?history=<file in history/> for an older plan. -->
+    <script type="module">
+      import { captureShapes } from "/src/capture.ts";
+      import target from "./goku-house.json";
+
+      const toAsset = (plan) => ({
+        ...plan,
+        shapes: plan.shapes.map((shape) => ({
+          ...shape,
+          faces: Array.isArray(shape.faces) ? Object.fromEntries(shape.faces.map((face) => [face.face, face.texture])) : shape.faces,
+        })),
+      });
+
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id") ?? "chichi-house";
+      const history = params.get("history");
+      const infer = history
+        ? await (await fetch(`/library/buildings/${id}/history/${history}`)).json()
+        : (await (await fetch(`/api/assets/${id}`)).json()).asset;
+
+      for (const [label, asset] of [["Target", toAsset(target)], ["Infer", infer]]) {
+        const { game, top } = await captureShapes(asset);
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `<b>${label}</b>`;
+        for (const blob of [game, top]) {
+          const image = document.createElement("img");
+          image.src = URL.createObjectURL(blob);
+          row.append(image);
+        }
+        document.body.append(row);
+      }
+    </script>
+  </body>
+</html>

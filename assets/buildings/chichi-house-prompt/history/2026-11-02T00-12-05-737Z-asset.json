@@ -1,0 +1,14 @@
+{
+  "id": "chichi-house-prompt",
+  "name": "ChiChi house prompt",
+  "kind": "building",
+  "status": "draft",
+  "description": "",
+  "prompt": "ChiChi's house as it looks in a top-down Dragon Ball game. It is compact. Main house at the back: one long rectangular house, wider than deep, with cream walls and one brown tile gable roof whose ridge runs from left to right. Three small white chimneys stand in that roof. In front of the main house, on its left half: a white round dome house (a half sphere) standing on the ground, with a short grey pipe on its top, a red square sign on its front right, a blue window on its left side, and an arched brown door in the middle of its front with a small step. On the right: one small wing that comes forward from the main house, with beige walls, a brown roof whose gable faces the front, and a brown door in its front with a step. The main house has no other wing: nothing on the left side. A small red mailbox on a thin post stands in front of the dome, on its left.",
+  "reference": "reference.png",
+  "referenceBucketFileId": "7494b5fe-fe85-467f-a6b7-3a89a6f8055a",
+  "shapes": [],
+  "textures": [],
+  "createdAt": "2026-11-02T00:03:21.868Z",
+  "updatedAt": "2026-11-02T00:03:28.667Z"
+}

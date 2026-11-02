@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "asset-studio",
+      "runtimeExecutable": "zsh",
+      "runtimeArgs": ["-c", "source ~/.nvm/nvm.sh && nvm use >/dev/null && pnpm studio"],
+      "port": 9300
+    }
+  ]
+}

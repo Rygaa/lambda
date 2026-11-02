@@ -1,0 +1,954 @@
+{
+  "id": "chichi-house",
+  "name": "ChiChi house",
+  "kind": "building",
+  "status": "draft",
+  "description": "ChiChi house is a small cottage with two timber roofed wings flanking a cream dome, red plaques, and a blue metal chimney.",
+  "prompt": "",
+  "reference": "reference.png",
+  "referenceBucketFileId": "072e1d73-c615-4e6a-826a-5c140d09b2e2",
+  "shapes": [
+    {
+      "id": "rear-base",
+      "type": "box",
+      "size": [
+        5.56,
+        0.16,
+        1.64
+      ],
+      "position": [
+        0.01,
+        0,
+        -0.45
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "stone-base",
+        "back": "stone-base",
+        "left": "stone-base",
+        "right": "stone-base",
+        "top": "stone-base",
+        "bottom": null
+      }
+    },
+    {
+      "id": "rear-walls",
+      "type": "box",
+      "size": [
+        5.42,
+        1.29,
+        1.5
+      ],
+      "position": [
+        0.01,
+        0.16,
+        -0.45
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "cottage-wall",
+        "back": "cottage-wall",
+        "left": "cottage-wall",
+        "right": "cottage-wall",
+        "top": null,
+        "bottom": null
+      }
+    },
+    {
+      "id": "rear-roof",
+      "type": "wedge",
+      "size": [
+        5.92,
+        0.72,
+        2
+      ],
+      "position": [
+        0.01,
+        1.45,
+        -0.45
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "roof-tiles",
+        "back": "roof-tiles",
+        "left": "gable-wood",
+        "right": "gable-wood",
+        "bottom": null
+      }
+    },
+    {
+      "id": "rear-ridge-board",
+      "type": "box",
+      "size": [
+        5.92,
+        0.05,
+        0.07
+      ],
+      "position": [
+        0.01,
+        2.17,
+        -0.45
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "ridge-wood",
+        "back": "ridge-wood",
+        "left": "ridge-wood",
+        "right": "ridge-wood",
+        "top": "ridge-wood",
+        "bottom": null
+      }
+    },
+    {
+      "id": "left-base",
+      "type": "box",
+      "size": [
+        1.74,
+        0.16,
+        1.39
+      ],
+      "position": [
+        -1.9,
+        0,
+        0.925
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "stone-base",
+        "back": "stone-base",
+        "left": "stone-base",
+        "right": "stone-base",
+        "top": "stone-base",
+        "bottom": null
+      }
+    },
+    {
+      "id": "left-walls",
+      "type": "box",
+      "size": [
+        1.6,
+        1.29,
+        1.25
+      ],
+      "position": [
+        -1.9,
+        0.16,
+        0.925
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "cottage-wall",
+        "back": null,
+        "left": "cottage-wall",
+        "right": "cottage-wall",
+        "top": null,
+        "bottom": null
+      }
+    },
+    {
+      "id": "left-roof",
+      "type": "wedge",
+      "size": [
+        1.75,
+        0.82,
+        2.1
+      ],
+      "position": [
+        -1.9,
+        1.45,
+        0.925
+      ],
+      "rotationY": 90,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "roof-tiles",
+        "back": "roof-tiles",
+        "left": "gable-wood",
+        "right": null,
+        "bottom": null
+      }
+    },
+    {
+      "id": "left-ridge-board",
+      "type": "box",
+      "size": [
+        1.75,
+        0.05,
+        0.07
+      ],
+      "position": [
+        -1.9,
+        2.27,
+        0.925
+      ],
+      "rotationY": 90,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "ridge-wood",
+        "back": "ridge-wood",
+        "left": "ridge-wood",
+        "right": "ridge-wood",
+        "top": "ridge-wood",
+        "bottom": null
+      }
+    },
+    {
+      "id": "right-base",
+      "type": "box",
+      "size": [
+        1.54,
+        0.16,
+        1.39
+      ],
+      "position": [
+        2.02,
+        0,
+        0.925
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "stone-base",
+        "back": "stone-base",
+        "left": "stone-base",
+        "right": "stone-base",
+        "top": "stone-base",
+        "bottom": null
+      }
+    },
+    {
+      "id": "right-walls",
+      "type": "box",
+      "size": [
+        1.4,
+        1.29,
+        1.25
+      ],
+      "position": [
+        2.02,
+        0.16,
+        0.925
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "cottage-wall",
+        "back": null,
+        "left": "cottage-wall",
+        "right": "cottage-wall",
+        "top": null,
+        "bottom": null
+      }
+    },
+    {
+      "id": "right-roof",
+      "type": "wedge",
+      "size": [
+        1.75,
+        0.7,
+        1.9
+      ],
+      "position": [
+        2.02,
+        1.45,
+        0.925
+      ],
+      "rotationY": 90,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "roof-tiles",
+        "back": "roof-tiles",
+        "left": "gable-wood",
+        "right": null,
+        "bottom": null
+      }
+    },
+    {
+      "id": "right-ridge-board",
+      "type": "box",
+      "size": [
+        1.75,
+        0.05,
+        0.07
+      ],
+      "position": [
+        2.02,
+        2.15,
+        0.925
+      ],
+      "rotationY": 90,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "ridge-wood",
+        "back": "ridge-wood",
+        "left": "ridge-wood",
+        "right": "ridge-wood",
+        "top": "ridge-wood",
+        "bottom": null
+      }
+    },
+    {
+      "id": "dome-base",
+      "type": "cylinder",
+      "size": [
+        2.56,
+        0.16,
+        2.54
+      ],
+      "position": [
+        0.11,
+        0,
+        1.25
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "side": "stone-base",
+        "top": "stone-base",
+        "bottom": null
+      }
+    },
+    {
+      "id": "dome-plaster-ring",
+      "type": "cylinder",
+      "size": [
+        2.42,
+        0.16,
+        2.4
+      ],
+      "position": [
+        0.11,
+        0.16,
+        1.25
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "side": "dome-plaster",
+        "top": null,
+        "bottom": null
+      }
+    },
+    {
+      "id": "dome-shell",
+      "type": "dome",
+      "size": [
+        2.42,
+        1.45,
+        2.4
+      ],
+      "position": [
+        0.11,
+        0.32,
+        1.25
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "side": "dome-plaster",
+        "bottom": null
+      }
+    },
+    {
+      "id": "dome-front-window",
+      "type": "box",
+      "size": [
+        1,
+        0.3,
+        0.06
+      ],
+      "position": [
+        -0.37,
+        0.54,
+        2.34
+      ],
+      "rotationY": -20,
+      "tilt": -8,
+      "role": null,
+      "faces": {
+        "front": "dome-window",
+        "back": null,
+        "left": "window-edge",
+        "right": "window-edge",
+        "top": "window-edge",
+        "bottom": "window-edge"
+      }
+    },
+    {
+      "id": "dome-door-panel",
+      "type": "box",
+      "size": [
+        0.46,
+        0.62,
+        0.06
+      ],
+      "position": [
+        1.03,
+        0.32,
+        2.045
+      ],
+      "rotationY": 45,
+      "tilt": 0,
+      "role": "door",
+      "faces": {
+        "front": "door-panel",
+        "back": null,
+        "left": "door-wood",
+        "right": "door-wood",
+        "top": null,
+        "bottom": null
+      }
+    },
+    {
+      "id": "dome-door-arch",
+      "type": "cylinder",
+      "size": [
+        0.46,
+        0.06,
+        0.46
+      ],
+      "position": [
+        1.009,
+        0.94,
+        2.024
+      ],
+      "rotationY": 45,
+      "tilt": 90,
+      "role": "door",
+      "faces": {
+        "side": "door-wood",
+        "top": "door-arch",
+        "bottom": null
+      }
+    },
+    {
+      "id": "dome-door-step",
+      "type": "box",
+      "size": [
+        0.58,
+        0.08,
+        0.24
+      ],
+      "position": [
+        1.19,
+        0.16,
+        2.27
+      ],
+      "rotationY": 45,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "stone-base",
+        "back": null,
+        "left": "stone-base",
+        "right": "stone-base",
+        "top": "stone-base",
+        "bottom": null
+      }
+    },
+    {
+      "id": "center-diamond-plaque",
+      "type": "box",
+      "size": [
+        0.34,
+        0.38,
+        0.04
+      ],
+      "position": [
+        -0.12,
+        1.11,
+        2.25
+      ],
+      "rotationY": 0,
+      "tilt": -35,
+      "role": null,
+      "faces": {
+        "front": "red-diamond",
+        "back": null,
+        "left": "plaque-edge",
+        "right": "plaque-edge",
+        "top": "plaque-edge",
+        "bottom": null
+      }
+    },
+    {
+      "id": "right-diamond-plaque",
+      "type": "box",
+      "size": [
+        0.34,
+        0.38,
+        0.04
+      ],
+      "position": [
+        0.97,
+        1.12,
+        1.78
+      ],
+      "rotationY": 45,
+      "tilt": -30,
+      "role": null,
+      "faces": {
+        "front": "red-diamond",
+        "back": null,
+        "left": "plaque-edge",
+        "right": "plaque-edge",
+        "top": "plaque-edge",
+        "bottom": null
+      }
+    },
+    {
+      "id": "dome-chimney-pipe",
+      "type": "cylinder",
+      "size": [
+        0.28,
+        0.92,
+        0.28
+      ],
+      "position": [
+        0.18,
+        1.36,
+        1.05
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "side": "pipe-metal",
+        "top": "pipe-opening",
+        "bottom": null
+      }
+    },
+    {
+      "id": "dome-chimney-collar",
+      "type": "cylinder",
+      "size": [
+        0.42,
+        0.18,
+        0.42
+      ],
+      "position": [
+        0.18,
+        2.06,
+        1.05
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "side": "pipe-metal",
+        "top": "pipe-opening",
+        "bottom": null
+      }
+    },
+    {
+      "id": "left-front-window",
+      "type": "box",
+      "size": [
+        0.55,
+        0.54,
+        0.06
+      ],
+      "position": [
+        -1.9,
+        0.53,
+        1.57
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "left-window",
+        "back": null,
+        "left": "window-edge",
+        "right": "window-edge",
+        "top": "window-edge",
+        "bottom": "window-edge"
+      }
+    },
+    {
+      "id": "left-gable-plaque",
+      "type": "box",
+      "size": [
+        0.28,
+        0.31,
+        0.04
+      ],
+      "position": [
+        -1.9,
+        1.59,
+        1.805
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "gable-plaque",
+        "back": null,
+        "left": "plaque-edge",
+        "right": "plaque-edge",
+        "top": "plaque-edge",
+        "bottom": null
+      }
+    },
+    {
+      "id": "right-front-window-left",
+      "type": "box",
+      "size": [
+        0.27,
+        0.6,
+        0.06
+      ],
+      "position": [
+        1.64,
+        0.48,
+        1.57
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "right-window",
+        "back": null,
+        "left": "window-edge",
+        "right": "window-edge",
+        "top": "window-edge",
+        "bottom": "window-edge"
+      }
+    },
+    {
+      "id": "right-front-window-right",
+      "type": "box",
+      "size": [
+        0.27,
+        0.6,
+        0.06
+      ],
+      "position": [
+        2.37,
+        0.48,
+        1.57
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "right-window",
+        "back": null,
+        "left": "window-edge",
+        "right": "window-edge",
+        "top": "window-edge",
+        "bottom": "window-edge"
+      }
+    },
+    {
+      "id": "rear-roof-vent",
+      "type": "box",
+      "size": [
+        0.24,
+        0.38,
+        0.24
+      ],
+      "position": [
+        -0.62,
+        1.87,
+        -0.35
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "vent-body",
+        "back": "vent-body",
+        "left": "vent-body",
+        "right": "vent-body",
+        "top": "vent-top",
+        "bottom": null
+      }
+    },
+    {
+      "id": "mailbox-post",
+      "type": "box",
+      "size": [
+        0.07,
+        0.5,
+        0.07
+      ],
+      "position": [
+        0.66,
+        0.16,
+        2.46
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "ridge-wood",
+        "back": "ridge-wood",
+        "left": "ridge-wood",
+        "right": "ridge-wood",
+        "top": null,
+        "bottom": null
+      }
+    },
+    {
+      "id": "mailbox-box",
+      "type": "box",
+      "size": [
+        0.3,
+        0.17,
+        0.22
+      ],
+      "position": [
+        0.66,
+        0.64,
+        2.46
+      ],
+      "rotationY": 0,
+      "tilt": 0,
+      "role": null,
+      "faces": {
+        "front": "mailbox-red",
+        "back": "mailbox-red",
+        "left": "mailbox-red",
+        "right": "mailbox-red",
+        "top": "mailbox-red",
+        "bottom": null
+      }
+    }
+  ],
+  "textures": [
+    {
+      "name": "stone-base",
+      "description": "Low gray beige stone foundation with small repeating irregular stone joints.",
+      "color": "#aaa08b",
+      "widthM": 0.6,
+      "heightM": 0.16,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "cottage-wall",
+      "description": "Warm cream cottage wall with subtle repeating stone and plaster texture.",
+      "color": "#d9c9a5",
+      "widthM": 1,
+      "heightM": 1.29,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "roof-tiles",
+      "description": "Repeating rows of weathered reddish brown clay roof tiles.",
+      "color": "#955a35",
+      "widthM": 0.5,
+      "heightM": 0.5,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "gable-wood",
+      "description": "Dark warm oak gable siding with repeating vertical boards and beams.",
+      "color": "#80502f",
+      "widthM": 0.7,
+      "heightM": 0.7,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "ridge-wood",
+      "description": "Plain dark brown roof ridge and post wood.",
+      "color": "#644027",
+      "widthM": 0.7,
+      "heightM": 0.1,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "dome-plaster",
+      "description": "Smooth ivory plaster with slight warm cream variation.",
+      "color": "#f0e3bf",
+      "widthM": 0.8,
+      "heightM": 0.8,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "dome-window",
+      "description": "One wide dark blue glass window with a thin pale frame.",
+      "color": "#5a7890",
+      "widthM": 1,
+      "heightM": 0.3,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "window-edge",
+      "description": "Plain muted brown painted wood for the thin edges of window pieces.",
+      "color": "#80634c",
+      "widthM": 0.2,
+      "heightM": 0.2,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "door-panel",
+      "description": "One warm brown plank door panel with darker vertical divisions.",
+      "color": "#956144",
+      "widthM": 0.46,
+      "heightM": 0.62,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "door-wood",
+      "description": "Plain warm brown wood on the edges of the arched door.",
+      "color": "#87563c",
+      "widthM": 0.3,
+      "heightM": 0.3,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "door-arch",
+      "description": "One rounded brown door top with a narrow cream arch border.",
+      "color": "#966246",
+      "widthM": 0.46,
+      "heightM": 0.46,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "red-diamond",
+      "description": "One crimson diamond emblem with a dark red character on a cream ground.",
+      "color": "#ac3640",
+      "widthM": 0.34,
+      "heightM": 0.38,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "plaque-edge",
+      "description": "Plain dark red painted edge of a thin plaque.",
+      "color": "#81333b",
+      "widthM": 0.1,
+      "heightM": 0.1,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "pipe-metal",
+      "description": "Blue gray metal with subtle vertical weathering.",
+      "color": "#8099ad",
+      "widthM": 0.35,
+      "heightM": 0.5,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "pipe-opening",
+      "description": "Dark recessed opening at the top of a metal chimney.",
+      "color": "#303a43",
+      "widthM": 0.28,
+      "heightM": 0.28,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "left-window",
+      "description": "One small window with deep violet shutters, reddish trim, and pale panes.",
+      "color": "#725570",
+      "widthM": 0.55,
+      "heightM": 0.54,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "gable-plaque",
+      "description": "One small square red and violet decorative plaque on the left gable.",
+      "color": "#8c3952",
+      "widthM": 0.28,
+      "heightM": 0.31,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "right-window",
+      "description": "One narrow pale blue glass window with blue shutters and light trim.",
+      "color": "#7fa9b7",
+      "widthM": 0.27,
+      "heightM": 0.6,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "vent-body",
+      "description": "Plain light blue gray plastered roof vent.",
+      "color": "#c6d0d0",
+      "widthM": 0.24,
+      "heightM": 0.38,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "vent-top",
+      "description": "Dark blue gray vent cap.",
+      "color": "#566878",
+      "widthM": 0.24,
+      "heightM": 0.24,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    },
+    {
+      "name": "mailbox-red",
+      "description": "Weathered muted red mailbox body.",
+      "color": "#984d36",
+      "widthM": 0.3,
+      "heightM": 0.17,
+      "file": null,
+      "prompt": null,
+      "updatedAt": "2026-11-01T23:54:08.727Z"
+    }
+  ],
+  "createdAt": "2026-11-01T23:46:31.090Z",
+  "updatedAt": "2026-11-01T23:54:08.728Z"
+}
