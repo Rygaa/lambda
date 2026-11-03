@@ -221,19 +221,30 @@ The Buu house shows how to build round forms that lie down, such as the tube on 
 
 With `tilt: 90`, the height of a cylinder or a dome lies flat. Its axis then points along (sin r, 0, cos r), where r is `rotationY`. To lay it along a direction u seen from above, use r = atan2(u.x, u.z).
 
-The Buu tube runs to the back right, 30° from x: u = (0.866, 0, -0.5), so r = 120. A dome laid with `rotationY: 120` points its round top to the back right. With `rotationY: -60` (120 − 180) it points to the front left.
+To raise the far end by an angle a, use `tilt: 90 − a`. A shape laid the other way (pointing back toward the near end) uses r − 180 and `tilt: 90 + a`.
+
+The Buu tube runs to the back right, 47° from x, and its back end rises 7°. A dome pointing to the back uses `rotationY: 137`, `tilt: 83`. A dome pointing to the front uses `rotationY: -43`, `tilt: 97`.
 
 ### An egg shape: 2 domes back to back
 
-2 domes with the same center and the same width, one pointing each way, make an egg. Each half can have its own length. The front and back of the Buu tube are made this way.
+2 domes with the same center and the same width, one pointing each way, make an egg. Each half can have its own length: a short half is blunt, a long half is pointed.
 
 ### A flat round end
 
-A dome ends in a round point. To cut a round body flat, put a short cylinder (laid the same way) at the end, with its front face where the flat end should be. The tip of the dome must stay inside that cylinder. The Buu tube does this with `tube-rim`: 1.36 wide, its front face is the flat front of the tube. The hole in it will be a texture.
+A dome ends in a round point. To cut a round body flat, put a short cylinder (laid the same way) at the end, with its front face where the flat end should be. The tip of each dome must stay inside that cylinder. The Buu tube does this with `tube-rim`: its front face is the flat front of the tube, 1.0 wide. The hole in it will be a texture.
 
-### A steady swelling
+### A body fattest in the middle, with a flat front
 
-One egg swells fast near its tip, then slowly. To make a body that grows slowly and steadily, like the Buu tube, put 2 eggs one after the other: a thinner one in front and a fatter one behind. Size them so the outline rises with no dip, and keep each tip hidden inside the other egg or the rim. The Buu tube: the outline is 0.63 m (radius) at the front, grows steadily to 0.88 m at two thirds of its length, then ends in a round back.
+One egg alone, cut flat, leaves a long straight piece of the cylinder showing at the front. To make the front round out quickly, as on the Buu tube, use 2 eggs:
+
+- a main egg, fattest in the middle of the body. Its back half is the round back end. Its front tip reaches the flat front, inside the cylinder.
+- a short front egg, a little thinner. Its blunt front half rounds the body down to the flat front. Its back tip stays inside the main egg.
+
+Check the outline along the body: it must rise from the flat front to the middle with no dip, then fall to the round back. The Buu tube (radius): 0.5 at the flat front, 0.69 at 0.5 m, 0.85 in the middle (2.1 m), then the round back ends at 3.9 m.
+
+### Sitting on a curved part
+
+To sit a body on a dome, find its lowest point over the dome and sink it a little into the dome. The Buu tube sinks 0.14 into the top of the head at its lowest point. Its back hangs in the air over segment 1, as in the reference.
 
 ## 7. Colors
 
