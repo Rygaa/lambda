@@ -44,7 +44,7 @@ Chichi house:
 
 Buu house:
 
-- Shapes: the head dome, the 4 segments, the 2 feet, and the tube on top. The front of the tube is cut flat, like a sausage cut with a knife: a full flat face, not hollow, with nothing coming out.
+- Shapes: the head (a lying egg, long and round at the same time), the 4 segments, the 2 fins, and the tube on top. The front of the tube is cut flat, like a sausage cut with a knife: a full flat face, not hollow, with nothing coming out.
 - Textures later: the round door hole on the head (the "eye"), the hole in the front of the tube, and all the small round windows.
 
 This differs from `../style/rules.md`, which makes doors, windows, and posts real shapes and gives each door the role "door". For buildings, follow this guide.
@@ -193,7 +193,7 @@ All sizes are measured from the Chichi plan.
 | cylinder | side, top, bottom (8 flat sides) | round bases, pipes, round tops (laid on its side) | 3: `dome-ring`, `dome-pipe`, `arch-top` | 0 |
 | wedge | front and back (the 2 slopes), left and right (the triangle ends), bottom | gable roofs | 2: `roof`, `wing-roof` | 0 |
 | pyramid | front, back, left, right, bottom | My reading: roofs with 4 slopes, pointed tops | 0 | 0 |
-| dome | side, bottom (14 sides, 5 bands) | round houses and round bodies, and the flat cut of a round body. Width, depth, and height may differ | 1: `dome` | 12 |
+| dome | side, bottom (14 sides, 5 bands) | round houses and round bodies, and the flat cut of a round body. Width, depth, and height may differ | 1: `dome` | 13 |
 
 ### A wedge with its gable to the front
 
@@ -228,6 +228,12 @@ The Buu tube runs to the back right, 47° from x, and its back end rises 7°. A 
 ### An egg shape: 2 domes back to back
 
 2 domes with the same center and the same width, one pointing each way, make an egg. Each half can have its own length: a short half is blunt, a long half is pointed.
+
+### A lying egg on the ground
+
+A body that is long and round at the same time, like the Buu head, is an egg laid along the ground. Put its axis a little above the ground: the lower part of the egg is under the ground and does not show. The Buu head: axis along x, 0.4 above the ground (the height of its round left end on the reference), 1.1 tall above the axis (top at 1.5), 2.3 deep. Its left half is 1.4 long, so the left end is round and its highest point is at 0.6 of its visible length. Its right half is 1.6 long and goes into segment 1: at the joint the head is about as high as segment 1, as on the reference.
+
+Small pointed parts on the ground, like the 2 fins under the head, are single domes laid on their side, their flat base hidden in the body and their point out. Make them fat and short, so the thick part shows (the fins: 0.46 thick, 0.85 to 0.9 long).
 
 ### A flat cut
 
@@ -297,7 +303,7 @@ The plan went from 25 to 17 shapes.
 
 ## 8. Limits
 
-- At most 30 shapes (`MAX_SHAPES` in `schema.ts`). Chichi uses 17: 11 boxes, 3 cylinders, 2 wedges, 1 dome. Buu uses 12, all domes.
+- At most 30 shapes (`MAX_SHAPES` in `schema.ts`). Chichi uses 17: 11 boxes, 3 cylinders, 2 wedges, 1 dome. Buu uses 13, all domes.
 - Only 5 shape types: box, cylinder, wedge, pyramid, dome.
 - No doors, windows, signs, holes, steps, or surface details as shapes. They will be textures.
 - No shape has `role: "door"` for now. The door will open and close as a texture.
