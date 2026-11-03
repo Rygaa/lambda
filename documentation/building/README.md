@@ -4,11 +4,13 @@ This guide says how to build a building from shapes. It is based on one example:
 
 Every number here comes from `example/chichi-house.json`. "My reading" means the JSON does not show it: it is how I read what the JSON does. The guide agrees with `../style/rules.md`.
 
+For now, buildings use plain colors, no textures (see section 7).
+
 The example:
 
 - `example/chichi-reference.png`: the image the house was built from.
-- `example/chichi-house.json`: the plan of shapes. Its `description` says "Goku's house": it is the same house.
-- `example/chichi-house.png`: the render in the game.
+- `example/chichi-house.json`: the plan of shapes. It is Claude's hand-built plan with a few color changes so it follows the simple color rules. The shapes are not changed. Section 7 lists the changes.
+- `example/chichi-house.png`: the render in the game of Claude's plan. The changes do not show in it (99.8% of the pixels are the same).
 
 | Reference | Render in the game |
 | --- | --- |
@@ -20,7 +22,7 @@ The JSON is a plan, the format Infer returns (see `apps/asset-studio/server/shap
 
 > **The simpler the shape, the better. This rule comes first.**
 
-This is 3D pixel art. A building is a few plain blocks, not a detailed model. The renderer, the outlines, and the textures give the look.
+This is 3D pixel art. A building is a few plain blocks, not a detailed model. The renderer, the outlines, and the colors give the look.
 
 Do not make:
 
@@ -31,9 +33,9 @@ Do not make:
 
 If a part reads fine as one box, it is one box.
 
-The proof is the Chichi house. The whole main house is 1 box for the walls (`walls`) and 1 wedge for the roof (`roof`). A base, a ridge board, 3 chimneys, and 1 window add 6 more boxes. That is all. Bricks, roof tiles, planks, and the window frame are painted in the textures.
+The proof is the Chichi house. The whole main house is 1 box for the walls (`walls`) and 1 wedge for the roof (`roof`). A base, a ridge board, 3 chimneys, and 1 window add 6 more boxes. That is all. Each part is one plain color: no bricks, no roof tiles, no planks, no window frame.
 
-Round things stay plain too. A cylinder has 8 flat sides and a dome has 14 sides and 5 bands (`packages/asset-format/src/geometry.ts`). The round top of the dome door is 1 cylinder laid on its side, not a ring of pieces. The sign is 1 square box; the diamond is painted on it.
+Round things stay plain too. A cylinder has 8 flat sides and a dome has 14 sides and 5 bands (`packages/asset-format/src/geometry.ts`). The round top of the dome door is 1 cylinder laid on its side, not a ring of pieces. The sign is 1 red square box.
 
 ## 1. Coordinates
 
@@ -57,7 +59,7 @@ Before any shape, write 2 texts:
 
 Chichi `description`:
 
-> Goku's house: a cream brick house with a brown tile roof and three white chimneys, a white dome house in front on the left, and a wing on the right with its gable to the front.
+> Chichi's house: a cream brick house with a brown tile roof and three white chimneys, a white dome house in front on the left, and a wing on the right with its gable to the front.
 
 The Chichi `layout` gives each part its range and checks it:
 
@@ -129,7 +131,7 @@ All sizes are measured from the JSON.
 - 4.18 long, 0.1 high, 0.18 wide.
 - 0.03 longer than the roof at each end (4.18 vs 4.12).
 - Its bottom is at y 2.4 and the roof peak is at 2.45, so half of it sits in the roof and half stands above.
-- The wing roof has no ridge board.
+- Only the main roof gets a ridge board. A smaller roof, like the wing roof, has none: one shape less, and the house still reads the same.
 
 ### Chimneys
 
@@ -256,57 +258,59 @@ In both, C is about 0.01 out of the dome surface. So the back face is just insid
 
 Use the same steps for any curved surface: find the normal at the point, then turn and tilt the front face onto it.
 
-## 7. Textures
+## 7. Colors
 
-A texture slot is one texture. `widthM` × `heightM` is the real size it covers on a face, in meters. After that size it repeats. The texture has 43.6 pixels per meter: cream is 3.6 × 1.2 m, so 157 × 52 pixels.
+For now there are no textures. Each texture slot is used only for its plain `color`.
 
-Texture coordinates are in meters and start at the bottom-left corner of each face (`geometry.ts`). So each face shows its texture from that corner.
+### One slot per material
 
-### Material slots: they repeat
+| Slot | Color | Used on |
+| --- | --- | --- |
+| grey | #b8b4b0 | bases, dome ring, dome pipe, steps |
+| cream | #f2dab0 | walls, wing walls |
+| tile | #c47a4a | both roofs: slopes and bottom |
+| wood | #ab7c58 | doors, door top, ridge board, triangle ends of both roofs, mailbox post |
+| white | #f0e8d0 | dome, arch, arch top, chimneys |
+| glass | #6f8fc0 | both windows |
+| red | #c83a3a | sign, mailbox |
 
-| Slot | Color | widthM × heightM | Used on |
-| --- | --- | --- | --- |
-| grey | #b8b4b0 | 3.7 × 0.2 | bases, dome ring, dome pipe, steps |
-| cream | #f2dab0 | 3.6 × 1.2 | walls, wing walls, main roof triangle ends |
-| tile | #c47a4a | 4.1 × 1.4 | the slopes and bottoms of both roofs |
-| wood | #ab7c58 | 0.7 × 0.9 | doors, door top, ridge board, wing roof triangle ends, mailbox post |
-| white | #f0e8d0 | 2.4 × 1.7 | dome, arch, arch top, chimneys, edges of the dome window |
-| red | #c83a3a | 0.5 × 0.5 | mailbox, edges of the sign |
-
-My reading: a material slot is about the size of the main face it covers. Cream 3.6 × 1.2 is about the front wall (3.6 × 1.14). Grey 3.7 × 0.2 is about the base front (3.74 × 0.16). Tile is 4.1 wide like the roof (4.12); its 1.4 height is less than the slope (1.86), so the tiles repeat on the slope. White 2.4 × 1.7 is the dome width and height. Wood 0.7 × 0.9 is about a door.
-
-### One-time slots: they show once
-
-| Slot | Color | widthM × heightM | Used on |
-| --- | --- | --- | --- |
-| sign | #c83a3a | 0.52 × 0.52 | the front of `dome-sign` only |
-| dome-window | #6f8fc0 | 0.74 × 0.5 | the front of `dome-window` only |
-| glass | #6f8fc0 | 0.5 × 0.4 | all 5 seen faces of `side-window` |
-
-- A one-time slot is the size of the face it is on, so it shows once. `sign` is exactly the 0.52 × 0.52 sign face. `dome-window` is exactly the 0.74 × 0.5 window face.
-- `glass` is a little bigger than its face (0.5 × 0.4 on a 0.46 × 0.36 face). The face shows it from the bottom-left corner, so about 0.04 m of the right and top edges is cut off.
-- The sign and the dome window put the one-time slot on the front only. Their thin edges get a material slot: red for the sign, white (the dome) for the window. My reading: do it this way. The side window puts glass on all faces.
-- The description of a one-time slot says "One ...": "One red diamond with a white mark in its middle; the corners around the diamond are white plaster". The corners match the dome, so a square box reads as a diamond on the dome.
-
-### Colors
-
+- One slot per material, not one slot per part. A sign or a window is a box with a material color: the sign is `red`, like the mailbox; both windows are `glass`. This differs from `rules.md`, which gives each sign and window its own slot. That rule is for textures and comes back with them.
+- The same material has the same color everywhere.
 - Daylight colors only. The reference is lit by an orange evening light. The plan uses plain day colors: cream #f2dab0, white #f0e8d0, not orange.
 - A slot color is the color in the sun. The renderer makes the shade tones.
-- The same material has the same color in every slot: sign and red are both #c83a3a; glass and dome-window are both #6f8fc0.
 
-### Which face gets which slot
+### Which face gets which color
 
-- Every bottom face is `null`: nobody sees it. The 2 roof wedges are the only exception: their bottom, under the overhang, gets `tile`.
-- Every other face gets a slot, even when it is hidden. The top of `walls` is under the roof and still gets `cream`.
-- A box gets the slot of its part on all its faces: walls cream, doors wood, chimneys white, steps grey.
-- The triangle ends of a wedge (`left`, `right`) are the gables. The main roof uses the wall texture there (`cream`). The wing roof uses `wood`.
-- A dome has only `side` and `bottom`. A cylinder has `side`, `top`, and `bottom`.
+- A shape is one color on all its faces: the color of its part. Walls are cream, doors wood, chimneys white, steps grey, windows glass.
+- The bottom gets that color too. Do not use `null`. A tilted shape can show its bottom: the dome sign leans back, so the game camera sees its bottom edge. A `null` face shows the grey fallback color there.
+- A roof wedge is the only shape with 2 colors: its slopes and bottom are `tile`, its triangle ends (`left`, `right`) are `wood`. This is the same for every roof.
+
+Why wood on every triangle end: the camera looks straight along -z and never turns. A roof with its ridge along x has its triangle ends looking left and right, so the camera never sees them. Only a turned roof, like the wing roof, shows a triangle end, and there the plan uses wood. So one rule gives the same picture.
+
+### widthM, heightM, and description
+
+The schema still needs `widthM`, `heightM`, and `description` on each slot. They do not change a plain color. Keep them ready for when textures come: `widthM` × `heightM` is the size of the main face the slot covers (cream 3.6 × 1.2, about the front wall), and `description` says what to paint.
+
+### What changed from Claude's plan
+
+Claude's hand-built plan had 2 more slots and a few other face choices. The example now follows the rules above. No shape was changed.
+
+| Change | Seen in the game camera? |
+| --- | --- |
+| `description`: "Goku's house" became "Chichi's house". | No. |
+| Main roof triangle ends: `cream` became `wood`. | No. They look left and right. |
+| Slot `sign` (#c83a3a) became `red` (#c83a3a). The slot was removed. | No. Same color. |
+| Slot `dome-window` (#6f8fc0) became `glass` (#6f8fc0). The slot was removed. | No. Same color. |
+| Dome window edges: `white` became `glass`. | Yes: its thin edges. |
+| Every `null` face got the color of its part. | Only the bottom edge of the sign. It was the grey fallback; it is now red. |
+
+Check: both plans were drawn in flat colors from the game camera, with `geometry.ts`. 99.8% of the house pixels are the same. The 0.2% that differ are the dome window edges and the sign's bottom edge.
 
 ## 8. Limits
 
 - At most 30 shapes (`MAX_SHAPES` in `schema.ts`). Chichi uses 25: 18 boxes, 4 cylinders, 2 wedges, 1 dome.
 - Only 5 shape types: box, cylinder, wedge, pyramid, dome.
-- No surface details as shapes. Bricks, planks, roof tiles, stones, cracks, window glass, and window frames are painted in textures. The Chichi side window is 1 box, and its frame is painted in the glass texture. The sign is 1 square box with the diamond painted on it.
+- No surface details as shapes: no bricks, planks, roof tiles, stones, cracks, or window frames. For now they are not shown at all; later they will be painted in textures. The Chichi side window is 1 blue box. The sign is 1 red box.
 - Doors, windows, chimneys, and posts are real small shapes. Chichi has 2 doors, 2 windows, 3 chimneys, 1 post, and 1 sign.
 - Every door is a real shape with `role: "door"`. Chichi has 2: `dome-door` and `wing-door`. All other shapes have `role: null`, the round door top (`door-top`) too.
 
@@ -319,11 +323,10 @@ Check a new building against this list before it is done.
 3. The front faces +z. The ground is at y = 0. Each `position` is the center of the bottom of its shape.
 4. Every part sits on the part under it. Nothing floats. Chimneys and pipes sink into their roof or dome.
 5. The base is 0.16 high and sticks out 0.07 past the walls. Each second volume has its own base.
-6. Walls are 1.2 to 1.4 m high from the ground. Roofs hang over by about 0.2 to 0.26 m. The main roof has a ridge board.
+6. Walls are 1.2 to 1.4 m high from the ground. Roofs hang over by about 0.2 to 0.26 m. Only the main roof has a ridge board.
 7. Parts side by side do not cut into each other. Only walls that join and small things on a surface touch.
 8. Every door is a real shape with `role: "door"`, about 0.06 thick, standing out of its wall, with a step 0.1 high in front.
 9. Things on a dome are turned and tilted onto the dome normal and stand about 0.03 out of it.
-10. Every face has a slot. Bottom faces are `null`, except under a roof.
-11. Material slots repeat. Each sign or special window has its own one-time slot, the size of its face, on its front only.
-12. Colors are daylight colors.
-13. 30 shapes or fewer, of the 5 types only.
+10. One slot per material, plain colors, daylight colors.
+11. Each shape is one color on all its faces, bottom too, with no `null`. Roofs: slopes and bottom `tile`, triangle ends `wood`.
+12. 30 shapes or fewer, of the 5 types only.
