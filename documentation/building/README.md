@@ -223,7 +223,7 @@ With `tilt: 90`, the height of a cylinder or a dome lies flat. Its axis then poi
 
 To raise the far end by an angle a, use `tilt: 90 − a`. A shape laid the other way (pointing back toward the near end) uses r − 180 and `tilt: 90 + a`.
 
-The Buu tube runs to the back right, 47° from x, and its back end rises 7°. A dome pointing to the back uses `rotationY: 137`, `tilt: 83`. A dome pointing to the front uses `rotationY: -43`, `tilt: 97`.
+The Buu tube runs almost along the body, turned 15° to the back right, and its back end rises 7°. A dome pointing to the back uses `rotationY: 105`, `tilt: 83`. A dome pointing to the front uses `rotationY: -75`, `tilt: 97`.
 
 ### An egg shape: 2 domes back to back
 
