@@ -1,26 +1,55 @@
 # Building guide
 
-This guide says how to build a building from shapes. It is based on one example: the Chichi house that Claude built by hand. It shows how that house was built, step by step, and turns each step into a rule for any building.
+This guide says how to build a building from shapes. It is based on 2 examples: the Chichi house that Claude built by hand, and the Buu house. It shows how they were built and turns each step into a rule for any building.
 
-Every number here comes from `example/chichi-house.json`. "My reading" means the JSON does not show it: it is how I read what the JSON does. The guide agrees with `../style/rules.md`.
+The numbers here come from the 2 example plans. "My reading" means the plan does not show it: it is how I read what the plan does.
 
-For now, buildings use plain colors, no textures (see section 7).
+For now, buildings use plain colors, no textures (see section 7). Textures come later.
 
-The example:
+The examples:
 
-- `example/chichi-reference.png`: the image the house was built from.
-- `example/chichi-house.json`: the plan of shapes. It is Claude's hand-built plan with a few color changes so it follows the simple color rules. The shapes are not changed. Section 7 lists the changes.
-- `example/chichi-house.png`: the render in the game of Claude's plan. The changes do not show in it (99.8% of the pixels are the same).
-
-| Reference | Render in the game |
-| --- | --- |
-| ![Chichi house reference](example/chichi-reference.png) | ![Chichi house render](example/chichi-house.png) |
+| | Reference | Render in the game |
+| --- | --- | --- |
+| Chichi house: `example/chichi-house.json` | ![Chichi house reference](example/chichi-reference.png) | ![Chichi house render](example/chichi-house.png) |
+| Buu house: `example/buu-house.json` | ![Buu house reference](example/buu-reference.png) | ![Buu house render](example/buu-house.png) |
 
 The JSON is a plan, the format Infer returns (see `apps/asset-studio/server/shapes.ts`): `description`, `layout`, `shapes`, `textures`. In a plan, `faces` is a list of `{"face", "texture"}`. In `asset.json`, the same faces are a map from face name to slot.
 
-## 0. Keep shapes simple
+## 0. Only the global form
 
-> **The simpler the shape, the better. This rule comes first.**
+> **Build only the global form of the building. Everything else is a texture.**
+
+What matters is the global form: the outline and the volumes, so the building reads like the reference. The details do not matter now. They will be painted in textures later, so the result looks like the reference.
+
+**Make a shape** only for a part that a texture cannot show and that is a simple form:
+
+- the main volumes: walls, roofs, domes, wings, round bodies;
+- parts that stick out of the outline: chimneys, pipes, an entrance block that comes out of a wall, feet;
+- small things that stand alone, away from a wall: a mailbox, a post.
+
+**Do not make a shape** for anything that lies on a surface. It will be a texture on that surface:
+
+- doors, even the door that opens. The door will open and close as a texture;
+- windows, portholes, and window frames;
+- signs and marks;
+- holes and openings: a round door hole, the open end of a tube;
+- steps, frames, trim, bricks, planks, roof tiles, stones.
+
+The test: could it be painted on the surface of a bigger shape and still read right? Then it is a texture, not a shape.
+
+Chichi house:
+
+- Shapes: the walls, the 2 roofs, the ridge board, the 3 chimneys, the dome and its pipe, the white arch block that comes out of the dome, the wing, and the mailbox on its post. The 3 chimneys stick up from the roof, so a texture cannot show them.
+- Textures later: the 2 doors, the 2 windows, the red sign, the steps.
+
+Buu house:
+
+- Shapes: the head dome, the 4 segments, the 2 feet, and the tube on top. The front of the tube is only a flat round side.
+- Textures later: the round door hole on the head (the "eye"), the hole in the front of the tube, and all the small round windows.
+
+This differs from `../style/rules.md`, which makes doors, windows, and posts real shapes and gives each door the role "door". For buildings, follow this guide.
+
+### Keep the shapes simple
 
 This is 3D pixel art. A building is a few plain blocks, not a detailed model. The renderer, the outlines, and the colors give the look.
 
@@ -28,14 +57,11 @@ Do not make:
 
 - rounded edges or bevels,
 - curved roofs,
-- frames or trim built from many pieces,
-- extra shapes for small details.
+- frames or trim built from many pieces.
 
-If a part reads fine as one box, it is one box.
+If a part reads fine as one box, it is one box. The whole Chichi main house is 1 box for the walls (`walls`) and 1 wedge for the roof (`roof`). A base, a ridge board, and 3 chimneys add 5 more boxes. That is all.
 
-The proof is the Chichi house. The whole main house is 1 box for the walls (`walls`) and 1 wedge for the roof (`roof`). A base, a ridge board, 3 chimneys, and 1 window add 6 more boxes. That is all. Each part is one plain color: no bricks, no roof tiles, no planks, no window frame.
-
-Round things stay plain too. A cylinder has 8 flat sides and a dome has 14 sides and 5 bands (`packages/asset-format/src/geometry.ts`). The round top of the dome door is 1 cylinder laid on its side, not a ring of pieces. The sign is 1 red square box.
+Round things stay plain too. A cylinder has 8 flat sides and a dome has 14 sides and 5 bands (`packages/asset-format/src/geometry.ts`).
 
 ## 1. Coordinates
 
@@ -69,7 +95,7 @@ The Chichi `layout` gives each part its range and checks it:
 | Dome | front left | -2.17 to 0.23 | 1.4 to 3.8 | stands whole in front of the main house: 1.4 > 1.2 |
 | Wing | front right | 0.36 to 1.8 | 0.4 to 3.6 | starts right of the dome: 0.36 > 0.23 |
 
-The layout also gives the numbers the shapes need later: the dome center (x -0.97, z 2.6), its radius 1.2 and height 1.68, the roof height (1.15 m over 2.4 m), and the angles of the sign and the dome window.
+The layout also gives the numbers the shapes need later: the dome center (x -0.97, z 2.6), its radius 1.2 and height 1.68, and the roof height (1.15 m over 2.4 m). It ends by saying which details will be textures.
 
 The wing goes into the main house from z 0.4 to 1.2. The layout says so: "that joins the main house". Walls that join may touch. The dome does not touch the main house.
 
@@ -86,26 +112,27 @@ Build in this order. Each step names the Chichi shapes.
 | 3 | Wedge roof | `roof` |
 | 4 | Ridge board | `ridge` |
 | 5 | Chimneys | `chimney-1`, `chimney-2`, `chimney-3` |
-| 6 | Windows | `side-window` |
-| 7 | Second volumes | the dome on its ring: `dome-ring`, `dome`, `dome-pipe`, with `dome-sign` and `dome-window` on it; the wing: `wing-base`, `wing-walls`, `wing-roof` |
-| 8 | Doors with steps | dome door: `arch`, `arch-top`, `dome-door` (`role: "door"`), `door-top`, `dome-step`; wing door: `wing-door` (`role: "door"`), `wing-step` |
-| 9 | Small props | `mailbox-post`, `mailbox` |
+| 6 | Second volumes | the dome on its ring: `dome-ring`, `dome`, `dome-pipe`; the wing: `wing-base`, `wing-walls`, `wing-roof` |
+| 7 | Blocks that stick out | the entrance block of the dome: `arch`, `arch-top` |
+| 8 | Small props | `mailbox-post`, `mailbox` |
 
-In the JSON the dome door comes right after the dome, before the wing. The order of shapes in the file does not change the model.
+The order of shapes in the file does not change the model.
 
 Each part sits on the part under it:
 
 - The walls start at y 0.16, the top of the base.
 - The roof starts at y 1.3, the top of the walls (0.16 + 1.14).
 - The dome starts at y 0.16, the top of its ring. The wing walls start at y 0.16, the top of the wing base.
-- The doors and the arch start at y 0.16, the floor height of the base and the ring.
-- The steps and the mailbox post stand on the ground, at y 0.
+- The arch starts at y 0.16, the floor height of the ring.
+- The mailbox post stands on the ground, at y 0.
 
 A second volume (the dome, the wing) gets its own base, like the main house.
 
+The stone base: a building with walls, like the Chichi house, stands on a low stone base (`rules.md`). A round building that sits on the ground in its reference, like the Buu house, gets no base. Follow the reference.
+
 ## 4. Sizes
 
-All sizes are measured from the JSON.
+All sizes are measured from the Chichi plan.
 
 ### Base
 
@@ -140,32 +167,11 @@ All sizes are measured from the JSON.
 - `chimney-1` runs from z -0.64 to -0.32. The roof there is at y 1.946 and 2.198. The chimney bottom is at 1.815: 0.13 below the low edge. Its top is at 2.565: 0.37 above the high edge. `chimney-2` is the same on the front slope.
 - `chimney-3` stands near the ridge: its bottom is 0.065 below the low edge, and its top (2.933) is 0.43 above the ridge board.
 
-### Doors
-
-- Dome door (`dome-door`): a box 0.68 × 0.8, with a half disc of radius 0.34 on top (`door-top`).
-- It stands in a white arch (`arch`) 0.84 × 0.8 × 0.42, with a half disc of radius 0.42 on top (`arch-top`). The arch is 0.08 wider than the door on each side.
-- Wing door (`wing-door`): a box 0.5 × 0.86.
-- Both doors are 0.06 thick.
-- How far a door stands out: the dome door runs from z 3.89 to 3.95 and the arch front is at 3.89, so it stands 0.06 out. The wing door runs from z 3.59 to 3.65 and the wing wall front is at 3.6, so it stands 0.05 out and 0.01 in.
-- Both doors start at y 0.16, on the base or the ring.
-
-### Steps
-
-- 0.1 high, on the ground. A step is lower than the base (0.16).
-- 0.36 deep (dome) and 0.5 deep (wing).
-- Wider than the door: 1.0 for the 0.68 door (0.16 more on each side), 0.9 for the 0.5 door (0.2 more on each side).
-- A step touches what is behind it. `dome-step` starts at z 3.92, 0.03 under the door front (3.95). `wing-step` starts at z 3.65, 0.02 under the front of the wing base (3.67).
-
-### Windows and flat parts
-
-- `side-window`: 0.46 wide, 0.36 high, 0.1 thick, on the left wall. The wall face is at x -1.8 and the window runs from x -1.88 to -1.78: 0.08 out and 0.02 in. Its bottom is at y 0.58.
-- `dome-window`: 0.74 × 0.5, 0.05 thick.
-- `dome-sign`: 0.52 × 0.52, 0.04 thick.
-
 ### Other parts
 
 - `dome`: 2.4 wide and deep, 1.68 high. A true half-sphere would be 1.2 high; this dome is taller.
 - `dome-pipe`: 0.2 wide, 0.52 high. Its bottom is at y 1.74 and the dome top at 1.84, so it sinks 0.1 into the dome.
+- Entrance block of the dome: a white box (`arch`) 0.84 × 0.8 × 0.42 with a half disc of radius 0.42 on top (`arch-top`). It comes 0.09 out of the front of the dome (front at z 3.89, dome front at 3.8). The door on it will be a texture.
 - Mailbox: a post 0.08 × 0.6 × 0.08 and a box 0.24 × 0.2 × 0.3 on top of it, at y 0.6. 0.8 high in all.
 
 ### Compared with rules.md
@@ -173,7 +179,7 @@ All sizes are measured from the JSON.
 | rules.md | Chichi |
 | --- | --- |
 | Walls 1.2 to 1.4 m high | 1.3 (main) and 1.22 (wing), from the ground. The wall boxes alone are 1.14 and 1.06. My reading: rules.md counts from the ground, base included. |
-| A door about 0.6 × 0.85 m | 0.5 × 0.86 (wing). 0.68 × 0.8 plus a round top of radius 0.34 (dome). |
+| A door about 0.6 × 0.85 m | Not a shape now. Use this size when the door is painted. |
 | A small house about 3.6 × 2.4 m | Main walls 3.6 × 2.4. |
 | Roofs hang over by about 0.25 m | 0.26 (main), 0.2 (wing). |
 | A thin ridge board | 0.1 high, 0.18 wide, on the main roof only. |
@@ -181,13 +187,13 @@ All sizes are measured from the JSON.
 
 ## 5. Shape types
 
-| Type | Faces | Use it for | In Chichi |
-| --- | --- | --- | --- |
-| box | front, back, left, right, top, bottom | walls, bases, chimneys, windows, doors, steps, signs, posts | 18 |
-| cylinder | side, top, bottom (8 flat sides) | round bases, pipes, round tops (laid on its side) | 4: `dome-ring`, `dome-pipe`, `arch-top`, `door-top` |
-| wedge | front and back (the 2 slopes), left and right (the triangle ends), bottom | gable roofs | 2: `roof`, `wing-roof` |
-| pyramid | front, back, left, right, bottom | not in Chichi. My reading: roofs with 4 slopes, pointed tops | 0 |
-| dome | side, bottom (14 sides, 5 bands) | round houses. Width, depth, and height may differ | 1: `dome` |
+| Type | Faces | Use it for | In Chichi | In Buu |
+| --- | --- | --- | --- | --- |
+| box | front, back, left, right, top, bottom | walls, bases, chimneys, entrance blocks, posts | 11 | 0 |
+| cylinder | side, top, bottom (8 flat sides) | round bases, pipes, round tops and flat round ends (laid on its side) | 3: `dome-ring`, `dome-pipe`, `arch-top` | 1: `tube-rim` |
+| wedge | front and back (the 2 slopes), left and right (the triangle ends), bottom | gable roofs | 2: `roof`, `wing-roof` | 0 |
+| pyramid | front, back, left, right, bottom | My reading: roofs with 4 slopes, pointed tops | 0 | 0 |
+| dome | side, bottom (14 sides, 5 bands) | round houses and round bodies. Width, depth, and height may differ | 1: `dome` | 11 |
 
 ### A wedge with its gable to the front
 
@@ -205,58 +211,29 @@ With `tilt: 90` a cylinder lies on its side. Its flat faces look to the front an
 
 - `arch-top`: size [0.84, 0.43, 0.84], position y 0.96, z 3.47, tilt 90. It is a disc of radius 0.42, centered at y 0.96 (the top of the arch box), from z 3.47 (the back of the arch box) to 3.90.
 - Its lower half is inside the arch box, so only the upper half shows: a round top.
-- `door-top` does the same on the door: radius 0.34, at y 0.96, from z 3.89 to 3.96.
-- Each disc is 0.01 deeper than the box under it (0.43 vs 0.42, 0.07 vs 0.06), so its front stands just in front of the box front. My reading: so the 2 fronts do not lie in the same plane.
+- It is 0.01 deeper than the box under it (0.43 vs 0.42), so its front stands just in front of the box front. My reading: so the 2 fronts do not lie in the same plane.
 
-## 6. Things on curved surfaces
+## 6. Round bodies lying down
 
-The sign and the window lie flat on the dome and stand out of it. Their front face must point straight out of the dome. `rotationY` and `tilt` do this.
+The Buu house shows how to build round forms that lie down, such as the tube on its head.
 
-After a turn r and a tilt t, the front face of a box points along:
+### Laying a shape along a direction
 
-(sin r × cos t, −sin t, cos r × cos t)
+With `tilt: 90`, the height of a cylinder or a dome lies flat. Its axis then points along (sin r, 0, cos r), where r is `rotationY`. To lay it along a direction u seen from above, use r = atan2(u.x, u.z).
 
-This direction must be the direction straight out of the dome at that point (the normal).
+The Buu tube runs to the back right, 30° from x: u = (0.866, 0, -0.5), so r = 120. A dome laid with `rotationY: 120` points its round top to the back right. With `rotationY: -60` (120 − 180) it points to the front left.
 
-### How to work out the angles
+### An egg shape: 2 domes back to back
 
-The dome: the center of its bottom is (cx, y0, cz) = (-0.972, 0.16, 2.6). R = width / 2 = 1.2. H = height = 1.68.
+2 domes with the same center and the same width, one pointing each way, make an egg. Each half can have its own length. The front and back of the Buu tube are made this way.
 
-Let C be the middle of the box, just out of the dome surface. Then:
+### A flat round end
 
-1. Turn: `rotationY` = atan2(C.x − cx, C.z − cz).
-2. Tilt: the dome is a stretched half-sphere (H is not R), so use its stretched normal.
-   - d = sqrt((C.x − cx)² + (C.z − cz)²), the distance from the center, seen from above.
-   - e = atan( ((C.y − y0) / H²) / (d / R²) ), the angle of the normal above the ground.
-   - `tilt` = −e.
-   - On a true half-sphere (H = R), e is the angle of C above the base, seen from the center.
-3. Position: `position` is the center of the bottom of the box, not its middle. Go back from C by half the box height, along the box's own up direction:
-   - up = (sin t × sin r, cos t, sin t × cos r)
-   - `position` = C − (height / 2) × up
+A dome ends in a round point. To cut a round body flat, put a short cylinder (laid the same way) at the end, with its front face where the flat end should be. The tip of the dome must stay inside that cylinder. The Buu tube does this with `tube-rim`: 1.36 wide, its front face is the flat front of the tube. The hole in it will be a texture.
 
-### Check with the JSON
+### A steady swelling
 
-The sign. Its middle is C = (-0.722, 1.566, 3.226).
-
-- C minus the dome center: x 0.25, y 1.406, z 0.626.
-- `rotationY` = atan2(0.25, 0.626) = 21.8.
-- d = 0.674. e = atan((1.406 / 2.8224) / (0.674 / 1.44)) = atan(0.498 / 0.468) = 46.8. So `tilt` = -46.8.
-- up = (-0.271, 0.685, -0.677). `position` = C − 0.26 × up = (-0.652, 1.388, 3.402).
-- The JSON has `rotationY: 21.8`, `tilt: -46.8`, `position: [-0.652, 1.388, 3.402]`.
-
-The dome window. Its middle is C = (-1.997, 0.788, 3.059).
-
-- C minus the dome center: x -1.025, y 0.628, z 0.459.
-- `rotationY` = atan2(-1.025, 0.459) = -65.9.
-- d = 1.123. e = atan((0.628 / 2.8224) / (1.123 / 1.44)) = atan(0.223 / 0.780) = 15.9. So `tilt` = -15.9.
-- up = (0.250, 0.962, -0.112). `position` = C − 0.25 × up = (-2.06, 0.548, 3.087).
-- The JSON has `rotationY: -65.9`, `tilt: -15.9`, `position: [-2.06, 0.548, 3.087]`.
-
-### How far out
-
-In both, C is about 0.01 out of the dome surface. So the back face is just inside the dome (0.008 for the sign, 0.015 for the window) and the front face stands about 0.03 out. The JSON does not show how C was picked. My reading: pick a point on the dome, then move it about 0.01 out along the normal.
-
-Use the same steps for any curved surface: find the normal at the point, then turn and tilt the front face onto it.
+One egg swells fast near its tip, then slowly. To make a body that grows slowly and steadily, like the Buu tube, put 2 eggs one after the other: a thinner one in front and a fatter one behind. Size them so the outline rises with no dip, and keep each tip hidden inside the other egg or the rim. The Buu tube: the outline is 0.63 m (radius) at the front, grows steadily to 0.88 m at two thirds of its length, then ends in a round back.
 
 ## 7. Colors
 
@@ -264,25 +241,28 @@ For now there are no textures. Each texture slot is used only for its plain `col
 
 ### One slot per material
 
+Chichi house:
+
 | Slot | Color | Used on |
 | --- | --- | --- |
-| grey | #b8b4b0 | bases, dome ring, dome pipe, steps |
+| grey | #b8b4b0 | bases, dome ring, dome pipe |
 | cream | #f2dab0 | walls, wing walls |
 | tile | #c47a4a | both roofs: slopes and bottom |
-| wood | #ab7c58 | doors, door top, ridge board, triangle ends of both roofs, mailbox post |
+| wood | #ab7c58 | ridge board, triangle ends of both roofs, mailbox post |
 | white | #f0e8d0 | dome, arch, arch top, chimneys |
-| glass | #6f8fc0 | both windows |
-| red | #c83a3a | sign, mailbox |
+| red | #c83a3a | mailbox |
 
-- One slot per material, not one slot per part. A sign or a window is a box with a material color: the sign is `red`, like the mailbox; both windows are `glass`. This differs from `rules.md`, which gives each sign and window its own slot. That rule is for textures and comes back with them.
+Buu house: 1 slot, `white` (#eeebf5), on every shape.
+
+- One slot per material, not one slot per part.
 - The same material has the same color everywhere.
-- Daylight colors only. The reference is lit by an orange evening light. The plan uses plain day colors: cream #f2dab0, white #f0e8d0, not orange.
+- Daylight colors only. The Chichi reference is lit by an orange evening light. The plan uses plain day colors: cream #f2dab0, white #f0e8d0, not orange.
 - A slot color is the color in the sun. The renderer makes the shade tones.
 
 ### Which face gets which color
 
-- A shape is one color on all its faces: the color of its part. Walls are cream, doors wood, chimneys white, steps grey, windows glass.
-- The bottom gets that color too. Do not use `null`. A tilted shape can show its bottom: the dome sign leans back, so the game camera sees its bottom edge. A `null` face shows the grey fallback color there.
+- A shape is one color on all its faces: the color of its part. Walls are cream, chimneys white, bases grey.
+- The bottom gets that color too. Do not use `null`. A shape laid on its side shows its bottom: the flat front of the Buu tube is the `bottom` face of `tube-rim`. A `null` face shows the grey fallback color there.
 - A roof wedge is the only shape with 2 colors: its slopes and bottom are `tile`, its triangle ends (`left`, `right`) are `wood`. This is the same for every roof.
 
 Why wood on every triangle end: the camera looks straight along -z and never turns. A roof with its ridge along x has its triangle ends looking left and right, so the camera never sees them. Only a turned roof, like the wing roof, shows a triangle end, and there the plan uses wood. So one rule gives the same picture.
@@ -291,42 +271,36 @@ Why wood on every triangle end: the camera looks straight along -z and never tur
 
 The schema still needs `widthM`, `heightM`, and `description` on each slot. They do not change a plain color. Keep them ready for when textures come: `widthM` × `heightM` is the size of the main face the slot covers (cream 3.6 × 1.2, about the front wall), and `description` says what to paint.
 
-### What changed from Claude's plan
+### What changed from Claude's Chichi plan
 
-Claude's hand-built plan had 2 more slots and a few other face choices. The example now follows the rules above. No shape was changed.
-
-| Change | Seen in the game camera? |
+| Change | Why |
 | --- | --- |
-| `description`: "Goku's house" became "Chichi's house". | No. |
-| Main roof triangle ends: `cream` became `wood`. | No. They look left and right. |
-| Slot `sign` (#c83a3a) became `red` (#c83a3a). The slot was removed. | No. Same color. |
-| Slot `dome-window` (#6f8fc0) became `glass` (#6f8fc0). The slot was removed. | No. Same color. |
-| Dome window edges: `white` became `glass`. | Yes: its thin edges. |
-| Every `null` face got the color of its part. | Only the bottom edge of the sign. It was the grey fallback; it is now red. |
+| `description`: "Goku's house" became "Chichi's house". | The right name. |
+| Main roof triangle ends: `cream` became `wood`. | One rule for every roof. The camera never sees these faces. |
+| Every `null` face got the color of its part. | A `null` face that shows is grey. |
+| The 2 doors, the round door top, the 2 windows, the sign, and the 2 steps were removed, with the `sign`, `dome-window`, and `glass` slots. | Only the global form. They will be textures. |
 
-Check: both plans were drawn in flat colors from the game camera, with `geometry.ts`. 99.8% of the house pixels are the same. The 0.2% that differ are the dome window edges and the sign's bottom edge.
+The plan went from 25 to 17 shapes.
 
 ## 8. Limits
 
-- At most 30 shapes (`MAX_SHAPES` in `schema.ts`). Chichi uses 25: 18 boxes, 4 cylinders, 2 wedges, 1 dome.
+- At most 30 shapes (`MAX_SHAPES` in `schema.ts`). Chichi uses 17: 11 boxes, 3 cylinders, 2 wedges, 1 dome. Buu uses 12: 11 domes and 1 cylinder.
 - Only 5 shape types: box, cylinder, wedge, pyramid, dome.
-- No surface details as shapes: no bricks, planks, roof tiles, stones, cracks, or window frames. For now they are not shown at all; later they will be painted in textures. The Chichi side window is 1 blue box. The sign is 1 red box.
-- Doors, windows, chimneys, and posts are real small shapes. Chichi has 2 doors, 2 windows, 3 chimneys, 1 post, and 1 sign.
-- Every door is a real shape with `role: "door"`. Chichi has 2: `dome-door` and `wing-door`. All other shapes have `role: null`, the round door top (`door-top`) too.
+- No doors, windows, signs, holes, steps, or surface details as shapes. They will be textures.
+- No shape has `role: "door"` for now. The door will open and close as a texture.
 
 ## 9. Checklist
 
 Check a new building against this list before it is done.
 
-1. Could any part be a simpler shape, or fewer shapes? Then make it simpler.
-2. There is a one-sentence `description` and a `layout` with every part, its x and z range, and checks with numbers.
-3. The front faces +z. The ground is at y = 0. Each `position` is the center of the bottom of its shape.
-4. Every part sits on the part under it. Nothing floats. Chimneys and pipes sink into their roof or dome.
-5. The base is 0.16 high and sticks out 0.07 past the walls. Each second volume has its own base.
-6. Walls are 1.2 to 1.4 m high from the ground. Roofs hang over by about 0.2 to 0.26 m. Only the main roof has a ridge board.
-7. Parts side by side do not cut into each other. Only walls that join and small things on a surface touch.
-8. Every door is a real shape with `role: "door"`, about 0.06 thick, standing out of its wall, with a step 0.1 high in front.
-9. Things on a dome are turned and tilted onto the dome normal and stand about 0.03 out of it.
-10. One slot per material, plain colors, daylight colors.
-11. Each shape is one color on all its faces, bottom too, with no `null`. Roofs: slopes and bottom `tile`, triangle ends `wood`.
-12. 30 shapes or fewer, of the 5 types only.
+1. Is every shape part of the global form? Could a part be painted on a bigger shape instead? Then remove it: it will be a texture.
+2. Could any part be a simpler shape, or fewer shapes? Then make it simpler.
+3. There is a one-sentence `description` and a `layout` with every part, its x and z range, and checks with numbers. The layout says which details will be textures.
+4. The front faces +z. The ground is at y = 0. Each `position` is the center of the bottom of its shape.
+5. Every part sits on the part under it. Nothing floats. Chimneys and pipes sink into their roof or dome.
+6. A building with walls has a base 0.16 high, 0.07 past the walls, and each second volume has its own. A round building on the ground in its reference has none.
+7. Walls are 1.2 to 1.4 m high from the ground. Roofs hang over by about 0.2 to 0.26 m. Only the main roof has a ridge board.
+8. Parts side by side do not cut into each other. Only walls that join, and parts that grow out of each other (segments, eggs), touch.
+9. One slot per material, plain colors, daylight colors.
+10. Each shape is one color on all its faces, bottom too, with no `null`. Roofs: slopes and bottom `tile`, triangle ends `wood`.
+11. 30 shapes or fewer, of the 5 types only.
