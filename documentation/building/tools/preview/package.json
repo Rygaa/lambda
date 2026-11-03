@@ -1,0 +1,10 @@
+{
+  "name": "building-preview",
+  "private": true,
+  "description": "Renders a building plan in the game style and from any angle, to compare it with its reference image.",
+  "dependencies": {
+    "esbuild": "0.25.0",
+    "three": "0.187.0",
+    "zod": "4.5.4"
+  }
+}

@@ -11,6 +11,16 @@ It is based on 2 examples. Look at them first:
 
 A building is a plan: a JSON file with `description`, `layout`, `shapes`, and `textures` (the format Infer returns, see `apps/asset-studio/server/shapes.ts`).
 
+What is in this folder:
+
+| Path | What it is |
+| --- | --- |
+| `README.md` | this guide |
+| `example/` | the 2 example plans, their reference images, their game renders, and comparison images (`*-compare-*.png`) |
+| `example/build-buu-house.py` | the script that builds `buu-house.json` from its measures |
+| `tools/preview/` | the tool that draws a plan, to compare it with the reference (see its `README.md`) |
+| `new-building-prompt.md` | a prompt to give a new chat, to build a new building from a reference image |
+
 ## 1. The 3 main rules
 
 ### Rule 1: only the global form
@@ -75,7 +85,7 @@ The whole Chichi main house is 1 box for the walls and 1 wedge for the roof, plu
    5. second volumes (a dome, a wing, segments), each with its own base if the main part has one;
    6. blocks that stick out;
    7. small things that stand alone.
-5. **Compare with the reference.** Draw the building from the same angle as the reference and put the two side by side. Check the length, the height, the depth, the outline of each part, and where it is highest. Fix what is different and draw again. Repeat until it matches. Then check the game view and the other sides: nothing floats, nothing cuts through.
+5. **Compare with the reference.** Draw the building from the same angle as the reference and put the two side by side, with `tools/preview` (`view`, then `compare`). Check the length, the height, the depth, the outline of each part, and where it is highest. Fix what is different and draw again. Repeat until it matches. Then check the game view (`game`) and the other sides (`turns`): nothing floats, nothing cuts through. The Buu house shows what to aim for: `example/buu-compare-side.png` and `example/buu-compare-game.png`.
 6. **Go through the checklist** (section 9).
 
 ## 3. Write the text first
