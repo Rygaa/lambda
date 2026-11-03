@@ -44,7 +44,7 @@ Chichi house:
 
 Buu house:
 
-- Shapes: the head dome, the 4 segments, the 2 feet, and the tube on top. The front of the tube is only a flat round side.
+- Shapes: the head dome, the 4 segments, the 2 feet, and the tube on top. The front of the tube is cut flat, like a sausage cut with a knife: a full flat face, not hollow, with nothing coming out.
 - Textures later: the round door hole on the head (the "eye"), the hole in the front of the tube, and all the small round windows.
 
 This differs from `../style/rules.md`, which makes doors, windows, and posts real shapes and gives each door the role "door". For buildings, follow this guide.
@@ -190,10 +190,10 @@ All sizes are measured from the Chichi plan.
 | Type | Faces | Use it for | In Chichi | In Buu |
 | --- | --- | --- | --- | --- |
 | box | front, back, left, right, top, bottom | walls, bases, chimneys, entrance blocks, posts | 11 | 0 |
-| cylinder | side, top, bottom (8 flat sides) | round bases, pipes, round tops and flat round ends (laid on its side) | 3: `dome-ring`, `dome-pipe`, `arch-top` | 1: `tube-rim` |
+| cylinder | side, top, bottom (8 flat sides) | round bases, pipes, round tops (laid on its side) | 3: `dome-ring`, `dome-pipe`, `arch-top` | 0 |
 | wedge | front and back (the 2 slopes), left and right (the triangle ends), bottom | gable roofs | 2: `roof`, `wing-roof` | 0 |
 | pyramid | front, back, left, right, bottom | My reading: roofs with 4 slopes, pointed tops | 0 | 0 |
-| dome | side, bottom (14 sides, 5 bands) | round houses and round bodies. Width, depth, and height may differ | 1: `dome` | 11 |
+| dome | side, bottom (14 sides, 5 bands) | round houses and round bodies, and the flat cut of a round body. Width, depth, and height may differ | 1: `dome` | 12 |
 
 ### A wedge with its gable to the front
 
@@ -229,18 +229,20 @@ The Buu tube runs to the back right, 47° from x, and its back end rises 7°. A 
 
 2 domes with the same center and the same width, one pointing each way, make an egg. Each half can have its own length: a short half is blunt, a long half is pointed.
 
-### A flat round end
+### A flat cut
 
-A dome ends in a round point. To cut a round body flat, put a short cylinder (laid the same way) at the end, with its front face where the flat end should be. The tip of each dome must stay inside that cylinder. The Buu tube does this with `tube-rim`: its front face is the flat front of the tube, 1.0 wide. The hole in it will be a texture.
+A dome ends in a round point. To cut a round body flat, as if with a knife, do not add a piece that shows. Lay one more dome pointing back into the body, with its flat base where the cut should be. Its base is the cut: a full flat face, not hollow. The rest of that dome is hidden inside the body. The tip of each egg must stay just behind the cut.
+
+The Buu tube does this with `tube-cut`: its base is the flat front of the tube, 1.06 wide (0.62 of the middle, the outer edge of the opening on the reference). The opening will be a texture on it.
 
 ### A body fattest in the middle, with a flat front
 
-One egg alone, cut flat, leaves a long straight piece of the cylinder showing at the front. To make the front round out quickly, as on the Buu tube, use 2 eggs:
+One egg alone is thin near its tip, so its front would look like a bottle neck behind the cut. On the reference, the body is nearly full right behind the cut. To make that, use 2 eggs:
 
-- a main egg, fattest in the middle of the body. Its back half is the round back end. Its front tip reaches the flat front, inside the cylinder.
+- a main egg, fattest in the middle of the body. Its back half is the round back end. Its front tip stops just behind the cut.
 - a short front egg, a little thinner. Its blunt front half rounds the body down to the flat front. Its back tip stays inside the main egg.
 
-Check the outline along the body: it must rise from the flat front to the middle with no dip, then fall to the round back. The Buu tube (radius): 0.5 at the flat front, 0.69 at 0.5 m, 0.85 in the middle (2.1 m), then the round back ends at 3.9 m.
+Check the outline along the body: it must rise from the flat front to the middle with no dip, then fall to the round back. The Buu tube (radius): 0.53 at the cut, 0.78 at 0.4 m, 0.85 in the middle (2.1 m), then the round back ends at 3.9 m.
 
 ### Sitting on a curved part
 
@@ -273,7 +275,7 @@ Buu house: 1 slot, `white` (#eeebf5), on every shape.
 ### Which face gets which color
 
 - A shape is one color on all its faces: the color of its part. Walls are cream, chimneys white, bases grey.
-- The bottom gets that color too. Do not use `null`. A shape laid on its side shows its bottom: the flat front of the Buu tube is the `bottom` face of `tube-rim`. A `null` face shows the grey fallback color there.
+- The bottom gets that color too. Do not use `null`. A shape laid on its side shows its bottom: the flat cut of the Buu tube is the `bottom` face of `tube-cut`. A `null` face shows the grey fallback color there.
 - A roof wedge is the only shape with 2 colors: its slopes and bottom are `tile`, its triangle ends (`left`, `right`) are `wood`. This is the same for every roof.
 
 Why wood on every triangle end: the camera looks straight along -z and never turns. A roof with its ridge along x has its triangle ends looking left and right, so the camera never sees them. Only a turned roof, like the wing roof, shows a triangle end, and there the plan uses wood. So one rule gives the same picture.
@@ -295,7 +297,7 @@ The plan went from 25 to 17 shapes.
 
 ## 8. Limits
 
-- At most 30 shapes (`MAX_SHAPES` in `schema.ts`). Chichi uses 17: 11 boxes, 3 cylinders, 2 wedges, 1 dome. Buu uses 12: 11 domes and 1 cylinder.
+- At most 30 shapes (`MAX_SHAPES` in `schema.ts`). Chichi uses 17: 11 boxes, 3 cylinders, 2 wedges, 1 dome. Buu uses 12, all domes.
 - Only 5 shape types: box, cylinder, wedge, pyramid, dome.
 - No doors, windows, signs, holes, steps, or surface details as shapes. They will be textures.
 - No shape has `role: "door"` for now. The door will open and close as a texture.
