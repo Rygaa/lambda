@@ -2,12 +2,13 @@
 
 This guide says how to build a building from simple shapes, starting from a reference image.
 
-It is based on 2 examples. Look at them first:
+It is based on 3 examples. Look at them first:
 
 | | Reference | Render in the game |
 | --- | --- | --- |
 | Chichi house: `example/chichi-house.json` (17 shapes) | ![Chichi house reference](example/chichi-reference.png) | ![Chichi house render](example/chichi-house.png) |
 | Buu house: `example/buu-house.json` (13 shapes) | ![Buu house reference](example/buu-reference.png) | ![Buu house render](example/buu-house.png) |
+| Capsule Corp ship: `example/capsule-ship.json` (18 shapes) | ![Capsule Corp ship reference](example/capsule-reference.png) | ![Capsule Corp ship render](example/capsule-ship.png) |
 
 A building is a plan: a JSON file with `description`, `layout`, `shapes`, and `textures` (the format Infer returns, see `apps/asset-studio/server/shapes.ts`).
 
@@ -16,10 +17,13 @@ What is in this folder:
 | Path | What it is |
 | --- | --- |
 | `README.md` | this guide |
-| `example/` | the 2 example plans, their reference images, their game renders, and comparison images (`*-compare-*.png`) |
-| `example/build-buu-house.py` | the script that builds `buu-house.json` from its measures |
+| `example/` | the 3 example plans, their reference images, their game renders, and comparison images (`*-compare-*.png`) |
+| `example/build-buu-house.py`, `example/build-capsule-ship.py` | the scripts that build `buu-house.json` and `capsule-ship.json` from their measures |
 | `tools/preview/` | the tool that draws a plan, to compare it with the reference (see its `README.md`) |
+| `tools/scene/` | the tool that draws several plans on grass with characters (see its `README.md`) |
+| `textured/` | the 3 examples with their textures, and the scripts that paint them with Infer (see its `README.md`) |
 | `new-building-prompt.md` | a prompt to give a new chat, to build a new building from a reference image |
+| `raditz-pod-prompt.md` | the same prompt, for Raditz's space pod |
 
 ## 1. The 3 main rules
 

@@ -1,0 +1,85 @@
+diff -ru vendor/packages/renderer/src/PixelRenderer.ts b/packages/renderer/src/PixelRenderer.ts
+--- a/packages/renderer/src/PixelRenderer.ts	2026-11-02 06:46:37.000000000 +0000
++++ b/packages/renderer/src/PixelRenderer.ts	2026-11-04 10:59:17.011651866 +0000
+@@ -220,7 +220,7 @@
+   }
+ 
+   private frame(time: number) {
+-    const seconds = this.lastTime ? Math.min((time - this.lastTime) / 1000, 0.1) : 0;
++    const seconds = (globalThis as any).__freeze ? 0 : this.lastTime ? Math.min((time - this.lastTime) / 1000, 0.1) : 0;
+     this.lastTime = time;
+     this.sceneTime += seconds;
+     if (this.clouds) this.shared.uCloudOffset.value.addScaledVector(CLOUD_WIND, seconds);
+@@ -230,6 +230,7 @@
+ 
+   private render() {
+     const error = this.placeCamera();
++    (this as any).snapError = error;
+     const renderer = this.renderer;
+     renderer.setClearColor(0x000000, 0);
+ 
+@@ -252,7 +253,7 @@
+     renderer.render(this.postScene, this.screenCamera);
+     this.dust.uniforms.uTime!.value = this.sceneTime;
+     this.dust.uniforms.uBoxMin!.value.set(this.target.x - 15, 0.15, this.target.z - 15);
+-    renderer.render(this.dustScene, this.camera);
++    if (!(globalThis as any).__noDust) renderer.render(this.dustScene, this.camera);
+ 
+     // The image is moved back by the snap error. One spare pixel sits on each side.
+     const scale = this.pixelScale;
+diff -ru vendor/packages/renderer/src/materials.ts b/packages/renderer/src/materials.ts
+--- a/packages/renderer/src/materials.ts	2026-11-02 06:46:37.000000000 +0000
++++ b/packages/renderer/src/materials.ts	2026-11-04 22:45:04.213368641 +0000
+@@ -59,6 +59,7 @@
+       uMap: { value: source.map ?? null },
+       uUseMap: { value: source.map ? 1 : 0 },
+       uRepeat: { value: source.map ? source.map.repeat : new THREE.Vector2(1, 1) },
++      uChar: { value: 0 },
+     });
+   }
+ 
+diff -ru vendor/packages/renderer/src/shaders.ts b/packages/renderer/src/shaders.ts
+--- a/packages/renderer/src/shaders.ts	2026-11-02 06:46:37.000000000 +0000
++++ b/packages/renderer/src/shaders.ts	2026-11-04 22:45:04.212872010 +0000
+@@ -107,6 +107,7 @@
+ uniform sampler2D uMap;
+ uniform float uUseMap;
+ uniform vec2 uRepeat;
++uniform float uChar;   // 1 on characters: they get their silhouette outline, not the fold lines
+ in vec3 vW; in vec3 vN; in vec2 vUv; in float vDepth;
+ void main() {
+   vec3 N = normalize(vN);
+@@ -117,7 +118,7 @@
+   vec3 albedo = uUseMap > 0.5 ? texture(uMap, vUv * uRepeat).rgb : uColor;
+   gData = vec4(lv, ${MID.solid.toFixed(1)}, N.y, 0.0);
+   gNorm = vec4(normalize(mat3(viewMatrix) * N), vDepth);
+-  gAlb = vec4(albedo, 1.0);
++  gAlb = vec4(albedo, 1.0 - 0.5 * uChar);
+ }
+ `;
+ 
+@@ -332,13 +333,13 @@
+     nsum += (1.0 - dot(n, q.xyz)) * di * ni;
+   }
+   float dei = dsum > 0.22 ? 1.0 : 0.0;
+-  float nei = nsum > 0.05 ? 1.0 : 0.0;
++  float nei = nsum > 0.05 && A.a > 0.75 ? 1.0 : 0.0;   // no fold lines on characters (A.a 0.5)
+   float edge = max(dei, nei) * isMid(mid, ${MID.solid.toFixed(1)});
+   // the outline around the shape is always dark; inner edges get a highlight where the face is lit
+   vec3 dark = toneShade(A.rgb) * (0.60 - 0.25 * dei);
+   vec3 edgeCol = mix(dark, toneHi(A.rgb), lit * (1.0 - dei));
+   col = mix(col, edgeCol, edge);
+-
++${(globalThis as any).__DBG === 1 ? "  col = baseColor(lv, mid, up, D.w, A);\n" : ""}${(globalThis as any).__DBG === 2 ? "  col = vec3(0.6) * baseColor(lv, mid, up, D.w, A); if (dei * isMid(mid, " + MID.solid.toFixed(1) + ") > 0.5) col = vec3(1.0, 0.0, 0.0); else if (nei * isMid(mid, " + MID.solid.toFixed(1) + ") > 0.5) col = vec3(0.0, 0.2, 1.0);\n" : ""}${(globalThis as any).__DBG === 3 ? "  col = A.rgb;\n" : ""}${(globalThis as any).__DBG === 4 ? "  col = vec3(0.6) * baseColor(lv, mid, up, D.w, A); { float far = 0.0; for (int i = 0; i < 4; i++) { vec4 q = texelFetch(tNorm, clamp(p + O4[i], ivec2(0), hi), 0); if (q.w > 0.0 && d - q.w > 0.1) far = max(far, d - q.w); } if (far > 0.0) col = vec3(0.0, 1.0, 0.0); }\n" : ""}${(globalThis as any).__DBG === 5 ? "  col = n * 0.5 + 0.5;\n" : ""}
+   // water: flat tone, and a 1px foam line where it meets something at its own level
+   if (isMid(mid, ${MID.water.toFixed(1)}) > 0.5) {
+     col = lv > 0.5 ? ${vec3(WATER.mid[0])} : ${vec3(WATER.mid[1])};
+@@ -370,7 +371,7 @@
+   ray = floor(ray * 24.0) / 24.0;
+   col += vec3(1.0, 0.95, 0.72) * ray;
+ 
+-  outColor = vec4(linToSrgb(col), 1.0);
++  outColor = vec4(linToSrgb(col), 1.0);${(globalThis as any).__KEY ? " if (mid < 0.5) outColor = vec4(1.0, 0.0, 1.0, 1.0);" : ""}
+ }
+ `;
+ 

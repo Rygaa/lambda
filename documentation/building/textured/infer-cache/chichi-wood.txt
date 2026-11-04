@@ -1,0 +1,14 @@
+Paint one flat texture for a top-down 3D pixel art game.
+It covers 0.7 x 0.9 meters of "Chichi's house, a cream brick house with a brown tile roof, a white dome house in front, and a wing on the right".
+What to paint: Brown wooden planks standing vertically, with thin darker gaps between them.
+Main color: #ab7c58.
+The reference image shows the object. Copy the material of this surface from it, but in plain white daylight: never copy the sunset, night, or colored light of the image.
+
+Rules:
+- A straight-on flat view of the surface that fills the whole image, edge to edge. No perspective, no background, no border, no frame, no text.
+- The image will be stretched to a 0.7:0.9 area, so place details for that shape.
+- Simple pixel art: big flat color areas, clear shapes, few colors.
+- Most of the image is the main color. Joints, lines, and marks are one or two steps lighter or darker in the same hue.
+- A material repeats, so its opposite edges must meet with no seams, and it has no signs or one-time marks.
+- No painted light, no shadows, no outlines, no gradients. The game adds light and outlines.
+- The final texture is only 31 x 39 pixels, so only big details survive.
