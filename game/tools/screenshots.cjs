@@ -1,7 +1,7 @@
 // Takes the test screenshots with 2 clients in Chromium (Playwright). The server must run with LAMBDA_DEBUG=1
 // (teleport) on SERVER (default localhost:8080):
 //   LAMBDA_DEBUG=1 node dist/server.js &
-//   node tools/screenshots.cjs <out dir> [steps...]     steps: buildings mountain walk attack monster kill items pet players overview
+//   node tools/screenshots.cjs <out dir> [steps...]     steps: buildings mountain walk attack monster kill items loot pet players overview
 const { chromium } = require("playwright");
 const path = require("path");
 const fs = require("fs");
@@ -239,6 +239,76 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
     }
     await sleep(4000);
     log("the pet picked up:", JSON.stringify(inv0), "->", JSON.stringify(await a.evaluate(() => window.__lambda.inventory())));
+  }
+
+  if (want("loot")) {
+    // a monster killed: the shot as soon as its items are on the ground, then the pet on its way to pick them up
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const m0 = await me(a);
+      const all = (await ents(a)).filter((e) => e.kind === "monster" && Math.hypot(e.x, e.z) > 14);
+      const alone = all.filter((p) => all.every((q) => q === p || Math.hypot(p.x - q.x, p.z - q.z) > 8));
+      const list = alone.length ? alone : all;
+      list.sort((p, q) => Math.hypot(p.x - m0.x, p.z - m0.z) - Math.hypot(q.x - m0.x, q.z - m0.z));
+      const target = list[0];
+      await teleport(a, target.x + 1.2, target.z + 0.8);
+      let dead = false;
+      for (let k = 0; k < 40 && !dead; k++) {
+        const now = await ents(a);
+        const mm = now.find((e) => e.id === target.id);
+        if (!mm || mm.anim === "dead") { dead = true; break; }
+        const m = await me(a);
+        if (m && Math.hypot(m.x - mm.x, m.z - mm.z) > 6) await teleport(a, mm.x + 1.2, mm.z + 0.8);
+        await walkTo(a, mm.x, mm.z, 1.3, 3000);
+        const mp = await me(a);
+        const d = Math.hypot(mm.x - mp.x, mm.z - mp.z) || 1;
+        await a.evaluate(([x, z]) => window.__lambda.setMove(x, z), [(mm.x - mp.x) / d, (mm.z - mp.z) / d]);
+        await sleep(80);
+        await a.evaluate(() => window.__lambda.setMove(0, 0));
+        await a.evaluate(() => window.__lambda.attack());
+        // poll often: the items must be caught before the pet takes them
+        for (let w = 0; w < 14; w++) {
+          const items = await a.evaluate(() => window.__lambda.entities().filter((e) => e.kind === "item").length);
+          if (items) { dead = true; break; }
+          await sleep(50);
+        }
+      }
+      const caught = await a.evaluate(() => {
+        const L = window.__lambda;
+        const items = L.entities().filter((e) => e.kind === "item");
+        if (items.length) L.freeze(true);
+        return items.length;
+      });
+      if (!caught) { log("loot: no item caught, again"); continue; }
+      await a.setViewportSize(VIEW);
+      await sleep(2500);
+      await a.screenshot({ path: path.join(OUT, "loot-on-ground.png"), timeout: 180000 });
+      log("saved loot-on-ground.png", caught, "items");
+      await a.setViewportSize(SMALL);
+      await a.evaluate(() => window.__lambda.freeze(false));
+      // the pet near an item
+      for (let k = 0; k < 200; k++) {
+        const near = await a.evaluate(() => {
+          const L = window.__lambda;
+          const list = L.entities();
+          const mine = list.find((e) => e.kind === "pet" && e.owner === L.localId);
+          const items = list.filter((e) => e.kind === "item");
+          const ok = mine && items.some((i) => Math.hypot(i.x - mine.x, i.z - mine.z) < 1.6);
+          if (ok) L.freeze(true);
+          return !!ok;
+        });
+        if (near) {
+          await a.setViewportSize(VIEW);
+          await sleep(2500);
+          await a.screenshot({ path: path.join(OUT, "loot-pet-pickup.png"), timeout: 180000 });
+          log("saved loot-pet-pickup.png");
+          await a.setViewportSize(SMALL);
+          await a.evaluate(() => window.__lambda.freeze(false));
+          break;
+        }
+        await sleep(20);
+      }
+      break;
+    }
   }
 
   if (want("pet")) {
