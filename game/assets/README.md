@@ -21,8 +21,10 @@ assets/
 │   └── pet/            pet.json: the pet cube that follows its player and picks up items
 ├── monsters/
 │   └── red-cube/       monster.json: the red cube (size, color, life, speed, ranges, damage, how many)
-└── items/
-    └── loot-cubes.json what a monster drops: small cubes of color
+├── items/
+│   └── loot-cubes.json what a monster drops: small cubes of color
+└── voxels/
+    └── voxels.json     how everything is drawn in voxels (size, light, chunks)
 ```
 
 ## Why this layout
@@ -45,7 +47,7 @@ assets/
 | `buildings/raditz-pod` | `documentation/building/example/raditz-pod.json` (drawn by `buildPod`, copied from `tools/scene/src/main.ts`) |
 | `terrain/ground-cover/` | `packages/renderer/assets/` of the `gpt` branch |
 | `characters/player/` | `documentation/building/tools/scene/web/char/` (the FlyFF male: parts, `mvr_male.glb` clips, textures) |
-| `terrain.json`, `rocks.json`, `monster.json`, `loot-cubes.json`, `character.json`, `pet.json` | written for the game |
+| `terrain.json`, `rocks.json`, `monster.json`, `loot-cubes.json`, `character.json`, `pet.json`, `voxels.json` | written for the game |
 
 ## The files
 
@@ -66,3 +68,7 @@ assets/
   "Ramasser" button), `items` (each kind: id, name, color, the stat it adds and how much), `caps` (max speed, max
   reach, max attack speed bonus).
 - `pet.json`: the pet cube: size, color, speed, how far behind its player it walks, how far it looks for items.
+- `voxels.json`: `voxelsPerMeter` (43.6: one voxel is one game pixel), `surfaceNormals` (each voxel is lit with the
+  normal of the surface it comes from, so the look stays the one of the meshes; `false`: each cube face has its own
+  light), `chunkMeters` (the size of the terrain chunks made around the camera). Only the look: the map and the
+  game do not depend on it.

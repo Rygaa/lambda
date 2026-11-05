@@ -69,7 +69,8 @@ or hide the inventory with I.
 game/
 ├── assets/            the data and the models, by kind (see assets/README.md)
 ├── src/
-│   ├── engine/        copied from the gpt branch: renderer/ (PixelRenderer) and asset-format/ (shapes)
+│   ├── engine/        copied from the gpt branch: renderer/ (PixelRenderer) and asset-format/ (shapes);
+│   │                  voxel/ (voxelize, palette, greedy meshing)
 │   ├── shared/        the code of both the server and the client
 │   │   ├── ecs.ts         World, Store, System
 │   │   ├── components.ts  every component (data only)
@@ -80,9 +81,11 @@ game/
 │   │   ├── protocol.ts    the network messages
 │   │   └── config.ts      the types of the asset files
 │   ├── server/        main.ts: the simulation, the WebSocket, the page
-│   └── client/        main.ts, net.ts (client systems), render.ts (render system), terrain.ts, buildings.ts, character.ts
+│   └── client/        main.ts, net.ts (client systems), render.ts (render system), terrain.ts, terrainShapes.ts,
+│                      buildings.ts, character.ts, voxels.ts, voxelTerrain.ts, terrainChunk.ts, voxelWorker.ts
 ├── web/index.html
-└── tools/             map-preview.ts (the map from above), screenshots.cjs (the test screenshots)
+└── tools/             map-preview.ts (the map from above), screenshots.cjs (the test screenshots),
+                       voxel-stats.cjs (load times, chunks and quads of the voxels)
 ```
 
 ### Strict ECS
@@ -121,6 +124,36 @@ outlines, flat bands, cloud shadows, god rays, dust, grass tufts). Two small add
 - `rowMap` on the ground material: one texture gives the ground row of each 25 cm cell (grass, sand, dirt), and
   water where it is 255. So the whole island is one ground mesh, with its coast and its foam line.
 
+### Voxels
+
+Everything that stands on the ground is made of voxels: small cubes on a grid of 1/43.6 m, so one voxel is one game
+pixel (`assets/voxels/voxels.json`). The renderer is not changed: a voxel mesh uses the game's solid material, its
+colors come from a small palette texture (one texel per color), so it gets the same light, bands, outlines and
+shadows. The ground stays one flat layer (grass, sand, dirt, water, as before), and what blocks the way is the
+same as before (`worldgen.ts` is not changed).
+
+- **How a model becomes voxels** (`src/engine/voxel/voxelize.ts`): each triangle is sampled every half voxel; a
+  voxel is kept when its center is inside the shape, within one voxel of the surface (so a shape keeps its size and
+  has no hole); it takes the color of the texel of the texture there. When several faces fall in one voxel, the one
+  that faces the camera wins, then the outer one, then the sample nearest to the voxel center. Closed shapes are
+  filled, and nothing is kept under the ground.
+- **Light** (`surfaceNormals`): each voxel keeps the normal of the surface it comes from, so a roof, a dome or a
+  mountain side is lit like before (flat bands), and only its edges become steps of one pixel. With `false`, each
+  cube face is lit by its own normal (slopes show stripes of lit tops and shaded fronts).
+- **Meshes** (`src/engine/voxel/mesher.ts`): only the faces between a voxel and an empty voxel are kept, and the
+  faces of one direction, color and normal are merged into the largest rectangles (greedy meshing).
+- **What is voxelized**:
+  - the 4 buildings once at load, on the world grid, with the colors of their textures (`buildings.ts`);
+  - each baked frame of the character, on the grid of the character, which turns and moves with it
+    (`character.ts`);
+  - the monsters, pets and items: cubes of N × N × N voxels (`render.ts`, `voxels.ts`);
+  - the mountains, rocks and stones in chunks of 8 m (`voxelTerrain.ts`): mountain columns up to the same low-poly
+    surface as before, rock or snow like the triangle above; rocks voxelized from their shapes. Chunks are made
+    near the camera (with a margin for shadows and for tall mountains in front of the view) by 1 or 2 Web Workers
+    (`voxelWorker.ts`), and dropped when the camera goes away.
+- For tests, the address can change the voxels: `?voxel=16` (1/16 m), `?voxel=0` (the meshes of the `game`
+  branch), `?normals=cube` or `?normals=surface`.
+
 ## Tests
 
 ```bash
@@ -128,5 +161,6 @@ npm test                                    # the shared systems: pickup, stats,
 npm run build
 node dist/map-preview.js map.png            # the map from above, 4 px per meter
 LAMBDA_DEBUG=1 npm start &
-W=1920 H=1080 node tools/screenshots.cjs shots   # Chromium (Playwright): buildings, walk, attack, monster, kill, items, pet, players, overview
+W=1920 H=1080 node tools/screenshots.cjs shots   # Chromium (Playwright): buildings, mountain, walk, attack, monster, kill, items, pet, players, overview
+node tools/voxel-stats.cjs 43.6 16 0             # load times, terrain chunks and quads (0: the meshes)
 ```
