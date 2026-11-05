@@ -6,6 +6,8 @@ import { buildShapeGeometry } from "../engine/asset-format/geometry.ts";
 import { preparePixelTexture, type PixelRenderer } from "../engine/renderer/index.ts";
 import type { BuildingId, BuildingPlan } from "../shared/config.ts";
 import type { GameMap } from "../shared/worldgen.ts";
+import { collectMeshes, meshVolume, voxelize } from "../engine/voxel/index.ts";
+import type { Voxels } from "./voxels.ts";
 
 function toAsset(plan: any, id: string): any {
   return {
@@ -29,14 +31,25 @@ async function loadTextures(id: BuildingId, plan: BuildingPlan) {
   return map;
 }
 
-export async function buildBuildings(renderer: PixelRenderer, map: GameMap) {
+// With voxels, each building is voxelized where it stands (on the world grid), with the colors of its textures,
+// and drawn as one merged mesh.
+export async function buildBuildings(renderer: PixelRenderer, map: GameMap, voxels: Voxels | null) {
   const group = new THREE.Group();
   for (const placed of map.buildings) {
     const plan = map.config.buildings[placed.id];
     const model = plan.pod ? buildPod(plan, renderer.materials) : buildAssetObject(toAsset(plan, placed.id), await loadTextures(placed.id, plan), renderer.materials);
     model.position.set(placed.x, 0, placed.z);
     model.name = placed.id;
-    group.add(model);
+    if (!voxels) {
+      group.add(model);
+      continue;
+    }
+    const volume = voxelize(collectMeshes(model, true), voxels.size, voxels.palette, { clipBelowGround: true, fill: true });
+    const geometry = volume && meshVolume(volume, voxels.palette, { cullGround: true });
+    if (!geometry) continue;
+    const mesh = new THREE.Mesh(geometry, voxels.material);
+    mesh.name = placed.id;
+    group.add(mesh);
   }
   return renderer.castShadows(group);
 }

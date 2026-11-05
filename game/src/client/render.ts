@@ -8,6 +8,7 @@ import type { Entity } from "../shared/components.ts";
 import type { System } from "../shared/ecs.ts";
 import { createCharacter, type CharacterLibrary } from "./character.ts";
 import type { ClientContext } from "./net.ts";
+import { voxelCube, type Voxels } from "./voxels.ts";
 
 type View = {
   object: THREE.Object3D;
@@ -15,10 +16,19 @@ type View = {
   label?: HTMLElement;
 };
 
-export function createRenderSystem(renderer: PixelRenderer, library: CharacterLibrary, labels: HTMLElement): System<ClientContext> {
+export function createRenderSystem(renderer: PixelRenderer, library: CharacterLibrary, labels: HTMLElement, voxels: Voxels | null = null): System<ClientContext> {
   const views = new Map<Entity, View>();
   const itemMaterials = new Map<string, THREE.Material>();
-  const cube = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
+  const box = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
+  // the cubes: a box of 1 m scaled to their size, or with voxels a cube of voxels (as many as fit in its size)
+  const cubes = new Map<string, THREE.BufferGeometry>();
+  const cube = (meters: number, color: string) => {
+    if (!voxels) return box;
+    const key = `${meters},${color}`;
+    let g = cubes.get(key);
+    if (!g) cubes.set(key, (g = voxelCube(voxels, meters, color)));
+    return g;
+  };
   const forward = new THREE.Vector3(...CAMERA_FORWARD).normalize();
   const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
   const up = new THREE.Vector3().crossVectors(right, forward).normalize();
@@ -62,7 +72,7 @@ export function createRenderSystem(renderer: PixelRenderer, library: CharacterLi
     if (kind === "monster") {
       const m = config.monster;
       const material = renderer.materials.solid({ color: m.color });
-      const body = new THREE.Mesh(cube, material);
+      const body = new THREE.Mesh(cube(m.size, m.color), material);
       body.scale.setScalar(m.size);
       const group = new THREE.Group();
       group.add(body);
@@ -122,7 +132,7 @@ export function createRenderSystem(renderer: PixelRenderer, library: CharacterLi
     if (kind === "pet") {
       // the pet cube: smaller, light blue, it hops after its player
       const p = config.pet;
-      const body = new THREE.Mesh(cube, renderer.materials.solid({ color: p.color }));
+      const body = new THREE.Mesh(cube(p.size, p.color), renderer.materials.solid({ color: p.color }));
       body.scale.setScalar(p.size);
       const group = new THREE.Group();
       group.add(body);
@@ -151,7 +161,7 @@ export function createRenderSystem(renderer: PixelRenderer, library: CharacterLi
       itemMaterials.set(color, material);
     }
     const s = config.loot.size;
-    const mesh = new THREE.Mesh(cube, material);
+    const mesh = new THREE.Mesh(cube(s, color), material);
     mesh.scale.setScalar(s);
     const group = new THREE.Group();
     group.add(mesh);

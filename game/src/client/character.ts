@@ -8,6 +8,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { preparePixelTexture, type PixelRenderer } from "../engine/renderer/index.ts";
 import type { AnimState } from "../shared/components.ts";
 import type { CharacterConfig } from "../shared/config.ts";
+import { meshVolume, voxelize } from "../engine/voxel/index.ts";
+import type { Voxels } from "./voxels.ts";
 
 const BASE = "assets/characters/player/";
 
@@ -83,7 +85,7 @@ type Part = { name: string; mesh: any; root: THREE.Object3D; mixer: THREE.Animat
 export type BakedClip = { frames: THREE.BufferGeometry[][]; duration: number; loop: boolean };
 export type CharacterLibrary = { clips: Record<AnimState, BakedClip>; materials: THREE.Material[]; fps: number };
 
-export async function loadCharacterLibrary(renderer: PixelRenderer, config: CharacterConfig): Promise<CharacterLibrary> {
+export async function loadCharacterLibrary(renderer: PixelRenderer, config: CharacterConfig, voxels: Voxels | null = null): Promise<CharacterLibrary> {
   const manager = new THREE.LoadingManager();
   manager.setURLModifier((url) => (url.endsWith(".dds") ? BASE + "textures/" + url.split("/").pop()!.replace(".dds", ".png") : url));
   const loader = new GLTFLoader(manager);
@@ -219,7 +221,19 @@ export async function loadCharacterLibrary(renderer: PixelRenderer, config: Char
     for (let k = 0; k < count; k++) frames.push(pose(clip, Math.min(clip.duration - 1e-3, k / fps)));
     clips[state] = { frames, duration: clip.duration, loop: state === "idle" || state === "walk" };
   }
-  return { clips, materials: parts.map((p) => p.material), fps };
+  if (!voxels) return { clips, materials: parts.map((p) => p.material), fps };
+
+  // Voxels: each baked frame is voxelized (every part, with the colors of its texture) into one merged mesh, on
+  // the grid of the character (it turns and moves with it).
+  const identity = new THREE.Matrix4();
+  for (const clip of Object.values(clips)) {
+    clip.frames = clip.frames.map((frame) => {
+      const volume = voxelize(frame.map((geometry, m) => ({ geometry, matrix: identity, material: parts[m]!.material })), voxels.size, voxels.palette, { fill: true });
+      frame.forEach((g) => g.dispose());
+      return [meshVolume(volume!, voxels.palette)!];
+    });
+  }
+  return { clips, materials: [voxels.characterMaterial], fps };
 }
 
 // One character on screen. setPose picks the frame of an animation at a time in seconds.

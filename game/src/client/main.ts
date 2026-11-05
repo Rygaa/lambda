@@ -13,6 +13,8 @@ import { loadCharacterLibrary } from "./character.ts";
 import { advanceAnims, applySnapshots, interpolate, predict, type ClientContext } from "./net.ts";
 import { createRenderSystem } from "./render.ts";
 import { buildGround, buildMountains, buildRocks, createGroundCoverManager } from "./terrain.ts";
+import { createVoxelTerrain } from "./voxelTerrain.ts";
+import { createVoxels, voxelSizeFrom } from "./voxels.ts";
 
 const params = new URLSearchParams(location.search);
 const $ = (id: string) => document.getElementById(id)!;
@@ -68,15 +70,20 @@ async function main() {
   const renderer = new PixelRenderer($("view"));
   // ?scale=1: smaller game pixels, to see more of the map (for overviews; the game uses 4)
   if (params.get("scale")) renderer.setPixelScale(Number(params.get("scale")));
-  renderer.scene.add(buildGround(renderer, map), buildMountains(renderer, map), buildRocks(renderer, map), await buildBuildings(renderer, map));
+  // voxels: ?voxel=16 is 1/16 m (?voxel=0: the meshes)
+  const voxelSize = voxelSizeFrom(params, 0);
+  const voxels = voxelSize > 0 ? createVoxels(renderer, voxelSize) : null;
+  const voxelTerrain = voxels ? createVoxelTerrain(renderer, map, voxels) : null;
+  renderer.scene.add(buildGround(renderer, map), await buildBuildings(renderer, map, voxels));
+  if (!voxels) renderer.scene.add(buildMountains(renderer, map), buildRocks(renderer, map));
   const updateGroundCover = createGroundCoverManager(renderer, map);
   status("Chargement du personnage…");
-  const library = await loadCharacterLibrary(renderer, config.character);
+  const library = await loadCharacterLibrary(renderer, config.character, voxels);
 
   const world = new World();
   const c = createComponents(world);
   const ctx: ClientContext = { c, map, config, dt: 0, time: 0, random: createRandom(1), localId: welcome.id, inbox, serverClock: { offset: 0, ready: false }, now: performance.now() / 1000, realDt: 0 };
-  const render = createRenderSystem(renderer, library, $("labels"));
+  const render = createRenderSystem(renderer, library, $("labels"), voxels);
   const systems = [applySnapshots, predict, interpolate, advanceAnims, render];
 
   // ------------------------------------------------------------ input
@@ -150,6 +157,7 @@ async function main() {
     if (target) {
       renderer.setTarget({ x: target.x, y: look ? (look[2] ?? 0.8) : 0.8, z: target.z });
       updateGroundCover(target.x, target.z);
+      voxelTerrain?.update(target.x, target.z);
     }
     const h = c.health.get(welcome.id);
     const players = [...world.query(c.player)].length;
@@ -225,7 +233,7 @@ async function main() {
   Object.assign(window, {
     __lambda: {
       ready: true,
-      world, c, map, renderer, localId: welcome.id,
+      world, c, map, renderer, localId: welcome.id, voxelSize, voxelStats: () => voxelTerrain?.stats(),
       setMove: (x: number, z: number) => (debug.move = x === 0 && z === 0 ? null : [x, z]),
       attack: () => (attackQueued = true),
       pickup: () => (pickupQueued = true),

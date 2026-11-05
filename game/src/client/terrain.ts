@@ -19,17 +19,20 @@ export function buildGround(renderer: PixelRenderer, map: GameMap) {
   return buildGroundPatch(material, map.size * 4);
 }
 
-// The mountains: one low-poly height field, flat faces, rock with snow on the tops. Triangles that lie flat on
-// the ground (every corner under 0.3 m) are left out, so the mountains rise straight from the ground.
-export function buildMountains(renderer: PixelRenderer, map: GameMap) {
+// The triangles of the low-poly mountains: 9 numbers each (3 corners), and 1 where a triangle is snow.
+// Triangles that lie flat on the ground (every corner under 0.3 m) are left out, so the mountains rise straight
+// from the ground.
+export function mountainTriangles(map: GameMap) {
   const mt = map.config.terrain.mountains;
   const step = mt.meshCell;
   const count = Math.round(map.size / step);
-  const buckets: Record<"rock" | "snow", number[]> = { rock: [], snow: [] };
+  const points: number[] = [];
+  const snow: number[] = [];
   const tri = (a: number[], b: number[], d: number[]) => {
     if (Math.max(a[1]!, b[1]!, d[1]!) < 0.3) return;
     const avg = (a[1]! + b[1]! + d[1]!) / 3;
-    buckets[avg > mt.snowAbove ? "snow" : "rock"].push(...a, ...b, ...d);
+    points.push(...a, ...b, ...d);
+    snow.push(avg > mt.snowAbove ? 1 : 0);
   };
   for (let j = 0; j < count; j++) {
     for (let i = 0; i < count; i++) {
@@ -52,6 +55,15 @@ export function buildMountains(renderer: PixelRenderer, map: GameMap) {
       }
     }
   }
+  return { points: new Float32Array(points), snow: new Uint8Array(snow) };
+}
+
+// The mountains as meshes (no voxels): one low-poly height field, flat faces, rock with snow on the tops.
+export function buildMountains(renderer: PixelRenderer, map: GameMap) {
+  const mt = map.config.terrain.mountains;
+  const { points, snow } = mountainTriangles(map);
+  const buckets: Record<"rock" | "snow", number[]> = { rock: [], snow: [] };
+  for (let t = 0; t < snow.length; t++) buckets[snow[t] ? "snow" : "rock"].push(...points.subarray(t * 9, t * 9 + 9));
   const group = new THREE.Group();
   const colors = { rock: mt.rockColor, snow: mt.snowColor };
   for (const kind of ["rock", "snow"] as const) {
@@ -66,7 +78,7 @@ export function buildMountains(renderer: PixelRenderer, map: GameMap) {
 }
 
 // A rock: an icosahedron pushed in and out from its seed, flattened, a little sunk in the ground.
-function rockGeometry(rock: Rock, detail: number) {
+export function rockGeometry(rock: Rock, detail: number) {
   const random = createRandom(rock.seed);
   const base = new THREE.IcosahedronGeometry(1, detail);
   const pos = base.getAttribute("position");
