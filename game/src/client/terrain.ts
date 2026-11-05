@@ -25,7 +25,6 @@ export function buildMountains(renderer: PixelRenderer, map: GameMap) {
   const mt = map.config.terrain.mountains;
   const step = mt.meshCell;
   const count = Math.round(map.size / step);
-  const h = (i: number, j: number) => map.heightAt(-map.half + i * step, -map.half + j * step);
   const buckets: Record<"rock" | "snow", number[]> = { rock: [], snow: [] };
   const tri = (a: number[], b: number[], d: number[]) => {
     if (Math.max(a[1]!, b[1]!, d[1]!) < 0.3) return;
@@ -34,9 +33,13 @@ export function buildMountains(renderer: PixelRenderer, map: GameMap) {
   };
   for (let j = 0; j < count; j++) {
     for (let i = 0; i < count; i++) {
+      // each corner moved a little (from its grid place, always the same), so the grid does not show
       const p = (ii: number, jj: number) => {
-        const y = h(ii, jj);
-        return [-map.half + ii * step, y < 0.05 ? -0.05 : y, -map.half + jj * step];
+        const r = createRandom((ii * 73856093) ^ (jj * 19349663));
+        const x = -map.half + ii * step + (r() - 0.5) * step * 0.6;
+        const z = -map.half + jj * step + (r() - 0.5) * step * 0.6;
+        const y = map.heightAt(x, z);
+        return [x, y < 0.05 ? -0.05 : y, z];
       };
       const a = p(i, j), b = p(i + 1, j), cc = p(i + 1, j + 1), d = p(i, j + 1);
       // counter-clockwise seen from above (+y): a, d, c and a, c, b

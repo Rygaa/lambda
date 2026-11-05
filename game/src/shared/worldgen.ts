@@ -113,17 +113,21 @@ export class GameMap {
         const x = i - this.half;
         const z = j - this.half;
         const dist = Math.hypot(x - this.spawn.x, z - this.spawn.z);
-        let v = t.coast.radius - Math.hypot(x, z) / this.half + fbm(coastNoise, x * t.coast.noiseScale, z * t.coast.noiseScale, 4) * t.coast.noiseAmount;
+        const coast = t.coast.radius - Math.hypot(x, z) / this.half + fbm(coastNoise, x * t.coast.noiseScale, z * t.coast.noiseScale, 4) * t.coast.noiseAmount;
+        let v = coast;
+        let pondV = 1;
         if (dist > t.ponds.minDistFromCenter) {
           const pond = fbm(pondNoise, x * t.ponds.noiseScale, z * t.ponds.noiseScale, 3) * 0.5 + 0.5;
           // ponds: the island value drops below 0 where the pond noise is high
-          v = Math.min(v, (t.ponds.threshold - pond) * 2.2);
+          pondV = (t.ponds.threshold - pond) * 2.2;
+          v = Math.min(v, pondV);
         }
         this.land[j * m + i] = v;
         const r = ridged(mountainNoise, x * mt.noiseScale, z * mt.noiseScale, 4);
         const base = (r - mt.threshold) / (1 - mt.threshold);
         let h = base > 0 ? Math.pow(base, 1.25) * mt.height : 0;
-        h *= smoothstep(mt.clearCenter, mt.clearCenter + 24, dist) * smoothstep(0.0, 0.07, v);
+        // away from the center, and down in a slope before the sea and before the ponds
+        h *= smoothstep(mt.clearCenter, mt.clearCenter + 24, dist) * smoothstep(0.0, 0.07, coast) * smoothstep(0.03, 0.3, pondV);
         this.heights[j * m + i] = h < 0.05 ? 0 : h;
       }
     }
