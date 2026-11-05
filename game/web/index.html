@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projet Lambda</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #21508f; overflow: hidden; font: 14px/1.35 system-ui, sans-serif; color: #fff; }
+    #view { position: absolute; inset: 0; }
+    #labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .label { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; white-space: nowrap; }
+    .label span { font-weight: 600; font-size: 13px; text-shadow: 0 1px 0 #1a2433, 1px 0 0 #1a2433, -1px 0 0 #1a2433, 0 -1px 0 #1a2433; }
+    .label.me span { color: #ffe680; }
+    .label i { display: block; width: 36px; height: 4px; background: linear-gradient(90deg, #6fd36a var(--hp), #3a2430 var(--hp)); outline: 1px solid #1a2433; }
+    .label.monster i { width: 26px; background: linear-gradient(90deg, #ff6b5a var(--hp), #3a2430 var(--hp)); }
+    #hud { position: absolute; left: 12px; top: 10px; padding: 8px 10px; background: #1a2433cc; border-radius: 6px; pointer-events: none; }
+    #hud .hp { display: inline-block; width: 120px; height: 8px; background: #3a2430; vertical-align: middle; margin: 0 6px; outline: 1px solid #0d131c; }
+    #hud .hp i { display: block; height: 100%; background: #6fd36a; }
+    #hud small { opacity: 0.75; }
+    #status { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); font-size: 18px; text-shadow: 0 1px 2px #000; }
+    #join { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); background: #1a2433ee; padding: 18px 20px; border-radius: 8px; display: grid; gap: 8px; min-width: 260px; }
+    #join h1 { margin: 0 0 4px; font-size: 20px; }
+    #join input, #join button { font: inherit; padding: 6px 8px; border-radius: 4px; border: 1px solid #4a5a70; }
+    #join button { background: #f2c94c; border-color: #c9a230; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="view"></div>
+  <div id="labels"></div>
+  <div id="hud"></div>
+  <div id="status">Chargement…</div>
+  <form id="join" style="display:none">
+    <h1>Projet Lambda</h1>
+    <label>Nom <input id="name" maxlength="16" autocomplete="off"></label>
+    <label>Serveur <input id="server" placeholder="adresse:port"></label>
+    <button type="submit">Rejoindre</button>
+  </form>
+  <script type="module" src="dist/client.js"></script>
+</body>
+</html>
