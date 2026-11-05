@@ -104,6 +104,14 @@ export type CharacterConfig = {
   respawnSeconds: number;
 };
 
+// voxels/voxels.json: the voxel size (voxels per meter; 43.6 is 1 game pixel), whether each voxel is lit with the
+// normal of the surface it comes from (true) or of each cube face, the size of the terrain chunks.
+export type VoxelConfig = {
+  voxelsPerMeter: number;
+  surfaceNormals: boolean;
+  chunkMeters: number;
+};
+
 // A building plan, as in documentation/building (the Infer format: faces is a list).
 export type BuildingShape = {
   id: string;
@@ -132,6 +140,7 @@ export type GameConfig = {
   loot: LootConfig;
   character: CharacterConfig;
   pet: PetConfig;
+  voxels: VoxelConfig;
   buildings: Record<BuildingId, BuildingPlan>;
 };
 
@@ -143,6 +152,7 @@ export const CONFIG_FILES = {
   loot: "items/loot-cubes.json",
   character: "characters/player/character.json",
   pet: "characters/pet/pet.json",
+  voxels: "voxels/voxels.json",
 } as const;
 export const buildingFile = (id: BuildingId) => `buildings/${id}/building.json`;
 

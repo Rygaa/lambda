@@ -1,0 +1,6 @@
+{
+  "description": "How everything is drawn in voxels (small cubes on a grid): the mountains, rocks and stones, the 4 buildings, the character and the cubes. Only the look: the game, the map and what blocks the way do not depend on it.",
+  "voxelsPerMeter": 43.6,
+  "surfaceNormals": true,
+  "chunkMeters": 8
+}

@@ -14,11 +14,11 @@ export type Voxels = {
   surfaceNormals: boolean;
 };
 
-// ?voxel=16 is 1/16 m, ?voxel=43.6 is 1/43.6 m (1 game pixel). ?voxel=0: the meshes, no voxels.
-export function voxelSizeFrom(params: URLSearchParams, fallback: number) {
+// The voxel size in meters, from voxels.json (voxelsPerMeter). For tests the address can change it:
+// ?voxel=16 is 1/16 m, ?voxel=0 draws the meshes of the game branch (no voxels).
+export function voxelSizeFrom(params: URLSearchParams, voxelsPerMeter: number) {
   const value = params.get("voxel");
-  if (value === null) return fallback;
-  const n = Number(value);
+  const n = value === null ? voxelsPerMeter : Number(value);
   return n > 0 ? 1 / n : 0;
 }
 

@@ -70,9 +70,10 @@ async function main() {
   const renderer = new PixelRenderer($("view"));
   // ?scale=1: smaller game pixels, to see more of the map (for overviews; the game uses 4)
   if (params.get("scale")) renderer.setPixelScale(Number(params.get("scale")));
-  // voxels: ?voxel=16 is 1/16 m (?voxel=0: the meshes)
-  const voxelSize = voxelSizeFrom(params, 0);
-  const voxels = voxelSize > 0 ? createVoxels(renderer, voxelSize, params.get("normals") === "surface") : null;
+  // voxels (voxels/voxels.json); for tests ?voxel=16 is 1/16 m, ?voxel=0 the meshes, ?normals=cube|surface
+  const voxelSize = voxelSizeFrom(params, config.voxels.voxelsPerMeter);
+  const normals = params.get("normals");
+  const voxels = voxelSize > 0 ? createVoxels(renderer, voxelSize, normals ? normals === "surface" : config.voxels.surfaceNormals) : null;
   const voxelTerrain = voxels ? createVoxelTerrain(renderer, map, voxels) : null;
   const timings: Record<string, number> = {};
   let t0 = performance.now();

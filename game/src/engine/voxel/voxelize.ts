@@ -174,6 +174,7 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
         N.crossVectors(AB, AC);
         if (N.lengthSq() === 0) continue;
         const facing = N.normalize().dot(VIEW);
+        const thin = size * 0.5 * Math.max(Math.abs(N.x), Math.abs(N.y), Math.abs(N.z)) + 1e-6;
         if (nrm) {
           NA.fromBufferAttribute(nrm, ia).applyMatrix3(normalMatrix);
           NB.fromBufferAttribute(nrm, ib).applyMatrix3(normalMatrix);
@@ -197,6 +198,10 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
             if (options.clipBelowGround && y < 0) continue;
             const vx = Math.floor(x / size) - min[0], vy = Math.floor(y / size) - min[1], vz = Math.floor(z / size) - min[2];
             if (vx < 0 || vy < 0 || vz < 0 || vx >= nx || vy >= ny || vz >= nz) continue;
+            // thin surface (6-separating): only the voxels whose center is near the plane of the triangle, so a
+            // thin part (an arm, a leg) is not one voxel wider on each side; it still has no hole a face shows through
+            const ox = (vx + min[0] + 0.5) * size - A.x, oy = (vy + min[1] + 0.5) * size - A.y, oz = (vz + min[2] + 0.5) * size - A.z;
+            if (Math.abs(ox * N.x + oy * N.y + oz * N.z) > thin) continue;
             const k = vx + nx * (vy + ny * vz);
             // the face toward the camera first, then the sample nearest to the voxel center (its texel)
             const cx = x / size - Math.floor(x / size) - 0.5, cy = y / size - Math.floor(y / size) - 0.5, cz = z / size - Math.floor(z / size) - 0.5;

@@ -11,12 +11,10 @@ import type { GameMap, Rock } from "../shared/worldgen.ts";
 import { mountainTriangles, rockGeometry } from "./terrain.ts";
 import type { Voxels } from "./voxels.ts";
 
-const CHUNK_METERS = 8;
-
 export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels: Voxels) {
   const s = voxels.size;
   const palette = voxels.palette;
-  const CH = Math.max(8, Math.round(CHUNK_METERS / s));
+  const CH = Math.max(8, Math.round(map.config.voxels.chunkMeters / s));
   const chunkM = CH * s;
   const mt = map.config.terrain.mountains;
   const rockIndex = palette.addColor(mt.rockColor);
