@@ -103,6 +103,7 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
   };
 
   const chunks = new Map<string, THREE.Mesh | null>();
+  let buildMs = 0, built = 0;
   const pitch = Math.asin(-CAMERA_FORWARD[1]);
   // Makes the chunks the view shows (with a margin for what casts shadows into it and for the tall mountains in
   // front of the view), nearest first, for at most `budgetMs` milliseconds; drops the ones far away.
@@ -126,7 +127,10 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
     const start = performance.now();
     for (const [ci, cj] of want) {
       if (performance.now() - start > budgetMs) break;
+      const t0 = performance.now();
       const mesh = buildChunk(ci, cj);
+      buildMs += performance.now() - t0;
+      built++;
       if (mesh) renderer.scene.add(mesh);
       chunks.set(`${ci},${cj}`, mesh);
     }
@@ -146,7 +150,7 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
   const stats = () => {
     let quads = 0, meshes = 0;
     for (const mesh of chunks.values()) if (mesh) { meshes++; quads += (mesh.geometry.index?.count ?? 0) / 6; }
-    return { chunks: chunks.size, meshes, quads };
+    return { chunks: chunks.size, meshes, quads, built, msPerChunk: built ? buildMs / built : 0, chunkMeters: chunkM };
   };
   return { update, stats };
 }

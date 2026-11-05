@@ -74,11 +74,16 @@ async function main() {
   const voxelSize = voxelSizeFrom(params, 0);
   const voxels = voxelSize > 0 ? createVoxels(renderer, voxelSize, params.get("normals") === "surface") : null;
   const voxelTerrain = voxels ? createVoxelTerrain(renderer, map, voxels) : null;
+  const timings: Record<string, number> = {};
+  let t0 = performance.now();
   renderer.scene.add(buildGround(renderer, map), await buildBuildings(renderer, map, voxels));
+  timings.buildings = performance.now() - t0;
   if (!voxels) renderer.scene.add(buildMountains(renderer, map), buildRocks(renderer, map));
   const updateGroundCover = createGroundCoverManager(renderer, map);
   status("Chargement du personnage…");
+  t0 = performance.now();
   const library = await loadCharacterLibrary(renderer, config.character, voxels);
+  timings.character = performance.now() - t0;
 
   const world = new World();
   const c = createComponents(world);
@@ -233,7 +238,7 @@ async function main() {
   Object.assign(window, {
     __lambda: {
       ready: true,
-      world, c, map, renderer, localId: welcome.id, voxelSize, voxelStats: () => voxelTerrain?.stats(),
+      world, c, map, renderer, localId: welcome.id, voxelSize, timings, voxelStats: () => voxelTerrain?.stats(),
       setMove: (x: number, z: number) => (debug.move = x === 0 && z === 0 ? null : [x, z]),
       attack: () => (attackQueued = true),
       pickup: () => (pickupQueued = true),
