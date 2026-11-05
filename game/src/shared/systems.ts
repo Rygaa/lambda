@@ -59,9 +59,10 @@ export const monsterAI: System<SimContext> = (world, { c, config, dt, random, ma
       v.x = v.z = 0;
       continue;
     }
+    const inSafeZone = (x: number, z: number) => Math.hypot(x - map.spawn.x, z - map.spawn.z) < m.safeZoneRadius;
     if (ai.state === "chase") {
       const tt = c.transform.get(ai.target);
-      if (!tt || !isAlive(c, ai.target) || Math.hypot(tt.x - t.x, tt.z - t.z) > m.leashRange) {
+      if (!tt || !isAlive(c, ai.target) || Math.hypot(tt.x - t.x, tt.z - t.z) > m.leashRange || inSafeZone(tt.x, tt.z)) {
         ai.state = "wander";
         ai.homeX = t.x;
         ai.homeZ = t.z;
@@ -74,7 +75,7 @@ export const monsterAI: System<SimContext> = (world, { c, config, dt, random, ma
       for (const p of players) {
         const pt = c.transform.get(p)!;
         const d = Math.hypot(pt.x - t.x, pt.z - t.z);
-        if (d < bestDist) {
+        if (d < bestDist && !inSafeZone(pt.x, pt.z)) {
           bestDist = d;
           best = p;
         }
@@ -107,6 +108,12 @@ export const monsterAI: System<SimContext> = (world, { c, config, dt, random, ma
     }
     // wander: walk to a goal near home, wait, pick another one
     ai.timer -= dt;
+    if (inSafeZone(t.x, t.z) && inSafeZone(ai.goalX, ai.goalZ)) {
+      const a = Math.atan2(t.z - map.spawn.z, t.x - map.spawn.x);
+      ai.homeX = ai.goalX = map.spawn.x + Math.cos(a) * (m.safeZoneRadius + 4);
+      ai.homeZ = ai.goalZ = map.spawn.z + Math.sin(a) * (m.safeZoneRadius + 4);
+      ai.timer = 4;
+    }
     const dx = ai.goalX - t.x;
     const dz = ai.goalZ - t.z;
     const d = Math.hypot(dx, dz);
@@ -115,7 +122,7 @@ export const monsterAI: System<SimContext> = (world, { c, config, dt, random, ma
       const r = 2 + random() * 7;
       const gx = ai.homeX + Math.cos(a) * r;
       const gz = ai.homeZ + Math.sin(a) * r;
-      if (map.isFree(gx, gz, m.radius)) {
+      if (map.isFree(gx, gz, m.radius) && !inSafeZone(gx, gz)) {
         ai.goalX = gx;
         ai.goalZ = gz;
       }
@@ -336,6 +343,6 @@ export const SERVER_SYSTEMS: System<SimContext>[] = [
   animations,
 ];
 
-export function runSystems(world: World, systems: System<SimContext>[], context: SimContext) {
+export function runSystems<C extends SimContext>(world: World, systems: System<C>[], context: C) {
   for (const system of systems) system(world, context);
 }

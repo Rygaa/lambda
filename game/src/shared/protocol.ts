@@ -8,7 +8,9 @@ export const VIEW_RADIUS = 45;
 export type ClientMessage =
   | { t: "hello"; name: string }
   // the held move direction, and attack: true once for each press
-  | { t: "input"; seq: number; moveX: number; moveZ: number; attack: boolean };
+  | { t: "input"; seq: number; moveX: number; moveZ: number; attack: boolean }
+  // tests only: the server accepts it when started with LAMBDA_DEBUG=1
+  | { t: "teleport"; x: number; z: number };
 
 export const NET_KINDS: NetKind[] = ["player", "monster", "item"];
 export const ANIM_STATES: AnimState[] = ["idle", "walk", "attack", "hit", "dead"];

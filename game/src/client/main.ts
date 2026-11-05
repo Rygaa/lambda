@@ -36,7 +36,7 @@ function askJoin(): Promise<{ name: string; server: string }> {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       form.style.display = "none";
-      resolve({ name: ($("name") as HTMLInputElement).value.trim() || "Player", server: ($("server") as HTMLInputElement).value.trim() || location.host });
+      resolve({ name: ($("name") as HTMLInputElement).value.trim() || "Joueur", server: ($("server") as HTMLInputElement).value.trim() || location.host });
     });
   });
 }
@@ -44,13 +44,13 @@ function askJoin(): Promise<{ name: string; server: string }> {
 async function main() {
   const configPromise = loadConfig(fetchJson);
   const join = await askJoin();
-  status(`Connecting to ${join.server}…`);
+  status(`Connexion à ${join.server}…`);
   const socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${join.server}/ws`);
   const send = (message: ClientMessage) => socket.readyState === WebSocket.OPEN && socket.send(JSON.stringify(message));
   const inbox: Extract<ServerMessage, { t: "snap" }>[] = [];
   const welcome = await new Promise<Extract<ServerMessage, { t: "welcome" }>>((resolve, reject) => {
     socket.addEventListener("open", () => send({ t: "hello", name: join.name }));
-    socket.addEventListener("error", () => reject(new Error(`Cannot reach the server at ${join.server}.`)));
+    socket.addEventListener("error", () => reject(new Error(`Impossible de joindre le serveur ${join.server}.`)));
     socket.addEventListener("message", (event) => {
       const message = JSON.parse(event.data) as ServerMessage;
       if (message.t === "welcome") resolve(message);
@@ -60,15 +60,17 @@ async function main() {
       } else if (message.t === "full") reject(new Error(message.reason));
     });
   });
-  socket.addEventListener("close", () => status("Disconnected from the server."));
+  socket.addEventListener("close", () => status("Déconnecté du serveur."));
 
-  status("Making the map…");
+  status("Génération de la carte…");
   const config: GameConfig = await configPromise;
   const map = new GameMap(welcome.seed, config);
   const renderer = new PixelRenderer($("view"));
+  // ?scale=1: smaller game pixels, to see more of the map (for overviews; the game uses 4)
+  if (params.get("scale")) renderer.setPixelScale(Number(params.get("scale")));
   renderer.scene.add(buildGround(renderer, map), buildMountains(renderer, map), buildRocks(renderer, map), await buildBuildings(renderer, map));
   const updateGroundCover = createGroundCoverManager(renderer, map);
-  status("Loading the character…");
+  status("Chargement du personnage…");
   const library = await loadCharacterLibrary(renderer, config.character);
 
   const world = new World();
@@ -104,7 +106,7 @@ async function main() {
   };
 
   // ------------------------------------------------------------ the frame
-  const look = params.get("look")?.split(",").map(Number);
+  let look = params.get("look")?.split(",").map(Number);
   const hud = $("hud");
   status("");
   renderer.onFrame((seconds) => {
@@ -137,8 +139,8 @@ async function main() {
     const h = c.health.get(welcome.id);
     const players = [...world.query(c.player)].length;
     hud.innerHTML = `<b>${escape(join.name)}</b> <span class="hp"><i style="width:${h ? (100 * h.hp) / h.max : 0}%"></i></span> ${h ? Math.ceil(h.hp) : 0}/${h?.max ?? 0}` +
-      `<br>${players} player${players > 1 ? "s" : ""} · ${me ? `${me.x.toFixed(0)}, ${me.z.toFixed(0)}` : ""}` +
-      `<br><small>Move: WASD / ZQSD / arrows · Attack: Space or click</small>`;
+      `<br>${players} joueur${players > 1 ? "s" : ""} · ${me ? `x ${me.x.toFixed(0)}, z ${me.z.toFixed(0)}` : ""}` +
+      `<br><small>Marcher : ZQSD / WASD / flèches · Attaquer : Espace ou clic</small>`;
   });
 
   // hooks for the tests (Playwright)
@@ -148,6 +150,9 @@ async function main() {
       world, c, map, renderer, localId: welcome.id,
       setMove: (x: number, z: number) => (debug.move = x === 0 && z === 0 ? null : [x, z]),
       attack: () => (attackQueued = true),
+      teleport: (x: number, z: number) => send({ t: "teleport", x, z }),
+      // the camera looks at (x, y, z) instead of my player; no argument: back to my player
+      setLook: (x?: number, z?: number, y?: number) => (look = x === undefined ? undefined : [x, z ?? 0, y ?? 0.8]),
       entities: () => [...world.query(c.net, c.transform)].map((e) => ({ id: e, kind: c.net.get(e)!.kind, ...c.transform.get(e)!, anim: c.anim.get(e)?.state, hp: c.health.get(e)?.hp, name: c.player.get(e)?.name })),
     },
   });

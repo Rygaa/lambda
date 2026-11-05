@@ -19,6 +19,8 @@ import { assetsDir, loadConfigFromDisk } from "./assets.ts";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = Number(process.env.PORT ?? 8080);
 const MAX_PLAYERS = Number(process.env.MAX_PLAYERS ?? 16);
+// LAMBDA_DEBUG=1: the clients may teleport (for the screenshots of the tests). Off by default.
+const DEBUG = process.env.LAMBDA_DEBUG === "1";
 
 const config = await loadConfigFromDisk(root);
 const seed = Number(process.env.SEED ?? config.terrain.seed);
@@ -74,11 +76,11 @@ wss.on("connection", (socket) => {
     }
     if (message.t === "hello" && !client) {
       if (clients.size >= MAX_PLAYERS) {
-        send(socket, { t: "full", reason: `The server is full (${MAX_PLAYERS} players).` });
+        send(socket, { t: "full", reason: `Le serveur est plein (${MAX_PLAYERS} joueurs).` });
         socket.close();
         return;
       }
-      const name = String(message.name ?? "").trim().slice(0, 16) || `Player ${clients.size + 1}`;
+      const name = String(message.name ?? "").trim().slice(0, 16) || `Joueur ${clients.size + 1}`;
       const p = playerSpawnPoint(map, context.random, config.character.radius);
       const entity = spawnPlayer(world, c, config, name, p.x, p.z);
       client = { socket, entity, attack: false, ack: 0 };
@@ -94,6 +96,13 @@ wss.on("connection", (socket) => {
       input.moveZ = (Number(message.moveZ) || 0) * k;
       if (message.attack) client.attack = true;
       client.ack = Math.max(client.ack, Number(message.seq) || 0);
+    } else if (message.t === "teleport" && client && DEBUG) {
+      const t = c.transform.get(client.entity);
+      const x = Number(message.x), z = Number(message.z);
+      if (t && map.isFree(x, z, config.character.radius)) {
+        t.x = x;
+        t.z = z;
+      }
     }
   });
   socket.on("close", () => {
@@ -155,6 +164,7 @@ setInterval(() => {
 }, 1000 / TICK_RATE / 2);
 
 http.listen(PORT, "0.0.0.0", () => {
+  if (DEBUG) console.log("LAMBDA_DEBUG=1: teleport allowed (tests only).");
   console.log(`\nLambda server ready on port ${PORT}. Players join with one of:`);
   console.log(`  http://localhost:${PORT}/`);
   for (const list of Object.values(networkInterfaces())) {

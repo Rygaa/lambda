@@ -15,5 +15,6 @@
   "attackWindup": 0.4,
   "count": 60,
   "respawnSeconds": 5,
-  "minSpawnDistanceFromPlayers": 22
+  "minSpawnDistanceFromPlayers": 22,
+  "safeZoneRadius": 8
 }

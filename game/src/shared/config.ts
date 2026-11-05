@@ -54,6 +54,8 @@ export type MonsterConfig = {
   count: number;
   respawnSeconds: number;
   minSpawnDistanceFromPlayers: number;
+  // monsters do not go into this circle around the spawn, so a player who arrives is not hit at once
+  safeZoneRadius: number;
 };
 
 export type LootConfig = {
