@@ -49,6 +49,10 @@ export class VoxelPalette {
   v(i: number) {
     return (Math.floor(i / SIDE) + 0.5) / SIDE;
   }
+  // The color index of a texel center UV (the inverse of u, v).
+  indexAt(u: number, v: number) {
+    return Math.floor(v * SIDE) * SIDE + Math.floor(u * SIDE);
+  }
 
   // Sends the new colors to the GPU (call after making geometries).
   flush() {

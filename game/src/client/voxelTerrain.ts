@@ -1,114 +1,104 @@
-// The mountains, rocks and stones in voxels, in chunks of about 8 m that are made when the camera comes near and
-// dropped when it goes away (a 256 m map in small voxels is far too big to keep whole).
+// The mountains, rocks and stones in voxels, in chunks (voxels.json: chunkMeters) that are made when the camera
+// comes near and dropped when it goes away (a 256 m map in small voxels is far too big to keep whole).
 // - Mountains: voxel columns. Each column goes up to the low-poly mountain surface above its center (the same
 //   triangles as the mesh mountains), rock or snow like the triangle over it. Only the tops and the sides that
 //   show are made (hidden faces removed), merged into large quads.
 // - Rocks and stones: their low-poly shapes voxelized on the world grid, filled, cut at the ground.
+// The chunks are made in workers (voxelWorker.ts), nearest first; in the page if workers are not available.
 import * as THREE from "three";
 import { CAMERA_FORWARD, PIXELS_PER_METER, type PixelRenderer } from "../engine/renderer/index.ts";
-import { encodeNormal, meshHeightField, meshVolume, QuadBuilder, voxelize } from "../engine/voxel/index.ts";
-import type { GameMap, Rock } from "../shared/worldgen.ts";
-import { mountainTriangles, rockGeometry } from "./terrain.ts";
+import type { GameMap } from "../shared/worldgen.ts";
+import { createChunkBuilder, type ChunkData, type ChunkSetup } from "./terrainChunk.ts";
+import { mountainTriangles } from "./terrainShapes.ts";
 import type { Voxels } from "./voxels.ts";
+
+const WORKER_URL = "dist/voxel-worker.js";
 
 export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels: Voxels) {
   const s = voxels.size;
-  const palette = voxels.palette;
-  const CH = Math.max(8, Math.round(map.config.voxels.chunkMeters / s));
-  const chunkM = CH * s;
+  const cells = Math.max(8, Math.round(map.config.voxels.chunkMeters / s));
   const mt = map.config.terrain.mountains;
-  const rockIndex = palette.addColor(mt.rockColor);
-  const snowIndex = palette.addColor(mt.snowColor);
-
-  // the triangles and the rocks of each chunk
   const { points, snow } = mountainTriangles(map);
-  const triangles = new Map<string, number[]>();
-  for (let t = 0; t < snow.length; t++) {
-    const o = t * 9;
-    const minX = Math.min(points[o]!, points[o + 3]!, points[o + 6]!) - s, maxX = Math.max(points[o]!, points[o + 3]!, points[o + 6]!) + s;
-    const minZ = Math.min(points[o + 2]!, points[o + 5]!, points[o + 8]!) - s, maxZ = Math.max(points[o + 2]!, points[o + 5]!, points[o + 8]!) + s;
-    for (let cj = Math.floor(minZ / chunkM); cj <= Math.floor(maxZ / chunkM); cj++) {
-      for (let ci = Math.floor(minX / chunkM); ci <= Math.floor(maxX / chunkM); ci++) {
-        const key = `${ci},${cj}`;
-        if (!triangles.has(key)) triangles.set(key, []);
-        triangles.get(key)!.push(t);
-      }
+  const setup: ChunkSetup = {
+    size: s, cells, points, snow, rockColor: mt.rockColor, snowColor: mt.snowColor, surfaceNormals: voxels.surfaceNormals,
+    rocks: [...map.rocks.map((r) => [r, 1] as [typeof r, number]), ...map.stones.map((r) => [r, 0] as [typeof r, number])],
+  };
+  // the page keeps a builder too: to know the empty chunks at once, and to build when there is no worker
+  const local = createChunkBuilder(setup);
+  const chunkM = local.chunkMeters;
+
+  // workers: one or two, each with one chunk at a time
+  const workers: { worker: Worker; busy: boolean }[] = [];
+  const count = Math.max(1, Math.min(2, (navigator.hardwareConcurrency ?? 2) - 1));
+  try {
+    for (let w = 0; w < count; w++) {
+      const worker = new Worker(WORKER_URL, { type: "module" });
+      worker.postMessage({ setup });
+      const slot = { worker, busy: false };
+      worker.onmessage = (event) => {
+        slot.busy = false;
+        const { id, data, ms } = event.data as { id: number; data: ChunkData | null; ms: number };
+        finish(id, data, ms);
+      };
+      worker.onerror = () => {
+        // a worker that fails is dropped; its chunk is asked again
+        workers.splice(workers.indexOf(slot), 1);
+        worker.terminate();
+        for (const [key, job] of pending) if (job.slot === slot) pending.delete(key);
+      };
+      workers.push(slot);
     }
-  }
-  const rocks = new Map<string, [Rock, number][]>();
-  for (const [list, detail] of [[map.rocks, 1], [map.stones, 0]] as const) {
-    for (const rock of list) {
-      const key = `${Math.floor(rock.x / chunkM)},${Math.floor(rock.z / chunkM)}`;
-      if (!rocks.has(key)) rocks.set(key, []);
-      rocks.get(key)!.push([rock, detail]);
-    }
+  } catch {
+    workers.length = 0;
   }
 
-  const buildChunk = (ci: number, cj: number) => {
-    const key = `${ci},${cj}`;
-    const builder = new QuadBuilder(palette);
-    const tris = triangles.get(key);
-    if (tris) {
-      const i0 = ci * CH, k0 = cj * CH, W = CH + 2;
-      const height = new Int32Array(W * W);
-      const color = new Uint32Array(W * W);
-      const normal = voxels.surfaceNormals ? new Uint16Array(W * W) : undefined;
-      for (const t of tris) {
-        const o = t * 9;
-        const ax = points[o]!, ay = points[o + 1]!, az = points[o + 2]!;
-        const bx = points[o + 3]!, by = points[o + 4]!, bz = points[o + 5]!;
-        const cx = points[o + 6]!, cy = points[o + 7]!, cz = points[o + 8]!;
-        const det = (bz - cz) * (ax - cx) + (cx - bx) * (az - cz);
-        if (Math.abs(det) < 1e-9) continue;
-        const x0 = Math.max(i0 - 1, Math.floor(Math.min(ax, bx, cx) / s)), x1 = Math.min(i0 + CH, Math.floor(Math.max(ax, bx, cx) / s));
-        const z0 = Math.max(k0 - 1, Math.floor(Math.min(az, bz, cz) / s)), z1 = Math.min(k0 + CH, Math.floor(Math.max(az, bz, cz) / s));
-        const c = snow[t] ? snowIndex : rockIndex;
-        let code = 0;
-        if (normal) {
-          // the normal of the triangle, facing up
-          const ux = bx - ax, uy = by - ay, uz = bz - az, vx = cx - ax, vy = cy - ay, vz = cz - az;
-          const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
-          const sign = ny < 0 ? -1 : 1;
-          code = encodeNormal(nx * sign, ny * sign, nz * sign);
-        }
-        for (let k = z0; k <= z1; k++) {
-          const pz = (k + 0.5) * s;
-          for (let i = x0; i <= x1; i++) {
-            const px = (i + 0.5) * s;
-            const l1 = ((bz - cz) * (px - cx) + (cx - bx) * (pz - cz)) / det;
-            const l2 = ((cz - az) * (px - cx) + (ax - cx) * (pz - cz)) / det;
-            const l3 = 1 - l1 - l2;
-            if (l1 < -1e-6 || l2 < -1e-6 || l3 < -1e-6) continue;
-            const h = Math.round((l1 * ay + l2 * by + l3 * cy) / s);
-            const q = i - i0 + 1 + W * (k - k0 + 1);
-            if (h > height[q]!) {
-              height[q] = h;
-              color[q] = c;
-              if (normal) normal[q] = code;
-            }
-          }
-        }
+  // a chunk is null (nothing to draw), a mesh, or being made
+  const chunks = new Map<string, THREE.Mesh | null>();
+  const pending = new Map<string, { id: number; slot: (typeof workers)[number] | null }>();
+  const byId = new Map<number, string>();
+  let nextId = 1;
+  let buildMs = 0, built = 0;
+
+  const toMesh = (data: ChunkData) => {
+    const uv = new Float32Array(data.rgb.length * 2);
+    const palette = voxels.palette;
+    let last = -1, index = 0;
+    for (let i = 0; i < data.rgb.length; i++) {
+      if (data.rgb[i] !== last) {
+        last = data.rgb[i]!;
+        index = palette.add(last);
       }
-      meshHeightField({ size: s, i0, k0, nx: CH, nz: CH, height, color, normal }, builder);
+      uv[i * 2] = palette.u(index);
+      uv[i * 2 + 1] = palette.v(index);
     }
-    for (const [rock, detail] of rocks.get(key) ?? []) {
-      const material = { uniforms: { uColor: { value: new THREE.Color(rock.color) } } } as unknown as THREE.Material;
-      const volume = voxelize([{ geometry: rockGeometry(rock, detail), matrix: new THREE.Matrix4(), material }], s, palette, { clipBelowGround: true, fill: true, surfaceNormals: voxels.surfaceNormals });
-      if (volume) meshVolume(volume, palette, { cullGround: true }, builder);
-    }
-    const geometry = builder.build();
-    if (!geometry) return null;
-    const mesh = new THREE.Mesh(geometry, voxels.material);
+    palette.flush();
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(data.positions, 3));
+    g.setAttribute("normal", new THREE.BufferAttribute(data.normals, 3));
+    g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+    g.setIndex(new THREE.BufferAttribute(data.index, 1));
+    g.computeBoundingSphere();
+    const mesh = new THREE.Mesh(g, voxels.material);
     renderer.castShadows(mesh);
     return mesh;
   };
 
-  const chunks = new Map<string, THREE.Mesh | null>();
-  let buildMs = 0, built = 0;
+  const finish = (id: number, data: ChunkData | null, ms: number) => {
+    const key = byId.get(id);
+    byId.delete(id);
+    if (!key || pending.get(key)?.id !== id) return;
+    pending.delete(key);
+    buildMs += ms;
+    built++;
+    const mesh = data ? toMesh(data) : null;
+    if (mesh) renderer.scene.add(mesh);
+    chunks.set(key, mesh);
+  };
+
   const pitch = Math.asin(-CAMERA_FORWARD[1]);
-  // Makes the chunks the view shows (with a margin for what casts shadows into it and for the tall mountains in
-  // front of the view), nearest first, for at most `budgetMs` milliseconds; drops the ones far away.
-  const update = (cx: number, cz: number, budgetMs = 12) => {
+  // Asks for the chunks the view shows (with a margin for what casts shadows into it and for the tall mountains in
+  // front of the view), nearest first; drops the ones far away. Returns how many are still missing.
+  const update = (cx: number, cz: number) => {
     const container = renderer.canvas.parentElement!;
     const scale = (renderer as any).pixelScale as number;
     const halfW = container.clientWidth / 2 / scale / PIXELS_PER_METER;
@@ -121,19 +111,35 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
         if (Math.abs((ci + 0.5) * chunkM) > map.half + chunkM || Math.abs((cj + 0.5) * chunkM) > map.half + chunkM) continue;
         const key = `${ci},${cj}`;
         keep.add(key);
-        if (!chunks.has(key)) want.push([ci, cj, Math.hypot((ci + 0.5) * chunkM - cx, (cj + 0.5) * chunkM - cz)]);
+        if (chunks.has(key) || pending.has(key)) continue;
+        if (local.isEmpty(ci, cj)) {
+          chunks.set(key, null);
+          continue;
+        }
+        want.push([ci, cj, Math.hypot((ci + 0.5) * chunkM - cx, (cj + 0.5) * chunkM - cz)]);
       }
     }
     want.sort((a, b) => a[2] - b[2]);
-    const start = performance.now();
-    for (const [ci, cj] of want) {
-      if (performance.now() - start > budgetMs) break;
+    if (workers.length) {
+      for (const [ci, cj] of want) {
+        const slot = workers.find((w) => !w.busy);
+        if (!slot) break;
+        const id = nextId++;
+        const key = `${ci},${cj}`;
+        slot.busy = true;
+        pending.set(key, { id, slot });
+        byId.set(id, key);
+        slot.worker.postMessage({ ci, cj, id });
+      }
+    } else if (want.length) {
+      // no worker: one chunk per frame in the page
+      const [ci, cj] = want[0]!;
+      const id = nextId++;
+      byId.set(id, `${ci},${cj}`);
+      pending.set(`${ci},${cj}`, { id, slot: null });
       const t0 = performance.now();
-      const mesh = buildChunk(ci, cj);
-      buildMs += performance.now() - t0;
-      built++;
-      if (mesh) renderer.scene.add(mesh);
-      chunks.set(`${ci},${cj}`, mesh);
+      const data = local.build(ci, cj);
+      finish(id, data, performance.now() - t0);
     }
     // dropped: more than 2 chunks out of the wanted area
     for (const [key, mesh] of chunks) {
@@ -146,12 +152,12 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
       }
       chunks.delete(key);
     }
-    return want.length;
+    return want.length + pending.size;
   };
   const stats = () => {
     let quads = 0, meshes = 0;
     for (const mesh of chunks.values()) if (mesh) { meshes++; quads += (mesh.geometry.index?.count ?? 0) / 6; }
-    return { chunks: chunks.size, meshes, quads, built, msPerChunk: built ? buildMs / built : 0, chunkMeters: chunkM };
+    return { chunks: chunks.size, meshes, quads, built, msPerChunk: built ? buildMs / built : 0, chunkMeters: chunkM, workers: workers.length, pending: pending.size };
   };
   return { update, stats };
 }

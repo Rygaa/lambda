@@ -7,5 +7,7 @@ await Promise.all([
   build({ ...common, entryPoints: ["tools/test-systems.ts"], outfile: "dist/test-systems.js", platform: "node", packages: "external" }),
   build({ ...common, entryPoints: ["tools/map-preview.ts"], outfile: "dist/map-preview.js", platform: "node", packages: "external" }),
   build({ ...common, entryPoints: ["src/client/main.ts"], outfile: "dist/client.js", platform: "browser", target: "es2022" }),
+  // the voxel workers: they make the terrain chunks off the main thread
+  build({ ...common, entryPoints: ["src/client/voxelWorker.ts"], outfile: "dist/voxel-worker.js", platform: "browser", target: "es2022" }),
 ]);
-console.log("Built dist/server.js and dist/client.js");
+console.log("Built dist/server.js, dist/client.js and dist/voxel-worker.js");
