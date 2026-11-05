@@ -279,11 +279,14 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
         return items.length;
       });
       if (!caught) { log("loot: no item caught, again"); continue; }
-      await a.setViewportSize(VIEW);
-      await sleep(2500);
-      await a.screenshot({ path: path.join(OUT, "loot-on-ground.png"), timeout: 180000 });
-      log("saved loot-on-ground.png", caught, "items");
-      await a.setViewportSize(SMALL);
+      // LOOT=pet: no shot of the items (the pet takes them during that shot), only the pet picking them up
+      if (process.env.LOOT !== "pet") {
+        await a.setViewportSize(VIEW);
+        await sleep(2500);
+        await a.screenshot({ path: path.join(OUT, "loot-on-ground.png"), timeout: 180000 });
+        log("saved loot-on-ground.png", caught, "items");
+        await a.setViewportSize(SMALL);
+      }
       await a.evaluate(() => window.__lambda.freeze(false));
       // the pet near an item
       for (let k = 0; k < 200; k++) {
@@ -292,7 +295,7 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
           const list = L.entities();
           const mine = list.find((e) => e.kind === "pet" && e.owner === L.localId);
           const items = list.filter((e) => e.kind === "item");
-          const ok = mine && items.some((i) => Math.hypot(i.x - mine.x, i.z - mine.z) < 1.6);
+          const ok = mine && items.some((i) => Math.hypot(i.x - mine.x, i.z - mine.z) < 3);
           if (ok) L.freeze(true);
           return !!ok;
         });
