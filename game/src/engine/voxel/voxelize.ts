@@ -4,12 +4,41 @@ import type { VoxelPalette } from "./palette.ts";
 
 // A box of voxels on the grid of `size` meters: voxel (i, j, k) covers [i, i + 1] × [j, j + 1] × [k, k + 1] × size.
 // data[x + nx * (y + ny * z)] is the palette index + 1 of the voxel at (min + (x, y, z)), 0 where it is empty.
+// normals (optional): the normal of the surface each voxel was made from (encodeNormal); its faces are lit with it.
 export type VoxelVolume = {
   size: number;
   min: [number, number, number];
   n: [number, number, number];
   data: Uint32Array;
+  normals?: Uint16Array;
 };
+
+// A unit normal in 16 bits (octahedral, 8 bits per axis). Equal normals give equal codes, so the voxels of one
+// flat face still merge.
+export function encodeNormal(x: number, y: number, z: number) {
+  const l = Math.abs(x) + Math.abs(y) + Math.abs(z) || 1;
+  let u = x / l, v = z / l;
+  if (y < 0) {
+    const ou = u;
+    u = (1 - Math.abs(v)) * (ou >= 0 ? 1 : -1);
+    v = (1 - Math.abs(ou)) * (v >= 0 ? 1 : -1);
+  }
+  return (Math.round((u * 0.5 + 0.5) * 255) << 8) | Math.round((v * 0.5 + 0.5) * 255);
+}
+export function decodeNormal(code: number, out: number[]) {
+  const u = ((code >> 8) / 255) * 2 - 1, v = ((code & 255) / 255) * 2 - 1;
+  let x = u, z = v;
+  const y = 1 - Math.abs(u) - Math.abs(v);
+  if (y < 0) {
+    x = (1 - Math.abs(v)) * (u >= 0 ? 1 : -1);
+    z = (1 - Math.abs(u)) * (v >= 0 ? 1 : -1);
+  }
+  const l = Math.hypot(x, y, z) || 1;
+  out[0] = x / l;
+  out[1] = y / l;
+  out[2] = z / l;
+  return out;
+}
 
 export function createVolume(size: number, min: [number, number, number], n: [number, number, number]): VoxelVolume {
   return { size, min, n, data: new Uint32Array(n[0] * n[1] * n[2]) };
@@ -114,6 +143,7 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
     Math.floor(box.max.z / size) + 2 - min[2],
   ];
   const volume = createVolume(size, min, n);
+  if (options.surfaceNormals) volume.normals = new Uint16Array(volume.data.length);
   const score = new Float32Array(volume.data.length).fill(-9);
   const [nx, ny, nz] = n;
 
@@ -171,10 +201,11 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
             if (facing <= score[k]!) continue;
             score[k] = facing;
             const rgb = colorAt(ua + (ub - ua) * a + (uc - ua) * b, va + (vb - va) * a + (vc - va) * b);
-            if (options.surfaceNormals) {
+            volume.data[k] = palette.add(rgb) + 1;
+            if (volume.normals) {
               NP.set(0, 0, 0).addScaledVector(NA, 1 - a - b).addScaledVector(NB, a).addScaledVector(NC, b).normalize();
-              volume.data[k] = palette.add(rgb, NP.x, NP.y, NP.z) + 1;
-            } else volume.data[k] = palette.add(rgb) + 1;
+              volume.normals[k] = encodeNormal(NP.x, NP.y, NP.z);
+            }
           }
         }
       }

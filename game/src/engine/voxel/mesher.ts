@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import type { VoxelPalette } from "./palette.ts";
-import type { VoxelVolume } from "./voxelize.ts";
+import { decodeNormal, type VoxelVolume } from "./voxelize.ts";
 
 // Collects merged voxel faces (quads) into one geometry: position, normal (one of the 6 axes), uv (the texel of
 // the color in the palette texture).
@@ -16,9 +16,8 @@ export class QuadBuilder {
   }
 
   // 4 corners counter-clockwise seen from the side the normal points to.
-  quad(corners: number[], faceNormal: [number, number, number], color: number) {
+  quad(corners: number[], normal: ArrayLike<number>, color: number) {
     const base = this.positions.length / 3;
-    const normal = this.palette.normalOf(color) ?? faceNormal;
     const u = this.palette.u(color), v = this.palette.v(color);
     for (let c = 0; c < 4; c++) {
       this.positions.push(corners[c * 3]!, corners[c * 3 + 1]!, corners[c * 3 + 2]!);
@@ -51,9 +50,15 @@ export type MeshOptions = {
 // faces of one direction, slice and color are merged into the largest rectangles.
 export function meshVolume(volume: VoxelVolume, palette: VoxelPalette, options: MeshOptions = {}, into?: QuadBuilder) {
   const builder = into ?? new QuadBuilder(palette);
-  const { size, min, n, data } = volume;
+  const { size, min, n, data, normals } = volume;
   const [nx, ny, nz] = n;
   const get = (x: number, y: number, z: number) => (x < 0 || y < 0 || z < 0 || x >= nx || y >= ny || z >= nz ? 0 : data[x + nx * (y + ny * z)]!);
+  // the faces merge where both the color and the surface normal (if any) are the same
+  const keyOf = (x: number, y: number, z: number) => {
+    const k = x + nx * (y + ny * z);
+    return normals ? data[k]! * 65536 + normals[k]! : data[k]!;
+  };
+  const decoded = [0, 0, 0];
   const pos = [0, 0, 0];
   const corner = (d: number, u: number, v: number, plane: number, a: number, b: number, out: number[]) => {
     const p = [0, 0, 0];
@@ -65,7 +70,7 @@ export function meshVolume(volume: VoxelVolume, palette: VoxelPalette, options: 
   for (let d = 0; d < 3; d++) {
     const u = (d + 1) % 3, v = (d + 2) % 3;
     const du = n[u]!, dv = n[v]!;
-    const mask = new Int32Array(du * dv);
+    const mask = new Float64Array(du * dv);
     for (const sign of [1, -1]) {
       const normal: [number, number, number] = [0, 0, 0];
       normal[d] = sign;
@@ -81,8 +86,9 @@ export function meshVolume(volume: VoxelVolume, palette: VoxelPalette, options: 
             const c = get(pos[0]!, pos[1]!, pos[2]!);
             let m = 0;
             if (c) {
+              const key = keyOf(pos[0]!, pos[1]!, pos[2]!);
               pos[d] = slice + sign;
-              if (!get(pos[0]!, pos[1]!, pos[2]!)) m = c;
+              if (!get(pos[0]!, pos[1]!, pos[2]!)) m = key;
             }
             mask[a + du * b] = m;
             if (m) any = true;
@@ -117,7 +123,10 @@ export function meshVolume(volume: VoxelVolume, palette: VoxelPalette, options: 
               corner(d, u, v, plane, a + w, b + h, corners);
               corner(d, u, v, plane, a + w, b, corners);
             }
-            builder.quad(corners, normal, c - 1);
+            if (normals) {
+              decodeNormal(c % 65536, decoded);
+              builder.quad(corners, decoded, Math.floor(c / 65536) - 1);
+            } else builder.quad(corners, normal, c - 1);
             a += w;
           }
         }
@@ -130,11 +139,20 @@ export function meshVolume(volume: VoxelVolume, palette: VoxelPalette, options: 
 // A height field of voxel columns: column (x, z) is solid from the ground up to height[x, z] voxels, with the color
 // color[x, z]. The arrays have a border of 1 column on each side (the neighbours, for the side faces), so they are
 // (nx + 2) × (nz + 2). Column (x, z) of the chunk is voxel column (i0 + x, k0 + z) of the world.
-export type HeightField = { size: number; i0: number; k0: number; nx: number; nz: number; height: Int32Array; color: Uint32Array };
+// normal (optional): the surface normal of each column (encodeNormal), for the light of all its faces.
+export type HeightField = { size: number; i0: number; k0: number; nx: number; nz: number; height: Int32Array; color: Uint32Array; normal?: Uint16Array };
 
 export function meshHeightField(field: HeightField, builder: QuadBuilder) {
-  const { size, i0, k0, nx, nz, height, color } = field;
+  const { size, i0, k0, nx, nz, height, normal: normals } = field;
   const W = nx + 2;
+  // color and normal together: one key per column
+  const color = normals ? Float64Array.from(field.color, (c, k) => c * 65536 + normals[k]!) : field.color;
+  const decoded = [0, 0, 0];
+  const emit = (corners: number[], faceNormal: [number, number, number], key: number) => {
+    if (!normals) return builder.quad(corners, faceNormal, key);
+    decodeNormal(key % 65536, decoded);
+    builder.quad(corners, decoded, Math.floor(key / 65536));
+  };
   const at = (x: number, z: number) => x + 1 + W * (z + 1);
   // tops: merged where the height and the color are the same
   const done = new Uint8Array(nx * nz);
@@ -158,7 +176,7 @@ export function meshHeightField(field: HeightField, builder: QuadBuilder) {
       }
       for (let dd = 0; dd < d; dd++) for (let q = 0; q < w; q++) done[x + q + nx * (z + dd)] = 1;
       const X0 = (i0 + x) * size, X1 = (i0 + x + w) * size, Z0 = (k0 + z) * size, Z1 = (k0 + z + d) * size, Y = h * size;
-      builder.quad([X0, Y, Z1, X1, Y, Z1, X1, Y, Z0, X0, Y, Z0], [0, 1, 0], c);
+      emit([X0, Y, Z1, X1, Y, Z1, X1, Y, Z0, X0, Y, Z0], [0, 1, 0], c);
       x += w;
     }
   }
@@ -187,12 +205,12 @@ export function meshHeightField(field: HeightField, builder: QuadBuilder) {
         const Y0 = lo * size, Y1 = h * size;
         if (alongX) {
           const Z = (k0 + z + (dz > 0 ? 1 : 0)) * size, X0 = (i0 + s) * size, X1 = (i0 + s + w) * size;
-          if (dz > 0) builder.quad([X0, Y0, Z, X1, Y0, Z, X1, Y1, Z, X0, Y1, Z], normal, c);
-          else builder.quad([X1, Y0, Z, X0, Y0, Z, X0, Y1, Z, X1, Y1, Z], normal, c);
+          if (dz > 0) emit([X0, Y0, Z, X1, Y0, Z, X1, Y1, Z, X0, Y1, Z], normal, c);
+          else emit([X1, Y0, Z, X0, Y0, Z, X0, Y1, Z, X1, Y1, Z], normal, c);
         } else {
           const X = (i0 + x + (dx > 0 ? 1 : 0)) * size, Z0 = (k0 + s) * size, Z1 = (k0 + s + w) * size;
-          if (dx > 0) builder.quad([X, Y0, Z1, X, Y0, Z0, X, Y1, Z0, X, Y1, Z1], normal, c);
-          else builder.quad([X, Y0, Z0, X, Y0, Z1, X, Y1, Z1, X, Y1, Z0], normal, c);
+          if (dx > 0) emit([X, Y0, Z1, X, Y0, Z0, X, Y1, Z0, X, Y1, Z1], normal, c);
+          else emit([X, Y0, Z0, X, Y0, Z1, X, Y1, Z1, X, Y1, Z0], normal, c);
         }
         s += w;
       }

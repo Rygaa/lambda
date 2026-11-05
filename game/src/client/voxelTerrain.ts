@@ -6,7 +6,7 @@
 // - Rocks and stones: their low-poly shapes voxelized on the world grid, filled, cut at the ground.
 import * as THREE from "three";
 import { CAMERA_FORWARD, PIXELS_PER_METER, type PixelRenderer } from "../engine/renderer/index.ts";
-import { meshHeightField, meshVolume, QuadBuilder, voxelize } from "../engine/voxel/index.ts";
+import { encodeNormal, meshHeightField, meshVolume, QuadBuilder, voxelize } from "../engine/voxel/index.ts";
 import type { GameMap, Rock } from "../shared/worldgen.ts";
 import { mountainTriangles, rockGeometry } from "./terrain.ts";
 import type { Voxels } from "./voxels.ts";
@@ -54,6 +54,7 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
       const i0 = ci * CH, k0 = cj * CH, W = CH + 2;
       const height = new Int32Array(W * W);
       const color = new Uint32Array(W * W);
+      const normal = voxels.surfaceNormals ? new Uint16Array(W * W) : undefined;
       for (const t of tris) {
         const o = t * 9;
         const ax = points[o]!, ay = points[o + 1]!, az = points[o + 2]!;
@@ -63,13 +64,14 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
         if (Math.abs(det) < 1e-9) continue;
         const x0 = Math.max(i0 - 1, Math.floor(Math.min(ax, bx, cx) / s)), x1 = Math.min(i0 + CH, Math.floor(Math.max(ax, bx, cx) / s));
         const z0 = Math.max(k0 - 1, Math.floor(Math.min(az, bz, cz) / s)), z1 = Math.min(k0 + CH, Math.floor(Math.max(az, bz, cz) / s));
-        let c = snow[t] ? snowIndex : rockIndex;
-        if (voxels.surfaceNormals) {
-          // the normal of the triangle (counter-clockwise seen from above)
+        const c = snow[t] ? snowIndex : rockIndex;
+        let code = 0;
+        if (normal) {
+          // the normal of the triangle, facing up
           const ux = bx - ax, uy = by - ay, uz = bz - az, vx = cx - ax, vy = cy - ay, vz = cz - az;
           const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
-          const len = Math.hypot(nx, ny, nz) * (ny < 0 ? -1 : 1);
-          c = palette.add(palette.rgbOf(c), nx / len, ny / len, nz / len);
+          const sign = ny < 0 ? -1 : 1;
+          code = encodeNormal(nx * sign, ny * sign, nz * sign);
         }
         for (let k = z0; k <= z1; k++) {
           const pz = (k + 0.5) * s;
@@ -84,11 +86,12 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
             if (h > height[q]!) {
               height[q] = h;
               color[q] = c;
+              if (normal) normal[q] = code;
             }
           }
         }
       }
-      meshHeightField({ size: s, i0, k0, nx: CH, nz: CH, height, color }, builder);
+      meshHeightField({ size: s, i0, k0, nx: CH, nz: CH, height, color, normal }, builder);
     }
     for (const [rock, detail] of rocks.get(key) ?? []) {
       const material = { uniforms: { uColor: { value: new THREE.Color(rock.color) } } } as unknown as THREE.Material;
