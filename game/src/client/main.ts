@@ -75,7 +75,7 @@ async function main() {
 
   const world = new World();
   const c = createComponents(world);
-  const ctx: ClientContext = { c, map, config, dt: 0, time: 0, random: createRandom(1), localId: welcome.id, inbox, serverClock: { offset: 0, ready: false }, now: performance.now() / 1000 };
+  const ctx: ClientContext = { c, map, config, dt: 0, time: 0, random: createRandom(1), localId: welcome.id, inbox, serverClock: { offset: 0, ready: false }, now: performance.now() / 1000, realDt: 0 };
   const render = createRenderSystem(renderer, library, $("labels"));
   const systems = [applySnapshots, predict, interpolate, advanceAnims, render];
 
@@ -111,7 +111,9 @@ async function main() {
   status("");
   renderer.onFrame((seconds) => {
     ctx.dt = seconds;
-    ctx.now = performance.now() / 1000;
+    const now = performance.now() / 1000;
+    ctx.realDt = Math.min(0.5, now - ctx.now);
+    ctx.now = now;
     const [mx, mz] = moveInput();
     const input = c.input.get(welcome.id);
     if (input) {

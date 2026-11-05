@@ -17,6 +17,8 @@ export type ClientContext = SimContext & {
   // estimated server time now (seconds), updated from the snapshots
   serverClock: { offset: number; ready: boolean };
   now: number;
+  // real seconds since the last frame (ctx.dt is capped at 0.1 s by the renderer, for movement)
+  realDt: number;
 };
 
 export const applySnapshots: System<ClientContext> = (world, ctx) => {
@@ -110,8 +112,8 @@ export const interpolate: System<ClientContext> = (world, ctx) => {
 };
 
 // Animation clocks run on between snapshots.
-export const advanceAnims: System<ClientContext> = (world, { c, dt }) => {
-  for (const e of world.query(c.anim)) c.anim.get(e)!.time += dt;
+export const advanceAnims: System<ClientContext> = (world, { c, realDt }) => {
+  for (const e of world.query(c.anim)) c.anim.get(e)!.time += realDt;
 };
 
 // My player: the shared systems move it at once from my input.
