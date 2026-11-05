@@ -1,0 +1,9 @@
+{
+  "description": "What a monster leaves on the ground when it dies: small cubes of color.",
+  "size": 0.22,
+  "colors": ["#f2c94c", "#56ccf2", "#6fcf97", "#bb6bd9", "#f2994a", "#f4f4f4"],
+  "dropMin": 2,
+  "dropMax": 4,
+  "spread": 0.9,
+  "lifetimeSeconds": 180
+}

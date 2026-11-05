@@ -1,0 +1,19 @@
+{
+  "name": "Red cube",
+  "description": "A red cube that hops around, chases the players it sees and hits them.",
+  "size": 0.8,
+  "color": "#d8392b",
+  "radius": 0.45,
+  "hp": 3,
+  "speed": 2.6,
+  "wanderSpeed": 1.0,
+  "aggroRange": 9,
+  "leashRange": 16,
+  "attackRange": 1.25,
+  "attackDamage": 1,
+  "attackPeriod": 1.4,
+  "attackWindup": 0.4,
+  "count": 60,
+  "respawnSeconds": 5,
+  "minSpawnDistanceFromPlayers": 22
+}

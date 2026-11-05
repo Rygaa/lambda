@@ -1,0 +1,19 @@
+{
+  "description": "Rocks (big, they block the way) and stones (small, you walk over them). Low-poly shapes made from a seed.",
+  "rocks": {
+    "spacing": 6,
+    "fieldNoiseScale": 0.025,
+    "fieldThreshold": 0.25,
+    "nearMountain": 7,
+    "minRadius": 0.45,
+    "maxRadius": 1.5,
+    "colors": ["#a39a8e", "#9a9590", "#b0a493"]
+  },
+  "stones": {
+    "spacing": 2.5,
+    "probability": 0.1,
+    "minRadius": 0.1,
+    "maxRadius": 0.28,
+    "colors": ["#b9b2a6", "#a8a39b", "#c2b8a6"]
+  }
+}

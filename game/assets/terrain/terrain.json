@@ -1,0 +1,24 @@
+{
+  "description": "Generation of the map from a seed: island, beaches, ponds, dirt patches and mountains. Sizes in meters.",
+  "size": 256,
+  "seed": 1337,
+  "cell": 0.25,
+  "coast": { "radius": 0.8, "noiseScale": 0.012, "noiseAmount": 0.2, "beach": 3.5 },
+  "ponds": { "noiseScale": 0.022, "threshold": 0.73, "minDistFromCenter": 30 },
+  "dirt": { "noiseScale": 0.03, "threshold": 0.45 },
+  "mountains": {
+    "noiseScale": 0.0095,
+    "threshold": 0.6,
+    "height": 18,
+    "clearCenter": 34,
+    "blockAbove": 0.35,
+    "meshCell": 2,
+    "snowAbove": 8.5,
+    "grassBelow": 1.4,
+    "rockColor": "#a8988a",
+    "snowColor": "#f4f6f8",
+    "grassColor": "#7fb35a"
+  },
+  "buildings": { "minDistFromCenter": 24, "maxDistFromCenter": 100, "margin": 5, "minSpacing": 45 },
+  "spawn": [0, 0]
+}
