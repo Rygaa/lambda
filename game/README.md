@@ -124,8 +124,9 @@ outlines, flat bands, cloud shadows, god rays, dust, grass tufts). Two small add
 ## Tests
 
 ```bash
+npm test                                    # the shared systems: pickup, stats, pet, combat, a minute of game
 npm run build
 node dist/map-preview.js map.png            # the map from above, 4 px per meter
 LAMBDA_DEBUG=1 npm start &
-W=1920 H=1080 node tools/screenshots.cjs shots   # 2 clients in Chromium (Playwright): buildings, walk, attack, ...
+W=1920 H=1080 node tools/screenshots.cjs shots   # Chromium (Playwright): buildings, walk, attack, monster, kill, items, pet, players, overview
 ```

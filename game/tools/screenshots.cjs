@@ -154,6 +154,88 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
     }
   }
 
+  if (want("items")) {
+    // kill an isolated monster, then pick up an item with the button
+    const killNear = async () => {
+      const m0 = await me(a);
+      const all = (await ents(a)).filter((e) => e.kind === "monster" && Math.hypot(e.x, e.z) > 14);
+      const alone = all.filter((p) => all.every((q) => q === p || Math.hypot(p.x - q.x, p.z - q.z) > 8));
+      const list = alone.length ? alone : all;
+      list.sort((p, q) => Math.hypot(p.x - m0.x, p.z - m0.z) - Math.hypot(q.x - m0.x, q.z - m0.z));
+      const target = list[0];
+      await teleport(a, target.x + 1.2, target.z + 0.8);
+      for (let k = 0; k < 40; k++) {
+        const now = await ents(a);
+        const mm = now.find((e) => e.id === target.id);
+        if (!mm || mm.anim === "dead") return;
+        const m = now.find((e) => e.id === (m0.id));
+        if (m && Math.hypot(m.x - mm.x, m.z - mm.z) > 6) await teleport(a, mm.x + 1.2, mm.z + 0.8);
+        await walkTo(a, mm.x, mm.z, 1.3, 3000);
+        const mp = await me(a);
+        const d = Math.hypot(mm.x - mp.x, mm.z - mp.z) || 1;
+        await a.evaluate(([x, z]) => window.__lambda.setMove(x, z), [(mm.x - mp.x) / d, (mm.z - mp.z) / d]);
+        await sleep(80);
+        await a.evaluate(() => window.__lambda.setMove(0, 0));
+        await a.evaluate(() => window.__lambda.attack());
+        await sleep(700);
+      }
+    };
+    await killNear();
+    log("killed; inventory", JSON.stringify(await a.evaluate(() => window.__lambda.inventory())));
+    // walk onto the nearest item until the button shows
+    for (let k = 0; k < 30; k++) {
+      if (await a.isVisible("#pickup")) break;
+      const items = (await ents(a)).filter((e) => e.kind === "item");
+      const m = await me(a);
+      if (!items.length) break;
+      items.sort((p, q) => Math.hypot(p.x - m.x, p.z - m.z) - Math.hypot(q.x - m.x, q.z - m.z));
+      await walkTo(a, items[0].x, items[0].z, 0.8, 600);
+    }
+    if (await a.isVisible("#pickup")) {
+      // the picture freezes on this instant and the button is clicked at once (the pet is quick)
+      const before = await a.evaluate(() => {
+        const inv = window.__lambda.inventory();
+        window.__lambda.freeze(true);
+        document.getElementById("pickup").click();
+        return inv;
+      });
+      await a.setViewportSize(VIEW);
+      await sleep(2500);
+      await a.screenshot({ path: path.join(OUT, "pickup-button.png"), timeout: 180000 });
+      log("saved pickup-button.png");
+      await a.setViewportSize(SMALL);
+      await a.evaluate(() => window.__lambda.freeze(false));
+      await sleep(600);
+      log("after the button: inventory", JSON.stringify(before), "->", JSON.stringify(await a.evaluate(() => window.__lambda.inventory())));
+    } else log("no item within reach (the pet took them all first)");
+    await sleep(2500);
+    log("inventory", JSON.stringify(await a.evaluate(() => window.__lambda.inventory())), "stats", JSON.stringify(await a.evaluate(() => window.__lambda.stats())));
+    await shot(a, "inventory.png");
+
+    // the pet: kill another monster, stand still, and catch the pet on its way to an item
+    await killNear();
+    const inv0 = await a.evaluate(() => window.__lambda.inventory());
+    for (let k = 0; k < 200; k++) {
+      const list = await ents(a);
+      const myPet = list.find((e) => e.kind === "pet" && e.owner === (list.find((p) => p.name === "Aissa") ?? {}).id);
+      const items = list.filter((e) => e.kind === "item");
+      if (myPet && myPet.anim === "walk" && items.some((i) => Math.hypot(i.x - myPet.x, i.z - myPet.z) < 1.5)) {
+        await shot(a, "pet-pickup.png");
+        break;
+      }
+      await sleep(30);
+    }
+    await sleep(4000);
+    log("the pet picked up:", JSON.stringify(inv0), "->", JSON.stringify(await a.evaluate(() => window.__lambda.inventory())));
+  }
+
+  if (want("pet")) {
+    await teleport(a, 3, 3);
+    await a.evaluate(() => window.__lambda.setMove(1, 0.2));
+    await sleep(2500);
+    await shot(a, "pet-follow.png");
+  }
+
   if (want("players")) {
     const b = await open(browser, "Ami");
     log("client 2 ready");
