@@ -15,10 +15,8 @@ export type TerrainConfig = {
     blockAbove: number;
     meshCell: number;
     snowAbove: number;
-    grassBelow: number;
     rockColor: string;
     snowColor: string;
-    grassColor: string;
   };
   buildings: { minDistFromCenter: number; maxDistFromCenter: number; margin: number; minSpacing: number };
   spawn: [number, number];

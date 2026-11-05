@@ -19,23 +19,25 @@ export function buildGround(renderer: PixelRenderer, map: GameMap) {
   return buildGroundPatch(material, map.size * 4);
 }
 
-// The mountains: one low-poly height field, flat faces, rock with snow on the tops and grass on low flat parts.
+// The mountains: one low-poly height field, flat faces, rock with snow on the tops. Triangles that lie flat on
+// the ground (every corner under 0.3 m) are left out, so the mountains rise straight from the ground.
 export function buildMountains(renderer: PixelRenderer, map: GameMap) {
   const mt = map.config.terrain.mountains;
   const step = mt.meshCell;
   const count = Math.round(map.size / step);
   const h = (i: number, j: number) => map.heightAt(-map.half + i * step, -map.half + j * step);
-  const buckets: Record<"rock" | "snow" | "grass", number[]> = { rock: [], snow: [], grass: [] };
+  const buckets: Record<"rock" | "snow", number[]> = { rock: [], snow: [] };
   const tri = (a: number[], b: number[], d: number[]) => {
-    if (a[1]! <= 0 && b[1]! <= 0 && d[1]! <= 0) return;
+    if (Math.max(a[1]!, b[1]!, d[1]!) < 0.3) return;
     const avg = (a[1]! + b[1]! + d[1]!) / 3;
-    const n = new THREE.Vector3(b[0]! - a[0]!, b[1]! - a[1]!, b[2]! - a[2]!).cross(new THREE.Vector3(d[0]! - a[0]!, d[1]! - a[1]!, d[2]! - a[2]!)).normalize();
-    const kind = avg > mt.snowAbove ? "snow" : avg < mt.grassBelow && n.y > 0.8 ? "grass" : "rock";
-    buckets[kind].push(...a, ...b, ...d);
+    buckets[avg > mt.snowAbove ? "snow" : "rock"].push(...a, ...b, ...d);
   };
   for (let j = 0; j < count; j++) {
     for (let i = 0; i < count; i++) {
-      const p = (ii: number, jj: number) => [-map.half + ii * step, h(ii, jj), -map.half + jj * step];
+      const p = (ii: number, jj: number) => {
+        const y = h(ii, jj);
+        return [-map.half + ii * step, y < 0.05 ? -0.05 : y, -map.half + jj * step];
+      };
       const a = p(i, j), b = p(i + 1, j), cc = p(i + 1, j + 1), d = p(i, j + 1);
       // counter-clockwise seen from above (+y): a, d, c and a, c, b
       if ((i + j) % 2 === 0) {
@@ -48,8 +50,8 @@ export function buildMountains(renderer: PixelRenderer, map: GameMap) {
     }
   }
   const group = new THREE.Group();
-  const colors = { rock: mt.rockColor, snow: mt.snowColor, grass: mt.grassColor };
-  for (const kind of ["rock", "snow", "grass"] as const) {
+  const colors = { rock: mt.rockColor, snow: mt.snowColor };
+  for (const kind of ["rock", "snow"] as const) {
     if (!buckets[kind].length) continue;
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.Float32BufferAttribute(buckets[kind], 3));
