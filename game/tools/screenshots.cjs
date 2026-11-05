@@ -26,7 +26,8 @@ async function open(browser, name, query = "") {
 }
 const shot = async (page, file) => {
   await page.screenshot({ path: path.join(OUT, file), timeout: 180000 });
-  log("saved", file);
+  const m = await page.evaluate(() => window.__lambda.entities().find((e) => e.id === window.__lambda.localId));
+  log("saved", file, m ? `(me at ${m.x.toFixed(1)}, ${m.z.toFixed(1)}, ${m.anim})` : "");
 };
 const me = (page) => page.evaluate(() => window.__lambda.entities().find((e) => e.id === window.__lambda.localId));
 const ents = (page) => page.evaluate(() => window.__lambda.entities());
@@ -102,8 +103,8 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
         const list = await ents(a);
         const mm = list.find((e) => e.id === target.id);
         if (mm && mm.anim === "attack") {
-          await sleep(350);
-          await shot(a, "monster-attack.png");
+          // a few shots: the crouch, then the jump
+          for (let n = 1; n <= 3; n++) await shot(a, `monster-attack-${n}.png`);
           break;
         }
         await sleep(100);
@@ -113,6 +114,8 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
       for (let k = 0; k < 40; k++) {
         const list = await ents(a);
         const mm = list.find((e) => e.id === target.id);
+        const m1 = list.find((e) => e.kind === "player");
+        log("kill", k, mm ? `monster ${mm.anim} hp ${mm.hp} at ${mm.x.toFixed(1)},${mm.z.toFixed(1)}` : "monster gone", m1 ? `me ${m1.anim} hp ${m1.hp?.toFixed(1)} at ${m1.x.toFixed(1)},${m1.z.toFixed(1)}` : "");
         if (!mm || mm.anim === "dead") break;
         await walkTo(a, mm.x, mm.z, 1.4, 3000);
         // face it: one short step toward it, then hit
