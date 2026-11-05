@@ -211,8 +211,9 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
               const depth = ox * N.x + oy * N.y + oz * N.z;
               if (depth > 1e-6 || depth < -thin) continue;
               const k = vx + nx * (vy + ny * vz);
-              // the face toward the camera first, then the sample nearest to the voxel center (its texel)
-              const rank = facing - 0.2 * Math.hypot(x / size - (vx + min[0] + 0.5), y / size - (vy + min[1] + 0.5), z / size - (vz + min[2] + 0.5));
+              // the face toward the camera first, then the outer surface when two overlap (as the depth buffer would
+              // show it), then the sample nearest to the voxel center (its texel)
+              const rank = facing - (0.5 * depth) / size - 0.2 * Math.hypot(x / size - (vx + min[0] + 0.5), y / size - (vy + min[1] + 0.5), z / size - (vz + min[2] + 0.5));
               if (rank <= score[k]!) continue;
               score[k] = rank;
               const rgb = colorAt(ua + (ub - ua) * a + (uc - ua) * b, va + (vb - va) * a + (vc - va) * b);
