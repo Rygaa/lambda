@@ -1,0 +1,24 @@
+{
+  "name": "lambda-game",
+  "private": true,
+  "type": "module",
+  "description": "Projet Lambda: le jeu en ligne (serveur qui fait autorité + client navigateur), avec le rendu pixel art du projet.",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node dist/server.js",
+    "server": "node build.mjs && node dist/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "three": "0.187.0",
+    "ws": "8.18.3",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.30",
+    "@types/three": "0.187.0",
+    "@types/ws": "8.18.1",
+    "esbuild": "0.25.0",
+    "typescript": "5.8.3"
+  }
+}
