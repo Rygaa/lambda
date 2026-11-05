@@ -44,7 +44,7 @@ export async function buildBuildings(renderer: PixelRenderer, map: GameMap, voxe
       group.add(model);
       continue;
     }
-    const volume = voxelize(collectMeshes(model, true), voxels.size, voxels.palette, { clipBelowGround: true, fill: true });
+    const volume = voxelize(collectMeshes(model, true), voxels.size, voxels.palette, { clipBelowGround: true, fill: true, surfaceNormals: voxels.surfaceNormals });
     const geometry = volume && meshVolume(volume, voxels.palette, { cullGround: true });
     if (!geometry) continue;
     const mesh = new THREE.Mesh(geometry, voxels.material);

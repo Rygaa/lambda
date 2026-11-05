@@ -13,6 +13,8 @@ const want = (step) => STEPS.length === 0 || STEPS.includes(step);
 // screenshots at VIEW; between them the pages are small (SMALL), so the software renderer keeps up with the game
 const VIEW = { width: Number(process.env.W ?? 1600), height: Number(process.env.H ?? 900) };
 const SMALL = { width: 640, height: 360 };
+// added to the address of every client, for example QUERY="&voxel=16"
+const QUERY = process.env.QUERY ?? "";
 fs.mkdirSync(OUT, { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -22,7 +24,7 @@ async function open(browser, name, query = "") {
   const page = await browser.newPage({ viewport: SMALL });
   page.on("pageerror", (e) => log(name, "pageerror:", e.message));
   page.on("console", (m) => m.type() === "error" && log(name, "console:", m.text().slice(0, 200)));
-  await page.goto(`http://${SERVER}/?name=${encodeURIComponent(name)}${query}`);
+  await page.goto(`http://${SERVER}/?name=${encodeURIComponent(name)}${query}${QUERY}`);
   await page.waitForFunction(() => window.__lambda?.ready, null, { timeout: 240000 });
   return page;
 }

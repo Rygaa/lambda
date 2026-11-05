@@ -10,6 +10,8 @@ export type Voxels = {
   palette: VoxelPalette;
   material: THREE.ShaderMaterial;
   characterMaterial: THREE.ShaderMaterial;
+  // each voxel is lit with the normal of the surface it comes from (true), or with the normal of each cube face
+  surfaceNormals: boolean;
 };
 
 // ?voxel=16 is 1/16 m, ?voxel=43.6 is 1/43.6 m (1 game pixel). ?voxel=0: the meshes, no voxels.
@@ -20,12 +22,12 @@ export function voxelSizeFrom(params: URLSearchParams, fallback: number) {
   return n > 0 ? 1 / n : 0;
 }
 
-export function createVoxels(renderer: PixelRenderer, size: number): Voxels {
+export function createVoxels(renderer: PixelRenderer, size: number, surfaceNormals = false): Voxels {
   const palette = new VoxelPalette();
   const material = renderer.materials.solid({ map: palette.texture });
   const characterMaterial = renderer.materials.solid({ map: palette.texture });
   characterMaterial.uniforms.uChar!.value = 1;
-  return { size, palette, material, characterMaterial };
+  return { size, palette, material, characterMaterial, surfaceNormals };
 }
 
 // A cube of voxels of one color, about `meters` wide, its base centered on the origin (monsters, pets, items).

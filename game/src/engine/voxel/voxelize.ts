@@ -86,6 +86,8 @@ export type VoxelizeOptions = {
   clipBelowGround?: boolean;
   // fill the inside of closed shapes, so no face is made inside them
   fill?: boolean;
+  // each voxel keeps the normal of the surface it was made from (the geometry's normals), for its light
+  surfaceNormals?: boolean;
 };
 
 // Toward the camera: when several faces fall in one voxel, the one that faces the camera most gives its color
@@ -117,10 +119,13 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
 
   const A = new THREE.Vector3(), B = new THREE.Vector3(), C = new THREE.Vector3();
   const AB = new THREE.Vector3(), AC = new THREE.Vector3(), N = new THREE.Vector3();
+  const NA = new THREE.Vector3(), NB = new THREE.Vector3(), NC = new THREE.Vector3(), NP = new THREE.Vector3();
   for (const source of sources) {
     const g = source.geometry;
     const pos = g.getAttribute("position");
     const uv = g.getAttribute("uv");
+    const nrm = options.surfaceNormals ? g.getAttribute("normal") : undefined;
+    const normalMatrix = new THREE.Matrix3().getNormalMatrix(source.matrix);
     const index = g.index;
     const count = index ? index.count : pos.count;
     const materials = Array.isArray(source.material) ? source.material : [source.material];
@@ -139,6 +144,15 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
         N.crossVectors(AB, AC);
         if (N.lengthSq() === 0) continue;
         const facing = N.normalize().dot(VIEW);
+        if (nrm) {
+          NA.fromBufferAttribute(nrm, ia).applyMatrix3(normalMatrix);
+          NB.fromBufferAttribute(nrm, ib).applyMatrix3(normalMatrix);
+          NC.fromBufferAttribute(nrm, ic).applyMatrix3(normalMatrix);
+        } else if (options.surfaceNormals) {
+          NA.copy(N);
+          NB.copy(N);
+          NC.copy(N);
+        }
         const ua = uv ? uv.getX(ia) : 0, va = uv ? uv.getY(ia) : 0;
         const ub = uv ? uv.getX(ib) : 0, vb = uv ? uv.getY(ib) : 0;
         const uc = uv ? uv.getX(ic) : 0, vc = uv ? uv.getY(ic) : 0;
@@ -157,7 +171,10 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
             if (facing <= score[k]!) continue;
             score[k] = facing;
             const rgb = colorAt(ua + (ub - ua) * a + (uc - ua) * b, va + (vb - va) * a + (vc - va) * b);
-            volume.data[k] = palette.add(rgb) + 1;
+            if (options.surfaceNormals) {
+              NP.set(0, 0, 0).addScaledVector(NA, 1 - a - b).addScaledVector(NB, a).addScaledVector(NC, b).normalize();
+              volume.data[k] = palette.add(rgb, NP.x, NP.y, NP.z) + 1;
+            } else volume.data[k] = palette.add(rgb) + 1;
           }
         }
       }

@@ -72,7 +72,7 @@ async function main() {
   if (params.get("scale")) renderer.setPixelScale(Number(params.get("scale")));
   // voxels: ?voxel=16 is 1/16 m (?voxel=0: the meshes)
   const voxelSize = voxelSizeFrom(params, 0);
-  const voxels = voxelSize > 0 ? createVoxels(renderer, voxelSize) : null;
+  const voxels = voxelSize > 0 ? createVoxels(renderer, voxelSize, params.get("normals") === "surface") : null;
   const voxelTerrain = voxels ? createVoxelTerrain(renderer, map, voxels) : null;
   renderer.scene.add(buildGround(renderer, map), await buildBuildings(renderer, map, voxels));
   if (!voxels) renderer.scene.add(buildMountains(renderer, map), buildRocks(renderer, map));

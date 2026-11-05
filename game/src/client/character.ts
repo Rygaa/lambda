@@ -228,7 +228,7 @@ export async function loadCharacterLibrary(renderer: PixelRenderer, config: Char
   const identity = new THREE.Matrix4();
   for (const clip of Object.values(clips)) {
     clip.frames = clip.frames.map((frame) => {
-      const volume = voxelize(frame.map((geometry, m) => ({ geometry, matrix: identity, material: parts[m]!.material })), voxels.size, voxels.palette, { fill: true });
+      const volume = voxelize(frame.map((geometry, m) => ({ geometry, matrix: identity, material: parts[m]!.material })), voxels.size, voxels.palette, { fill: true, surfaceNormals: voxels.surfaceNormals });
       frame.forEach((g) => g.dispose());
       return [meshVolume(volume!, voxels.palette)!];
     });

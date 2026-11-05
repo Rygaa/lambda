@@ -16,8 +16,9 @@ export class QuadBuilder {
   }
 
   // 4 corners counter-clockwise seen from the side the normal points to.
-  quad(corners: number[], normal: [number, number, number], color: number) {
+  quad(corners: number[], faceNormal: [number, number, number], color: number) {
     const base = this.positions.length / 3;
+    const normal = this.palette.normalOf(color) ?? faceNormal;
     const u = this.palette.u(color), v = this.palette.v(color);
     for (let c = 0; c < 4; c++) {
       this.positions.push(corners[c * 3]!, corners[c * 3 + 1]!, corners[c * 3 + 2]!);

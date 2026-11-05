@@ -63,7 +63,14 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
         if (Math.abs(det) < 1e-9) continue;
         const x0 = Math.max(i0 - 1, Math.floor(Math.min(ax, bx, cx) / s)), x1 = Math.min(i0 + CH, Math.floor(Math.max(ax, bx, cx) / s));
         const z0 = Math.max(k0 - 1, Math.floor(Math.min(az, bz, cz) / s)), z1 = Math.min(k0 + CH, Math.floor(Math.max(az, bz, cz) / s));
-        const c = snow[t] ? snowIndex : rockIndex;
+        let c = snow[t] ? snowIndex : rockIndex;
+        if (voxels.surfaceNormals) {
+          // the normal of the triangle (counter-clockwise seen from above)
+          const ux = bx - ax, uy = by - ay, uz = bz - az, vx = cx - ax, vy = cy - ay, vz = cz - az;
+          const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+          const len = Math.hypot(nx, ny, nz) * (ny < 0 ? -1 : 1);
+          c = palette.add(palette.rgbOf(c), nx / len, ny / len, nz / len);
+        }
         for (let k = z0; k <= z1; k++) {
           const pz = (k + 0.5) * s;
           for (let i = x0; i <= x1; i++) {
@@ -85,7 +92,7 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
     }
     for (const [rock, detail] of rocks.get(key) ?? []) {
       const material = { uniforms: { uColor: { value: new THREE.Color(rock.color) } } } as unknown as THREE.Material;
-      const volume = voxelize([{ geometry: rockGeometry(rock, detail), matrix: new THREE.Matrix4(), material }], s, palette, { clipBelowGround: true, fill: true });
+      const volume = voxelize([{ geometry: rockGeometry(rock, detail), matrix: new THREE.Matrix4(), material }], s, palette, { clipBelowGround: true, fill: true, surfaceNormals: voxels.surfaceNormals });
       if (volume) meshVolume(volume, palette, { cullGround: true }, builder);
     }
     const geometry = builder.build();
