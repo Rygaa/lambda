@@ -24,6 +24,7 @@ What is in this folder:
 | `textured/` | the 3 examples with their textures, and the scripts that paint them with Infer (see its `README.md`) |
 | `new-building-prompt.md` | a prompt to give a new chat, to build a new building from a reference image |
 | `raditz-pod-prompt.md` | the same prompt, for Raditz's space pod |
+| `example/raditz-pod.json`, `example/raditz-pod-open.json`, `example/build-raditz-pod.py` | Raditz's space pod, closed and open: a sphere whose door is cut out of its own quads (the `pod` block, read by `tools/scene` and `tools/preview`; the game format cannot do it yet). Its images: `example/raditz-pod-*` |
 
 ## 1. The 3 main rules
 

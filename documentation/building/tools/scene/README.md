@@ -54,3 +54,17 @@ Limit: a building in front of a character does not hide it yet.
 - `chars/3d_new.js`: the "3D New" character (colored parts, no skin).
 
 `images/`: the scene with the character, before/after the fixes, and the debug views.
+
+## Raditz's pod
+
+A plan with a `pod` block (`example/raditz-pod.json`) is drawn by `buildPod` in `src/main.ts`, not by the game's
+`buildAssetObject`: the sphere of its 2 domes, the door cut out of its quads and turned around its hinge by `pod.open`
+degrees, the porthole (small triangles colored by where they lie), the white inside, the hinge bar and the 2 arms,
+all with the game materials. `example/raditz-pod-scene.png` is the scene with the 3 other buildings, closed and open:
+
+```bash
+VIEW=6400,1800 node render.cjs scene /tmp/scene.png 2 $T/chichi/chichi-house.json $T/buu/buu-house.json \
+  $T/capsule/capsule-ship.json ../../example/raditz-pod.json ../../example/raditz-pod-open.json
+# the game view of the door opening, one frame per file (slow: about 2 minutes a frame)
+node anim-pod.cjs ../../example/raditz-pod.json /tmp/frames 12
+```

@@ -21,7 +21,7 @@ function toAsset(plan: any): any {
 const PATCH = 24;
 
 // rotation: degrees. The game camera never turns, so the model turns to show its other sides.
-async function gameView(plan: any, rotation = 0): Promise<string> {
+async function gameView(plan: any, rotation = 0, targetY: number | null = null, wait = 1500): Promise<string> {
   const asset = toAsset(plan);
   const container = document.getElementById("view")!;
   container.innerHTML = "";
@@ -38,8 +38,8 @@ async function gameView(plan: any, rotation = 0): Promise<string> {
     renderer.createGroundCover({ minX: -half, maxX: half, minZ: -half, maxZ: half, groundAt: (x, z) => (under(x, z) ? null : "grass") }),
     model,
   );
-  renderer.setTarget({ x: 0, y: new THREE.Box3().setFromObject(model).getCenter(new THREE.Vector3()).y, z: 0 });
-  await new Promise((r) => setTimeout(r, 1500));
+  renderer.setTarget({ x: 0, y: targetY ?? new THREE.Box3().setFromObject(model).getCenter(new THREE.Vector3()).y, z: 0 });
+  await new Promise((r) => setTimeout(r, wait));
   const blob = await renderer.capture();
   renderer.dispose();
   return await new Promise<string>((r) => { const f = new FileReader(); f.onload = () => r(f.result as string); f.readAsDataURL(blob); });

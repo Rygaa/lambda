@@ -40,3 +40,15 @@ node tools/preview/render.cjs compare example/buu-reference.png /tmp/side.png /t
 ```
 
 The result is `example/buu-compare-side.png`.
+
+## Raditz's pod: the door cut out of the sphere
+
+`example/raditz-pod.json` has a `pod` block: a door made of quads of the sphere (not a shape), its hinge, and flat colors.
+Build the page once (`npx esbuild src/faces.ts --bundle --format=esm --outfile=dist/faces.js --log-level=error --tsconfig-raw='{}'`), then:
+
+| Command | What it draws |
+| --- | --- |
+| `node paint.cjs <plan.json> <out.png>` | the closed sphere with the quads of the door painted red, in 4 views (`example/raditz-pod-door-faces.png`) |
+| `node door.cjs <plan.json> <outDir> [frames]` | the door from closed to open, 3 plain views per frame (no hinge bar or arms: see `tools/scene`) |
+
+`src/main.ts`: `gameView` also takes a fixed target height and a wait, for animations.
