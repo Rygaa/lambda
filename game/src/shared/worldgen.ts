@@ -16,6 +16,15 @@ export const ROW_DIRT = 2;
 export const ROW_WATER = 255;
 
 export type Box = { minX: number; maxX: number; minZ: number; maxZ: number };
+// A tunnel the Kikoha cut through a rock or stone (its index: propAt), along a line on the ground plan: it goes
+// through (x, z) with the direction (dx, dz). How high and how wide it is comes from the rock: holeShape.
+export type RockHole = { rock: number; x: number; z: number; dx: number; dz: number };
+
+// The tunnel of a rock: half way up what shows over the ground, at most 0.6 m wide, smaller in a small stone.
+export function holeShape(rock: Rock) {
+  return { y: rock.height * 0.55, radius: Math.min(0.3, rock.height * 0.33) };
+}
+
 export type PlacedBuilding = { id: BuildingId; x: number; z: number; footprint: Box };
 export type Rock = { x: number; z: number; radius: number; height: number; seed: number; color: string };
 
@@ -86,6 +95,12 @@ export class GameMap {
   readonly buildings: PlacedBuilding[] = [];
   readonly rocks: Rock[] = [];
   readonly stones: Rock[] = [];
+  // the index (propAt) of each rock and stone that was blown up
+  readonly gone = new Set<number>();
+  // the tunnels the Kikoha cut: they do not change what blocks the way
+  readonly holes: RockHole[] = [];
+  // what `blocked` holds without the rocks
+  private readonly blockedNoRocks: Uint8Array;
   readonly spawn: { x: number; z: number };
 
   constructor(readonly seed: number, readonly config: GameConfig) {
@@ -157,7 +172,22 @@ export class GameMap {
       }
     }
     for (const b of this.buildings) this.blockBuilding(b, config.buildings[b.id]);
-    for (const rock of this.rocks) this.blockCircle(rock.x, rock.z, rock.radius * 0.8);
+    this.blockedNoRocks = this.blocked.slice();
+    for (const rock of this.rocks) this.blockCircle(rock, 1);
+  }
+
+  // Each rock and stone has one index on the server and on the clients: the rocks first, then the stones.
+  propAt(index: number): Rock | undefined {
+    return index < this.rocks.length ? this.rocks[index] : this.stones[index - this.rocks.length];
+  }
+
+  // A rock or stone blows up: nothing blocks the way there any more. Returns it, or null when there is none.
+  removeRock(index: number) {
+    const rock = this.propAt(index);
+    if (!rock || this.gone.has(index)) return null;
+    this.gone.add(index);
+    if (index < this.rocks.length) this.blockCircle(rock, 0);
+    return rock;
   }
 
   private sample(grid: Float32Array, x: number, z: number) {
@@ -304,12 +334,48 @@ export class GameMap {
     }
   }
 
-  private blockCircle(cx: number, cz: number, radius: number) {
+  // A beam along the ground plan, (dx, dz) of length 1: how far it goes, and the first rock or stone it goes through
+  // (it stops on the far side of it). Mountains and buildings stop it.
+  castBeam(x: number, z: number, dx: number, dz: number, range: number) {
+    let length = range;
+    for (let t = 0.25; t < range; t += 0.25) {
+      const px = x + dx * t, pz = z + dz * t;
+      if (this.heightAt(px, pz) > 0.5 || this.buildings.some((b) => px > b.footprint.minX && px < b.footprint.maxX && pz > b.footprint.minZ && pz < b.footprint.maxZ)) {
+        length = t;
+        break;
+      }
+    }
+    let rock: number | null = null;
+    let enter = length;
+    let exit = length;
+    for (let index = 0; index < this.rocks.length + this.stones.length; index++) {
+      if (this.gone.has(index)) continue;
+      const prop = this.propAt(index)!;
+      const fx = prop.x - x, fz = prop.z - z;
+      const along = fx * dx + fz * dz;
+      const side = fx * dz - fz * dx;
+      // the shape of a rock is uneven: the beam must pass well inside it
+      const radius = prop.radius * 0.85;
+      if (Math.abs(side) >= radius) continue;
+      const half = Math.sqrt(radius * radius - side * side);
+      const near = Math.max(0, along - half);
+      if (along + half < 0 || near >= enter) continue;
+      rock = index;
+      enter = near;
+      exit = along + prop.radius;
+    }
+    return { length: exit, rock };
+  }
+
+  // Blocks the ground under a rock (block 1), or gives it back as it was without the rock (block 0).
+  private blockCircle(rock: Rock, block: 0 | 1) {
+    const { x: cx, z: cz } = rock;
+    const radius = rock.radius * 0.8;
     for (let z = cz - radius; z <= cz + radius; z += this.cell / 2) {
       for (let x = cx - radius; x <= cx + radius; x += this.cell / 2) {
         if (Math.hypot(x - cx, z - cz) > radius) continue;
         const k = this.cellIndex(x, z);
-        if (k >= 0) this.blocked[k] = 1;
+        if (k >= 0) this.blocked[k] = block || this.blockedNoRocks[k]!;
       }
     }
   }

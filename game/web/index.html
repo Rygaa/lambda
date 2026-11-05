@@ -18,6 +18,11 @@
     #hud .hp i { display: block; height: 100%; background: #6fd36a; }
     #hud small { opacity: 0.75; }
     #pickup { position: absolute; left: 50%; bottom: 14%; transform: translateX(-50%); font: 600 15px system-ui, sans-serif; padding: 8px 14px; border-radius: 6px; border: 2px solid #c9a230; background: #f2c94c; color: #1a2433; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 0 #8a6d16; }
+    #blast { position: absolute; left: 50%; bottom: calc(14% + 48px); transform: translateX(-50%); font: 600 15px system-ui, sans-serif; padding: 8px 14px; border-radius: 6px; border: 2px solid #c9542f; background: #f2784c; color: #1a2433; cursor: pointer; box-shadow: 0 2px 0 #8a3416; }
+    #kikoha { position: absolute; left: 12px; bottom: 12px; font: 600 15px system-ui, sans-serif; padding: 8px 14px; border-radius: 6px; border: 2px solid #c9a230; background: #ffe45c; color: #1a2433; cursor: pointer; box-shadow: 0 2px 0 #8a6d16; }
+    #kikoha kbd { font: 12px system-ui; background: #1a243322; border-radius: 3px; padding: 0 5px; margin-left: 4px; }
+    #zoom { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
+    #zoom button { width: 36px; height: 36px; font: 700 20px system-ui, sans-serif; border-radius: 6px; border: 1px solid #4a5a70; background: #1a2433cc; color: #fff; cursor: pointer; }
     #pickup i, #inventory i, .toast i { display: inline-block; width: 12px; height: 12px; outline: 1px solid #1a2433; vertical-align: -1px; }
     #pickup kbd { font: 12px system-ui; background: #1a243322; border-radius: 3px; padding: 0 5px; }
     #inventory { position: absolute; right: 12px; top: 10px; padding: 8px 10px; background: #1a2433cc; border-radius: 6px; font-size: 13px; max-width: 330px; }
@@ -47,6 +52,12 @@
   <div id="inventory"></div>
   <div id="toasts"></div>
   <button id="pickup" type="button" style="display:none"></button>
+  <button id="blast" type="button" style="display:none">Exploser la pierre</button>
+  <button id="kikoha" type="button">Kikoha <kbd>K</kbd></button>
+  <div id="zoom">
+    <button id="zoom-out" type="button" title="Dézoomer">−</button>
+    <button id="zoom-in" type="button" title="Zoomer">+</button>
+  </div>
   <div id="status">Chargement…</div>
   <form id="join" style="display:none">
     <h1>Projet Lambda</h1>

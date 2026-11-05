@@ -5,14 +5,16 @@ import { createComponents } from "../shared/components.ts";
 import { loadConfig, type GameConfig } from "../shared/config.ts";
 import { World } from "../shared/ecs.ts";
 import { createRandom } from "../shared/noise.ts";
-import type { ClientMessage, ServerMessage } from "../shared/protocol.ts";
+import { BLAST_RANGE, type ClientMessage, type ServerMessage } from "../shared/protocol.ts";
 import { runSystems } from "../shared/systems.ts";
-import { GameMap } from "../shared/worldgen.ts";
+import { GameMap, holeShape } from "../shared/worldgen.ts";
 import { buildBuildings } from "./buildings.ts";
 import { loadCharacterLibrary } from "./character.ts";
 import { advanceAnims, applySnapshots, interpolate, predict, type ClientContext } from "./net.ts";
 import { createRenderSystem } from "./render.ts";
 import { buildGround, buildMountains, buildRocks, createGroundCoverManager } from "./terrain.ts";
+import { createKikohaBeams } from "./kikoha.ts";
+import { createVoxelBlast } from "./voxelBlast.ts";
 import { createVoxelTerrain } from "./voxelTerrain.ts";
 import { createVoxels, voxelSizeFrom } from "./voxels.ts";
 
@@ -50,6 +52,8 @@ async function main() {
   const socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${join.server}/ws`);
   const send = (message: ClientMessage) => socket.readyState === WebSocket.OPEN && socket.send(JSON.stringify(message));
   const inbox: Extract<ServerMessage, { t: "snap" }>[] = [];
+  const blastInbox: number[] = [];
+  const kikohaInbox: Extract<ServerMessage, { t: "kikoha" }>[] = [];
   const welcome = await new Promise<Extract<ServerMessage, { t: "welcome" }>>((resolve, reject) => {
     socket.addEventListener("open", () => send({ t: "hello", name: join.name }));
     socket.addEventListener("error", () => reject(new Error(`Impossible de joindre le serveur ${join.server}.`)));
@@ -59,7 +63,9 @@ async function main() {
       else if (message.t === "snap") {
         inbox.push(message);
         if (inbox.length > 40) inbox.shift();
-      } else if (message.t === "full") reject(new Error(message.reason));
+      } else if (message.t === "blast") blastInbox.push(message.rock);
+      else if (message.t === "kikoha") kikohaInbox.push(message);
+      else if (message.t === "full") reject(new Error(message.reason));
     });
   });
   socket.addEventListener("close", () => status("Déconnecté du serveur."));
@@ -67,6 +73,8 @@ async function main() {
   status("Génération de la carte…");
   const config: GameConfig = await configPromise;
   const map = new GameMap(welcome.seed, config);
+  for (const index of welcome.gone) map.removeRock(index);
+  map.holes.push(...welcome.holes);
   const renderer = new PixelRenderer($("view"));
   // ?scale=1: smaller game pixels, to see more of the map (for overviews; the game uses 4)
   if (params.get("scale")) renderer.setPixelScale(Number(params.get("scale")));
@@ -75,6 +83,8 @@ async function main() {
   const normals = params.get("normals");
   const voxels = voxelSize > 0 ? createVoxels(renderer, voxelSize, normals ? normals === "surface" : config.voxels.surfaceNormals) : null;
   const voxelTerrain = voxels ? createVoxelTerrain(renderer, map, voxels) : null;
+  const voxelBlast = voxels ? createVoxelBlast(renderer, voxels) : null;
+  const kikohaBeams = voxels ? createKikohaBeams(renderer, voxels) : null;
   const timings: Record<string, number> = {};
   let t0 = performance.now();
   renderer.scene.add(buildGround(renderer, map), await buildBuildings(renderer, map, voxels));
@@ -104,6 +114,7 @@ async function main() {
     held.add(event.code);
     if ((event.code === "Space" || event.code === "KeyJ") && !event.repeat) attackQueued = true;
     if (event.code === "KeyE" && !event.repeat) pickupQueued = true;
+    if (event.code === "KeyK" && !event.repeat) send({ t: "kikoha" });
     if (event.code === "KeyI" && !event.repeat) $("inventory").classList.toggle("hidden");
     if (event.code.startsWith("Arrow") || event.code === "Space") event.preventDefault();
   });
@@ -119,6 +130,65 @@ async function main() {
     // no focus left on the button, so Space attacks and does not click it again
     pickupButton.blur();
   });
+  // the "Exploser" button: it shows when a rock or stone is near. The server decides, and tells every player.
+  const blastButton = $("blast") as HTMLButtonElement;
+  const blastTarget = () => {
+    const me = c.transform.get(welcome.id);
+    return (me && !c.dead.has(welcome.id) && voxelTerrain?.nearestRock(me.x, me.z, BLAST_RANGE)) ?? null;
+  };
+  blastButton.addEventListener("click", () => {
+    blastButton.blur();
+    const rock = blastTarget();
+    if (typeof rock === "number") send({ t: "blast", rock });
+  });
+  // what the server says blew up: out of the map, then out of the picture
+  const applyBlasts = () => {
+    for (const index of blastInbox.splice(0)) {
+      const rock = map.removeRock(index);
+      const pieces = rock && voxelTerrain?.takeRock(index);
+      if (rock && pieces) voxelBlast!.start(pieces, rock.x, rock.z);
+    }
+  };
+  // the Kikoha: the K key or its button. The server fires it and tells every player; the tunnel is cut when the beam
+  // gets to the far side of the rock.
+  $("kikoha").addEventListener("click", (event) => {
+    send({ t: "kikoha" });
+    (event.currentTarget as HTMLElement).blur();
+  });
+  const applyKikohas = () => {
+    for (const { x, z, dx, dz, length, rock } of kikohaInbox.splice(0)) {
+      const target = rock === null ? undefined : map.propAt(rock);
+      const hole = rock === null ? null : { rock, x, z, dx, dz };
+      if (hole) map.holes.push(hole);
+      kikohaBeams?.fire(x, z, dx, dz, length, target ? holeShape(target).y : null, () => {
+        const pieces = hole && voxelTerrain?.cutHole(hole);
+        if (target && pieces) voxelBlast!.start(pieces, target.x, target.z);
+      });
+    }
+  };
+  // zoom: the mouse wheel or the - and + buttons change the size of the game pixels (whole numbers, so the pixels
+  // stay sharp). The largest is the size the game starts with; 1 shows the most of the map.
+  const maxZoom = (renderer as any).pixelScale as number;
+  let zoom = maxZoom;
+  const setZoom = (value: number) => {
+    zoom = Math.min(maxZoom, Math.max(1, value));
+    renderer.setPixelScale(zoom);
+  };
+  for (const [id, change] of [["zoom-out", -1], ["zoom-in", 1]] as const) {
+    $(id).addEventListener("click", (event) => {
+      setZoom(zoom + change);
+      // no focus left on the button, so Space attacks and does not click it again
+      (event.currentTarget as HTMLElement).blur();
+    });
+  }
+  let wheel = 0;
+  $("view").addEventListener("wheel", (event) => {
+    // a trackpad sends many small steps: one zoom step for each 100
+    wheel += event.deltaY;
+    if (Math.abs(wheel) < 100) return;
+    setZoom(zoom + (wheel > 0 ? -1 : 1));
+    wheel = 0;
+  }, { passive: true });
   const moveInput = (): [number, number] => {
     if (debug.move) return debug.move;
     // event.code is the key place: W A S D on QWERTY is Z Q S D on AZERTY. Screen up is -z.
@@ -131,12 +201,20 @@ async function main() {
   // ------------------------------------------------------------ the frame
   let look = params.get("look")?.split(",").map(Number);
   const hud = $("hud");
+  // frames per second, counted over half a second
+  let fps = 0, fpsFrames = 0, fpsFrom = performance.now() / 1000;
   status("");
   renderer.onFrame((seconds) => {
     ctx.dt = seconds;
     const now = performance.now() / 1000;
     ctx.realDt = Math.min(0.5, now - ctx.now);
     ctx.now = now;
+    fpsFrames++;
+    if (now - fpsFrom >= 0.5) {
+      fps = Math.round(fpsFrames / (now - fpsFrom));
+      fpsFrames = 0;
+      fpsFrom = now;
+    }
     const [mx, mz] = moveInput();
     const input = c.input.get(welcome.id);
     if (input) {
@@ -168,9 +246,14 @@ async function main() {
     const h = c.health.get(welcome.id);
     const players = [...world.query(c.player)].length;
     hud.innerHTML = `<b>${escape(join.name)}</b> <span class="hp"><i style="width:${h ? (100 * h.hp) / h.max : 0}%"></i></span> ${h ? Math.ceil(h.hp) : 0}/${h?.max ?? 0}` +
-      `<br>${players} joueur${players > 1 ? "s" : ""} · ${me ? `x ${me.x.toFixed(0)}, z ${me.z.toFixed(0)}` : ""}` +
-      `<br><small>Marcher : ZQSD / WASD / flèches · Attaquer : Espace ou clic · Ramasser : E · Inventaire : I</small>`;
+      `<br>${players} joueur${players > 1 ? "s" : ""} · ${me ? `x ${me.x.toFixed(0)}, z ${me.z.toFixed(0)}` : ""} · ${fps} FPS` +
+      `<br><small>Marcher : ZQSD / WASD / flèches · Attaquer : Espace ou clic · Kikoha : K · Ramasser : E · Inventaire : I</small>`;
     updatePickupButton(me);
+    applyBlasts();
+    applyKikohas();
+    kikohaBeams?.update(seconds);
+    blastButton.style.display = typeof blastTarget() === "number" ? "" : "none";
+    voxelBlast?.update(seconds);
     updateInventory();
   });
 

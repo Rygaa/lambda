@@ -11,7 +11,7 @@ import { createComponents, type Entity } from "../shared/components.ts";
 import { World } from "../shared/ecs.ts";
 import { createRandom, hashSeed } from "../shared/noise.ts";
 import { spawnMonsterSpawner, spawnPet, spawnPlayer } from "../shared/prefabs.ts";
-import { ANIM_STATES, NET_KINDS, round2, TICK_RATE, VIEW_RADIUS, type ClientMessage, type NetEntity, type ServerMessage } from "../shared/protocol.ts";
+import { ANIM_STATES, BLAST_RANGE, KIKOHA_PERIOD, KIKOHA_RANGE, NET_KINDS, round2, TICK_RATE, VIEW_RADIUS, type ClientMessage, type NetEntity, type ServerMessage } from "../shared/protocol.ts";
 import { playerSpawnPoint, runSystems, SERVER_SYSTEMS, type SimContext } from "../shared/systems.ts";
 import { GameMap } from "../shared/worldgen.ts";
 import { assetsDir, loadConfigFromDisk } from "./assets.ts";
@@ -34,7 +34,7 @@ const c = createComponents(world);
 const context: SimContext = { c, map, config, dt: 1 / TICK_RATE, time: 0, random: createRandom(hashSeed(seed, "server", Date.now())) };
 spawnMonsterSpawner(world, c, config);
 
-type Client = { socket: WebSocket; entity: Entity; attack: boolean; pickup: boolean; ack: number };
+type Client = { socket: WebSocket; entity: Entity; attack: boolean; pickup: boolean; ack: number; nextKikoha: number };
 const clients = new Set<Client>();
 
 // ---------------------------------------------------------------- static files (the client page)
@@ -85,9 +85,9 @@ wss.on("connection", (socket) => {
       const entity = spawnPlayer(world, c, config, name, p.x, p.z);
       // its pet cube comes with it (and goes away with it: petAI drops a pet whose player is gone)
       spawnPet(world, c, config, entity, p.x + 1, p.z + 1);
-      client = { socket, entity, attack: false, pickup: false, ack: 0 };
+      client = { socket, entity, attack: false, pickup: false, ack: 0, nextKikoha: 0 };
       clients.add(client);
-      send(socket, { t: "welcome", id: entity, seed, tickRate: TICK_RATE });
+      send(socket, { t: "welcome", id: entity, seed, tickRate: TICK_RATE, gone: [...map.gone], holes: map.holes });
       console.log(`+ ${name} joined (entity ${entity}), ${clients.size} player(s)`);
     } else if (message.t === "input" && client) {
       const input = c.input.get(client.entity);
@@ -99,6 +99,21 @@ wss.on("connection", (socket) => {
       if (message.attack) client.attack = true;
       if (message.pickup) client.pickup = true;
       client.ack = Math.max(client.ack, Number(message.seq) || 0);
+    } else if (message.t === "blast" && client) {
+      const me = c.transform.get(client.entity);
+      const index = Number(message.rock);
+      const rock = map.propAt(index);
+      // 1 m more than the button, for the player's position that the server has not seen yet
+      if (!me || !rock || c.dead.has(client.entity) || Math.hypot(rock.x - me.x, rock.z - me.z) - rock.radius > BLAST_RANGE + 1) return;
+      if (map.removeRock(index)) for (const other of clients) send(other.socket, { t: "blast", rock: index });
+    } else if (message.t === "kikoha" && client) {
+      const me = c.transform.get(client.entity);
+      if (!me || c.dead.has(client.entity) || context.time < client.nextKikoha) return;
+      client.nextKikoha = context.time + KIKOHA_PERIOD;
+      const line = { x: me.x, z: me.z, dx: Math.sin(me.rot), dz: Math.cos(me.rot) };
+      const { length, rock } = map.castBeam(line.x, line.z, line.dx, line.dz, KIKOHA_RANGE);
+      if (rock !== null) map.holes.push({ rock, ...line });
+      for (const other of clients) send(other.socket, { t: "kikoha", ...line, length, rock });
     } else if (message.t === "teleport" && client && DEBUG) {
       const t = c.transform.get(client.entity);
       const x = Number(message.x), z = Number(message.z);

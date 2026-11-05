@@ -7,21 +7,25 @@
 // The chunks are made in workers (voxelWorker.ts), nearest first; in the page if workers are not available.
 import * as THREE from "three";
 import { CAMERA_FORWARD, PIXELS_PER_METER, type PixelRenderer } from "../engine/renderer/index.ts";
-import type { GameMap } from "../shared/worldgen.ts";
-import { createChunkBuilder, type ChunkData, type ChunkSetup } from "./terrainChunk.ts";
+import { holeShape, type GameMap, type RockHole } from "../shared/worldgen.ts";
+import { createChunkBuilder, type ChunkData, type ChunkSetup, type HoleCut } from "./terrainChunk.ts";
 import { mountainTriangles } from "./terrainShapes.ts";
 import type { Voxels } from "./voxels.ts";
 
 const WORKER_URL = "dist/voxel-worker.js";
 
 export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels: Voxels) {
+  const toCut = (hole: RockHole): HoleCut => ({ x: hole.x, z: hole.z, dx: hole.dx, dz: hole.dz, ...holeShape(map.propAt(hole.rock)!) });
   const s = voxels.size;
   const cells = Math.max(8, Math.round(map.config.voxels.chunkMeters / s));
   const mt = map.config.terrain.mountains;
   const { points, snow } = mountainTriangles(map);
   const setup: ChunkSetup = {
     size: s, cells, points, snow, rockColor: mt.rockColor, snowColor: mt.snowColor, surfaceNormals: voxels.surfaceNormals,
+    // in the order of map.propAt: the same index here
     rocks: [...map.rocks.map((r) => [r, 1] as [typeof r, number]), ...map.stones.map((r) => [r, 0] as [typeof r, number])],
+    removed: [...map.gone].map((index) => map.propAt(index)!.seed),
+    cuts: map.holes.map((hole) => [map.propAt(hole.rock)!.seed, toCut(hole)]),
   };
   // the page keeps a builder too: to know the empty chunks at once, and to build when there is no worker
   const local = createChunkBuilder(setup);
@@ -154,10 +158,73 @@ export function createVoxelTerrain(renderer: PixelRenderer, map: GameMap, voxels
     }
     return want.length + pending.size;
   };
+
+  const isNear = (key: string) => chunks.has(key) || pending.has(key);
+  // Makes a chunk again at once, in the page.
+  const remake = (ci: number, cj: number) => {
+    const key = `${ci},${cj}`;
+    // a build on its way has the old rock: its answer is dropped
+    const job = pending.get(key);
+    if (job) {
+      byId.delete(job.id);
+      pending.delete(key);
+    }
+    const data = local.build(ci, cj);
+    const mesh = data ? toMesh(data) : null;
+    if (mesh) renderer.scene.add(mesh);
+    const old = chunks.get(key);
+    if (old) {
+      renderer.scene.remove(old);
+      old.geometry.dispose();
+    }
+    chunks.set(key, mesh);
+  };
+
+  // The index of the nearest rock or stone still on the map, its edge within `range` meters.
+  const nearestRock = (x: number, z: number, range: number) => {
+    let best: number | null = null;
+    let bestDist = range;
+    setup.rocks.forEach(([rock], index) => {
+      const d = Math.hypot(rock.x - x, rock.z - z) - rock.radius;
+      if (d <= bestDist && !map.gone.has(index)) {
+        bestDist = d;
+        best = index;
+      }
+    });
+    return best as number | null;
+  };
+
+  // Takes a rock or stone out of the picture. Its chunk is made again at once in the page, so it is gone on the same
+  // frame as the blast starts. Returns its pieces, or null when its chunk is not near the camera (nothing to show).
+  const takeRock = (index: number) => {
+    const [rock, detail] = setup.rocks[index]!;
+    local.remove(rock.seed);
+    for (const { worker } of workers) worker.postMessage({ remove: rock.seed });
+    const ci = Math.floor(rock.x / chunkM), cj = Math.floor(rock.z / chunkM);
+    const key = `${ci},${cj}`;
+    if (!isNear(key)) return null;
+    const list = local.rockPieces(rock, detail);
+    remake(ci, cj);
+    return list;
+  };
+
+  // Cuts a tunnel in a rock or stone, at once, like takeRock. Returns the voxels it takes out, or null.
+  const cutHole = (hole: RockHole) => {
+    const [rock, detail] = setup.rocks[hole.rock]!;
+    const cut = toCut(hole);
+    const ci = Math.floor(rock.x / chunkM), cj = Math.floor(rock.z / chunkM);
+    const near = isNear(`${ci},${cj}`);
+    const list = near ? local.holePieces(rock, detail, cut) : null;
+    local.addCut(rock.seed, cut);
+    for (const { worker } of workers) worker.postMessage({ cut: [rock.seed, cut] });
+    if (near) remake(ci, cj);
+    return list;
+  };
+
   const stats = () => {
     let quads = 0, meshes = 0;
     for (const mesh of chunks.values()) if (mesh) { meshes++; quads += (mesh.geometry.index?.count ?? 0) / 6; }
     return { chunks: chunks.size, meshes, quads, built, msPerChunk: built ? buildMs / built : 0, chunkMeters: chunkM, workers: workers.length, pending: pending.size };
   };
-  return { update, stats };
+  return { update, stats, nearestRock, takeRock, cutHole };
 }

@@ -27,6 +27,37 @@ function test(name: string, body: (w: World, ctx: SimContext) => void) {
 }
 const { x: sx, z: sz } = map.spawn;
 
+test("a rock that blows up frees the way, once, and a stone changes nothing", () => {
+  const m = new GameMap(config.terrain.seed, config);
+  const index = m.rocks.findIndex((r) => m.isBlocked(r.x, r.z) && !m.isBlocked(r.x + r.radius + 1, r.z));
+  const rock = m.propAt(index)!;
+  const before = m.blocked.reduce((sum, v) => sum + v, 0);
+  assert.equal(m.removeRock(index), rock);
+  assert.equal(m.isBlocked(rock.x, rock.z), false);
+  assert.ok(m.blocked.reduce((sum, v) => sum + v, 0) < before);
+  assert.equal(m.removeRock(index), null);
+  assert.equal(m.propAt(m.rocks.length), m.stones[0]);
+  const after = m.blocked.reduce((sum, v) => sum + v, 0);
+  assert.ok(m.removeRock(m.rocks.length));
+  assert.equal(m.blocked.reduce((sum, v) => sum + v, 0), after);
+  assert.equal(m.removeRock(1e6), null);
+});
+
+test("the Kikoha goes through the first rock on its line, and a tunnel does not free the way", () => {
+  // a rock on flat ground, with nothing else on the line
+  const rock = map.rocks.find((r) => {
+    for (let t = -r.radius - 1; t < r.radius + 1; t += 0.25) if (map.heightAt(r.x + t, r.z) > 0.5) return false;
+    return !map.rocks.concat(map.stones).some((o) => o !== r && Math.hypot(o.x - r.x, o.z - r.z) < r.radius + o.radius + 2);
+  })!;
+  const index = map.rocks.indexOf(rock);
+  const shot = map.castBeam(rock.x - rock.radius - 1, rock.z, 1, 0, 20);
+  assert.equal(shot.rock, index);
+  assert.ok(Math.abs(shot.length - (2 * rock.radius + 1)) < 0.01, "it stops on the far side");
+  assert.equal(map.castBeam(rock.x - rock.radius - 1, rock.z, -1, 0, 0.5).rock, null, "the other way: nothing");
+  assert.equal(map.castBeam(rock.x, rock.z + rock.radius + 1, 1, 0, 0.5).rock, null, "beside it: nothing");
+  assert.ok(map.isBlocked(rock.x, rock.z));
+});
+
 test("the map has exactly one of each building, on free ground", () => {
   assert.deepEqual(map.buildings.map((b) => b.id).sort(), ["buu-house", "capsule-ship", "chichi-house", "raditz-pod"]);
 });

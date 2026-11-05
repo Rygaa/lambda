@@ -40,7 +40,10 @@ From another network, open the port on the router (TCP) or put the server behind
 
 **Controls:** move with W A S D (Z Q S D on an AZERTY keyboard, the same keys) or the arrows; attack with Space,
 J, or a left click; pick up an item with the "Ramasser" button (it shows when an item is within 1.6 m) or E; show
-or hide the inventory with I.
+or hide the inventory with I. The "Exploser la pierre" button shows when a rock or stone is within 3 m: it blows up
+into voxels for every player, and the way is free where it stood. It stays gone until the server restarts. The Kikoha (K or its button, once a second) fires a beam the way you
+face, up to 20 m: it cuts a tunnel through the first rock or stone it touches and stops there, for every player,
+until the server restarts. A rock with a tunnel still blocks the way, and the beam does not hurt monsters. Zoom out and in with the mouse wheel or the − and + buttons. The FPS show in the top left box.
 
 ## What is in the game
 
@@ -108,8 +111,8 @@ player, so it moves at once), `interpolate` (the others, 0.12 s behind the serve
 ### Network
 
 - Client → server: `hello` (name), then `input` 30 times a second (move direction, attack pressed, pick up
-  pressed, number).
-- Server → client: `welcome` (my entity id, the seed), then `snap` 20 times a second: every entity within 45 m
+  pressed, number), `blast` (a rock or stone to blow up) and `kikoha`.
+- Server → client: `welcome` (my entity id, the seed, the rocks that are gone, the tunnels), `blast` and `kikoha` (to every player), then `snap` 20 times a second: every entity within 45 m
   (and every player), with position, facing, animation, life and label, and `me`: my inventory and my stats (only
   to me). An entity missing from a `snap` is gone.
 - The server checks everything (speed, walls, reach, damage). The client only sends what the keys say.
