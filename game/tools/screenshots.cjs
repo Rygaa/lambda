@@ -1,7 +1,7 @@
 // Takes the test screenshots with 2 clients in Chromium (Playwright). The server must run with LAMBDA_DEBUG=1
 // (teleport) on SERVER (default localhost:8080):
 //   LAMBDA_DEBUG=1 node dist/server.js &
-//   node tools/screenshots.cjs <out dir> [steps...]     steps: buildings walk attack monster kill players overview
+//   node tools/screenshots.cjs <out dir> [steps...]     steps: buildings mountain walk attack monster kill items pet players overview
 const { chromium } = require("playwright");
 const path = require("path");
 const fs = require("fs");
@@ -78,6 +78,16 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
       await sleep(2500);
       await shot(a, `building-${b.id}.png`);
     }
+    await a.evaluate(() => window.__lambda.setLook());
+  }
+
+  if (want("mountain")) {
+    // a mountain with rocks at its foot (seed 1337: x 32, z -64), my player in front of it
+    const [mx, mz] = (process.env.MOUNTAIN ?? "32,-64").split(",").map(Number);
+    await teleport(a, mx, mz + 2.5);
+    await a.evaluate(([x, z]) => window.__lambda.setLook(x, z, 1.4), [mx, mz - 1]);
+    await sleep(2500);
+    await shot(a, "mountain-rocks.png");
     await a.evaluate(() => window.__lambda.setLook());
   }
 
