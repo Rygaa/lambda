@@ -84,7 +84,7 @@ async function main() {
   let attackQueued = false;
   let seq = 0;
   let lastSend = 0;
-  const debug: { move: [number, number] | null } = { move: null };
+  const debug: { move: [number, number] | null; frozen: boolean } = { move: null, frozen: false };
   addEventListener("keydown", (event) => {
     if ((event.target as HTMLElement).tagName === "INPUT") return;
     held.add(event.code);
@@ -118,7 +118,9 @@ async function main() {
       input.moveX = mx;
       input.moveZ = mz;
     }
-    runSystems(world, systems, ctx);
+    // frozen (tests): the picture stays on one instant, the snapshots that come meanwhile are dropped
+    if (debug.frozen) inbox.length = 0;
+    runSystems(world, debug.frozen ? [render] : systems, ctx);
     // send my input 30 times a second, and at once for an attack
     if (attackQueued || ctx.now - lastSend > 1 / 30) {
       seq++;
@@ -150,6 +152,7 @@ async function main() {
       world, c, map, renderer, localId: welcome.id,
       setMove: (x: number, z: number) => (debug.move = x === 0 && z === 0 ? null : [x, z]),
       attack: () => (attackQueued = true),
+      freeze: (on: boolean) => (debug.frozen = on),
       teleport: (x: number, z: number) => send({ t: "teleport", x, z }),
       // the camera looks at (x, y, z) instead of my player; no argument: back to my player
       setLook: (x?: number, z?: number, y?: number) => (look = x === undefined ? undefined : [x, z ?? 0, y ?? 0.8]),

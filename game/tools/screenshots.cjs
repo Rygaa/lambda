@@ -24,9 +24,11 @@ async function open(browser, name, query = "") {
   await page.waitForFunction(() => window.__lambda?.ready, null, { timeout: 240000 });
   return page;
 }
+// the client picture is frozen during the screenshot (it takes seconds with the software renderer)
 const shot = async (page, file) => {
+  const m = await page.evaluate(() => (window.__lambda.freeze(true), window.__lambda.entities().find((e) => e.id === window.__lambda.localId)));
   await page.screenshot({ path: path.join(OUT, file), timeout: 180000 });
-  const m = await page.evaluate(() => window.__lambda.entities().find((e) => e.id === window.__lambda.localId));
+  await page.evaluate(() => window.__lambda.freeze(false));
   log("saved", file, m ? `(me at ${m.x.toFixed(1)}, ${m.z.toFixed(1)}, ${m.anim})` : "");
 };
 const me = (page) => page.evaluate(() => window.__lambda.entities().find((e) => e.id === window.__lambda.localId));
@@ -82,8 +84,16 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
     await a.evaluate(() => window.__lambda.setMove(0, 0));
     await sleep(1200);
     if (want("attack")) {
+      await a.evaluate(() => window.__lambda.setMove(0, 1));
+      await sleep(150);
+      await a.evaluate(() => window.__lambda.setMove(0, 0));
       await a.evaluate(() => window.__lambda.attack());
-      await sleep(250);
+      // the swing: the attack clip is about half way
+      for (let k = 0; k < 100; k++) {
+        const t = await a.evaluate(() => { const L = window.__lambda; const an = L.c.anim.get(L.localId); return an?.state === "attack" ? an.time : -1; });
+        if (t > 0.3) break;
+        await sleep(20);
+      }
       await shot(a, "player-attack.png");
       await sleep(1200);
     }
@@ -102,12 +112,13 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
       for (let k = 0; k < 120; k++) {
         const list = await ents(a);
         const mm = list.find((e) => e.id === target.id);
-        if (mm && mm.anim === "attack") {
-          // a few shots: the crouch, then the jump
-          for (let n = 1; n <= 3; n++) await shot(a, `monster-attack-${n}.png`);
+        // the jump at the player: just after the windup
+        const t = await a.evaluate((id) => window.__lambda.c.anim.get(id)?.time ?? 0, target.id);
+        if (mm && mm.anim === "attack" && t > 0.48 && t < 0.62) {
+          await shot(a, "monster-attack.png");
           break;
         }
-        await sleep(100);
+        await sleep(20);
       }
     }
     if (want("kill")) {
