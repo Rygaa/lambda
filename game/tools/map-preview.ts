@@ -26,5 +26,19 @@ for (let k = 0; k < n * n; k++) {
   rgb.set(c, k * 3);
 }
 const mark = (x: number, z: number, c: number[]) => { const ci = Math.floor((x + map.half) / map.cell), cj = Math.floor((z + map.half) / map.cell); for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) { const k = (cj + dy) * n + ci + dx; if (k >= 0 && k < n * n) rgb.set(c, k * 3); } };
-mark(map.spawn.x, map.spawn.z, [255, 0, 255]);
-writeFileSync(process.argv[2] ?? "map.png", encodePng(n, n, rgb));
+mark(map.spawn.x, map.spawn.z, [255, 255, 255]);
+// each building: its footprint in its own color, with a black frame
+const COLORS: Record<string, number[]> = { "chichi-house": [230, 60, 50], "buu-house": [250, 200, 40], "capsule-ship": [60, 90, 230], "raditz-pod": [200, 40, 200] };
+for (const b of map.buildings) {
+  const f = b.footprint, c = COLORS[b.id] ?? [255, 255, 255];
+  for (let z = f.minZ - 1.5; z <= f.maxZ + 1.5; z += map.cell) for (let x = f.minX - 1.5; x <= f.maxX + 1.5; x += map.cell) {
+    const ci = Math.floor((x + map.half) / map.cell), cj = Math.floor((z + map.half) / map.cell);
+    const inside = x >= f.minX && x <= f.maxX && z >= f.minZ && z <= f.maxZ;
+    rgb.set(inside ? c : [20, 20, 20], (cj * n + ci) * 3);
+  }
+}
+// SCALE=2: each cell drawn 2 x 2
+const k = Number(process.env.SCALE ?? 1);
+const big = new Uint8Array(n * k * n * k * 3);
+for (let y = 0; y < n * k; y++) for (let x = 0; x < n * k; x++) big.set(rgb.subarray(((Math.floor(y / k)) * n + Math.floor(x / k)) * 3, ((Math.floor(y / k)) * n + Math.floor(x / k)) * 3 + 3), (y * n * k + x) * 3);
+writeFileSync(process.argv[2] ?? "map.png", encodePng(n * k, n * k, big));
