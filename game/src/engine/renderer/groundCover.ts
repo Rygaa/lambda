@@ -13,6 +13,7 @@ const SPROUTS = [0, 1, 2, 7];
 const FLOWERS = [3, 4, 5, 6];
 
 const QUAD = new THREE.PlaneGeometry(1, 1).translate(0, 0.5, 0);
+const TEXTURES = new Map<string, THREE.Texture>();
 
 export type GroundCoverOptions = {
   // The square to cover, in meters.
@@ -45,10 +46,15 @@ function spriteMesh(shared: SharedUniforms, atlas: (typeof ATLASES)[keyof typeof
   geometry.setAttribute("iParam", new THREE.InstancedBufferAttribute(new Float32Array(items.flatMap((item) => item.slice(3))), 4));
   geometry.instanceCount = items.length;
 
-  const texture = new THREE.TextureLoader().load(atlas.url);
-  texture.magFilter = texture.minFilter = THREE.NearestFilter;
-  texture.generateMipmaps = false;
-  texture.colorSpace = THREE.NoColorSpace;
+  // one texture per atlas, shared by every patch of ground cover (the game makes patches as the camera moves)
+  let texture = TEXTURES.get(atlas.url);
+  if (!texture) {
+    texture = new THREE.TextureLoader().load(atlas.url);
+    texture.magFilter = texture.minFilter = THREE.NearestFilter;
+    texture.generateMipmaps = false;
+    texture.colorSpace = THREE.NoColorSpace;
+    TEXTURES.set(atlas.url, texture);
+  }
 
   const forward = new THREE.Vector3(...CAMERA_FORWARD);
   const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();

@@ -3,7 +3,7 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { buildGroundPatch } from "../engine/asset-format/build.ts";
-import type { PixelRenderer } from "../engine/renderer/index.ts";
+import { CAMERA_FORWARD, PIXELS_PER_METER, type PixelRenderer } from "../engine/renderer/index.ts";
 import type { GroundRow } from "../engine/renderer/palette.ts";
 import { createRandom } from "../shared/noise.ts";
 import { GameMap, ROW_DIRT, ROW_GRASS, ROW_SAND, type Rock } from "../shared/worldgen.ts";
@@ -96,8 +96,9 @@ export function buildRocks(renderer: PixelRenderer, map: GameMap) {
   return renderer.castShadows(group);
 }
 
-// Grass tufts and flowers: chunks of CHUNK meters made around the camera, dropped when far.
-const CHUNK = 16;
+// Grass tufts and flowers, as in the scene tool, but only where the camera looks: patches of CHUNK meters
+// over the ground the view shows (plus a margin), made when they come into view and dropped after.
+const CHUNK = 4;
 export function createGroundCoverManager(renderer: PixelRenderer, map: GameMap) {
   const chunks = new Map<string, THREE.Object3D>();
   const rows: Record<number, GroundRow> = { [ROW_GRASS]: "grass", [ROW_SAND]: "sand", [ROW_DIRT]: "dirt" };
@@ -105,14 +106,16 @@ export function createGroundCoverManager(renderer: PixelRenderer, map: GameMap) 
     if (map.isBlocked(x, z) || map.heightAt(x, z) > 0.02) return null;
     return rows[map.rowAt(x, z)] ?? null;
   };
+  const pitch = Math.asin(-CAMERA_FORWARD[1]);
   return (cx: number, cz: number) => {
-    const ci = Math.floor(cx / CHUNK);
-    const cj = Math.floor(cz / CHUNK);
+    // the ground the view shows: half its width, and half its depth along z (the camera looks down `pitch`)
+    const container = renderer.canvas.parentElement!;
+    const scale = (renderer as any).pixelScale as number;
+    const halfW = container.clientWidth / 2 / scale / PIXELS_PER_METER + 1.5;
+    const halfD = container.clientHeight / 2 / scale / PIXELS_PER_METER / Math.sin(pitch) + 1.5;
     const want = new Set<string>();
-    for (let dj = -2; dj <= 1; dj++) {
-      for (let di = -1; di <= 1; di++) {
-        const i = ci + di;
-        const j = cj + dj;
+    for (let j = Math.floor((cz - halfD) / CHUNK); j <= Math.floor((cz + halfD) / CHUNK); j++) {
+      for (let i = Math.floor((cx - halfW) / CHUNK); i <= Math.floor((cx + halfW) / CHUNK); i++) {
         if (Math.abs(i * CHUNK) > map.half + CHUNK || Math.abs(j * CHUNK) > map.half + CHUNK) continue;
         const key = `${i},${j}`;
         want.add(key);
