@@ -198,8 +198,11 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
             const vx = Math.floor(x / size) - min[0], vy = Math.floor(y / size) - min[1], vz = Math.floor(z / size) - min[2];
             if (vx < 0 || vy < 0 || vz < 0 || vx >= nx || vy >= ny || vz >= nz) continue;
             const k = vx + nx * (vy + ny * vz);
-            if (facing <= score[k]!) continue;
-            score[k] = facing;
+            // the face toward the camera first, then the sample nearest to the voxel center (its texel)
+            const cx = x / size - Math.floor(x / size) - 0.5, cy = y / size - Math.floor(y / size) - 0.5, cz = z / size - Math.floor(z / size) - 0.5;
+            const rank = facing - 0.2 * Math.sqrt(cx * cx + cy * cy + cz * cz);
+            if (rank <= score[k]!) continue;
+            score[k] = rank;
             const rgb = colorAt(ua + (ub - ua) * a + (uc - ua) * b, va + (vb - va) * a + (vc - va) * b);
             volume.data[k] = palette.add(rgb) + 1;
             if (volume.normals) {
