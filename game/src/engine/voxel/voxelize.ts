@@ -174,7 +174,10 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
         N.crossVectors(AB, AC);
         if (N.lengthSq() === 0) continue;
         const facing = N.normalize().dot(VIEW);
-        const thin = size * 0.5 * Math.max(Math.abs(N.x), Math.abs(N.y), Math.abs(N.z)) + 1e-6;
+        const thin = size * Math.max(Math.abs(N.x), Math.abs(N.y), Math.abs(N.z)) + 1e-6;
+        // one voxel toward the inside along the main axis of the normal
+        const ax = Math.abs(N.x), ay = Math.abs(N.y), az = Math.abs(N.z);
+        const stepIn = ax >= ay && ax >= az ? [Math.sign(N.x), 0, 0] : ay >= az ? [0, Math.sign(N.y), 0] : [0, 0, Math.sign(N.z)];
         if (nrm) {
           NA.fromBufferAttribute(nrm, ia).applyMatrix3(normalMatrix);
           NB.fromBufferAttribute(nrm, ib).applyMatrix3(normalMatrix);
@@ -196,23 +199,28 @@ export function voxelize(sources: VoxelSource[], size: number, palette: VoxelPal
             const y = A.y + AB.y * a + AC.y * b;
             const z = A.z + AB.z * a + AC.z * b;
             if (options.clipBelowGround && y < 0) continue;
-            const vx = Math.floor(x / size) - min[0], vy = Math.floor(y / size) - min[1], vz = Math.floor(z / size) - min[2];
-            if (vx < 0 || vy < 0 || vz < 0 || vx >= nx || vy >= ny || vz >= nz) continue;
-            // thin surface (6-separating): only the voxels whose center is near the plane of the triangle, so a
-            // thin part (an arm, a leg) is not one voxel wider on each side; it still has no hole a face shows through
-            const ox = (vx + min[0] + 0.5) * size - A.x, oy = (vy + min[1] + 0.5) * size - A.y, oz = (vz + min[2] + 0.5) * size - A.z;
-            if (Math.abs(ox * N.x + oy * N.y + oz * N.z) > thin) continue;
-            const k = vx + nx * (vy + ny * vz);
-            // the face toward the camera first, then the sample nearest to the voxel center (its texel)
-            const cx = x / size - Math.floor(x / size) - 0.5, cy = y / size - Math.floor(y / size) - 0.5, cz = z / size - Math.floor(z / size) - 0.5;
-            const rank = facing - 0.2 * Math.sqrt(cx * cx + cy * cy + cz * cz);
-            if (rank <= score[k]!) continue;
-            score[k] = rank;
-            const rgb = colorAt(ua + (ub - ua) * a + (uc - ua) * b, va + (vb - va) * a + (vc - va) * b);
-            volume.data[k] = palette.add(rgb) + 1;
-            if (volume.normals) {
-              NP.set(0, 0, 0).addScaledVector(NA, 1 - a - b).addScaledVector(NB, a).addScaledVector(NC, b).normalize();
-              volume.normals[k] = encodeNormal(NP.x, NP.y, NP.z);
+            // thin surface, on the inner side: only the voxels whose center is inside the shape, within one voxel
+            // of the plane of the triangle (6-separating, so no face shows through a hole). The shape keeps its
+            // size (rounded to the voxel), and a thin part (an arm, a leg) does not get a voxel more on each side.
+            // Candidates: the voxel of the sample, and the one next to it toward the inside, along the main axis.
+            const bx = Math.floor(x / size) - min[0], by = Math.floor(y / size) - min[1], bz = Math.floor(z / size) - min[2];
+            for (let c = 0; c < 2; c++) {
+              const vx = bx - (c ? stepIn[0]! : 0), vy = by - (c ? stepIn[1]! : 0), vz = bz - (c ? stepIn[2]! : 0);
+              if (vx < 0 || vy < 0 || vz < 0 || vx >= nx || vy >= ny || vz >= nz) continue;
+              const ox = (vx + min[0] + 0.5) * size - A.x, oy = (vy + min[1] + 0.5) * size - A.y, oz = (vz + min[2] + 0.5) * size - A.z;
+              const depth = ox * N.x + oy * N.y + oz * N.z;
+              if (depth > 1e-6 || depth < -thin) continue;
+              const k = vx + nx * (vy + ny * vz);
+              // the face toward the camera first, then the sample nearest to the voxel center (its texel)
+              const rank = facing - 0.2 * Math.hypot(x / size - (vx + min[0] + 0.5), y / size - (vy + min[1] + 0.5), z / size - (vz + min[2] + 0.5));
+              if (rank <= score[k]!) continue;
+              score[k] = rank;
+              const rgb = colorAt(ua + (ub - ua) * a + (uc - ua) * b, va + (vb - va) * a + (vc - va) * b);
+              volume.data[k] = palette.add(rgb) + 1;
+              if (volume.normals) {
+                NP.set(0, 0, 0).addScaledVector(NA, 1 - a - b).addScaledVector(NB, a).addScaledVector(NC, b).normalize();
+                volume.normals[k] = encodeNormal(NP.x, NP.y, NP.z);
+              }
             }
           }
         }
