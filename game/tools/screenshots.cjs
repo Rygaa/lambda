@@ -10,14 +10,16 @@ const SERVER = process.env.SERVER ?? "localhost:8080";
 const OUT = process.argv[2] ?? "screenshots";
 const STEPS = process.argv.slice(3);
 const want = (step) => STEPS.length === 0 || STEPS.includes(step);
+// screenshots at VIEW; between them the pages are small (SMALL), so the software renderer keeps up with the game
 const VIEW = { width: Number(process.env.W ?? 1600), height: Number(process.env.H ?? 900) };
+const SMALL = { width: 640, height: 360 };
 fs.mkdirSync(OUT, { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 
 async function open(browser, name, query = "") {
-  const page = await browser.newPage({ viewport: VIEW });
+  const page = await browser.newPage({ viewport: SMALL });
   page.on("pageerror", (e) => log(name, "pageerror:", e.message));
   page.on("console", (m) => m.type() === "error" && log(name, "console:", m.text().slice(0, 200)));
   await page.goto(`http://${SERVER}/?name=${encodeURIComponent(name)}${query}`);
@@ -26,8 +28,12 @@ async function open(browser, name, query = "") {
 }
 // the client picture is frozen during the screenshot (it takes seconds with the software renderer)
 const shot = async (page, file) => {
-  const m = await page.evaluate(() => (window.__lambda.freeze(true), window.__lambda.entities().find((e) => e.id === window.__lambda.localId)));
+  // freeze the picture on this instant, stop my player (the server keeps running), take the shot at full size
+  const m = await page.evaluate(() => (window.__lambda.freeze(true), window.__lambda.setMove(0, 0), window.__lambda.entities().find((e) => e.id === window.__lambda.localId)));
+  await page.setViewportSize(VIEW);
+  await sleep(2500);
   await page.screenshot({ path: path.join(OUT, file), timeout: 180000 });
+  await page.setViewportSize(SMALL);
   await page.evaluate(() => window.__lambda.freeze(false));
   log("saved", file, m ? `(me at ${m.x.toFixed(1)}, ${m.z.toFixed(1)}, ${m.anim})` : "");
 };
@@ -100,9 +106,11 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
   }
 
   if (want("monster") || want("kill")) {
-    // the nearest monster outside the safe zone
+    // the nearest monster outside the safe zone with no other monster near it
     const m0 = await me(a);
-    const monsters = (await ents(a)).filter((e) => e.kind === "monster" && Math.hypot(e.x, e.z) > 14);
+    const all = (await ents(a)).filter((e) => e.kind === "monster" && Math.hypot(e.x, e.z) > 14);
+    const alone = all.filter((p) => all.every((q) => q === p || Math.hypot(p.x - q.x, p.z - q.z) > 7));
+    const monsters = alone.length ? alone : all;
     monsters.sort((p, q) => Math.hypot(p.x - m0.x, p.z - m0.z) - Math.hypot(q.x - m0.x, q.z - m0.z));
     let target = monsters[0];
     log("monster", target);
@@ -128,6 +136,7 @@ async function walkTo(page, x, z, stop, maxMs = 8000) {
         const m1 = list.find((e) => e.kind === "player");
         log("kill", k, mm ? `monster ${mm.anim} hp ${mm.hp} at ${mm.x.toFixed(1)},${mm.z.toFixed(1)}` : "monster gone", m1 ? `me ${m1.anim} hp ${m1.hp?.toFixed(1)} at ${m1.x.toFixed(1)},${m1.z.toFixed(1)}` : "");
         if (!mm || mm.anim === "dead") break;
+        if (m1 && Math.hypot(m1.x - mm.x, m1.z - mm.z) > 6) await teleport(a, mm.x + 1.5, mm.z + 1);
         await walkTo(a, mm.x, mm.z, 1.4, 3000);
         // face it: one short step toward it, then hit
         const m = await me(a);
