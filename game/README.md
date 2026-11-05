@@ -39,7 +39,8 @@ PORT=9000 SEED=42 npm start
 From another network, open the port on the router (TCP) or put the server behind a tunnel.
 
 **Controls:** move with W A S D (Z Q S D on an AZERTY keyboard, the same keys) or the arrows; attack with Space,
-J, or a left click.
+J, or a left click; pick up an item with the "Ramasser" button (it shows when an item is within 1.6 m) or E; show
+or hide the inventory with I.
 
 ## What is in the game
 
@@ -53,7 +54,14 @@ J, or a left click.
 - **Monsters**: 60 red cubes. They wander, chase a player they see (9 m), give up when too far (16 m), and hit
   in front of them. A dead one leaves 2 to 4 small cubes of color on the ground (they stay 3 minutes), and a new
   monster comes 5 seconds later, far from the players. They do not go into the 8 m around the spawn.
-- **Online**: every player sees the other players, the same monsters and the same items.
+- **Items and inventory**: each kind of cube adds to one stat (`assets/items/loot-cubes.json`): Force (damage),
+  Vie (max life), Régénération, Vitesse (walking speed), Portée (attack reach), Rapidité (attack speed), with caps
+  on speed, reach and attack speed. The inventory (top right) shows each kind, how many, and the stats.
+  The inventory lives on the server, for as long as the player is connected (it is kept when the player dies).
+- **The pet cube**: each player has one (`assets/characters/pet/pet.json`), a small light blue cube that hops behind
+  it, goes to every item it sees (8 m around it, at most 12 m from its player) and picks it up into its player's
+  inventory. Monsters ignore it. When its player is far (respawn), it jumps back next to it.
+- **Online**: every player sees the other players, their pets, the same monsters and the same items.
 
 ## How the code is made
 
@@ -81,12 +89,13 @@ game/
 
 - An **entity** is a number.
 - A **component** is plain data in a store: `transform`, `velocity`, `collider`, `player`, `input`, `health`,
-  `melee`, `monster`, `ai`, `anim`, `item`, `lifetime`, `dead`, `net`, `spawner` (and on the client `interp`,
-  `local`). No methods, no three.js objects.
+  `melee`, `monster`, `ai`, `anim`, `item`, `inventory`, `stats`, `pet`, `petAI`, `lifetime`, `dead`, `net`,
+  `spawner` (and on the client `interp`, `local`). No methods, no three.js objects.
 - A **system** is a function `(world, context)`. All the logic is there.
 
-The server runs, 20 times a second: `spawners`, `steerPlayers`, `playerAttacks`, `monsterAI`, `meleeHits`,
-`movement`, `separation`, `health`, `deaths`, `lifetimes`, `animations` (`src/shared/systems.ts`).
+The server runs, 20 times a second: `spawners`, `applyStats` (inventory → stats → attack, life, speed),
+`steerPlayers`, `playerAttacks`, `playerPickup`, `monsterAI`, `petAI`, `meleeHits`, `movement`, `separation`,
+`health`, `deaths`, `lifetimes`, `animations` (`src/shared/systems.ts`).
 
 The client has its own world with the same components and the same ids as the server. Each frame it runs
 `applySnapshots` (the server state into the world), `predict` (the shared `steerPlayers` and `movement` on my own
@@ -95,9 +104,11 @@ player, so it moves at once), `interpolate` (the others, 0.12 s behind the serve
 
 ### Network
 
-- Client → server: `hello` (name), then `input` 30 times a second (move direction, attack pressed, number).
+- Client → server: `hello` (name), then `input` 30 times a second (move direction, attack pressed, pick up
+  pressed, number).
 - Server → client: `welcome` (my entity id, the seed), then `snap` 20 times a second: every entity within 45 m
-  (and every player), with position, facing, animation, life and label. An entity missing from a `snap` is gone.
+  (and every player), with position, facing, animation, life and label, and `me`: my inventory and my stats (only
+  to me). An entity missing from a `snap` is gone.
 - The server checks everything (speed, walls, reach, damage). The client only sends what the keys say.
 
 ### The look

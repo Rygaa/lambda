@@ -82,6 +82,7 @@ async function main() {
   // ------------------------------------------------------------ input
   const held = new Set<string>();
   let attackQueued = false;
+  let pickupQueued = false;
   let seq = 0;
   let lastSend = 0;
   const debug: { move: [number, number] | null; frozen: boolean } = { move: null, frozen: false };
@@ -89,12 +90,21 @@ async function main() {
     if ((event.target as HTMLElement).tagName === "INPUT") return;
     held.add(event.code);
     if ((event.code === "Space" || event.code === "KeyJ") && !event.repeat) attackQueued = true;
+    if (event.code === "KeyE" && !event.repeat) pickupQueued = true;
+    if (event.code === "KeyI" && !event.repeat) $("inventory").classList.toggle("hidden");
     if (event.code.startsWith("Arrow") || event.code === "Space") event.preventDefault();
   });
   addEventListener("keyup", (event) => held.delete(event.code));
   addEventListener("blur", () => held.clear());
   $("view").addEventListener("mousedown", (event) => {
     if (event.button === 0) attackQueued = true;
+  });
+  // the "Ramasser" button: it shows when an item is within reach
+  const pickupButton = $("pickup") as HTMLButtonElement;
+  pickupButton.addEventListener("click", () => {
+    pickupQueued = true;
+    // no focus left on the button, so Space attacks and does not click it again
+    pickupButton.blur();
   });
   const moveInput = (): [number, number] => {
     if (debug.move) return debug.move;
@@ -124,9 +134,10 @@ async function main() {
     if (debug.frozen) inbox.length = 0;
     runSystems(world, debug.frozen ? [render] : systems, ctx);
     // send my input 30 times a second, and at once for an attack
-    if (attackQueued || ctx.now - lastSend > 1 / 30) {
+    if (attackQueued || pickupQueued || ctx.now - lastSend > 1 / 30) {
       seq++;
-      send({ t: "input", seq, moveX: mx, moveZ: mz, attack: attackQueued });
+      send({ t: "input", seq, moveX: mx, moveZ: mz, attack: attackQueued, pickup: pickupQueued });
+      pickupQueued = false;
       const me = c.transform.get(welcome.id);
       const local = c.local.get(welcome.id);
       if (me && local) local.history.push({ seq, x: me.x, z: me.z });
@@ -144,8 +155,71 @@ async function main() {
     const players = [...world.query(c.player)].length;
     hud.innerHTML = `<b>${escape(join.name)}</b> <span class="hp"><i style="width:${h ? (100 * h.hp) / h.max : 0}%"></i></span> ${h ? Math.ceil(h.hp) : 0}/${h?.max ?? 0}` +
       `<br>${players} joueur${players > 1 ? "s" : ""} · ${me ? `x ${me.x.toFixed(0)}, z ${me.z.toFixed(0)}` : ""}` +
-      `<br><small>Marcher : ZQSD / WASD / flèches · Attaquer : Espace ou clic</small>`;
+      `<br><small>Marcher : ZQSD / WASD / flèches · Attaquer : Espace ou clic · Ramasser : E · Inventaire : I</small>`;
+    updatePickupButton(me);
+    updateInventory();
   });
+
+  // the nearest item within reach of my player: the button says which one
+  let shownItem = "";
+  function updatePickupButton(me: { x: number; z: number } | undefined) {
+    let best: string | null = null;
+    let bestDist = config.loot.pickupRange;
+    if (me && !c.dead.has(welcome.id)) {
+      for (const e of world.query(c.item, c.transform)) {
+        const t = c.transform.get(e)!;
+        const d = Math.hypot(t.x - me.x, t.z - me.z);
+        if (d <= bestDist) {
+          bestDist = d;
+          best = c.item.get(e)!.type;
+        }
+      }
+    }
+    const key = best ?? "";
+    if (key === shownItem) return;
+    shownItem = key;
+    const type = config.loot.items.find((i) => i.id === best);
+    pickupButton.style.display = type ? "" : "none";
+    if (type) pickupButton.innerHTML = `<i style="background:${type.color}"></i> Ramasser ${escape(type.name)} <kbd>E</kbd>`;
+  }
+
+  // the inventory: each kind of item, how many, what it gives; then my stats. "+1 Force" when one comes in.
+  let shownInventory = "";
+  let lastCounts: Record<string, number> | null = null;
+  function updateInventory() {
+    const inv = c.inventory.get(welcome.id);
+    const stats = c.stats.get(welcome.id);
+    if (!inv || !stats) return;
+    const key = JSON.stringify([inv.counts, stats]);
+    if (key === shownInventory) return;
+    shownInventory = key;
+    if (lastCounts) {
+      for (const type of config.loot.items) {
+        const more = (inv.counts[type.id] ?? 0) - (lastCounts[type.id] ?? 0);
+        if (more > 0) toast(`<i style="background:${type.color}"></i> +${more} ${escape(type.name)}`);
+      }
+    }
+    lastCounts = { ...inv.counts };
+    const rows = config.loot.items.map((type) => {
+      const n = inv.counts[type.id] ?? 0;
+      return `<tr class="${n ? "" : "none"}"><td><i style="background:${type.color}"></i></td><td>${escape(type.name)}</td><td class="n">${n}</td><td class="d">${escape(type.description)}</td></tr>`;
+    }).join("");
+    $("inventory").innerHTML = `<h2>Inventaire <small>(I)</small></h2><table>${rows}</table>` +
+      `<h2>Stats</h2><table class="stats">` +
+      `<tr><td>Dégâts</td><td>${stats.damage.toFixed(2)}</td></tr>` +
+      `<tr><td>Vie max</td><td>${stats.maxHp}</td></tr>` +
+      `<tr><td>Régénération</td><td>${stats.regen.toFixed(2)} /s</td></tr>` +
+      `<tr><td>Vitesse</td><td>${stats.speed.toFixed(2)} m/s</td></tr>` +
+      `<tr><td>Portée</td><td>${stats.range.toFixed(2)} m</td></tr>` +
+      `<tr><td>Attaque toutes les</td><td>${stats.attackPeriod.toFixed(2)} s</td></tr></table>`;
+  }
+  function toast(html: string) {
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.innerHTML = html;
+    $("toasts").appendChild(el);
+    setTimeout(() => el.remove(), 2200);
+  }
 
   // hooks for the tests (Playwright)
   Object.assign(window, {
@@ -154,11 +228,14 @@ async function main() {
       world, c, map, renderer, localId: welcome.id,
       setMove: (x: number, z: number) => (debug.move = x === 0 && z === 0 ? null : [x, z]),
       attack: () => (attackQueued = true),
+      pickup: () => (pickupQueued = true),
       freeze: (on: boolean) => (debug.frozen = on),
       teleport: (x: number, z: number) => send({ t: "teleport", x, z }),
       // the camera looks at (x, y, z) instead of my player; no argument: back to my player
       setLook: (x?: number, z?: number, y?: number) => (look = x === undefined ? undefined : [x, z ?? 0, y ?? 0.8]),
-      entities: () => [...world.query(c.net, c.transform)].map((e) => ({ id: e, kind: c.net.get(e)!.kind, ...c.transform.get(e)!, anim: c.anim.get(e)?.state, hp: c.health.get(e)?.hp, name: c.player.get(e)?.name })),
+      entities: () => [...world.query(c.net, c.transform)].map((e) => ({ id: e, kind: c.net.get(e)!.kind, ...c.transform.get(e)!, anim: c.anim.get(e)?.state, hp: c.health.get(e)?.hp, name: c.player.get(e)?.name, type: c.item.get(e)?.type, owner: c.pet.get(e)?.owner })),
+      inventory: () => ({ ...c.inventory.get(welcome.id)?.counts }),
+      stats: () => ({ ...c.stats.get(welcome.id) }),
     },
   });
 }

@@ -1,0 +1,13 @@
+{
+  "name": "Pet cube",
+  "description": "A small cube that follows its player like a pet and picks up every item it finds on the ground (they go into its player's inventory). Monsters ignore it.",
+  "size": 0.45,
+  "color": "#8fd8ff",
+  "radius": 0.25,
+  "speed": 5.5,
+  "followDistance": 1.4,
+  "searchRadius": 8,
+  "maxDistanceFromOwner": 12,
+  "teleportDistance": 18,
+  "pickupDistance": 0.5
+}

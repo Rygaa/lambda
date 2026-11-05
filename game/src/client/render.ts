@@ -119,8 +119,32 @@ export function createRenderSystem(renderer: PixelRenderer, library: CharacterLi
         },
       };
     }
+    if (kind === "pet") {
+      // the pet cube: smaller, light blue, it hops after its player
+      const p = config.pet;
+      const body = new THREE.Mesh(cube, renderer.materials.solid({ color: p.color }));
+      body.scale.setScalar(p.size);
+      const group = new THREE.Group();
+      group.add(body);
+      const phase = (e * 0.29) % 1;
+      return {
+        object: group,
+        update: (ctx, e) => {
+          const anim = c.anim.get(e)!;
+          let y = 0, sy = 1;
+          if (anim.state === "walk") {
+            const k = (ctx.now * 3.2 + phase) % 1;
+            y = Math.sin(k * Math.PI) * 0.18;
+            sy = 1 + Math.sin(k * Math.PI) * 0.15;
+          } else sy = 1 + Math.sin((ctx.now + phase * 3) * 4) * 0.05;
+          const sx = 1 / Math.sqrt(sy);
+          body.scale.set(p.size * sx, p.size * sy, p.size * sx);
+          body.position.y = y;
+        },
+      };
+    }
     // item: a small cube of color that turns and bobs a little
-    const color = c.item.get(e)?.color ?? "#ffffff";
+    const color = config.loot.items.find((i) => i.id === c.item.get(e)?.type)?.color ?? "#ffffff";
     let material = itemMaterials.get(color);
     if (!material) {
       material = renderer.materials.solid({ color });

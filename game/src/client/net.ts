@@ -45,6 +45,11 @@ export const applySnapshots: System<ClientContext> = (world, ctx) => {
       else c.interp.get(id)!.samples.push({ t: snap.time, x, z, rot });
     }
     for (const e of [...world.query(c.net)]) if (!seen.has(e)) world.destroy(e);
+    // my inventory and my stats (my speed is used by the prediction)
+    if (snap.me && world.exists(ctx.localId)) {
+      c.inventory.set(ctx.localId, { counts: { ...snap.me.inv } });
+      c.stats.set(ctx.localId, { ...snap.me.stats });
+    }
   }
   ctx.inbox.length = 0;
 };
@@ -54,13 +59,14 @@ function createMirror(world: World, c: Components, config: GameConfig, id: Entit
   c.net.set(id, { kind });
   c.transform.set(id, { x, z, rot });
   c.anim.set(id, { state: "idle", time: 0 });
-  if (kind === "item") c.item.set(id, { color: label });
+  if (kind === "item") c.item.set(id, { type: label });
+  if (kind === "pet") c.pet.set(id, { owner: Number(label) });
   if (kind === "monster") c.monster.set(id, { kind: "red-cube" });
   if (isLocal) {
     c.local.set(id, { history: [] });
     c.velocity.set(id, { x: 0, z: 0 });
     c.collider.set(id, { radius: config.character.radius });
-    c.input.set(id, { moveX: 0, moveZ: 0, attack: false, seq: 0 });
+    c.input.set(id, { moveX: 0, moveZ: 0, attack: false, pickup: false, seq: 0 });
   } else c.interp.set(id, { samples: [{ t: -1, x, z, rot }] });
 }
 

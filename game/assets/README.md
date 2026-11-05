@@ -17,7 +17,8 @@ assets/
 ├── props/
 │   └── rocks.json      rocks (they block the way) and stones (you walk over them)
 ├── characters/
-│   └── player/         the player character: character.json + the FlyFF parts (*.glb), clips, textures/
+│   ├── player/         the player character: character.json + the FlyFF parts (*.glb), clips, textures/
+│   └── pet/            pet.json: the pet cube that follows its player and picks up items
 ├── monsters/
 │   └── red-cube/       monster.json: the red cube (size, color, life, speed, ranges, damage, how many)
 └── items/
@@ -44,7 +45,7 @@ assets/
 | `buildings/raditz-pod` | `documentation/building/example/raditz-pod.json` (drawn by `buildPod`, copied from `tools/scene/src/main.ts`) |
 | `terrain/ground-cover/` | `packages/renderer/assets/` of the `gpt` branch |
 | `characters/player/` | `documentation/building/tools/scene/web/char/` (the FlyFF male: parts, `mvr_male.glb` clips, textures) |
-| `terrain.json`, `rocks.json`, `monster.json`, `loot-cubes.json`, `character.json` | written for the game |
+| `terrain.json`, `rocks.json`, `monster.json`, `loot-cubes.json`, `character.json`, `pet.json` | written for the game |
 
 ## The files
 
@@ -61,4 +62,7 @@ assets/
 - `monster.json`: the red cube: size, color, life, speeds, `aggroRange` (it sees a player), `leashRange` (it gives
   up), attack reach, damage, windup and period, `count` on the map, `respawnSeconds`, `safeZoneRadius` (it does not
   go near the spawn).
-- `loot-cubes.json`: size, colors, how many cubes a monster drops, how long they stay on the ground.
+- `loot-cubes.json`: size, how many cubes a monster drops, how long they stay on the ground, `pickupRange` (the
+  "Ramasser" button), `items` (each kind: id, name, color, the stat it adds and how much), `caps` (max speed, max
+  reach, max attack speed bonus).
+- `pet.json`: the pet cube: size, color, speed, how far behind its player it walks, how far it looks for items.

@@ -10,7 +10,7 @@ import { WebSocketServer, type WebSocket } from "ws";
 import { createComponents, type Entity } from "../shared/components.ts";
 import { World } from "../shared/ecs.ts";
 import { createRandom, hashSeed } from "../shared/noise.ts";
-import { spawnMonsterSpawner, spawnPlayer } from "../shared/prefabs.ts";
+import { spawnMonsterSpawner, spawnPet, spawnPlayer } from "../shared/prefabs.ts";
 import { ANIM_STATES, NET_KINDS, round2, TICK_RATE, VIEW_RADIUS, type ClientMessage, type NetEntity, type ServerMessage } from "../shared/protocol.ts";
 import { playerSpawnPoint, runSystems, SERVER_SYSTEMS, type SimContext } from "../shared/systems.ts";
 import { GameMap } from "../shared/worldgen.ts";
@@ -34,7 +34,7 @@ const c = createComponents(world);
 const context: SimContext = { c, map, config, dt: 1 / TICK_RATE, time: 0, random: createRandom(hashSeed(seed, "server", Date.now())) };
 spawnMonsterSpawner(world, c, config);
 
-type Client = { socket: WebSocket; entity: Entity; attack: boolean; ack: number };
+type Client = { socket: WebSocket; entity: Entity; attack: boolean; pickup: boolean; ack: number };
 const clients = new Set<Client>();
 
 // ---------------------------------------------------------------- static files (the client page)
@@ -83,7 +83,9 @@ wss.on("connection", (socket) => {
       const name = String(message.name ?? "").trim().slice(0, 16) || `Joueur ${clients.size + 1}`;
       const p = playerSpawnPoint(map, context.random, config.character.radius);
       const entity = spawnPlayer(world, c, config, name, p.x, p.z);
-      client = { socket, entity, attack: false, ack: 0 };
+      // its pet cube comes with it (and goes away with it: petAI drops a pet whose player is gone)
+      spawnPet(world, c, config, entity, p.x + 1, p.z + 1);
+      client = { socket, entity, attack: false, pickup: false, ack: 0 };
       clients.add(client);
       send(socket, { t: "welcome", id: entity, seed, tickRate: TICK_RATE });
       console.log(`+ ${name} joined (entity ${entity}), ${clients.size} player(s)`);
@@ -95,6 +97,7 @@ wss.on("connection", (socket) => {
       input.moveX = (Number(message.moveX) || 0) * k;
       input.moveZ = (Number(message.moveZ) || 0) * k;
       if (message.attack) client.attack = true;
+      if (message.pickup) client.pickup = true;
       client.ack = Math.max(client.ack, Number(message.seq) || 0);
     } else if (message.t === "teleport" && client && DEBUG) {
       const t = c.transform.get(client.entity);
@@ -120,9 +123,11 @@ function step() {
     const input = c.input.get(client.entity);
     if (input) {
       input.attack = client.attack;
+      input.pickup = client.pickup;
       input.seq = client.ack;
     }
     client.attack = false;
+    client.pickup = false;
   }
   runSystems(world, SERVER_SYSTEMS, context);
   context.time += context.dt;
@@ -134,7 +139,7 @@ function step() {
     const t = c.transform.get(e)!;
     const anim = c.anim.get(e);
     const h = c.health.get(e);
-    const label = c.player.get(e)?.name ?? c.item.get(e)?.color ?? "";
+    const label = c.player.get(e)?.name ?? c.item.get(e)?.type ?? (c.pet.has(e) ? String(c.pet.get(e)!.owner) : "");
     all.push({
       e, x: t.x, z: t.z,
       data: [e, NET_KINDS.indexOf(c.net.get(e)!.kind), round2(t.x), round2(t.z), round2(t.rot), ANIM_STATES.indexOf(anim?.state ?? "idle"), round2(anim?.time ?? 0), round2(h?.hp ?? 0), h?.max ?? 0, label],
@@ -144,7 +149,10 @@ function step() {
     const me = c.transform.get(client.entity);
     if (!me) continue;
     const ents = all.filter((a) => c.player.has(a.e) || Math.hypot(a.x - me.x, a.z - me.z) < VIEW_RADIUS).map((a) => a.data);
-    send(client.socket, { t: "snap", tick, time: round2(context.time), ack: client.ack, ents });
+    const inventory = c.inventory.get(client.entity);
+    const stats = c.stats.get(client.entity);
+    const mine = inventory && stats ? { inv: inventory.counts, stats } : null;
+    send(client.socket, { t: "snap", tick, time: round2(context.time), ack: client.ack, ents, me: mine });
   }
 }
 

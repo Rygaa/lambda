@@ -56,13 +56,34 @@ export type MonsterConfig = {
   safeZoneRadius: number;
 };
 
+export type StatName = "damage" | "maxHp" | "regen" | "speed" | "range" | "attackSpeed";
+export type ItemType = { id: string; name: string; color: string; stat: StatName; amount: number; description: string };
+
 export type LootConfig = {
   size: number;
-  colors: string[];
   dropMin: number;
   dropMax: number;
   spread: number;
   lifetimeSeconds: number;
+  // a player picks up an item closer than this (the "Ramasser" button)
+  pickupRange: number;
+  items: ItemType[];
+  caps: { speed: number; range: number; attackSpeed: number };
+};
+
+export type PetConfig = {
+  name: string;
+  size: number;
+  color: string;
+  radius: number;
+  speed: number;
+  followDistance: number;
+  // it looks for items this far around itself, but never farther than maxDistanceFromOwner from its player
+  searchRadius: number;
+  maxDistanceFromOwner: number;
+  // farther than this from its player (after a respawn), it jumps back next to it
+  teleportDistance: number;
+  pickupDistance: number;
 };
 
 export type CharacterConfig = {
@@ -110,6 +131,7 @@ export type GameConfig = {
   monster: MonsterConfig;
   loot: LootConfig;
   character: CharacterConfig;
+  pet: PetConfig;
   buildings: Record<BuildingId, BuildingPlan>;
 };
 
@@ -120,6 +142,7 @@ export const CONFIG_FILES = {
   monster: "monsters/red-cube/monster.json",
   loot: "items/loot-cubes.json",
   character: "characters/player/character.json",
+  pet: "characters/pet/pet.json",
 } as const;
 export const buildingFile = (id: BuildingId) => `buildings/${id}/building.json`;
 

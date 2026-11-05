@@ -19,6 +19,148 @@ export type SimContext = {
 const angleDiff = (a: number, b: number) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
 const isAlive = (c: Components, e: Entity) => !c.dead.has(e) && (c.health.get(e)?.hp ?? 1) > 0;
 
+// The stats of each player: the base of character.json plus what the items of its inventory add (with caps).
+// They set its attack, its life and its speed.
+export const applyStats: System<SimContext> = (world, { c, config }) => {
+  const ch = config.character;
+  const loot = config.loot;
+  for (const e of world.query(c.inventory, c.stats)) {
+    const bonus = { damage: 0, maxHp: 0, regen: 0, speed: 0, range: 0, attackSpeed: 0 };
+    const counts = c.inventory.get(e)!.counts;
+    for (const item of loot.items) bonus[item.stat] += (counts[item.id] ?? 0) * item.amount;
+    const stats = c.stats.get(e)!;
+    stats.damage = ch.attackDamage + bonus.damage;
+    stats.maxHp = ch.hp + Math.floor(bonus.maxHp);
+    stats.regen = ch.regenPerSecond + bonus.regen;
+    stats.speed = Math.min(loot.caps.speed, ch.speed + bonus.speed);
+    stats.range = Math.min(loot.caps.range, ch.attackRange + bonus.range);
+    stats.attackPeriod = ch.attackPeriod / (1 + Math.min(loot.caps.attackSpeed, bonus.attackSpeed));
+    const melee = c.melee.get(e);
+    if (melee) {
+      melee.damage = stats.damage;
+      melee.range = stats.range;
+      melee.period = stats.attackPeriod;
+      melee.windup = ch.attackWindup * (stats.attackPeriod / ch.attackPeriod);
+    }
+    const h = c.health.get(e);
+    if (h) {
+      // more max life: the new points are given at once
+      if (stats.maxHp > h.max && !c.dead.has(e)) h.hp += stats.maxHp - h.max;
+      h.max = stats.maxHp;
+      h.hp = Math.min(h.hp, h.max);
+      h.regen = stats.regen;
+    }
+  }
+};
+
+// An item goes into a player's inventory.
+export function collectItem(world: World, c: Components, owner: Entity, item: Entity) {
+  const inventory = c.inventory.get(owner);
+  const type = c.item.get(item)?.type;
+  if (!inventory || !type) return;
+  inventory.counts[type] = (inventory.counts[type] ?? 0) + 1;
+  world.destroy(item);
+}
+
+// The "Ramasser" button: the nearest item within reach goes into the inventory.
+export const playerPickup: System<SimContext> = (world, { c, config }) => {
+  for (const e of world.query(c.input, c.transform, c.inventory)) {
+    if (!c.input.get(e)!.pickup || c.dead.has(e)) continue;
+    const t = c.transform.get(e)!;
+    let best = 0;
+    let bestDist = config.loot.pickupRange;
+    for (const item of world.query(c.item, c.transform)) {
+      const it = c.transform.get(item)!;
+      const d = Math.hypot(it.x - t.x, it.z - t.z);
+      if (d <= bestDist) {
+        bestDist = d;
+        best = item;
+      }
+    }
+    if (best) collectItem(world, c, e, best);
+  }
+};
+
+// The pet cube: it goes to the items it sees and picks them up for its player, and otherwise follows it.
+export const petAI: System<SimContext> = (world, { c, config, map }) => {
+  const p = config.pet;
+  for (const e of world.query(c.pet, c.petAI, c.transform, c.velocity)) {
+    const owner = c.pet.get(e)!.owner;
+    const ot = c.transform.get(owner);
+    if (!ot) {
+      world.destroy(e);
+      continue;
+    }
+    const ai = c.petAI.get(e)!;
+    const t = c.transform.get(e)!;
+    const v = c.velocity.get(e)!;
+    // too far from its player (a respawn, a teleport): it jumps back next to it
+    if (Math.hypot(ot.x - t.x, ot.z - t.z) > p.teleportDistance) {
+      for (let a = 0; a < 8; a++) {
+        const x = ot.x + Math.cos((a * Math.PI) / 4) * p.followDistance;
+        const z = ot.z + Math.sin((a * Math.PI) / 4) * p.followDistance;
+        if (map.isFree(x, z, p.radius)) {
+          t.x = x;
+          t.z = z;
+          break;
+        }
+      }
+      ai.target = 0;
+    }
+    // its item: still there, and not too far from its player?
+    const near = (x: number, z: number) => Math.hypot(x - ot.x, z - ot.z) <= p.maxDistanceFromOwner;
+    if (ai.target) {
+      const it = c.transform.get(ai.target);
+      if (!it || !c.item.has(ai.target) || !near(it.x, it.z)) ai.target = 0;
+    }
+    if (!ai.target) {
+      let bestDist = p.searchRadius;
+      for (const item of world.query(c.item, c.transform)) {
+        // an item that just fell is left to land first
+        if ((c.anim.get(item)?.time ?? 1) < 0.5) continue;
+        const it = c.transform.get(item)!;
+        const d = Math.hypot(it.x - t.x, it.z - t.z);
+        if (d < bestDist && near(it.x, it.z)) {
+          bestDist = d;
+          ai.target = item;
+        }
+      }
+    }
+    let gx: number;
+    let gz: number;
+    let stop: number;
+    if (ai.target) {
+      const it = c.transform.get(ai.target)!;
+      if (Math.hypot(it.x - t.x, it.z - t.z) <= p.pickupDistance) {
+        collectItem(world, c, owner, ai.target);
+        ai.target = 0;
+        v.x = v.z = 0;
+        continue;
+      }
+      gx = it.x;
+      gz = it.z;
+      stop = 0;
+    } else {
+      // a place behind its player
+      gx = ot.x - Math.sin(ot.rot) * p.followDistance;
+      gz = ot.z - Math.cos(ot.rot) * p.followDistance;
+      stop = 0.4;
+    }
+    const dx = gx - t.x;
+    const dz = gz - t.z;
+    const d = Math.hypot(dx, dz);
+    if (d <= stop || d < 1e-3) {
+      v.x = v.z = 0;
+      continue;
+    }
+    // faster when far behind
+    const speed = p.speed * (d > 4 ? 1.4 : 1);
+    v.x = (dx / d) * speed;
+    v.z = (dz / d) * speed;
+    t.rot = Math.atan2(dx, dz);
+  }
+};
+
 // Input -> velocity and facing of the players (slower while an attack is under way).
 export const steerPlayers: System<SimContext> = (world, { c, config }) => {
   for (const e of world.query(c.input, c.velocity, c.transform)) {
@@ -29,7 +171,8 @@ export const steerPlayers: System<SimContext> = (world, { c, config }) => {
       continue;
     }
     const len = Math.hypot(input.moveX, input.moveZ);
-    const k = len > 1e-3 ? (config.character.speed / Math.max(1, len)) * ((c.melee.get(e)?.pending ?? -1) >= 0 ? 0.35 : 1) : 0;
+    const speed = c.stats.get(e)?.speed ?? config.character.speed;
+    const k = len > 1e-3 ? (speed / Math.max(1, len)) * ((c.melee.get(e)?.pending ?? -1) >= 0 ? 0.35 : 1) : 0;
     v.x = input.moveX * k;
     v.z = input.moveZ * k;
     if (len > 1e-3) c.transform.get(e)!.rot = Math.atan2(input.moveX, input.moveZ);
@@ -249,7 +392,7 @@ export const health: System<SimContext> = (world, { c, config, dt, random }) => 
       for (let k = 0; k < count; k++) {
         const a = random() * Math.PI * 2;
         const r = 0.25 + random() * loot.spread;
-        spawnItem(world, c, config, t.x + Math.cos(a) * r, t.z + Math.sin(a) * r, loot.colors[Math.floor(random() * loot.colors.length)]!, random() * Math.PI * 2);
+        spawnItem(world, c, config, t.x + Math.cos(a) * r, t.z + Math.sin(a) * r, loot.items[Math.floor(random() * loot.items.length)]!.id, random() * Math.PI * 2);
       }
     } else c.dead.set(e, { timer: config.character.respawnSeconds });
   }
@@ -331,9 +474,12 @@ export const animations: System<SimContext> = (world, { c, dt }) => {
 
 export const SERVER_SYSTEMS: System<SimContext>[] = [
   spawners,
+  applyStats,
   steerPlayers,
   playerAttacks,
+  playerPickup,
   monsterAI,
+  petAI,
   meleeHits,
   movement,
   separation,
