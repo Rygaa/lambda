@@ -4,16 +4,16 @@
   "size": 44,
   "clearings": { "amount": "some" },
   "props": [
-    { "kind": "water", "preset": "lake", "count": 1, "gap": 1.0, "avoid": "clearings" },
-    { "kind": "water", "preset": "stream", "count": 1, "gap": 0.8, "avoid": "clearings" },
-    { "kind": "water", "preset": "pond", "count": 2, "gap": 0.8, "avoid": "clearings", "palette": ["clear", "swamp"] },
-    { "kind": "water", "preset": "puddle", "amount": "few", "gap": 0.4 },
-    { "kind": "tree", "preset": "medium", "amount": "some", "spacing": 4.6, "avoid": "clearings" },
-    { "kind": "tree", "preset": "big", "amount": "few", "spacing": 4.6, "avoid": "clearings" },
-    { "kind": "tree", "preset": "bush", "count": 14, "near": "water", "gap": 0.2 },
-    { "kind": "tree", "preset": "bush", "amount": "some", "gap": 0.2 },
-    { "kind": "boulder", "preset": "small", "count": 3, "near": "water", "gap": 0.4, "palette": ["moss", "grey"] },
-    { "kind": "rock", "preset": "stone", "count": 10, "near": "water", "gap": 0.3, "palette": ["moss", "grey"] },
-    { "kind": "rock", "preset": "pebble", "amount": "lots", "gap": 0.2 }
+    { "asset": "water/lake/medium", "count": 1, "gap": 1.0, "avoid": "clearings" },
+    { "asset": "water/river/medium", "count": 1, "gap": 0.8, "avoid": "clearings" },
+    { "asset": "water/pond/medium", "count": 2, "gap": 0.8, "avoid": "clearings", "palette": ["clear", "swamp"] },
+    { "asset": "water/puddle/medium", "amount": "few", "gap": 0.4 },
+    { "asset": "plant/oak/medium", "amount": "some", "spacing": 4.6, "avoid": "clearings" },
+    { "asset": "plant/oak/large", "amount": "few", "spacing": 4.6, "avoid": "clearings" },
+    { "asset": "plant/bush/medium", "count": 14, "near": "water", "gap": 0.2 },
+    { "asset": "plant/bush/medium", "amount": "some", "gap": 0.2 },
+    { "asset": "rock/round/small", "count": 3, "near": "water", "gap": 0.4, "palette": ["moss", "grey"] },
+    { "asset": "rock/sharp/medium", "count": 10, "near": "water", "gap": 0.3, "palette": ["moss", "grey"] },
+    { "asset": "rock/sharp/small", "amount": "lots", "gap": 0.2 }
   ]
 }

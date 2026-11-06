@@ -13,7 +13,7 @@ export function spawnProp(world, p) {
   const y = heightAt(getResource(world, Settings).land.terrain, x, z);
   const pairs = [
     [Transform, { x, z, rotY: p.rot }],
-    [Prop, { kind: p.kind, set: p.set, variant: p.variant, palette: paletteRows(p.palette) }],
+    [Prop, { name: p.name, set: p.set, variant: p.variant, palette: paletteRows(p.palette) }],
   ];
   if (!shape.circles) pairs.push([Footprint, { x, z, r: shape.radius }]);
   pairs.push([ShadowCaster]);

@@ -4,12 +4,12 @@
   "size": 40,
   "clearings": { "amount": "few" },
   "props": [
-    { "kind": "tree", "preset": "big", "amount": "few", "spacing": 5, "palette": { "canopy": ["autumn", "green"], "trunk": "brown" } },
-    { "kind": "tree", "preset": "bush", "amount": "many", "palette": { "canopy": ["autumn", "pine"] } },
-    { "kind": "boulder", "preset": "big", "amount": "some", "gap": 0.8, "palette": ["sand", "grey"] },
-    { "kind": "boulder", "preset": "small", "amount": "some", "palette": "sand" },
-    { "kind": "rock", "preset": "crag", "amount": "some", "palette": ["sand", "dark"] },
-    { "kind": "rock", "preset": "stone", "amount": "many", "palette": ["sand", "moss"] },
-    { "kind": "rock", "preset": "pebble", "amount": "lots", "palette": ["sand", "grey", "dark"], "params": { "height": [0.1, 0.2] } }
+    { "asset": "plant/oak/large", "amount": "few", "spacing": 5, "palette": ["autumn", "green"] },
+    { "asset": "plant/bush/medium", "amount": "many", "palette": ["autumn", "pine"] },
+    { "asset": "rock/round/large", "amount": "some", "gap": 0.8, "palette": ["sand", "grey"] },
+    { "asset": "rock/round/small", "amount": "some", "palette": "sand" },
+    { "asset": "rock/sharp/large", "amount": "some", "palette": ["sand", "dark"] },
+    { "asset": "rock/sharp/medium", "amount": "many", "palette": ["sand", "moss"] },
+    { "asset": "rock/sharp/small", "amount": "lots", "palette": ["sand", "grey", "dark"], "params": {"height": [0.1, 0.2]} }
   ]
 }

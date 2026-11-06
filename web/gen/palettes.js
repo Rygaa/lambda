@@ -3,7 +3,8 @@
 // materials are built from these tables, so a new palette is one more entry in
 // the JSON file. The first palette of a family is its default.
 //
-//   stone:  flat tones { lit, up: top in shade, shade, hi: lit edge }
+//   stone:  flat tones { lit, up: top in shade, shade, hi: lit edge }; palm and wood
+//           are the palm trunk and its coconuts (gen/builders/palm.js)
 //   trunk, canopy: light ramps [[light value, colour], ...] (canopy is also the leaves)
 //   water:  tones { deep, mid, shallow, foam, wave }, each [lit, in shade]
 //   ground: light ramps of the ground paints (gen/ground.js); tile and furrow

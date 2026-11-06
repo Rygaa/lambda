@@ -2,9 +2,10 @@
 import * as THREE from 'three';
 import { createWorld, setResource, getResource, addSystem, runStartup, runFrame } from './ecs/world.js';
 import * as Res from './resources.js';
-import './gen/kinds/index.js';
+import './gen/builders/index.js';
+import { loadTypes } from './gen/assets.js';
 import { createShapes } from './gen/shapes.js';
-import { buildRecipe } from './gen/recipe.js';
+import { buildRecipe, assetsOf } from './gen/recipe.js';
 import { setPalettes } from './gen/palettes.js';
 import { setupGpuSystem, setupUiSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem } from './systems/setup.js';
 import { inputSystem } from './systems/input.js';
@@ -61,7 +62,9 @@ showErrors(() => setPalettes(palettes, theme));
 const F = new THREE.Vector3(...meta.render.cam_forward).normalize();
 const R = new THREE.Vector3().crossVectors(F, new THREE.Vector3(0, 1, 0)).normalize();
 const sunL = new THREE.Vector3(...meta.render.sun_l).normalize();
-// the shapes of generated objects (gen/kinds) and where they stand
+// the asset types the world uses (assets/<family>/<type>/<family>.json), their shapes and where they stand
+const typeNames = showErrors(() => assetsOf(recipe));
+await loadTypes(typeNames, '../assets/').catch((err) => showErrors(() => { throw err; }));
 const shapes = createShapes({ meta, sunL, mid: meta.mid, seed: recipe.seed ?? 11 });
 const land = showErrors(() => buildRecipe(shapes, recipe));
 

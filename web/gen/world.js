@@ -13,7 +13,7 @@ export function createWorldBuilder(cache, seed, half) {
   let maxR = 0;
   const b = {
     cache, half,
-    props: [],      // { set, variant, x, z, rot, palette, radius, kind, discs }
+    props: [],      // { name, set, asset, family, variant, x, z, rot, palette, radius, discs }
     glades: [],     // { x, z, r, k }: clearings where light falls through the canopy
     start: [0, 0.6, 0],
     terrain: null,  // the level map (gen/terrain.js), when the recipe has cliffs
@@ -23,7 +23,7 @@ export function createWorldBuilder(cache, seed, half) {
     rand: () => nextRandom(rng),
     range: (lo, hi) => lo + (hi - lo) * nextRandom(rng),
     pick: (arr) => arr[Math.floor(nextRandom(rng) * arr.length)],
-    set: (kind, preset, overrides) => shapeSet(cache, kind, preset, overrides),
+    set: (asset, size, overrides) => shapeSet(cache, asset, size, overrides),
 
     // is a circle of radius r at (x, z) clear of everything placed so far?
     free(x, z, r) {
@@ -34,11 +34,12 @@ export function createWorldBuilder(cache, seed, half) {
       return true;
     },
 
-    // place variant `variant` of a shape set; palette: { family: name } (gen/palettes.js)
-    add(set, variant, x, z, rot = 0, palette = {}) {
+    // place variant `variant` (0, 1, ...) of a shape set; palette: one of the
+    // set's palette names (default: its first). Its name: family/type/size/palette/variant (from 1)
+    add(set, variant, x, z, rot = 0, palette = set.palette) {
       const shape = set.shapes[variant];
-      const p = { set: set.key, kind: set.kind, variant, x, z, rot: shape.turns ? rot : 0,
-        palette: { ...set.palettes, ...palette }, radius: shape.radius };
+      const p = { name: `${set.asset}/${set.size}/${palette}/${variant + 1}`, set: set.key, asset: set.asset, family: set.family,
+        variant, x, z, rot: shape.turns ? rot : 0, palette: set.palettes[palette], radius: shape.radius };
       p.discs = discsOf(shape, p);
       b.props.push(p);
       for (const c of p.discs) {

@@ -1,7 +1,8 @@
 // World recipes (worlds/*.json) -> a world: borders, clearings, cliffs, then
-// every recipe line scattered over the ground. See docs/worlds.md for the fields.
+// every recipe line scattered over the ground. See documentation/worlds.md for the fields.
 import { createWorldBuilder, finish, discsOf } from './world.js';
-import { FAMILY, paletteNames } from './palettes.js';
+import { paletteNames } from './palettes.js';
+import { SIZES } from './assets.js';
 import { buildCliffs, levelUnder, CLIFF_FIELDS } from './terrain.js';
 import { SIDES, BORDER_KINDS, fromSide, wavyLine } from './borders.js';
 import { createGround, paint, groundAt, pathShape, rectShape, circleShape, PAINTS, GROUND_FIELDS } from './ground.js';
@@ -13,10 +14,25 @@ const CLEARINGS = { none: 0, few: 2, some: 3, many: 4, lots: 4 };   // the shade
 const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'borders', 'islands', 'clearings', 'cliffs', 'ground', 'props'];
 // recipe "clouds": how much of the ground their shadows cover -> the CloudLayer edges (lo, hi)
 export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02] };
-const LINE_FIELDS = ['kind', 'preset', 'params', 'amount', 'count', 'palette', 'spacing', 'gap', 'near', 'avoid', 'on', 'at'];
+const LINE_FIELDS = ['asset', 'params', 'amount', 'count', 'palette', 'spacing', 'gap', 'near', 'avoid', 'on', 'at'];
 const ISLAND_FIELDS = ['at', 'radius', 'bar', 'barWidth'];
 
-// recipe: the parsed JSON; seed: replaces recipe.seed when given
+// the asset types ('family/type') a recipe uses: they are loaded before it is built (gen/assets.js)
+export function assetsOf(recipe) {
+  const names = (recipe.props ?? []).map((line, i) => assetOf(line, `props[${i}]`).asset);
+  if (Object.values(recipe.borders ?? {}).some((v) => (typeof v === 'string' ? v : v?.kind) === 'ocean')) names.push('water/ocean');
+  return names;
+}
+
+// recipe line "asset": "family/type/size" -> { asset: 'family/type', size }
+function assetOf(line, where) {
+  if (typeof line.asset !== 'string') bad(where, 'no "asset": "family/type/size", for example "rock/sharp/small"');
+  const parts = line.asset.split('/');
+  if (parts.length !== 3 || !SIZES.includes(parts[2])) bad(where, `asset "${line.asset}": give family/type/size, with a size of ${SIZES.join(', ')}`);
+  return { asset: `${parts[0]}/${parts[1]}`, size: parts[2] };
+}
+
+// recipe: the parsed JSON
 export function buildRecipe(cache, recipe) {
   check(recipe, WORLD_FIELDS, 'world');
   const half = (recipe.size ?? 40) / 2;
@@ -53,7 +69,7 @@ export function buildRecipe(cache, recipe) {
   for (const bd of borders) if (bd.set) b.add(bd.set, 0, ...bd.set.shapes[0].origin, 0);
   if (recipe.ground) b.ground = buildGround(b, recipe.ground, borders);
 
-  // big things first; lines placed "near" a kind come after the others
+  // big things first; lines placed "near" something come after the others
   const lines = (recipe.props ?? []).map((line, i) => prepare(b, line, i));
   lines.sort((p, q) => (!!p.line.near - !!q.line.near) || q.size - p.size);
   for (const l of lines) place(b, l);
@@ -71,7 +87,7 @@ function planBorders(b, spec, islands) {
     if (!BORDER_KINDS.includes(kind)) bad('borders', `${side}: "${kind}" (use ${BORDER_KINDS.join(', ')})`);
     if (width !== undefined && kind !== 'ocean') bad('borders', `${side}: only the ocean takes a "width"`);
     if (kind === 'ocean') {
-      const set = b.set('water', 'ocean', { side, half: b.half, islands, ...(width !== undefined && { width }) });
+      const set = b.set('water/ocean', 'medium', { side, half: b.half, islands, ...(width !== undefined && { width }) });
       const shore = set.shapes[0].shore;
       return { side, kind, set, inside: (x, z, pad = 0) => shore(x, z) > -pad };
     }
@@ -118,50 +134,42 @@ function buildGround(b, lines, borders) {
 }
 
 function prepare(b, line, i) {
-  const where = `props[${i}] (${line.kind}${line.preset ? ' ' + line.preset : ''})`;
+  const where = `props[${i}] (${line.asset})`;
   check(line, LINE_FIELDS, where);
-  if (!line.kind) bad(where, 'no "kind"');
+  const { asset, size } = assetOf(line, where);
   if (line.on !== undefined && line.on !== 'grass' && !PAINTS.includes(line.on)) bad(where, `on "${line.on}" (use grass, ${PAINTS.join(', ')})`);
   let set;
-  try { set = b.set(line.kind, line.preset, line.params); } catch (err) { bad(where, err.message); }
+  try { set = b.set(asset, size, line.params); } catch (err) { bad(where, err.message); }
   const area = (2 * b.half) ** 2 / 100;
   const count = line.at ? line.at.length
     : line.count ?? Math.round(area * (AMOUNTS[line.amount ?? 'some'] ?? bad(where, `amount "${line.amount}" (use ${Object.keys(AMOUNTS).join(', ')})`)));
   return { line, where, set, count, palettes: palettesOf(set, line.palette, where), size: Math.max(...set.shapes.map((s) => s.radius)) };
 }
 
-// recipe "palette": a name, a list of names (one is picked per object), or
-// { family: name | [names] } for kinds with more than one colour family
+// recipe "palette": a name, or a list of names (one is picked per object),
+// of the asset type's palettes (gen/assets.js); none: its default
 function palettesOf(set, value, where) {
-  const families = [...new Set(set.shapes.flatMap((s) => s.parts.map((p) => FAMILY[p.role])))];
-  if (value === undefined) return {};
-  if (typeof value === 'string' || Array.isArray(value)) {
-    if (families.length !== 1) bad(where, `palette: give { ${families.join(', ')} } for this kind`);
-    value = { [families[0]]: value };
-  }
-  const out = {};
-  for (const [f, v] of Object.entries(value)) {
-    if (!families.includes(f)) bad(where, `palette family "${f}" (this kind has ${families.join(', ')})`);
-    out[f] = [v].flat();
-    for (const name of out[f])
-      if (!paletteNames(f).includes(name)) bad(where, `${f} palette "${name}" (known: ${paletteNames(f).join(', ')})`);
-  }
-  return out;
+  if (value === undefined) return null;
+  const names = [value].flat();
+  for (const name of names)
+    if (!set.palettes[name]) bad(where, `palette "${name}" (${set.asset} has ${Object.keys(set.palettes).join(', ')})`);
+  return names;
 }
 
 function place(b, { line, set, count, palettes }) {
-  const paletteFor = () => Object.fromEntries(Object.entries(palettes).map(([f, names]) => [f, b.pick(names)]));
+  const paletteFor = () => (palettes ? b.pick(palettes) : set.palette);
   const variant = () => Math.floor(b.rand() * set.shapes.length);
   if (line.at) {
     for (const [x, z, rot = b.range(0, Math.PI * 2)] of line.at) b.add(set, variant(), x, z, rot, paletteFor());
     return;
   }
-  // spacing: keep this far from the other spaced objects of the same kind (e.g. tree crowns)
-  const spaced = line.spacing ? b.props.filter((p) => p.kind === line.kind && p.spaced) : [];
-  // near "cliffs": at the foot of a wall; "cliff-tops": on top, just behind its edge
+  // spacing: keep this far from the other spaced objects of the same type (e.g. tree crowns)
+  const spaced = line.spacing ? b.props.filter((p) => p.asset === set.asset && p.spaced) : [];
+  // near "cliffs": at the foot of a wall; "cliff-tops": on top, just behind its edge;
+  // near a family ("water", "rock", "plant"): around the objects of that family
   const edges = b.terrain?.edges ?? [];
   const cliffs = { cliffs: 1, 'cliff-tops': -1 }[line.near];
-  const near = !line.near || cliffs ? null : b.props.filter((p) => p.kind === line.near);
+  const near = !line.near || cliffs ? null : b.props.filter((p) => p.family === line.near);
   const spacing = line.spacing ?? 0, gap = line.gap ?? 0.3;
   for (let made = 0, tries = 0; made < count && tries < count * 60; tries++) {
     const v = variant();

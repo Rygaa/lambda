@@ -1,22 +1,14 @@
-// Rocks: the convex hull of a few random points on a squashed sphere, set on
+// Sharp rocks (rock/sharp): the convex hull of a few random points on a squashed sphere, set on
 // the ground (port of blender/pipeline/geometry.py rock). Flat faces, outlined
 // like the Blender stones. Values in [lo, hi] are drawn per variant.
 // width, depth, height: the size of the rock before it sinks into the ground.
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
-import { defineKind } from '../registry.js';
+import { defineBuilder } from '../registry.js';
 import { nextRandom, between } from '../../lib/random.js';
 
-defineKind({
-  name: 'rock',
-  presets: {
-    //        width (x), depth (z), height (y), corner points, sunk into the ground, lean (radians)
-    pebble: { width: [0.3, 0.5], depth: [0.26, 0.44], height: [0.14, 0.28], points: 8, sink: [0.03, 0.05], lean: 0 },
-    stone: { width: [0.65, 0.95], depth: [0.6, 0.85], height: [0.8, 1.2], points: [9, 11], sink: 0.12, lean: 0.08 },
-    crag: { width: [1.2, 1.5], depth: [1.0, 1.3], height: [1.0, 1.5], points: 12, sink: 0.12, lean: 0 },
-  },
-  variants: 6,
-  palettes: { stone: 'grey' },
+defineBuilder({
+  name: 'sharp-rock',
   build(p, rng) {
     const size = new THREE.Vector3(between(rng, p.width), between(rng, p.height), between(rng, p.depth));
     const n = Math.round(between(rng, p.points));

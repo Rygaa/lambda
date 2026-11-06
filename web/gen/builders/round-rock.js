@@ -1,19 +1,13 @@
-// Boulders: a subdivided cube pushed out towards a sphere, a little bumpy,
+// Round rocks (rock/round): a subdivided cube pushed out towards a sphere, a little bumpy,
 // half sunk into the ground (port of blender/pipeline/geometry.py boulder).
 // width, depth, height: the size of the whole ball, before it sinks.
 import * as THREE from 'three';
-import { defineKind } from '../registry.js';
+import { defineBuilder } from '../registry.js';
 import { between, hashSeed, nextRandom } from '../../lib/random.js';
-import { settle, fit } from './rock.js';
+import { settle, fit } from './sharp-rock.js';
 
-defineKind({
-  name: 'boulder',
-  presets: {
-    big: { width: [2.0, 2.9], depth: [1.7, 2.3], height: [1.5, 1.9], cuts: [2, 3], bump: 0.06, sink: 0.3 },
-    small: { width: [1.1, 1.5], depth: [0.9, 1.3], height: [0.8, 1.1], cuts: 2, bump: 0.08, sink: 0.12 },
-  },
-  variants: 4,
-  palettes: { stone: 'grey' },
+defineBuilder({
+  name: 'round-rock',
   build(p, rng) {
     const size = new THREE.Vector3(between(rng, p.width), between(rng, p.height), between(rng, p.depth));
     const cuts = Math.round(between(rng, p.cuts)) + 1;

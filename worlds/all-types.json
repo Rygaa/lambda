@@ -1,0 +1,31 @@
+{
+  "name": "All types: every asset type in every size, in rows (rocks, plants, water), with a mountain border, the ocean, a beach and a dirt path",
+  "seed": 1,
+  "size": 56,
+  "start": [0, 0],
+  "borders": { "west": "mountains", "east": "ocean" },
+  "clearings": { "count": 0 },
+  "ground": [
+    { "paint": "sand", "beach": 3 },
+    { "paint": "dirt", "path": [[-16, 16], [14, 16]], "width": 1.6 }
+  ],
+  "props": [
+    { "asset": "rock/sharp/small", "at": [[-14, -14, 0]] },
+    { "asset": "rock/sharp/medium", "at": [[-11, -14, 0]] },
+    { "asset": "rock/sharp/large", "at": [[-7, -14, 0]] },
+    { "asset": "rock/round/small", "at": [[-1, -14, 0]] },
+    { "asset": "rock/round/large", "at": [[5, -14, 0]] },
+
+    { "asset": "plant/bush/medium", "at": [[-14, -6, 0]] },
+    { "asset": "plant/oak/small", "at": [[-10, -6, 0]] },
+    { "asset": "plant/oak/medium", "at": [[-5, -6, 0]] },
+    { "asset": "plant/oak/large", "at": [[1, -6, 0]] },
+    { "asset": "plant/palm/small", "at": [[8, -6, 0]] },
+    { "asset": "plant/palm/large", "at": [[13, -6, 0]] },
+
+    { "asset": "water/puddle/medium", "at": [[-14, 4, 0]] },
+    { "asset": "water/pond/medium", "at": [[-9, 4, 0]] },
+    { "asset": "water/lake/medium", "at": [[0, 4, 0]] },
+    { "asset": "water/river/medium", "at": [[8, 9, 1.5708]] }
+  ]
+}

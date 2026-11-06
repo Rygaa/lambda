@@ -1,24 +1,14 @@
 // Trees: a six-sided trunk, an egg-shaped canopy and leaf clumps on it (port
 // of blender/pipeline/geometry.py trunk + canopy). A tree without a trunk
-// (trunk: 0) is a bush: it never blocks the way.
+// (trunk: 0) is a bush (plant/bush): it never blocks the way.
 import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
-import { defineKind } from '../registry.js';
+import { defineBuilder } from '../registry.js';
 import { between } from '../../lib/random.js';
 import { leafGeometry } from '../../lib/sprites.js';
 
-defineKind({
+defineBuilder({
   name: 'tree',
-  presets: {
-    //       trunk length, radius at the bottom / top, trunk centre height,
-    //       canopy centre height, canopy radii [x, y, z], everything times `scale`
-    small: { trunk: 1.4, r1: 0.22, r2: 0.15, trunkY: 0.6, canopyY: 1.95, radii: [0.95, 1.08, 0.95], scale: [0.92, 1.08] },
-    medium: { trunk: 1.7, r1: 0.27, r2: 0.18, trunkY: 0.75, canopyY: 2.3, radii: [1.18, 1.32, 1.18], scale: [0.92, 1.08] },
-    big: { trunk: 2.0, r1: 0.32, r2: 0.22, trunkY: 0.9, canopyY: 2.75, radii: [1.42, 1.58, 1.42], scale: [0.92, 1.08] },
-    bush: { trunk: 0, r1: 0, r2: 0, trunkY: 0, canopyY: 0.3, radii: [0.62, 0.45, 0.62], scale: [0.8, 1.2] },
-  },
-  variants: 3,
-  palettes: { trunk: 'brown', canopy: 'green' },
   build(p, rng, ctx) {
     const s = between(rng, p.scale);
     const radii = p.radii.map((r) => r * s);

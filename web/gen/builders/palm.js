@@ -1,22 +1,14 @@
-// Palm trees: a ringed trunk of flat faces with outlines (gen/solids.js) that
+// Palm trees (plant/palm): a ringed trunk of flat faces with outlines (gen/solids.js) that
 // bends as it rises, a few coconuts, and a crown of drooping fronds made like
 // the tree canopies: a thin folded leaf (canopy material) covered in leaf
 // clumps (sprites lit by the leaf's normal, lib/sprites.js).
-import { defineKind } from '../registry.js';
+import { defineBuilder } from '../registry.js';
 import { between, nextRandom } from '../../lib/random.js';
 import { spriteGeometry } from '../../lib/sprites.js';
 import { tube, ball, sheet, partsOf } from '../solids.js';
 
-defineKind({
+defineBuilder({
   name: 'palm',
-  presets: {
-    //      trunk height, how far its top leans out, trunk rings, radius at the bottom / top,
-    //      fronds, frond length, how far they drop
-    tall: { height: [3.0, 3.8], lean: [0.5, 1.1], rings: 7, r1: 0.17, r2: 0.12, fronds: [7, 8], length: [1.5, 1.85], droop: [0.9, 1.2] },
-    small: { height: [1.8, 2.4], lean: [0.2, 0.6], rings: 5, r1: 0.15, r2: 0.11, fronds: [6, 7], length: [1.2, 1.4], droop: [0.8, 1.1] },
-  },
-  variants: 4,
-  palettes: { canopy: 'green' },
   build(p, rng, ctx) {
     const H = between(rng, p.height), lean = between(rng, p.lean), turn = nextRandom(rng) * Math.PI * 2;
     // the trunk bends more near the top: out = lean * t^2

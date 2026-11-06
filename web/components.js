@@ -5,8 +5,9 @@ import { defineComponent } from './ecs/world.js';
 export const Transform = defineComponent('Transform', () => ({ x: 0, z: 0, rotY: 0 }));
 
 // a generated object (gen/): variant `variant` of the shape set `set`;
-// palette: material role family -> palette row (gen/palettes.js)
-export const Prop = defineComponent('Prop', () => ({ kind: '', set: '', variant: 0, palette: {} }));
+// name: family/type/size/palette/variant (documentation/assets.md);
+// palette: colour family -> palette row (gen/palettes.js)
+export const Prop = defineComponent('Prop', () => ({ name: '', set: '', variant: 0, palette: {} }));
 // grass and flowers do not grow inside this circle
 export const Footprint = defineComponent('Footprint', () => ({ x: 0, z: 0, r: 0 }));
 // nothing walks through this standing cylinder (radius r, height h); only on

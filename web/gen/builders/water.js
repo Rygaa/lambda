@@ -1,16 +1,16 @@
-// Water: puddles, ponds, lakes and streams. Each shape is a signed distance
+// Water: puddles, ponds, lakes, rivers and the ocean. Each shape is a signed distance
 // field made with math (world units to the shore, positive inside):
 //   blobs:  one or more round blobs, their edge waved by a few sine harmonics,
 //           joined with a smooth union (lakes: more blobs, wider spread)
-//   stream: a band of changing width along a winding centre line
+//   stream: a band of changing width along a winding centre line (a river)
 //   coast:  the ocean along one side of the world (recipe "borders"), out to the horizon,
 //           with islands cut out of it (recipe "islands")
 // The field is sampled on a grid: the mesh is the grid cells near the water and
 // each vertex carries its distance to the shore (aShore). The water shader cuts
 // the surface where it drops below 0 and paints the depth bands from it.
-// Circles laid inside the field hide the grass and stop the player.
+// Circles laid inside the field hide the grass and stop walkers.
 import * as THREE from 'three';
-import { defineKind } from '../registry.js';
+import { defineBuilder } from '../registry.js';
 import { nextRandom, between, hashSeed } from '../../lib/random.js';
 import { fromSide, wavyLine } from '../borders.js';
 import { segmentDistance } from '../ground.js';
@@ -19,22 +19,8 @@ export const WATER_Y = 0.004;   // the surface, just over the ground (the reflec
 const STEP = 0.15;              // grid step of the surface mesh
 const MIN_CIRCLE = 0.1;         // circles start this far inside the shore
 
-defineKind({
+defineBuilder({
   name: 'water',
-  presets: {
-    //        blob radius, blobs, sine harmonics on the edge, how much they wave the edge
-    //        (share of the radius), how far extra blobs sit from the others; blocks: stops the player
-    pond: { form: 'blobs', radius: [1.6, 2.3], blobs: [1, 2], waves: 4, wobble: [0.1, 0.18], spread: 0.9, blocks: true },
-    lake: { form: 'blobs', radius: [2.6, 3.3], blobs: [3, 4], waves: 5, wobble: [0.08, 0.15], spread: 1.15, blocks: true },
-    puddle: { form: 'blobs', radius: [0.45, 0.75], blobs: [1, 2], waves: 3, wobble: [0.1, 0.2], spread: 0.8, blocks: false },
-    //        length, width, half waves of the bends, how far the bends swing to the side
-    stream: { form: 'stream', length: [11, 15], width: [1.7, 2.3], bends: [2, 3], swing: [1.0, 1.6], blocks: true },
-    //        side of the world, its half size, how far the ocean reaches in, how much
-    //        the shore waves, how far it goes on past the edge, islands (in world coordinates: placed at 0, 0)
-    ocean: { form: 'coast', side: 'east', half: 20, width: [5, 8], wobble: [0.6, 1.2], out: 60, islands: [], blocks: true },
-  },
-  variants: (p) => (p.form === 'coast' ? 1 : 3),
-  palettes: { water: 'clear' },
   build(p, rng) {
     if (p.form === 'coast') return coast(p, rng);
     const field = p.form === 'stream' ? stream(p, rng) : blobs(p, rng);

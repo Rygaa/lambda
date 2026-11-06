@@ -6,7 +6,8 @@
       "moss": {"lit": "#b7c28e", "up": "#5f7a62", "shade": "#4a6355", "hi": "#eef5cf"},
       "dark": {"lit": "#9b98a6", "up": "#4b4a5e", "shade": "#3a3a4f", "hi": "#d8d6e2"},
       "cliff": {"lit": "#b48c68", "up": "#a07d60", "shade": "#6a4e46", "hi": "#e2c49c"},
-      "palm": {"lit": "#c6a47c", "up": "#7e6a6a", "shade": "#685660", "hi": "#efd6a8"}
+      "palm": {"lit": "#c6a47c", "up": "#7e6a6a", "shade": "#685660", "hi": "#efd6a8"},
+      "wood": {"lit": "#ab7c58", "up": "#6c5058", "shade": "#5a4250", "hi": "#e0b48a"}
     },
     "trunk": {
       "brown": [[0, "#6f625e"], [0.1, "#a5897a"]],
