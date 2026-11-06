@@ -15,6 +15,7 @@ The official copy is on GitHub, in `Rygaa/lambda`.
 | Path | What it is |
 | --- | --- |
 | `documentation/branches.md` | this guide |
+| `documentation/assets.md` | how the assets are sorted and named, and the plan to build it |
 | `documentation/building/` | how to build a building from a reference image, with examples and tools (see its `README.md`) |
 | `documentation/style/` | the style rules (`rules.md`) and the article they come from |
 
