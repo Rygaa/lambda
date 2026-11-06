@@ -17,8 +17,6 @@
 //   blocker: { r, h } the part that stops movement (default { r: radius, h: height })
 //   blocks:  true / false to skip the height rule of gen/collision.js
 //   turns:   false if it must not be turned around the up axis (trees: their leaves are lit in place)
-//   crown:   { y, r } a ball the third-person camera may look through: its
-//            canopy and leaves are hidden while they stand in the way
 //
 // A recipe line (worlds/*.json) picks a kind and a preset and may change any
 // preset value: params = { ...preset, ...line.params }.

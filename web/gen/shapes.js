@@ -1,9 +1,9 @@
 // Makes the shapes of a kind once per world and keeps them: every object of a
-// kind shares one of its few variants (shared geometry, like the old assets.glb).
+// kind shares one of its few variants (shared geometry).
 import { getKind, paramsOf } from './registry.js';
 import { hashSeed } from '../lib/random.js';
 
-// ctx: { meta, geo, sunL, mid, seed } -> a cache of shape sets
+// ctx: { meta, sunL, mid, seed } -> a cache of shape sets
 export function createShapes(ctx) {
   return { ctx, sets: new Map() };     // key -> { key, kind, preset, params, shapes: [Shape] }
 }

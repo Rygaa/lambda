@@ -1,18 +1,16 @@
 // Creates, updates and removes the Three.js objects behind entities.
 import * as THREE from 'three';
 import { added, removed, changed, addComponent, hasComponent, getComponent, getResource } from '../ecs/world.js';
-import { Transform, Prop, ShadowCaster, SceneObject, GroundPlane, GroundCover, DustField, Character, Slime } from '../components.js';
+import { Transform, Prop, ShadowCaster, SceneObject, GroundPlane, GroundCover, DustField } from '../components.js';
 import { Assets, Gpu, Settings } from '../resources.js';
 import * as S from '../render/shaders.js';
 import { shaderMaterial } from '../render/materials.js';
-import { QUAD, spriteGeometry, spriteUniforms } from '../lib/sprites.js';
-import { buildRig, disposeRig } from '../lib/character.js';
-import { buildSlimeRig, disposeSlimeRig } from '../lib/slime.js';
+import { spriteGeometry, spriteUniforms } from '../lib/sprites.js';
 import { FAMILY, paletteRows } from '../gen/palettes.js';
 import { heightAt, terrainGeometry } from '../gen/terrain.js';
 
 // the meshes of one generated object: [{ mesh, role }]; rows: palette family -> row
-// (a part with its own `palette` name keeps it: the walls and roof of a house)
+// (a part with its own `palette` name keeps it)
 function propMeshes(gpu, shape, rows, casts) {
   const group = new THREE.Group();
   const meshes = [];
@@ -54,7 +52,7 @@ export function meshSystem(world) {
 
   for (const e of added(world, GroundPlane)) {
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2),
-      shaderMaterial(gpu.shared, S.MESH_VERT, S.GROUND_FRAG, groundUniforms(settings.land.ground)));
+      shaderMaterial(gpu.shared, S.MESH_VERT, S.groundFrag(), groundUniforms(settings.land.ground)));
     gpu.scene.add(mesh);
     addComponent(world, e, SceneObject, { group: mesh, meshes: [] });
     // cliffs: the plateau tops look like the ground; the walls and the stairs are stone
@@ -108,44 +106,7 @@ export function meshSystem(world) {
     placeGroup(world, e);
   }
 
-  // characters: a rig of flat-faced parts, outlined like stone; a new look
-  // builds a new rig (the rig system poses it). The sprite model is one card
-  // (the sprite frame system picks its frame)
-  for (const e of new Set([...added(world, Character), ...changed(world, Character)])) {
-    const old = getComponent(world, e, SceneObject);
-    if (old) {
-      old.group.parent?.remove(old.group);
-      if (old.rig) disposeRig(old.rig);
-    }
-    const look = getComponent(world, e, Character);
-    if (look.model === 'sprite') {
-      const mesh = new THREE.Mesh(QUAD, gpu.charSprite);
-      mesh.frustumCulled = false;
-      gpu.spriteScene.add(mesh);
-      addComponent(world, e, SceneObject, { group: mesh, meshes: [{ mesh, role: 'sprite' }], rig: null });
-      placeGroup(world, e);
-      continue;
-    }
-    const rig = buildRig(look, (role) => gpu.materials[role][0], gpu.screenCharMaterial);
-    const group = new THREE.Group().add(rig.root);
-    gpu.scene.add(group);
-    addComponent(world, e, SceneObject, { group, meshes: rig.meshes, rig });
-    placeGroup(world, e);
-  }
-
-  // slimes: a low-poly blob and its effects (the slime rig system shapes them)
-  for (const e of added(world, Slime)) {
-    const rig = buildSlimeRig(getComponent(world, e, Slime).kind, (role) => gpu.materials[role][0]);
-    const group = new THREE.Group().add(rig.root);
-    gpu.scene.add(group);
-    addComponent(world, e, SceneObject, { group, meshes: rig.meshes, rig });
-    placeGroup(world, e);
-  }
-
   for (const e of changed(world, Transform)) if (hasComponent(world, e, SceneObject)) placeGroup(world, e);
 
-  for (const [, so] of removed(world, SceneObject)) {
-    so.group.parent?.remove(so.group);
-    if (so.rig?.slime) disposeSlimeRig(so.rig);
-  }
+  for (const [, so] of removed(world, SceneObject)) so.group.parent?.remove(so.group);
 }

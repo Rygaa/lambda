@@ -1,6 +1,5 @@
 // A world under construction: the objects placed so far and the tests that
-// placement rules need (is this spot free?). Layouts (gen/layouts.js) and
-// recipes (gen/recipe.js) both fill one.
+// placement rules need (is this spot free?). Recipes (gen/recipe.js) fill one.
 import { shapeSet } from './shapes.js';
 import { nextRandom } from '../lib/random.js';
 

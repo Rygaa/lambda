@@ -3,48 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixel Forest</title>
+<title>Lambda nature</title>
 <style>
   html, body { margin: 0; height: 100%; background: #13392c; overflow: hidden; }
-  canvas { display: block; width: 100vw; height: 100vh; cursor: grab; touch-action: none; }
-  canvas.drag { cursor: grabbing; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
   #hint {
     position: fixed; left: 12px; bottom: 10px; color: #e6f3c4; opacity: .85;
     font: 12px/1.4 ui-monospace, Menlo, monospace; text-shadow: 0 1px 0 #0b2a20;
     pointer-events: none; transition: opacity 1s;
   }
-  #edit-toggle {
-    position: fixed; top: 10px; right: 10px; width: 34px; height: 34px;
-    font: bold 18px/1 ui-monospace, Menlo, monospace; color: #e6f3c4;
-    background: #1d4a38cc; border: 2px solid #e6f3c4; cursor: pointer;
-  }
-  body.editing #edit-toggle { background: #e6f3c4; color: #1d4a38; }
-  #editor {
-    display: none; position: fixed; top: 54px; right: 10px; width: 176px;
-    max-height: calc(100vh - 70px); overflow: auto;
-    background: #133b2cee; border: 2px solid #e6f3c4; color: #e6f3c4;
-    font: 12px/1.35 ui-monospace, Menlo, monospace; padding: 8px;
-    user-select: none;
-  }
-  body.editing #editor { display: block; }
-  body.editing canvas.drag { cursor: grabbing; }
-  .ed-title { font-weight: bold; letter-spacing: 1px; margin-bottom: 6px; }
-  .ed-title span { color: #f0d27a; font-weight: normal; }
-  .ed-section { margin: 8px 0 3px; color: #9fd28a; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
-  #editor button {
-    display: block; width: 100%; text-align: left; margin: 2px 0; padding: 3px 6px;
-    font: inherit; color: #e6f3c4; background: #1f5040; border: 1px solid #3d7a5e; cursor: pointer;
-  }
-  #editor button:hover { background: #2a6450; }
-  #editor button.on { background: #e6f3c4; color: #133b2c; border-color: #e6f3c4; }
-  #editor .ed-zoom { display: block; width: 100%; margin: 2px 0; accent-color: #e6f3c4; }
-  .ed-help { margin-top: 10px; color: #b9d6a8; font-size: 10px; }
-  .ed-row { display: flex; align-items: center; gap: 2px; margin: 2px 0; }
-  .ed-row span { flex: 0 0 62px; font-size: 10px; color: #b9d6a8; }
-  #editor .ed-row button { flex: 1; width: auto; padding: 2px 0; text-align: center; font-size: 10px; margin: 0; }
-  .ed-chips { display: flex; flex-wrap: wrap; gap: 2px; margin: 2px 0 5px; }
-  .ed-chips span { flex: 0 0 100%; font-size: 10px; color: #b9d6a8; }
-  #editor .ed-chips button { flex: 1 0 auto; width: auto; padding: 2px 4px; text-align: center; font-size: 10px; margin: 0; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -55,7 +22,7 @@
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="hint">WASD: move · shift: run · space: jump · F: attack · G: shield · arrows: camera · C: clouds · #: settings (zoom, third person)</div>
+<div id="hint">arrows: camera · wheel: zoom · C: clouds</div>
 <script type="module" src="main.js"></script>
 </body>
 </html>

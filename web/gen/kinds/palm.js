@@ -55,7 +55,6 @@ defineKind({
       radius: p.r1 + 0.15,
       blocker: { r: p.r1 + 0.1, h: top[1] },
       turns: false,            // the leaves are lit in place
-      crown: { y: top[1], r: 1.6 },
     };
   },
 });

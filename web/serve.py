@@ -1,8 +1,8 @@
-# Static server for this folder with caching off (assets are rebuilt often).
-# PUT /capture/<name>.png saves a frame into captures/ (used to compare with Blender).
-import http.server, functools, os, sys, re
+# Static server for the repo, with caching off: web/ reads ../assets and ../worlds.
+#   python3 web/serve.py [port]   then open http://127.0.0.1:8643/web/
+import http.server, functools, os, sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -10,19 +10,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store')
         super().end_headers()
 
-    def do_PUT(self):
-        m = re.fullmatch(r'/capture/([\w-]+\.png)', self.path)
-        if not m:
-            self.send_error(404)
-            return
-        data = self.rfile.read(int(self.headers['Content-Length']))
-        os.makedirs(os.path.join(HERE, 'captures'), exist_ok=True)
-        with open(os.path.join(HERE, 'captures', m.group(1)), 'wb') as fh:
-            fh.write(data)
-        self.send_response(204)
-        self.end_headers()
-
 
 port = int(sys.argv[1]) if len(sys.argv) > 1 else 8643
+print(f'http://127.0.0.1:{port}/web/', flush=True)
 http.server.ThreadingHTTPServer(('127.0.0.1', port),
-                                functools.partial(Handler, directory=HERE)).serve_forever()
+                                functools.partial(Handler, directory=ROOT)).serve_forever()

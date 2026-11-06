@@ -31,7 +31,7 @@ defineKind({
       parts.push({ geometry: t, role: 'trunk' });
     }
     parts.push({ geometry: canopy(canopyY, radii), role: 'canopy' });
-    // the leaf clumps: same layout rules as the exported trees (assets.json "trees")
+    // the leaf clumps: same layout rules as the trees exported from Blender
     const info = { canopy_radii: radii, canopy_center_y: canopyY, canopy_scale: 0.9, egg: 0.1, leaf_offset: 0.13, leaf_spacing: 0.15 };
     parts.push({ geometry: leafGeometry(info, rng, ctx.sunL, ctx.mid.canopy), role: 'leaves' });
     const trunk = p.trunk > 0;
@@ -42,7 +42,6 @@ defineKind({
       blocker: { r: p.r2 * s + 0.15, h: canopyY },
       blocks: trunk,
       turns: false,
-      crown: { y: canopyY, r: Math.max(...radii) },
     };
   },
 });
