@@ -1,0 +1,22 @@
+{
+  "name": "Meadow",
+  "seed": 11,
+  "size": 40,
+  "clearings": { "amount": "many", "radius": [3, 3.6] },
+  "props": [
+    { "kind": "water", "preset": "pond", "count": 2, "gap": 0.8, "avoid": "clearings" },
+    { "kind": "water", "preset": "puddle", "amount": "few", "gap": 0.4 },
+    { "kind": "tree", "preset": "medium", "amount": "some", "spacing": 4.6, "avoid": "clearings" },
+    { "kind": "tree", "preset": "small", "amount": "few", "spacing": 4.6, "avoid": "clearings" },
+    { "kind": "tree", "preset": "big", "amount": "few", "spacing": 4.6, "avoid": "clearings" },
+    { "kind": "tree", "preset": "bush", "amount": "some", "gap": 0.2 },
+    { "kind": "boulder", "preset": "big", "amount": "few", "gap": 1.0 },
+    { "kind": "rock", "preset": "crag", "amount": "few", "gap": 0.8 },
+    { "kind": "rock", "preset": "stone", "amount": "some", "near": "tree", "gap": 0.4 },
+    { "kind": "rock", "preset": "stone", "amount": "few", "gap": 0.5 },
+    { "kind": "rock", "preset": "stone", "count": 5, "near": "water", "gap": 0.3, "palette": ["moss", "grey"] },
+    { "kind": "tree", "preset": "bush", "count": 6, "near": "water", "gap": 0.2 },
+    { "kind": "rock", "preset": "pebble", "amount": "lots", "gap": 0.2 },
+    { "kind": "glb", "params": { "names": ["OldPillar", "GatePillarR"] }, "amount": "few", "gap": 1.0 }
+  ]
+}

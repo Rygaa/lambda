@@ -1,0 +1,20 @@
+{
+  "name": "Mountains: cliffs in levels, with stone stairs",
+  "seed": 5,
+  "size": 56,
+  "clearings": { "amount": "some", "radius": [3, 3.6] },
+  "cliffs": { "count": 5, "levels": [1, 3], "size": [11, 18], "height": [1.2, 1.8] },
+  "props": [
+    { "kind": "water", "preset": "pond", "count": 2, "gap": 0.8, "avoid": "clearings" },
+    { "kind": "tree", "preset": "medium", "amount": "few", "spacing": 4.6, "avoid": "clearings" },
+    { "kind": "tree", "preset": "small", "amount": "few", "spacing": 4.6, "avoid": "clearings", "palette": { "canopy": "pine" } },
+    { "kind": "tree", "preset": "bush", "amount": "some", "gap": 0.2 },
+    { "kind": "tree", "preset": "bush", "count": 18, "near": "cliff-tops", "gap": 0.2 },
+    { "kind": "boulder", "preset": "small", "count": 10, "near": "cliffs", "gap": 0.3, "palette": ["sand", "grey"] },
+    { "kind": "rock", "preset": "crag", "count": 8, "near": "cliffs", "gap": 0.3, "palette": ["sand", "grey"] },
+    { "kind": "rock", "preset": "stone", "count": 24, "near": "cliffs", "gap": 0.2, "palette": ["sand", "grey"] },
+    { "kind": "rock", "preset": "pebble", "count": 60, "near": "cliffs", "gap": 0.1, "palette": ["sand", "grey"] },
+    { "kind": "rock", "preset": "stone", "amount": "few", "gap": 0.3, "palette": ["sand", "grey"] },
+    { "kind": "rock", "preset": "pebble", "amount": "some", "gap": 0.2, "palette": ["sand", "grey"] }
+  ]
+}
