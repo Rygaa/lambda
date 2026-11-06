@@ -1,5 +1,5 @@
 // Borders: what closes a side of the world (recipe "borders"): a wall of
-// mountains (gen/terrain.js) or the ocean (water kind, preset ocean). Both are
+// mountains (gen/terrain.js) or the ocean (asset type water/ocean). Both are
 // bands along the side, reaching in as far as a wavy line.
 import { nextRandom, between } from '../lib/random.js';
 

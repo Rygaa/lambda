@@ -64,7 +64,7 @@ export const partsOf = (pieces) => Object.entries(pieces).filter(([, list]) => l
   .map(([palette, list]) => ({ geometry: mergeGeometries(list), role: 'stone', palette }));
 
 // circles of radius r that cover a w x d rectangle around the origin (they stop
-// the player and keep grass and other objects out): [[x, z, r]]
+// walkers and keep grass and other objects out): [[x, z, r]]
 export function boxCircles(w, d, r) {
   const out = [];
   const nx = Math.max(1, Math.ceil(w / (r * 1.4))), nz = Math.max(1, Math.ceil(d / (r * 1.4)));

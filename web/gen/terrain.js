@@ -3,10 +3,10 @@
 // a lower one with a terrace around it. Each separate plateau rises by its own
 // height. Rock walls stand where the ground drops, and stone stairs go down
 // from every plateau, so every level can be reached (recipe "cliffs", see
-// docs/worlds.md). A mountain border (recipe "borders", gen/borders.js) is a
+// documentation/worlds.md). A mountain border (recipe "borders", gen/borders.js) is a
 // band of cliffs stacked along a side, with no stairs: it closes the world.
 //   heightAt, levelUnder, bareAt: what the movers, the placement rules and the grass ask
-//   terrainGeometry: the tops, the walls and the stairs (made with math, like gen/kinds)
+//   terrainGeometry: the tops, the walls and the stairs (made with math, like gen/builders)
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 import { nextRandom, hashSeed } from '../lib/random.js';
@@ -119,7 +119,7 @@ export function buildCliffs(b, spec, borders = []) {
     const R = pick(spec.size ?? [8, 14]) / 2;
     const cx = b.range(-b.half * 0.85, b.half * 0.85), cz = b.range(-b.half * 0.85, b.half * 0.85);
     let cur = open(blobs(cx, cz, R, 1 + Math.floor(b.rand() * 3), 1), n);
-    // the player starts on the ground, in the first clearing; borders stay apart
+    // the camera starts on the ground, in the first clearing; borders stay apart
     if (!any(cur) || touches(t, cur, start)) continue;
     if (cur.some((v, c) => v && borders.some((bd) => bd.inside(centre(t, Math.floor(c / n)), centre(t, c % n), MARGIN * CELL + 1)))) continue;
     const levels = Math.round(pick(spec.levels ?? [1, 3]));

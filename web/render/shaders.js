@@ -193,7 +193,7 @@ void main() {
 `;
 
 // ------------------------------------------------------------------ water
-// The surface of a water shape (gen/kinds/water.js): aShore is the distance to
+// The surface of a water shape (gen/builders/water.js): aShore is the distance to
 // the shore, below 0 is dry ground. G-buffer: light, WATER_MID, shore distance
 // (instead of "up"), palette row. The post pass paints it.
 export const WATER_VERT = /* glsl */ `

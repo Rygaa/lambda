@@ -40,7 +40,7 @@ export function buildRecipe(cache, recipe) {
   const borders = planBorders(b, recipe.borders ?? {}, islandsOf(recipe.islands ?? []));
   const inBorder = (x, z, pad) => borders.some((bd) => bd.inside(x, z, pad));
 
-  // clearings: open ground where light falls through the canopy; the player starts in the first
+  // clearings: open ground where light falls through the canopy; the camera starts in the first
   const c = recipe.clearings ?? {};
   check(c, ['amount', 'count', 'radius', 'light'], 'clearings');
   const nClear = Math.min(4, c.count ?? CLEARINGS[c.amount ?? 'some'] ?? bad('clearings', `amount "${c.amount}"`));
