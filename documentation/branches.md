@@ -14,12 +14,17 @@ The official copy is on GitHub, in `Rygaa/lambda`.
 
 | Path | What it is |
 | --- | --- |
+| `assets/` | the asset files: one folder per type (`assets/<family>/<type>/<family>.json`), the colours (`palettes.json`), the render settings (`render.json`), and the sprite textures |
+| `worlds/` | the world recipes (see `documentation/worlds.md`) |
+| `web/` | the code that makes and draws the worlds, in the browser (`web/serve.py`) |
 | `documentation/branches.md` | this guide |
 | `documentation/assets.md` | how the assets are sorted and named, and the plan to build it |
+| `documentation/worlds.md` | how to open a world, and how to write one |
 | `documentation/building/` | how to build a building from a reference image, with examples and tools (see its `README.md`) |
 | `documentation/style/` | the style rules (`rules.md`) and the article they come from |
 
-There is no code of the game on this branch yet. Some guides name paths that are not here: `packages/renderer` and
+The code here makes and draws the nature only: water, rocks, plants, and terrain, seen from the top. There is no
+player, server, or building yet. Some guides name paths that are not here: `packages/renderer` and
 `apps/asset-studio/` are on the `gpt` branch, and `game/` is on the `game` and `voxel` branches. These paths are real
 only after they move here.
 
@@ -86,3 +91,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `backup` | documentation only, up to Raditz's space pod | old state of the documentation |
 | `claude/building-docs` | documentation only, up to the Capsule Corp ship | old state of the documentation |
 | `claude/work`, `main-2` | only a `.gitignore` | empty start |
+| `try/nature` | the nature of `pixel-scene` version-3 (commit `9da4216`), sorted with the names of `assets.md` | try, moved to `attempt_1` |

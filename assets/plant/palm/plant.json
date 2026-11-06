@@ -1,0 +1,10 @@
+{
+  "about": "A palm tree: a ringed trunk that bends as it rises (stone palette palm), coconuts, and drooping fronds. height: of the trunk; lean: how far its top leans out; rings: trunk rings; r1, r2: radius at the bottom and the top; fronds: how many; length: of a frond; droop: how far they drop.",
+  "builder": "palm",
+  "variants": 4,
+  "palettes": {"green": {"canopy": "green"}, "autumn": {"canopy": "autumn"}, "pine": {"canopy": "pine"}},
+  "sizes": {
+    "small": {"height": [1.8, 2.4], "lean": [0.2, 0.6], "rings": 5, "r1": 0.15, "r2": 0.11, "fronds": [6, 7], "length": [1.2, 1.4], "droop": [0.8, 1.1]},
+    "large": {"height": [3.0, 3.8], "lean": [0.5, 1.1], "rings": 7, "r1": 0.17, "r2": 0.12, "fronds": [7, 8], "length": [1.5, 1.85], "droop": [0.9, 1.2]}
+  }
+}

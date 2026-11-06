@@ -1,0 +1,9 @@
+{
+  "about": "A bush: a tree canopy with no trunk, on the ground. You walk through it. The values are the ones of plant/oak.",
+  "builder": "tree",
+  "variants": 3,
+  "palettes": ["green", "autumn", "pine"],
+  "sizes": {
+    "medium": {"trunk": 0, "r1": 0, "r2": 0, "trunkY": 0, "canopyY": 0.3, "radii": [0.62, 0.45, 0.62], "scale": [0.8, 1.2]}
+  }
+}

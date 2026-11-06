@@ -1,0 +1,11 @@
+{
+  "about": "A tree: a six-sided trunk and an egg-shaped canopy covered in leaf clumps. trunk: its length; r1, r2: its radius at the bottom and the top; trunkY: its centre height; canopyY: the canopy centre height; radii: the canopy radii [x, y, z]; everything times scale.",
+  "builder": "tree",
+  "variants": 3,
+  "palettes": {"green": {"trunk": "brown", "canopy": "green"}, "autumn": {"trunk": "brown", "canopy": "autumn"}, "pine": {"trunk": "brown", "canopy": "pine"}},
+  "sizes": {
+    "small": {"trunk": 1.4, "r1": 0.22, "r2": 0.15, "trunkY": 0.6, "canopyY": 1.95, "radii": [0.95, 1.08, 0.95], "scale": [0.92, 1.08]},
+    "medium": {"trunk": 1.7, "r1": 0.27, "r2": 0.18, "trunkY": 0.75, "canopyY": 2.3, "radii": [1.18, 1.32, 1.18], "scale": [0.92, 1.08]},
+    "large": {"trunk": 2.0, "r1": 0.32, "r2": 0.22, "trunkY": 0.9, "canopyY": 2.75, "radii": [1.42, 1.58, 1.42], "scale": [0.92, 1.08]}
+  }
+}

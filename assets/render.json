@@ -1,0 +1,5 @@
+{
+  "sprites": {"tufts": {"file": "textures/tufts.png", "cell": [24, 16], "count": 4}, "clumps": {"file": "textures/clumps.png", "cell": [12, 12], "count": 4}, "decor": {"file": "textures/decor.png", "cell": [14, 12], "count": 8, "sprouts": [0, 1, 2, 7], "flowers": [3, 4, 5, 6]}},
+  "mid": {"grass": 1, "rock": 2, "trunk": 3, "canopy": 4, "flower_w": 5, "flower_l": 6, "sprout": 7, "leafdeco": 8},
+  "render": {"res": [480, 270], "ortho": 11.0, "ppu": 43.63636363636363, "cam_target": [0.3, 0.6, -0.6], "cam_forward": [0.0, -0.54464, -0.83867], "sun_l": [-0.73592, 0.57358, -0.35977], "volume_top": 7.6, "godray_gain": 5.0, "glade": [1.4, 0.0, -0.9], "glade_r": 3.4}
+}

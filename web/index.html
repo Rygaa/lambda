@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lambda nature</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #13392c; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+  #hint {
+    position: fixed; left: 12px; bottom: 10px; color: #e6f3c4; opacity: .85;
+    font: 12px/1.4 ui-monospace, Menlo, monospace; text-shadow: 0 1px 0 #0b2a20;
+    pointer-events: none; transition: opacity 1s;
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hint">arrows: camera · wheel: zoom · C: clouds</div>
+<script type="module" src="main.js"></script>
+</body>
+</html>

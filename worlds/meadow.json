@@ -1,0 +1,21 @@
+{
+  "name": "Meadow",
+  "seed": 11,
+  "size": 40,
+  "clearings": { "amount": "many", "radius": [3, 3.6] },
+  "props": [
+    { "asset": "water/pond/medium", "count": 2, "gap": 0.8, "avoid": "clearings" },
+    { "asset": "water/puddle/medium", "amount": "few", "gap": 0.4 },
+    { "asset": "plant/oak/medium", "amount": "some", "spacing": 4.6, "avoid": "clearings" },
+    { "asset": "plant/oak/small", "amount": "few", "spacing": 4.6, "avoid": "clearings" },
+    { "asset": "plant/oak/large", "amount": "few", "spacing": 4.6, "avoid": "clearings" },
+    { "asset": "plant/bush/medium", "amount": "some", "gap": 0.2 },
+    { "asset": "rock/round/large", "amount": "few", "gap": 1.0 },
+    { "asset": "rock/sharp/large", "amount": "few", "gap": 0.8 },
+    { "asset": "rock/sharp/medium", "amount": "some", "near": "tree", "gap": 0.4 },
+    { "asset": "rock/sharp/medium", "amount": "few", "gap": 0.5 },
+    { "asset": "rock/sharp/medium", "count": 5, "near": "water", "gap": 0.3, "palette": ["moss", "grey"] },
+    { "asset": "plant/bush/medium", "count": 6, "near": "water", "gap": 0.2 },
+    { "asset": "rock/sharp/small", "amount": "lots", "gap": 0.2 }
+  ]
+}
