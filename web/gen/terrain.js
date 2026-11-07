@@ -5,6 +5,7 @@
 // from every plateau, so every level can be reached (recipe "cliffs", see
 // documentation/worlds.md). A mountain border (recipe "borders", gen/borders.js) is a
 // band of cliffs stacked along a side, with no stairs: it closes the world.
+// Their numbers are in the asset types terrain/cliff and terrain/mountain.
 //   heightAt, levelUnder, bareAt: what the movers, the placement rules and the grass ask
 //   terrainGeometry: the tops, the walls and the stairs (made with math, like gen/builders)
 import * as THREE from 'three';
@@ -22,10 +23,9 @@ const FOOT = 0.22;              // a wall leans back: its foot stands this far o
 const JITTER = 0.06;            // cell corners move this far at most, so edges are not ruler-straight
 const MOVE = 0.2;               // smoothing moves a corner of the walls at most this far
 const LANDING = -2;             // stair[] value of the free cells at the foot of stairs
-const BORDER = { tiers: [3, 4], ledge: [1.3, 2.2], height: [1.4, 1.9], past: 14 };   // mountain borders: tiers
-// stacked like a big cliff, ledges between them, the height of each, how far they go on past the edge
+const PAST = 14;                // mountain borders go on this far past the edge of the world
 
-export const CLIFF_FIELDS = ['count', 'levels', 'size', 'height', 'palette', 'stairs'];
+export const CLIFF_FIELDS = ['asset', 'count', 'palette', 'stairs'];
 const DIRS = [[0, 1], [-1, 0], [1, 0], [0, -1]];    // the last one (-z) faces away from the camera
 
 // the grid covers [-ext, ext] (past the world when there are mountain borders);
@@ -81,12 +81,13 @@ export function levelUnder(t, x, z, r) {
 }
 
 // ---------------------------------------------------------------- the level map
-// b: gen/world.js builder; spec: the recipe "cliffs" object; borders: the
-// planned borders [{ side, kind, line, inside(x, z, pad) }] (gen/recipe.js)
+// b: gen/world.js builder; spec: { count, levels, width, height, palette, stairs };
+// borders: the planned borders (gen/recipe.js), a mountain border has
+// { name, mountain: the values of its type, line, inside(x, z, pad) }
 export function buildCliffs(b, spec, borders = []) {
-  const mountains = borders.filter((bd) => bd.kind === 'mountains');
-  const ext = b.half + (mountains.length ? BORDER.past : 0);
-  const t = createTerrain(ext, Math.floor(b.rand() * 2 ** 31), spec.palette ?? 'cliff', spec.stairs ?? 'sand');
+  const mountains = borders.filter((bd) => bd.mountain);
+  const ext = b.half + (mountains.length ? PAST : 0);
+  const t = createTerrain(ext, Math.floor(b.rand() * 2 ** 31), spec.palette, spec.stairs ?? 'sand');
   const n = t.n;
   const pick = (v) => (Array.isArray(v) ? b.range(v[0], v[1]) : v);
   const start = { x: b.start[0], z: b.start[2], r: (b.glades[0]?.r ?? 2) + 2 };
@@ -114,15 +115,15 @@ export function buildCliffs(b, spec, borders = []) {
     return m;
   };
 
-  const count = spec.count ?? 3;
+  const count = spec.count;
   for (let made = 0, tries = 0; made < count && tries < count * 40; tries++) {
-    const R = pick(spec.size ?? [8, 14]) / 2;
+    const R = pick(spec.width) / 2;
     const cx = b.range(-b.half * 0.85, b.half * 0.85), cz = b.range(-b.half * 0.85, b.half * 0.85);
     let cur = open(blobs(cx, cz, R, 1 + Math.floor(b.rand() * 3), 1), n);
     // the camera starts on the ground, in the first clearing; borders stay apart
     if (!any(cur) || touches(t, cur, start)) continue;
     if (cur.some((v, c) => v && borders.some((bd) => bd.inside(centre(t, Math.floor(c / n)), centre(t, c % n), MARGIN * CELL + 1)))) continue;
-    const levels = Math.round(pick(spec.levels ?? [1, 3]));
+    const levels = Math.round(pick(spec.levels));
     for (let k = 1; k <= levels; k++) {
       masks[k - 1] = or(masks[k - 1] ?? new Uint8Array(n * n), cur);
       const ox = b.range(-R, R) * 0.3, oz = b.range(-R, R) * 0.3;
@@ -138,7 +139,7 @@ export function buildCliffs(b, spec, borders = []) {
     masks[k] = open(close(masks[k], n), n);
     if (k > 0) masks[k] = open(and(masks[k], erode(masks[k - 1], MARGIN, n)), n);
     for (const piece of pieces(masks[k], n)) {
-      const h = Math.round(pick(spec.height ?? [1.2, 1.8]) * 20) / 20;
+      const h = Math.round(pick(spec.height) * 20) / 20;
       for (const c of piece) { t.level[c]++; t.height[c] += h; }
     }
   }
@@ -148,13 +149,17 @@ export function buildCliffs(b, spec, borders = []) {
     for (const piece of pieces(masks[k - 1], n)) addStairs(t, b, piece, k);
 
   // mountain borders: tiers of cliffs, each further in from the side than the one
-  // on top of it (a wavy ledge between), each tier the same height all round
+  // on top of it (a wavy ledge between); one type has the same tiers on every
+  // side, so they meet at the corners
   const rng = { seed: Math.floor(b.rand() * 2 ** 31) };
-  const tierHeights = [];
-  const tiers = Math.round(pick(BORDER.tiers));
-  for (let k = 0; k < tiers; k++) tierHeights.push(Math.round(pick(BORDER.height) * 20) / 20);
+  // a world with no mountain border still takes these numbers, so that its objects stay where they are
+  if (!mountains.length) for (let k = Math.round(b.range(3, 4)); k > 0; k--) b.rand();
+  const stacks = new Map();      // type -> the height of each tier
   for (const bd of mountains) {
-    const ledges = tierHeights.map(() => wavyLine(rng, BORDER.ledge, [0.3, 0.6]));     // ledges[0] is not used
+    const m = bd.mountain;
+    if (!stacks.has(bd.name)) stacks.set(bd.name, Array.from({ length: Math.round(pick(m.tiers)) }, () => Math.round(pick(m.height) * 20) / 20));
+    const tierHeights = stacks.get(bd.name), tiers = tierHeights.length;
+    const ledges = tierHeights.map(() => wavyLine(rng, m.ledge, m.ledgeWobble));     // ledges[0] is not used
     for (let k = 0; k < tiers; k++) {
       const m = new Uint8Array(n * n);
       for (let i = 0; i < n; i++)

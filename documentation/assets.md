@@ -145,8 +145,14 @@ The types come from `pixel-scene` version-3 (commit `9da4216`, `web/gen/kinds/`)
 - `water/puddle`, `water/pond`, `water/lake`, `water/ocean`: the presets of the `water` kind. Its `stream`
   became `water/river`. Each has one size, `medium`.
 - The palettes and themes: `web/gen/palettes.js` became `assets/palettes.json`.
-- Terrain: the cliffs, the mountain borders, and the ground paints are still fields of a world recipe (`cliffs`,
-  `borders`, `ground`, see `worlds.md`), not type files.
+- `terrain/cliff`: the numbers of the recipe field `cliffs`, moved to a type file. `medium` has the numbers of the
+  `coast` world, and `large` has those of the `mountains` world.
+- `terrain/mountain`: the numbers of the mountain borders in `web/gen/terrain.js`, moved to a type file. It has one
+  size, `medium`.
+- Ground paints are still a field of a world recipe (`ground`, see `worlds.md`), not type files.
+
+A terrain type has no `variants`. It is part of the ground, not an object placed on it, so its shape comes from the
+world seed and each world gets its own. Its name stops at the size: `terrain/mountain/medium`.
 
 Left out on purpose: the player and the slimes, the houses (`kame`, `goku`), the Blender pieces (ruins, old
 layouts), the first and third person views, and the `dbz` world (a map of buildings).
@@ -164,5 +170,7 @@ Do each step on a `try/` branch, then move it to `attempt_1` (see `branches.md`)
    (`web/gen/assets.js`, `web/gen/shapes.js`).
 6. To do: worlds that ask by tags, for example "plants with the tag `forest`". Then a type file gets `"tags"`.
 7. Done: the test world `worlds/all-types.json`, with every type in every size, in rows.
-8. To do: new types, one at a time: `rock/flat`, `plant/pine`, `rock/round/medium`, sizes for water. Terrain type
-   files (`terrain/cliff`, `terrain/mountain`) when the terrain gets more kinds.
+8. To do: new types, one at a time: `rock/flat`, `plant/pine`, `rock/round/medium`, sizes for water,
+   `terrain/mountain` in `small` and `large`.
+9. Done: the type files `terrain/cliff` and `terrain/mountain`, with the numbers that were in the code.
+10. To do: mountains made with noise, and chunks for huge maps.

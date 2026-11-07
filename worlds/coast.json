@@ -2,9 +2,9 @@
   "name": "Coast: mountains on the west, the ocean on the east",
   "seed": 4,
   "size": 56,
-  "borders": { "west": "mountains", "east": "ocean" },
+  "borders": { "west": "terrain/mountain/medium", "east": "water/ocean/medium" },
   "clearings": { "amount": "some", "radius": [3, 3.6] },
-  "cliffs": { "count": 2, "levels": [1, 2], "size": [10, 14] },
+  "cliffs": { "asset": "terrain/cliff/medium", "count": 2 },
   "props": [
     { "asset": "water/pond/medium", "count": 1, "gap": 0.8, "avoid": "clearings" },
     { "asset": "plant/oak/medium", "amount": "few", "spacing": 4.6, "avoid": "clearings" },

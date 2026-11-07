@@ -92,28 +92,31 @@ The types today:
 - `plant/palm`: `small`, `large`. Palettes `green`, `autumn`, `pine` (the fronds; the trunk is always `palm`).
 - `water/puddle`, `water/pond`, `water/lake`, `water/river`: `medium`. Palettes `clear`, `swamp`, `glacier`.
 - `water/ocean`: `medium`, only for `borders`.
+- `terrain/cliff`: `medium`, `large`, only for `cliffs`. Palettes `cliff`, `sand`, `grey`, `moss`, `dark`.
+- `terrain/mountain`: `medium`, only for `borders`. Palettes `cliff`, `sand`, `grey`, `moss`, `dark`.
 
 ## 4. Terrain: cliffs, mountains, and the ocean
 
-`"cliffs": { "count": 5, "levels": [1, 3], "size": [11, 18], "height": [1.2, 1.8] }` makes the ground in levels
-(`web/gen/terrain.js`):
+`"cliffs": { "asset": "terrain/cliff/large", "count": 5 }` makes the ground in levels (`web/gen/terrain.js`):
 
+- `asset`: the type and size. Its file has the numbers: `levels`, `width`, and `height`.
 - `count`: the number of plateaus (default 3). Plateaus that touch become one.
-- `levels`: how many levels each plateau has, one on top of the other (default [1, 3]).
-- `size`: the width of a plateau (default [8, 14]).
-- `height`: how high each plateau rises (default [1.2, 1.8]).
-- `palette`: the stone palette of the walls (default `cliff`).
+- `palette`: the stone palette of the walls (default: the first of the type).
 - `stairs`: the stone palette of the stairs (default `sand`).
 
 Every level gets stairs down, so every level can be reached. Objects stand only on flat ground, and water stays on
 the lowest level.
 
-`"borders": { "west": "mountains", "east": "ocean" }` closes sides of the world (`web/gen/borders.js`). The sides are
-`north` (top of the screen), `south` (towards the camera), `west`, and `east`.
+`"borders": { "west": "terrain/mountain/medium", "east": "water/ocean/medium" }` closes sides of the world
+(`web/gen/borders.js`). The sides are `north` (top of the screen), `south` (towards the camera), `west`, and `east`.
 
-- `mountains`: a band of cliffs 6 to 10 units in from the side, about 5 to 7 units high, with no stairs.
-- `ocean`: the type `water/ocean`, 5 to 8 units in from the side, with a wavy shore. `{ "kind": "ocean", "width":
+- `terrain/mountain/medium`: a band of cliffs 6 to 10 units in from the side, about 5 to 7 units high, with no stairs.
+  `{ "asset": "terrain/mountain/medium", "palette": "sand" }` gives it a palette.
+- `water/ocean/medium`: 5 to 8 units in from the side, with a wavy shore. `{ "asset": "water/ocean/medium", "width":
   [17, 19] }` makes a wider sea.
+
+All the walls of one world have one palette, so cliffs and mountains in the same world must ask for the same one.
+A world with two gives an error.
 
 `"islands": [{ "at": [36, 55], "radius": 5.6, "bar": [33.5, 43], "barWidth": 2.6 }]` cuts islands out of every
 ocean, with a sand bar out to the point `bar`.
@@ -159,3 +162,6 @@ A new kind of shape needs a builder too:
    returns the shape: its meshes, `height`, and `radius` (see `web/gen/registry.js`).
 2. Add its `import` to `web/gen/builders/index.js`.
 3. Make the type file, with `"builder": "<name>"`.
+
+A new terrain type only needs a file, with `"builder": "mountain"` or `"builder": "cliff"`, for example
+`assets/terrain/volcano/terrain.json`, then `"terrain/volcano/medium"` in `borders`.

@@ -2,9 +2,9 @@
 // every recipe line scattered over the ground. See documentation/worlds.md for the fields.
 import { createWorldBuilder, finish, discsOf } from './world.js';
 import { paletteNames } from './palettes.js';
-import { SIZES } from './assets.js';
+import { SIZES, getType, paramsOf } from './assets.js';
 import { buildCliffs, levelUnder, CLIFF_FIELDS } from './terrain.js';
-import { SIDES, BORDER_KINDS, fromSide, wavyLine } from './borders.js';
+import { SIDES, fromSide, wavyLine } from './borders.js';
 import { createGround, paint, groundAt, pathShape, rectShape, circleShape, PAINTS, GROUND_FIELDS } from './ground.js';
 
 // objects per 100 m² for each amount word
@@ -16,12 +16,24 @@ const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays'
 export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02] };
 const LINE_FIELDS = ['asset', 'params', 'amount', 'count', 'palette', 'spacing', 'gap', 'near', 'avoid', 'on', 'at'];
 const ISLAND_FIELDS = ['at', 'radius', 'bar', 'barWidth'];
+const BORDER_FIELDS = ['asset', 'palette', 'width'];
 
 // the asset types ('family/type') a recipe uses: they are loaded before it is built (gen/assets.js)
 export function assetsOf(recipe) {
   const names = (recipe.props ?? []).map((line, i) => assetOf(line, `props[${i}]`).asset);
-  if (Object.values(recipe.borders ?? {}).some((v) => (typeof v === 'string' ? v : v?.kind) === 'ocean')) names.push('water/ocean');
+  for (const [side, value] of Object.entries(recipe.borders ?? {})) names.push(assetOf(borderLine(value), `borders.${side}`).asset);
+  if (recipe.cliffs) names.push(assetOf(recipe.cliffs, 'cliffs').asset);
   return names;
+}
+
+// recipe "borders": a side is an asset, or { asset, palette, width }
+const borderLine = (value) => (typeof value === 'string' ? { asset: value } : value);
+
+// the palette of a terrain type (a list of stone palettes): `name`, else its first
+function terrainPalette(type, name, where) {
+  const palette = name ?? type.palettes[0];
+  if (!type.palettes.includes(palette) || !paletteNames('stone').includes(palette)) bad(where, `palette "${palette}" (known: ${type.palettes.join(', ')})`);
+  return palette;
 }
 
 // recipe line "asset": "family/type/size" -> { asset: 'family/type', size }
@@ -58,12 +70,13 @@ export function buildRecipe(cache, recipe) {
 
   // cliffs: plateaus in levels, with stairs, and the mountain borders
   // (gen/terrain.js); the start stays on the ground
-  if (recipe.cliffs || borders.some((bd) => bd.kind === 'mountains')) {
-    const cl = recipe.cliffs ?? { count: 0 };
-    check(cl, CLIFF_FIELDS, 'cliffs');
-    for (const key of ['palette', 'stairs'])
-      if (cl[key] !== undefined && !paletteNames('stone').includes(cl[key])) bad('cliffs', `${key}: stone palette "${cl[key]}" (known: ${paletteNames('stone').join(', ')})`);
-    b.terrain = buildCliffs(b, cl, borders);
+  const mountains = borders.filter((bd) => bd.mountain);
+  if (recipe.cliffs || mountains.length) {
+    const cl = recipe.cliffs ? cliffsOf(recipe.cliffs) : { count: 0 };
+    // all the walls of a world are drawn with one material (gen/terrain.js)
+    const walls = new Set([...(recipe.cliffs ? [cl.palette] : []), ...mountains.map((bd) => bd.palette)]);
+    if (walls.size > 1) bad('terrain', `one world takes one wall palette, this one asks for ${[...walls].join(', ')}`);
+    b.terrain = buildCliffs(b, { ...cl, palette: [...walls][0] }, borders);
   }
   // the ocean borders: one water shape each, before anything else takes the room
   for (const bd of borders) if (bd.set) b.add(bd.set, 0, ...bd.set.shapes[0].origin, 0);
@@ -76,24 +89,38 @@ export function buildRecipe(cache, recipe) {
   return finish(b);
 }
 
-// recipe "borders": { side: "mountains" | "ocean" | { kind, width } } -> [{ side, kind, inside(x, z, pad) }]
+// recipe "cliffs": { asset, count, palette, stairs } -> the values buildCliffs takes
+function cliffsOf(spec) {
+  check(spec, CLIFF_FIELDS, 'cliffs');
+  const { asset, size } = assetOf(spec, 'cliffs');
+  const type = getType(asset);
+  if (type.builder !== 'cliff') bad('cliffs', `${asset} is not a cliff type`);
+  if (spec.stairs !== undefined && !paletteNames('stone').includes(spec.stairs)) bad('cliffs', `stairs: stone palette "${spec.stairs}" (known: ${paletteNames('stone').join(', ')})`);
+  return { ...paramsOf(type, size), count: spec.count ?? 3, palette: terrainPalette(type, spec.palette, 'cliffs'), stairs: spec.stairs };
+}
+
+// recipe "borders": { side: asset | { asset, palette, width } } -> [{ side, inside(x, z, pad), ... }]
 // inside: is (x, z) in the border, or less than pad from it? islands: cut out of every ocean
 function planBorders(b, spec, islands) {
-  if (typeof spec !== 'object' || Array.isArray(spec)) bad('borders', 'give { side: kind }, for example { "west": "mountains" }');
+  if (typeof spec !== 'object' || Array.isArray(spec)) bad('borders', 'give { side: asset }, for example { "west": "terrain/mountain/medium" }');
   check(spec, SIDES, 'borders');
   return Object.entries(spec).map(([side, value]) => {
-    const { kind, width } = typeof value === 'string' ? { kind: value } : value;
-    if (typeof value !== 'string') check(value, ['kind', 'width'], `borders.${side}`);
-    if (!BORDER_KINDS.includes(kind)) bad('borders', `${side}: "${kind}" (use ${BORDER_KINDS.join(', ')})`);
-    if (width !== undefined && kind !== 'ocean') bad('borders', `${side}: only the ocean takes a "width"`);
-    if (kind === 'ocean') {
-      const set = b.set('water/ocean', 'medium', { side, half: b.half, islands, ...(width !== undefined && { width }) });
+    const where = `borders.${side}`, border = borderLine(value);
+    check(border, BORDER_FIELDS, where);
+    const { asset, size } = assetOf(border, where);
+    const type = getType(asset);
+    if (type.builder === 'water') {
+      if (border.palette !== undefined) bad(where, `${asset} takes no "palette" here`);
+      const set = b.set(asset, size, { side, half: b.half, islands, ...(border.width !== undefined && { width: border.width }) });
       const shore = set.shapes[0].shore;
-      return { side, kind, set, inside: (x, z, pad = 0) => shore(x, z) > -pad };
+      return { side, set, inside: (x, z, pad = 0) => shore(x, z) > -pad };
     }
-    // mountains: in from the side as far as a wavy line, 6 to 10 units
-    const line = wavyLine({ seed: Math.floor(b.rand() * 2 ** 31) }, [6, 10], [0.8, 1.6]);
-    return { side, kind, line, inside(x, z, pad = 0) {
+    if (type.builder !== 'mountain') bad(where, `${asset} cannot close a side (use a terrain/mountain type or water/ocean)`);
+    if (border.width !== undefined) bad(where, 'only the ocean takes a "width"');
+    // mountains: in from the side as far as a wavy line
+    const mountain = paramsOf(type, size);
+    const line = wavyLine({ seed: Math.floor(b.rand() * 2 ** 31) }, mountain.reach, mountain.wobble);
+    return { side, name: border.asset, mountain, palette: terrainPalette(type, border.palette, where), line, inside(x, z, pad = 0) {
       const [e, along] = fromSide(side, b.half, x, z);
       return e < line(along) + pad;
     } };

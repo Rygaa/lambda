@@ -1,0 +1,9 @@
+{
+  "about": "Plateaus in levels, with stone stairs (recipe \"cliffs\"). They are part of the ground, so their shape comes from the world seed, and each world gets its own. levels: how many levels each plateau has; width: the width of a plateau; height: how high each level rises.",
+  "builder": "cliff",
+  "palettes": ["cliff", "sand", "grey", "moss", "dark"],
+  "sizes": {
+    "medium": {"levels": [1, 2], "width": [10, 14], "height": [1.2, 1.8]},
+    "large": {"levels": [1, 3], "width": [11, 18], "height": [1.2, 1.8]}
+  }
+}

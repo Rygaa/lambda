@@ -3,7 +3,7 @@
   "seed": 1,
   "size": 56,
   "start": [0, 0],
-  "borders": { "west": "mountains", "east": "ocean" },
+  "borders": { "west": "terrain/mountain/medium", "east": "water/ocean/medium" },
   "clearings": { "count": 0 },
   "ground": [
     { "paint": "sand", "beach": 3 },

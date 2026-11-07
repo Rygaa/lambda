@@ -3,7 +3,7 @@
   "seed": 5,
   "size": 56,
   "clearings": { "amount": "some", "radius": [3, 3.6] },
-  "cliffs": { "count": 5, "levels": [1, 3], "size": [11, 18], "height": [1.2, 1.8] },
+  "cliffs": { "asset": "terrain/cliff/large", "count": 5 },
   "props": [
     { "asset": "water/pond/medium", "count": 2, "gap": 0.8, "avoid": "clearings" },
     { "asset": "plant/oak/medium", "amount": "few", "spacing": 4.6, "avoid": "clearings" },

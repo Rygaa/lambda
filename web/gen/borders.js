@@ -1,11 +1,10 @@
 // Borders: what closes a side of the world (recipe "borders"): a wall of
-// mountains (gen/terrain.js) or the ocean (asset type water/ocean). Both are
-// bands along the side, reaching in as far as a wavy line.
+// mountains (asset type terrain/mountain, gen/terrain.js) or the ocean (asset
+// type water/ocean). Both are bands along the side, reaching in as far as a wavy line.
 import { nextRandom, between } from '../lib/random.js';
 
 // north: -z (the top of the screen), south: +z (towards the camera)
 export const SIDES = ['north', 'south', 'west', 'east'];
-export const BORDER_KINDS = ['mountains', 'ocean'];
 
 // -> [how far (x, z) is in from that side of the world, where it is along the side]
 export function fromSide(side, half, x, z) {
