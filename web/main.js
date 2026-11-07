@@ -110,8 +110,16 @@ function tick(now) {
   getResource(world, Res.Time).now = now;
   runFrame(world);
 }
+// frames per second, shown at the top right, counted over half a second
+const fps = { el: document.getElementById('fps'), frames: 0, since: performance.now() };
 requestAnimationFrame(function loop(now) {
   tick(now);
+  fps.frames++;
+  if (now - fps.since >= 500) {
+    fps.el.textContent = `${Math.round((fps.frames * 1000) / (now - fps.since))} fps`;
+    fps.frames = 0;
+    fps.since = now;
+  }
   requestAnimationFrame(loop);
 });
 
