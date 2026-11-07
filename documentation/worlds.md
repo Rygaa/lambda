@@ -174,5 +174,13 @@ Make its plan from a reference image with `documentation/building/README.md`, th
 
 `"all"` is for the faces it does not name. A new colour is one more stone palette in `assets/palettes.json`.
 
+Doors, windows, and holes go in a `details` list next to `shapes`, one line each:
+
+```json
+{ "form": "rect", "at": [1.12, 0.585, 3.6], "facing": [0, 0, 1], "size": [0.5, 0.85], "palette": "wood", "frame": { "palette": "wood-dark", "width": 0.03 } }
+```
+
+Follow the rules of `documentation/building/README.md`, section 10, so that they show right.
+
 A new terrain type only needs a file, with `"builder": "mountain"` or `"builder": "cliff"`, for example
 `assets/terrain/volcano/terrain.json`, then `"terrain/volcano/medium"` in `borders`.

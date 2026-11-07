@@ -181,4 +181,5 @@ Do each step on a `try/` branch, then move it to `attempt_1` (see `branches.md`)
 9. Done: the type files `terrain/cliff` and `terrain/mountain`, with the numbers that were in the code.
 10. To do: mountains made with noise, and chunks for huge maps.
 11. Done: the builder `building` and the types `building/chichi-house`, `building/buu-house`, `building/capsule-ship`.
-12. To do: painted details on the faces that need them (doors, windows, the Capsule Corp logo).
+12. Done: doors, windows, and holes as `details` in palette colors (see `building/README.md`, section 10).
+13. To do: the red signs on the Chichi dome, theme lines for the building palettes.

@@ -25,6 +25,7 @@ Le token est dans $BITBUCKET_TOKEN, avec le nom d'utilisateur x-token-auth. Ne l
 
 3. LES POINTS LES PLUS IMPORTANTS DU GUIDE
 - Seulement la forme globale. Portes, fenêtres, enseignes, trous, marches et détails seront des textures plus tard : pas de formes pour eux.
+- Dans attempt_1, portes, fenêtres et trous sont des `details` en couleurs de palette : suis la section 10 du guide.
 - Suivre l'image exactement. Mesure au lieu de deviner : prends une partie comme échelle, puis mesure la longueur, la hauteur, la profondeur et l'endroit où chaque partie est la plus haute.
 - Les pièces restent droites, dans l'axe du corps, sauf si l'image montre clairement un angle. N'ajoute rien que l'image n'a pas.
 - Une coupe est une face plate et pleine : rien ne sort, pas de vide.

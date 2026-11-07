@@ -6,6 +6,12 @@
 //   type:     box | wedge | pyramid | cylinder | dome
 //   position: the centre of the bottom of the shape
 //   faces:    { face: palette }, "all" for the faces it does not name
+// Details are the flat things on a surface, like doors and windows. They add no
+// volume: each one is laid on whatever surface it meets, flat or curved.
+//   details: [{ form, at: [x, y, z], facing: [x, y, z], size: [w, h], palette, frame: { palette, width } }]
+//   form:   rect | circle | arch (a door with a round top)
+//   at:     the middle of the form, on the surface; facing: the way the surface looks
+//   frame:  the form is drawn in this palette, and again inside it, `width` smaller, in `palette`
 import * as THREE from 'three';
 import { defineBuilder } from '../registry.js';
 import { partsOf, clean } from '../solids.js';
@@ -15,6 +21,12 @@ const CYLINDER_SIDES = 8;       // flat sides, so it reads as low-poly
 const DOME_SIDES = 14, DOME_BANDS = 5;
 const LOW = 1.2;                // what starts lower than this stands on the ground, the rest (a roof) hangs over it
 const STEP = 0.6, DISC = 0.45;  // the ground it covers: circles on a grid
+const CELL = 0.03;              // a detail is laid in small squares this wide
+const REACH = 0.6;              // a detail looks for its surface this far on both sides of `at`
+const JUMP = 0.25;              // a square that bends more than this is over an edge: it is left out
+const LIFT = 0.015;             // how far a detail stands off the surface, and its middle off its frame
+const FLAT = 0.05;              // a detail over surfaces less deep than this is laid flat, on the nearest one
+                                // (a door on a wall and on the round top in front of it), so it shows no step
 
 // every shape type: [w, h, d] -> [[face, [x, y, z], ...]]: polygons, counter-clockwise from outside
 const SHAPES = {
@@ -114,6 +126,79 @@ function under(x, z, [a, b, c]) {
   return s.every((v) => v >= 0) || s.every((v) => v <= 0);
 }
 
+// the forms of the details: is (u, v), from the middle of a w x h form, inside it?
+const FORMS = {
+  rect: (u, v, w, h) => Math.abs(u) <= w / 2 && Math.abs(v) <= h / 2,
+  circle: (u, v, w, h) => (2 * u / w) ** 2 + (2 * v / h) ** 2 <= 1,
+  arch(u, v, w, h) {
+    const r = w / 2, top = h / 2 - r;
+    return Math.abs(u) <= r && (v <= top ? v >= -h / 2 : u * u + (v - top) ** 2 <= r * r);
+  },
+};
+
+// the first of the triangles a ray from `from` along `dir` meets from outside -> its distance, or null
+function firstHit(from, dir, tris) {
+  let best = null;
+  for (const t of tris) {
+    const [a, b, c] = t.map((p) => new THREE.Vector3(...p));
+    const e1 = b.sub(a), e2 = c.sub(a), h = new THREE.Vector3().crossVectors(dir, e2), det = e1.dot(h);
+    if (det < 1e-9) continue;       // seen from behind, or edge on
+    const s = from.clone().sub(a), u = s.dot(h) / det;
+    if (u < 0 || u > 1) continue;
+    const q = s.clone().cross(e1), v = dir.dot(q) / det;
+    if (v < 0 || u + v > 1) continue;
+    const d = e2.dot(q) / det;
+    if (d > 0 && (best === null || d < best)) best = d;
+  }
+  return best;
+}
+
+// one form laid on the surface -> triangles [[a, b, c], ...]
+function laid(d, form, w, h, lift, tris) {
+  if (!FORMS[form]) throw new Error(`building detail: unknown form "${form}" (known: ${Object.keys(FORMS).join(', ')})`);
+  const c = new THREE.Vector3(...d.at), n = new THREE.Vector3(...d.facing).normalize();
+  const side = new THREE.Vector3(0, 1, Math.abs(n.y) > 0.99 ? -1 : 0).cross(n).normalize();
+  const up = new THREE.Vector3().crossVectors(n, side), dir = n.clone().negate();
+  const nu = Math.ceil(w / CELL / 2), nv = Math.ceil(h / CELL / 2);
+  const corners = new Map();
+  const corner = (i, j) => {
+    const key = `${i},${j}`;
+    if (!corners.has(key)) {
+      const p = c.clone().addScaledVector(side, i * CELL).addScaledVector(up, j * CELL).addScaledVector(n, REACH);
+      const hit = firstHit(p, dir, tris);
+      corners.set(key, hit === null || hit > 2 * REACH ? null : { hit, from: p });
+    }
+    return corners.get(key);
+  };
+  const cells = [];
+  for (let i = -nu; i < nu; i++)
+    for (let j = -nv; j < nv; j++) {
+      if (!FORMS[form]((i + 0.5) * CELL, (j + 0.5) * CELL, w, h)) continue;
+      const q = [corner(i, j), corner(i + 1, j), corner(i + 1, j + 1), corner(i, j + 1)];
+      if (q.some((p) => !p)) continue;
+      const hits = q.map((p) => p.hit);
+      if (Math.max(...hits) - Math.min(...hits) > JUMP) continue;
+      cells.push(q);
+    }
+  const hits = cells.flat().map((p) => p.hit);
+  const near = Math.min(...hits), flat = Math.max(...hits) - near < FLAT;
+  const at = (p) => p.from.clone().addScaledVector(dir, (flat ? near : p.hit) - lift).toArray();
+  return cells.flatMap((q) => {
+    const [a, b, c, e] = q.map(at);
+    return [[a, b, c], [a, c, e]];
+  });
+}
+
+// a detail -> { palette: [[a, b, c], ...] }
+function detailOf(d, tris) {
+  const [w, h] = d.size;
+  if (!d.frame) return { [d.palette]: laid(d, d.form, w, h, LIFT, tris) };
+  const inset = 2 * d.frame.width;
+  const out = { [d.frame.palette]: laid(d, d.form, w, h, LIFT, tris) };
+  (out[d.palette] ??= []).push(...laid(d, d.form, w - inset, h - inset, 2 * LIFT, tris));
+  return out;
+}
+
 // the ground it stands on, as circles [[x, z, r]] on a grid
 function groundOf(tris) {
   const low = tris.filter((t) => t.some((p) => p[1] < LOW));
@@ -135,6 +220,9 @@ defineBuilder({
         all.push(...tris);
       }
     const circles = groundOf(all);
+    for (const d of p.details ?? [])
+      for (const [palette, tris] of Object.entries(detailOf(d, all)))
+        if (tris.length) (pieces[palette] ??= []).push(geometryOf(tris));
     return {
       parts: partsOf(pieces),
       height: Math.max(...all.flat().map((v) => v[1])),

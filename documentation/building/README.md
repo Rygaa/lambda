@@ -12,7 +12,7 @@ It is based on 3 examples. Look at them first:
 
 A building is a plan: a JSON file with `description`, `layout`, `shapes`, and `textures` (the format Infer returns, see `apps/asset-studio/server/shapes.ts`).
 
-In `attempt_1`, the same shapes go in `assets/building/<name>/building.json`, and each face names a stone palette in place of a texture (see `../worlds.md`, section 8). Painted textures come later, only on the faces that need them.
+In `attempt_1`, the same shapes go in `assets/building/<name>/building.json`, and each face names a stone palette in place of a texture (see `../worlds.md`, section 8). Doors, windows, and holes are `details`: flat forms in palette colors, laid on the shapes (section 10).
 
 What is in this folder:
 
@@ -34,7 +34,7 @@ What is in this folder:
 
 > **Build only the global form: the outline and the volumes. Everything else is a texture.**
 
-The details will be painted in textures later. For now they are not made at all.
+The details will be painted in textures later. For now they are not made at all. In `attempt_1`, doors, windows, and holes are `details` (section 10): still not shapes.
 
 **Make a shape** only for a part that a texture cannot show:
 
@@ -207,3 +207,52 @@ For now there are no textures. Each texture slot is only a plain `color`.
 8. Base, walls, roofs: do they follow section 6 (for a building with walls)?
 9. One slot per material, daylight colors, every face colored, no `null`?
 10. 30 shapes or fewer?
+11. In `attempt_1`: does every detail follow section 10, and did you look at each door and window up close in the game?
+
+## 10. Details in `attempt_1`: doors, windows, and holes
+
+A detail is a flat form in a palette color, laid on the surface of the shapes. It adds no volume, so Rule 1 still
+holds. The builder (`web/gen/builders/building.js`) lays it on whatever it meets, flat or curved, in small squares
+3 cm wide. A door is one line in the `details` list, next to `shapes`:
+
+```json
+{ "form": "arch", "at": [-0.972, 0.71, 3.89], "facing": [0, 0, 1], "size": [0.6, 1.1], "palette": "wood", "frame": { "palette": "wood-dark", "width": 0.03 } }
+```
+
+- `form`: `rect`, `circle`, or `arch` (a door with a round top).
+- `at`: the middle of the form, on the surface.
+- `facing`: the way the surface looks at that point. On a wall, `[0, 0, 1]` is the front. On a dome, it is the
+  direction from the middle of the dome out through `at`.
+- `size`: [width, height] in meters.
+- `palette`: a stone palette. Use `glass` for windows, `hole` for openings, `wood` for doors, and `steel` or
+  `wood-dark` for frames. A new color is one more stone palette in `assets/palettes.json`.
+- `frame` (optional): the form is drawn in `frame.palette`, then again inside it, `width` smaller on every side, in
+  `palette`.
+
+### Rules, so that a detail shows right
+
+1. **One detail, one surface.** Put each detail where one surface is behind it: one wall, one dome, one cut face.
+   Two surfaces less than 5 cm apart in depth also work (the Chichi door is on the entrance block and on the round
+   top in front of it): the builder then lays the detail flat, on the nearest one. Never put a detail over a real
+   edge or a corner. The squares that bend more than 25 cm are left out, so the detail gets a hole there. Make 2
+   details instead, one on each side.
+2. **Flush faces under a detail.** When 2 shapes meet under a door or a window, make their faces meet at the same
+   depth, or less than 5 cm apart. More than that, and the outlines draw a line across the detail.
+3. **`at` on the surface.** The builder looks for the surface only 60 cm in front of and behind `at`, along
+   `facing`. Too far away, and the detail is not drawn at all.
+4. **Nothing in front.** The detail goes on the first surface it meets from the front. A shape less than 60 cm in
+   front of `at`, like a dome in front of a wall, takes the detail instead.
+5. **Measure the details too.** Take their place and size from the reference image, like the shapes (Rule 2).
+6. **Look up close.** Draw the building in the game, zoom on every door and window, and check: no line across it,
+   no missing piece, nothing floating, the frame all around.
+
+Where the numbers of the 3 buildings come from: the old paint scripts (`textured/paint_*.py`), which placed the
+painted doors and windows.
+
+### What is left to do
+
+- Signs and marks: the red signs on the Chichi dome are not back yet. The Capsule Corp text stays out.
+- The Buu door hole looks lighter than its palette under a light ray. This is not checked yet.
+- The details add about 7,000 to 10,000 triangles per building. If it is too heavy, make the squares larger
+  (`CELL` in the builder).
+- The building palettes have no theme lines yet, so the buildings keep the same colors in `dbz` and `namek`.

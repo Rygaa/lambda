@@ -17,6 +17,9 @@
       "hull": {"lit": "#f1f6f0", "up": "#b5b8c6", "shade": "#9b9daf", "hi": "#f9f7eb"},
       "black": {"lit": "#2a2f3a", "up": "#1c2028", "shade": "#14171e", "hi": "#4a5262"},
       "metal": {"lit": "#8aaad6", "up": "#788bb7", "shade": "#6b7aa3", "hi": "#d0d9e1"},
+      "glass": {"lit": "#5f86c8", "up": "#5873ab", "shade": "#526a9c", "hi": "#a9c4e8"},
+      "hole": {"lit": "#1b2148", "up": "#171c3e", "shade": "#141834", "hi": "#3a4478"},
+      "wood-dark": {"lit": "#7e5a40", "up": "#5c4246", "shade": "#4c363e", "hi": "#a98262"},
       "steel": {"lit": "#c9ccd3", "up": "#9d9fb5", "shade": "#8889a2", "hi": "#e9e6e0"}
     },
     "trunk": {

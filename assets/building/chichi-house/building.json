@@ -22,6 +22,14 @@
       {"id": "wing-roof", "type": "wedge", "size": [3.6, 0.9, 1.84], "position": [1.08, 1.22, 2.0], "rotationY": 90, "faces": {"all": "tile", "left": "wood", "right": "wood"}},
       {"id": "mailbox-post", "type": "box", "size": [0.08, 0.6, 0.08], "position": [-2.372, 0, 4.3], "faces": {"all": "wood"}},
       {"id": "mailbox", "type": "box", "size": [0.24, 0.2, 0.3], "position": [-2.372, 0.6, 4.3], "faces": {"all": "red"}}
+    ],
+    "details": [
+      {"form": "rect", "at": [-1.4, 0.79, 1.2], "facing": [0, 0, 1], "size": [0.62, 0.68], "palette": "glass", "frame": {"palette": "wood-dark", "width": 0.03}},
+      {"form": "rect", "at": [-0.75, 0.75, 1.2], "facing": [0, 0, 1], "size": [0.26, 0.9], "palette": "glass", "frame": {"palette": "wood-dark", "width": 0.03}},
+      {"form": "rect", "at": [0.63, 0.65, 3.6], "facing": [0, 0, 1], "size": [0.3, 0.6], "palette": "glass", "frame": {"palette": "wood-dark", "width": 0.03}},
+      {"form": "rect", "at": [1.12, 0.585, 3.6], "facing": [0, 0, 1], "size": [0.5, 0.85], "palette": "wood", "frame": {"palette": "wood-dark", "width": 0.03}},
+      {"form": "arch", "at": [-0.972, 0.71, 3.89], "facing": [0, 0, 1], "size": [0.6, 1.1], "palette": "wood", "frame": {"palette": "wood-dark", "width": 0.03}},
+      {"form": "rect", "at": [-1.785, 0.559, 3.442], "facing": [-0.691, 0.107, 0.715], "size": [0.85, 0.3], "palette": "glass", "frame": {"palette": "wood-dark", "width": 0.03}}
     ]}
   }
 }
