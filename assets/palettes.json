@@ -7,7 +7,17 @@
       "dark": {"lit": "#9b98a6", "up": "#4b4a5e", "shade": "#3a3a4f", "hi": "#d8d6e2"},
       "cliff": {"lit": "#b48c68", "up": "#a07d60", "shade": "#6a4e46", "hi": "#e2c49c"},
       "palm": {"lit": "#c6a47c", "up": "#7e6a6a", "shade": "#685660", "hi": "#efd6a8"},
-      "wood": {"lit": "#ab7c58", "up": "#6c5058", "shade": "#5a4250", "hi": "#e0b48a"}
+      "wood": {"lit": "#ab7c58", "up": "#6c5058", "shade": "#5a4250", "hi": "#e0b48a"},
+      "cream": {"lit": "#f2dab0", "up": "#b5a7a0", "shade": "#9b9091", "hi": "#faecd2"},
+      "tile": {"lit": "#c47a4a", "up": "#9a6f65", "shade": "#866362", "hi": "#e7c6a9"},
+      "plaster": {"lit": "#f0e8d0", "up": "#b4afb3", "shade": "#9a97a0", "hi": "#f9f2de"},
+      "concrete": {"lit": "#b8b4b0", "up": "#9391a0", "shade": "#807e91", "hi": "#e3ddd2"},
+      "red": {"lit": "#c83a3a", "up": "#9d495b", "shade": "#88455a", "hi": "#e9aca2"},
+      "clay": {"lit": "#eeebf5", "up": "#b3b1c9", "shade": "#9998b2", "hi": "#f8f3ed"},
+      "hull": {"lit": "#f1f6f0", "up": "#b5b8c6", "shade": "#9b9daf", "hi": "#f9f7eb"},
+      "black": {"lit": "#2a2f3a", "up": "#1c2028", "shade": "#14171e", "hi": "#4a5262"},
+      "metal": {"lit": "#8aaad6", "up": "#788bb7", "shade": "#6b7aa3", "hi": "#d0d9e1"},
+      "steel": {"lit": "#c9ccd3", "up": "#9d9fb5", "shade": "#8889a2", "hi": "#e9e6e0"}
     },
     "trunk": {
       "brown": [[0, "#6f625e"], [0.1, "#a5897a"]],

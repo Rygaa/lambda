@@ -1,5 +1,5 @@
 {
-  "name": "All types: every asset type in every size, in rows (rocks, plants, water), with a mountain border, the ocean, a beach and a dirt path",
+  "name": "All types: every asset type in every size, in rows (rocks, plants, water, buildings), with a mountain border, the ocean, a beach and a dirt path",
   "seed": 1,
   "size": 56,
   "start": [0, 0],
@@ -26,6 +26,10 @@
     { "asset": "water/puddle/medium", "at": [[-14, 4, 0]] },
     { "asset": "water/pond/medium", "at": [[-9, 4, 0]] },
     { "asset": "water/lake/medium", "at": [[0, 4, 0]] },
-    { "asset": "water/river/medium", "at": [[8, 9, 1.5708]] }
+    { "asset": "water/river/medium", "at": [[8, 9, 1.5708]] },
+
+    { "asset": "building/chichi-house/medium", "at": [[-11, 20, 0]] },
+    { "asset": "building/buu-house/medium", "at": [[1, 21, 0]] },
+    { "asset": "building/capsule-ship/medium", "at": [[11, 21, 0]] }
   ]
 }

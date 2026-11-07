@@ -4,3 +4,4 @@ import './round-rock.js';
 import './tree.js';
 import './palm.js';
 import './water.js';
+import './building.js';

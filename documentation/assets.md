@@ -150,12 +150,18 @@ The types come from `pixel-scene` version-3 (commit `9da4216`, `web/gen/kinds/`)
 - `terrain/mountain`: the numbers of the mountain borders in `web/gen/terrain.js`, moved to a type file. It has one
   size, `medium`.
 - Ground paints are still a field of a world recipe (`ground`, see `worlds.md`), not type files.
+- `building/chichi-house`, `building/buu-house`, `building/capsule-ship`: the plans of the branch `voxel`
+  (`game/assets/buildings/`), with their shapes and numbers. Each face names a stone palette in place of a texture.
+  The colours are the main colours of their old textures. They have one size, `medium`, and one palette, `classic`.
 
 A terrain type has no `variants`. It is part of the ground, not an object placed on it, so its shape comes from the
 world seed and each world gets its own. Its name stops at the size: `terrain/mountain/medium`.
 
-Left out on purpose: the player and the slimes, the houses (`kame`, `goku`), the Blender pieces (ruins, old
-layouts), the first and third person views, and the `dbz` world (a map of buildings).
+A building is a plan, with one variant: nothing in it is random, so its name ends with `/classic/1`.
+
+Left out on purpose: the player and the slimes, the houses `kame` and `goku` (code, not plans), `raditz-pod` (its door
+needs its own code, the `pod` block), the painted textures, the Blender pieces (ruins, old layouts), the first and
+third person views, and the `dbz` world (a map of buildings).
 
 ## 7. The plan
 
@@ -174,3 +180,5 @@ Do each step on a `try/` branch, then move it to `attempt_1` (see `branches.md`)
    `terrain/mountain` in `small` and `large`.
 9. Done: the type files `terrain/cliff` and `terrain/mountain`, with the numbers that were in the code.
 10. To do: mountains made with noise, and chunks for huge maps.
+11. Done: the builder `building` and the types `building/chichi-house`, `building/buu-house`, `building/capsule-ship`.
+12. To do: painted details on the faces that need them (doors, windows, the Capsule Corp logo).

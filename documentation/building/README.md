@@ -12,6 +12,8 @@ It is based on 3 examples. Look at them first:
 
 A building is a plan: a JSON file with `description`, `layout`, `shapes`, and `textures` (the format Infer returns, see `apps/asset-studio/server/shapes.ts`).
 
+In `attempt_1`, the same shapes go in `assets/building/<name>/building.json`, and each face names a stone palette in place of a texture (see `../worlds.md`, section 8). Painted textures come later, only on the faces that need them.
+
 What is in this folder:
 
 | Path | What it is |

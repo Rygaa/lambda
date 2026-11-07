@@ -1,0 +1,23 @@
+{
+  "about": "Buu's house: a white round house like a lying caterpillar, with a big head like a lying egg, four round segments trailing to the right, and a long round tube lying on top, fattest in the middle, with its flat front to the front left. A plan of simple shapes (documentation/building/README.md). Each face names a stone palette; \"all\" is for the faces it does not name.",
+  "builder": "building",
+  "variants": 1,
+  "palettes": {"classic": {}},
+  "sizes": {
+    "medium": {"shapes": [
+      {"id": "head-front", "type": "dome", "size": [2.3, 1.4, 2.2], "position": [-2.0, 0.4, 0], "rotationY": -90, "tilt": 90, "faces": {"all": "clay"}},
+      {"id": "head-back", "type": "dome", "size": [2.3, 1.6, 2.2], "position": [-2.0, 0.4, 0], "rotationY": 90, "tilt": 90, "faces": {"all": "clay"}},
+      {"id": "seg-1", "type": "dome", "size": [1.6, 1.25, 1.95], "position": [-0.2, 0, 0], "faces": {"all": "clay"}},
+      {"id": "seg-2", "type": "dome", "size": [1.7, 1.38, 2.05], "position": [0.95, 0, 0], "faces": {"all": "clay"}},
+      {"id": "seg-3", "type": "dome", "size": [1.8, 1.48, 2.15], "position": [2.2, 0, 0], "faces": {"all": "clay"}},
+      {"id": "tail", "type": "dome", "size": [1.4, 1.0, 1.6], "position": [3.3, 0, 0], "faces": {"all": "clay"}},
+      {"id": "foot-front", "type": "dome", "size": [0.56, 0.85, 0.46], "position": [-3.05, 0.23, 0.75], "rotationY": -90, "tilt": 90, "faces": {"all": "clay"}},
+      {"id": "foot-back", "type": "dome", "size": [0.56, 0.9, 0.46], "position": [-3.1, 0.23, 0.1], "rotationY": -90, "tilt": 90, "faces": {"all": "clay"}},
+      {"id": "tube-front-end-front", "type": "dome", "size": [1.56, 0.35, 1.56], "position": [-2.695, 2.052, 0.308], "rotationY": -75.0, "tilt": 97, "faces": {"all": "clay"}},
+      {"id": "tube-front-end-back", "type": "dome", "size": [1.56, 3.2, 1.56], "position": [-2.695, 2.052, 0.308], "rotationY": 105.0, "tilt": 83, "faces": {"all": "clay"}},
+      {"id": "tube-body-front", "type": "dome", "size": [1.7, 2.09, 1.7], "position": [-1.027, 2.264, -0.139], "rotationY": -75.0, "tilt": 97, "faces": {"all": "clay"}},
+      {"id": "tube-body-back", "type": "dome", "size": [1.7, 1.8, 1.7], "position": [-1.027, 2.264, -0.139], "rotationY": 105.0, "tilt": 83, "faces": {"all": "clay"}},
+      {"id": "tube-cut", "type": "dome", "size": [1.06, 0.6, 1.06], "position": [-3.04, 2.008, 0.4], "rotationY": 105.0, "tilt": 83, "faces": {"all": "clay"}}
+    ]}
+  }
+}

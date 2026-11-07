@@ -92,6 +92,8 @@ The types today:
 - `plant/palm`: `small`, `large`. Palettes `green`, `autumn`, `pine` (the fronds; the trunk is always `palm`).
 - `water/puddle`, `water/pond`, `water/lake`, `water/river`: `medium`. Palettes `clear`, `swamp`, `glacier`.
 - `water/ocean`: `medium`, only for `borders`.
+- `building/chichi-house`, `building/buu-house`, `building/capsule-ship`: `medium`. Palette `classic`. Their front
+  always faces the camera.
 - `terrain/cliff`: `medium`, `large`, only for `cliffs`. Palettes `cliff`, `sand`, `grey`, `moss`, `dark`.
 - `terrain/mountain`: `medium`, only for `borders`. Palettes `cliff`, `sand`, `grey`, `moss`, `dark`.
 
@@ -162,6 +164,15 @@ A new kind of shape needs a builder too:
    returns the shape: its meshes, `height`, and `radius` (see `web/gen/registry.js`).
 2. Add its `import` to `web/gen/builders/index.js`.
 3. Make the type file, with `"builder": "<name>"`.
+
+A new building is only a new JSON file too: `assets/building/<name>/building.json`, with `"builder": "building"`.
+Make its plan from a reference image with `documentation/building/README.md`, then give each face a stone palette:
+
+```json
+{ "id": "walls", "type": "box", "size": [3.6, 1.14, 2.4], "position": [0, 0.16, 0], "faces": { "all": "cream" } }
+```
+
+`"all"` is for the faces it does not name. A new colour is one more stone palette in `assets/palettes.json`.
 
 A new terrain type only needs a file, with `"builder": "mountain"` or `"builder": "cliff"`, for example
 `assets/terrain/volcano/terrain.json`, then `"terrain/volcano/medium"` in `borders`.
