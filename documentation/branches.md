@@ -93,3 +93,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `claude/work`, `main-2` | only a `.gitignore` | empty start |
 | `try/nature` | the nature of `pixel-scene` version-3 (commit `9da4216`), sorted with the names of `assets.md` | try, moved to `attempt_1` |
 | `try/mountain-ends` | the free ends of mountain borders stop tier by tier on wavy lines, not in one flat cut | try, moved to `attempt_1` |
+| `try/no-wall-rocks` | no small rocks stuck on the cliff walls, and the rule against such fake details | try, moved to `attempt_1` |

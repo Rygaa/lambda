@@ -24,6 +24,7 @@ All 3D views use `packages/renderer`. It is the renderer of `pixel-scene` (top v
 - A model uses only boxes, cylinders, wedges (gable roofs), pyramids, and domes (half-spheres). At most 30 shapes. (Our choice.)
 - Doors, windows, chimneys, and posts are real small shapes. A door has the role "door", so the game can open it. (Your request.)
 - Surface details (bricks, planks, roof tiles, stones, cracks, window glass) are painted in textures, never made as shapes. (Your request.)
+- Keep forms simple. Never stick small random shapes on a surface to fake detail, like little rocks on a cliff wall: at this pixel size they read as strange marks, not as detail. A form is either big enough to read clearly, or it is not there. (Your request: the rocks once stuck in the cliff walls were removed for this.)
 - A texture repeats, so a material slot never holds a sign or a one-time mark. Each sign, door, and window is its own thin shape with its own slot, sized to show once. (Found in Infer tests.)
 - Infer writes the layout first: each part, its x and z range, and a check that parts do not cut into each other. Shapes on a dome stand out of its surface. (Found in Infer tests.)
 - Colors are plain daylight colors, never the sunset or night light of a reference image. (Found in Infer tests.)

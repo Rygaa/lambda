@@ -9,7 +9,6 @@
 //   heightAt, levelUnder, bareAt: what the movers, the placement rules and the grass ask
 //   terrainGeometry: the tops, the walls and the stairs (made with math, like gen/builders)
 import * as THREE from 'three';
-import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 import { nextRandom, hashSeed } from '../lib/random.js';
 import { fromSide, wavyLine } from './borders.js';
 
@@ -307,7 +306,7 @@ function pieces(m, n) {
 // ---------------------------------------------------------------- geometry
 // -> { tops, walls, stairs }: BufferGeometry (or null). The walls are rock
 // columns of random width (two faces each, so the outlines draw their edges),
-// with a few rocks stuck in them, under an uneven stone lip.
+// under an uneven stone lip. Nothing small is stuck on them (documentation/style/rules.md).
 export function terrainGeometry(t) {
   const rng = { seed: t.seed };
   const rand = (lo, hi) => lo + (hi - lo) * nextRandom(rng);
@@ -398,8 +397,6 @@ export function terrainGeometry(t) {
       quad(walls, at(u0, 0, 0), at(um, off, 0), at(um, off, 1), at(u0, 0, 1));
       quad(walls, at(um, off, 0), at(u1, 0, 0), at(u1, 0, 1), at(um, off, 1));
     }
-    // now and then a rock stuck in the wall
-    if (nextRandom(rng) < 0.12) walls.push(...rock(rng, at(rand(0.2, 0.8), 0.03, rand(0.15, 0.8)), rand(0.12, 0.3)));
     // the lip: front, top, back, bottom; each corner at its own height
     const up = (v) => h + RIM.up[0] + (RIM.up[1] - RIM.up[0]) * nextRandom({ seed: hashSeed(t.seed, 'lip', v[0], v[1]) });
     const out = (p, o, d) => [p[0] + o[0] * d, p[1] + o[1] * d];
@@ -428,15 +425,6 @@ export function terrainGeometry(t) {
   const stairs = [];
   for (const st of t.stairs) stairSteps(stairs, walls, st);
   return { tops: faces(tops), walls: faces(walls), stairs: faces(stairs) };
-}
-
-// a small rock of size s at p: the hull of a few random points -> positions
-function rock(rng, p, s) {
-  const pts = [];
-  for (let k = 0; k < 8; k++)
-    pts.push(new THREE.Vector3(2 * nextRandom(rng) - 1, (2 * nextRandom(rng) - 1) * 0.7, 2 * nextRandom(rng) - 1).multiplyScalar(s));
-  const g = new ConvexGeometry(pts).translate(...p);
-  return g.attributes.position.array;
 }
 
 // one flight of stairs: the treads and risers in stone (out), the two sides
