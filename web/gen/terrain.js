@@ -23,7 +23,10 @@ const FOOT = 0.22;              // a wall leans back: its foot stands this far o
 const JITTER = 0.06;            // cell corners move this far at most, so edges are not ruler-straight
 const MOVE = 0.2;               // smoothing moves a corner of the walls at most this far
 const LANDING = -2;             // stair[] value of the free cells at the foot of stairs
-const PAST = 14;                // mountain borders go on this far past the edge of the world
+const PAST = 18;                // mountain borders go on this far past the edge of the world
+const END = 1;                  // a free end of a mountain border stops at least this far past the world
+// the sides next to each side: at its negative end (along < 0), at its positive end (gen/borders.js fromSide)
+const NEXT = { west: ['north', 'south'], east: ['north', 'south'], north: ['west', 'east'], south: ['west', 'east'] };
 
 export const CLIFF_FIELDS = ['asset', 'count', 'palette', 'stairs'];
 const DIRS = [[0, 1], [-1, 0], [1, 0], [0, -1]];    // the last one (-z) faces away from the camera
@@ -160,11 +163,28 @@ export function buildCliffs(b, spec, borders = []) {
     if (!stacks.has(bd.name)) stacks.set(bd.name, Array.from({ length: Math.round(pick(m.tiers)) }, () => Math.round(pick(m.height) * 20) / 20));
     const tierHeights = stacks.get(bd.name), tiers = tierHeights.length;
     const ledges = tierHeights.map(() => wavyLine(rng, m.ledge, m.ledgeWobble));     // ledges[0] is not used
+    // an end with no mountain on the next side stops past the world tier by tier,
+    // each tier on its own wavy line (like the foot and the ledges of the side), and
+    // all before the end of the grid (else a flat cut shows there). Its own random
+    // numbers, so the world itself stays the same.
+    const endRng = { seed: hashSeed(t.seed, bd.side, 'end') };
+    const ends = NEXT[bd.side].map((side) => !mountains.some((o) => o.side === side) && {
+      foot: wavyLine(endRng, [2 * m.wobble[1], 2 * m.wobble[1]], m.wobble),
+      ledges: tierHeights.map(() => wavyLine(endRng, m.ledge, m.ledgeWobble)),
+    });
+    // how far past the world tier k of an end goes, at e in from the side (the top tier stops first)
+    const endOf = (end, k, e) => {
+      let a = END + end.foot(e);
+      for (let q = k + 1; q < tiers; q++) a += end.ledges[q](e);
+      return Math.min(a, PAST - 1);
+    };
     for (let k = 0; k < tiers; k++) {
       const m = new Uint8Array(n * n);
       for (let i = 0; i < n; i++)
         for (let j = 0; j < n; j++) {
           const [e, along] = fromSide(bd.side, b.half, centre(t, i), centre(t, j));
+          const end = ends[along < 0 ? 0 : 1];
+          if (end && Math.abs(along) - b.half >= endOf(end, k, e)) continue;
           let inward = bd.line(along);
           for (let q = 1; q <= k; q++) inward -= ledges[q](along);
           m[i * n + j] = e < inward ? 1 : 0;

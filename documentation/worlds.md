@@ -114,6 +114,9 @@ the lowest level.
 
 - `terrain/mountain/medium`: a band of cliffs 6 to 10 units in from the side, about 5 to 7 units high, with no stairs.
   `{ "asset": "terrain/mountain/medium", "palette": "sand" }` gives it a palette.
+  It goes on past the world. Where the next side has no mountain, it stops tier by tier just past the corner, each
+  tier on its own wavy line with a ledge between, like the side itself. So the camera never sees it stop in one flat,
+  straight wall at the end of the terrain grid. Two mountain sides meet at the corner instead.
 - `water/ocean/medium`: 5 to 8 units in from the side, with a wavy shore. `{ "asset": "water/ocean/medium", "width":
   [17, 19] }` makes a wider sea.
 
