@@ -110,7 +110,8 @@ export function setupUiSystem(world) {
     e.preventDefault();
     push({ t: 'wheel', dy: e.deltaY || e.deltaX });
   }, { passive: false });
-  addEventListener('keydown', (e) => push({ t: 'key', key: e.key }));
+  // keys typed in a field of the admin menu are not game keys
+  addEventListener('keydown', (e) => { if (e.target.tagName !== 'INPUT') push({ t: 'key', key: e.key }); });
   addEventListener('keyup', (e) => push({ t: 'keyup', key: e.key }));
   addEventListener('blur', () => push({ t: 'blur' }));
   addEventListener('resize', () => push({ t: 'resize' }));

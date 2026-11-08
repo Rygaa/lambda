@@ -20,6 +20,7 @@ import { shadowSystem } from './systems/shadows.js';
 import { renderSystem } from './systems/render.js';
 import { viewSystem } from './systems/view.js';
 import { playerSystem } from './systems/player.js';
+import { setupAdminSystem, adminSystem } from './systems/admin.js';
 
 // ------------------------------------------------------------------ assets
 // the page is web/index.html: the assets and the worlds are next to web/
@@ -92,17 +93,18 @@ setResource(world, Res.Assets, { meta, tex: { tufts, clumps, decor }, shapes });
 setResource(world, Res.Viewport, Res.createViewport());
 setResource(world, Res.Time, Res.createTime());
 setResource(world, Res.Input, Res.createInput());
+setResource(world, Res.Tuning, Res.createTuning());
 setResource(world, Res.BlockGrid, Res.createGrid(land.terrain));
 setResource(world, Res.CoverGrid, Res.createGrid());
 setResource(world, Res.Random, Res.createRandom(5));
 
-for (const s of [setupGpuSystem, setupUiSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
+for (const s of [setupGpuSystem, setupUiSystem, setupAdminSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
   addSystem(world, s, 'startup');
 for (const s of [
   inputSystem, timeSystem,
   playerSystem, cameraControlSystem, viewportSystem, cloudSystem,
   meshSystem, footprintSystem, groundCoverSystem, shadowSystem,
-  cameraSnapSystem, viewSystem, renderSystem,
+  cameraSnapSystem, viewSystem, renderSystem, adminSystem,
 ]) addSystem(world, s);
 
 runStartup(world);

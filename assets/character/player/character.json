@@ -3,7 +3,7 @@
   "description": "The player character, from documentation/building/tools/scene/web/char/. Skinned parts and the clips of mvr_male.glb.",
   "parts": ["part_malehead01", "part_malehair01", "part_maleupper", "part_malelower", "part_malehand", "part_malefoot"],
   "animations": "mvr_male.glb",
-  "clips": { "idle": "genstand", "walk": "genwalk", "attack": "atkatk1-01", "hit": "gendmg1", "dead": "gendie1" },
+  "clips": { "idle": "genstand", "walk": "genwalk", "run": "genrun", "attack": "atkatk1-01", "hit": "gendmg1", "dead": "gendie1" },
   "bakeFps": 15,
   "radius": 0.3,
   "speed": 4,

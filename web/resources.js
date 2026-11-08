@@ -18,6 +18,10 @@ export const createViewport = () => ({ w: 480, h: 270, scale: 1, ppu: 0, mx: 0, 
 export const Time = 'Time';
 export const createTime = () => ({ now: 0, prev: null, dt: 0, sceneTime: 0, paused: false });
 
+// values the admin menu changes while the game runs (systems/admin.js)
+export const Tuning = 'Tuning';
+export const createTuning = () => ({ walkSpeed: 2.4, runSpeed: 5.2 });
+
 export const Input = 'Input';
 // DOM listeners only push raw records into `pending`; the input system turns
 // them into the per-frame fields below.

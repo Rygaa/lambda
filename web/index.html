@@ -17,6 +17,20 @@
     font: 12px/1.4 ui-monospace, Menlo, monospace; text-shadow: 0 1px 0 #0b2a20;
     pointer-events: none;
   }
+  #admin-button {
+    position: fixed; left: 12px; top: 10px; padding: 4px 10px; cursor: pointer;
+    color: #e6f3c4; background: #0b2a20cc; border: 1px solid #e6f3c455; border-radius: 4px;
+    font: 12px/1.4 ui-monospace, Menlo, monospace;
+  }
+  #admin-button:hover { background: #134030; }
+  #admin {
+    position: fixed; left: 12px; top: 40px; width: 220px; padding: 10px 12px; display: grid; gap: 10px;
+    color: #e6f3c4; background: #0b2a20e6; border: 1px solid #e6f3c455; border-radius: 4px;
+    font: 12px/1.4 ui-monospace, Menlo, monospace;
+  }
+  #admin[hidden] { display: none; }
+  #admin label { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
+  #admin input { grid-column: 1 / -1; width: 100%; accent-color: #b8d86a; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -27,7 +41,9 @@
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="hint">arrows: camera · wheel: zoom · C: clouds</div>
+<div id="hint">arrows: walk · shift: run · wheel: zoom · C: clouds</div>
+<button id="admin-button">⚙ Admin</button>
+<div id="admin" hidden></div>
 <div id="fps"></div>
 <script type="module" src="main.js"></script>
 </body>

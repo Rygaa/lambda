@@ -17,8 +17,9 @@ Then open `http://127.0.0.1:8643/web/?world=all-types`.
 - `?freeze`: time stops (for screenshots that must match pixel by pixel).
 - `?char=<x>,<z>`: where the human stands. The default is the start of the world. `?nochar`: no human.
 
-Keys: the arrows (or W A S D, or Z Q S D) make the human walk, and the camera follows it (with `?nochar`, the arrows
-move the camera). The wheel zooms, `C` stops or starts the clouds. Trees, rocks, water and cliff walls stop the human;
+Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it run, and the camera follows it (with
+`?nochar`, the arrows move the camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top
+left opens a menu that changes the walk speed, the run speed, and the zoom while the game runs (`web/systems/admin.js`). Trees, rocks, water and cliff walls stop the human;
 it goes up and down stairs.
 
 The worlds:
