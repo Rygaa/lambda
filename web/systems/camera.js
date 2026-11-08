@@ -1,7 +1,8 @@
 // Camera: arrows move it, the wheel zooms, else a slow idle walk; then pixel snapping.
+// With the human (systems/player.js), the arrows move the human and the camera follows it.
 import * as THREE from 'three';
 import { query, getComponent, getResource } from '../ecs/world.js';
-import { CameraRig, OrthoView } from '../components.js';
+import { CameraRig, OrthoView, Player } from '../components.js';
 import { Input, Settings, Viewport, Time, Gpu } from '../resources.js';
 import { ZOOM_STEP } from './viewport.js';
 
@@ -21,7 +22,7 @@ export function cameraControlSystem(world) {
     vp.dirty = true;
   }
 
-  const keys = input.keys;
+  const keys = query(world, [Player]).length ? new Set() : input.keys;
   const mv = new THREE.Vector3();
   if (keys.has('arrowup')) mv.add(groundFwd);
   if (keys.has('arrowdown')) mv.sub(groundFwd);
@@ -31,7 +32,7 @@ export function cameraControlSystem(world) {
     rig.follow = false;
     target.addScaledVector(mv.normalize(), 3.2 * time.dt * Math.max(1, 4 / vp.scale));
     rig.lastInput = time.now;
-  } else if (rig.follow && !settings.freeze && time.now - rig.lastInput > 5000) {
+  } else if (rig.follow && !query(world, [Player]).length && !settings.freeze && time.now - rig.lastInput > 5000) {
     // slow idle walk; turn back towards the centre near the edges
     const dt = time.dt;
     rig.driftPhase += dt * 0.05;

@@ -1,16 +1,17 @@
 // The human (assets/character/player, the FlyFF male): ported from the voxel branch
-// (game/src/client/character.ts). It stands in the world in its first idle pose.
+// (game/src/client/character.ts). Its clips (idle, walk) are baked once at load into frames of posed
+// vertices (bakeFps a second); systems/player.js swaps the frames and moves it.
 // The fixes of character.ts are kept: fixSecondBones, triangles on transparent texels dropped,
 // faces turned the right way, transparent texels filled, seams welded, normals smoothed over the body.
 // It is drawn 4x finer than the world, on top of the frame (render/shaders.js FINE_VERT, FINE_FRAG), like the
 // fixed human of the scene tool on the backup branch. Layer 1: it casts a shadow; layer 2: the fine pass.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { getResource } from '../ecs/world.js';
+import { getResource, spawn } from '../ecs/world.js';
+import { Player } from '../components.js';
 import { Gpu, Settings } from '../resources.js';
 import * as S from '../render/shaders.js';
 import { shaderMaterial } from '../render/materials.js';
-import { heightAt } from '../gen/terrain.js';
 
 const BASE = '../assets/character/player/';
 const HEIGHT = 1.05;    // world units: a person is about 1 unit tall (gen/collision.js)
@@ -81,13 +82,12 @@ function solidTexture(map) {
   return { texture, alphaAt };
 }
 
-// the posed body: one geometry per part, at the first frame of the idle clip
-async function poseBody(config) {
+// the body: its parts (skinned meshes, fixed), the seams between them, and the clips
+async function loadBody(config) {
   const manager = new THREE.LoadingManager();
   manager.setURLModifier((url) => (url.endsWith('.dds') ? BASE + 'textures/' + url.split('/').pop().replace('.dds', '.png') : url));
   const loader = new GLTFLoader(manager);
   const anim = await loader.loadAsync(BASE + config.animations);
-  const clip = anim.animations.find((a) => a.name === config.clips.idle);
   const parts = [];
   for (const name of config.parts) {
     const gltf = await loader.loadAsync(`${BASE}${name}.glb`);
@@ -106,10 +106,16 @@ async function poseBody(config) {
   const groups = new Map();
   parts.forEach((part, m) => part.bind.forEach((p, i) => { const k = key(p); if (!groups.has(k)) groups.set(k, []); groups.get(k).push({ m, i }); }));
   const seams = [...groups.values()].filter((g) => new Set(g.map((e) => e.m)).size > 1);
+  return { parts, seams, clips: anim.animations };
+}
 
+// one posed frame of the body: one geometry per part, at `time` seconds of `clip`
+function pose({ parts, seams }, clip, time) {
   const out = [], hints = [];
   for (const part of parts) {
-    if (clip) { part.mixer.clipAction(clip).reset().play(); part.mixer.setTime(0); }
+    part.mixer.stopAllAction();
+    part.mixer.clipAction(clip).reset().play();
+    part.mixer.setTime(time);
     part.root.updateMatrixWorld(true);
     const o = part.mesh;
     o.skeleton.update();
@@ -126,8 +132,9 @@ async function poseBody(config) {
     }
     out.push(arr); hints.push(hint);
   }
-  // the index: no triangles on transparent texels, each triangle faces like its vertex normals
+  // the index (on the first frame): no triangles on transparent texels, each triangle faces like its vertex normals
   parts.forEach((part, m) => {
+    if (part.index) return;
     const src = part.mesh.geometry, count = src.getAttribute('position').count;
     const index = src.index ? Array.from(src.index.array) : [...Array(count).keys()];
     const kept = [], P = (k) => new THREE.Vector3(out[m][k * 3], out[m][k * 3 + 1], out[m][k * 3 + 2]);
@@ -165,11 +172,11 @@ async function poseBody(config) {
     g.setAttribute('normal', new THREE.BufferAttribute(n, 3));
     g.setAttribute('uv', part.uv);
     g.setIndex(part.index);
-    return { geometry: g, texture: part.texture };
+    return g;
   });
 }
 
-// puts the human at (x, z), or at the start of the world
+// spawns the human at (x, z), or at the start of the world
 export async function addCharacter(world, at) {
   const gpu = getResource(world, Gpu), settings = getResource(world, Settings);
   // the fine pass (systems/render.js): its camera and the uniforms all its materials share
@@ -180,21 +187,28 @@ export async function addCharacter(world, at) {
   };
   gpu.fine.camera.layers.set(2);
   const config = await (await fetch(BASE + 'character.json')).json();
-  const body = await poseBody(config);
+  const body = await loadBody(config);
+  const clips = {};
+  for (const state of ['idle', 'walk']) {
+    const clip = body.clips.find((a) => a.name === config.clips[state]);
+    if (!clip) throw new Error(`character: no clip ${config.clips[state]} in ${config.animations}`);
+    const n = Math.max(1, Math.round(clip.duration * config.bakeFps));
+    clips[state] = Array.from({ length: n }, (_, k) => pose(body, clip, Math.min(clip.duration - 1e-3, k / config.bakeFps)));
+  }
   const group = new THREE.Group();
-  for (const { geometry, texture } of body) {
-    const mesh = new THREE.Mesh(geometry, shaderMaterial(gpu.shared, S.FINE_VERT, S.FINE_FRAG, { uMap: { value: texture }, ...gpu.fine.uniforms }, { side: THREE.DoubleSide }));
+  const meshes = body.parts.map((part, m) => {
+    const mesh = new THREE.Mesh(clips.idle[0][m], shaderMaterial(gpu.shared, S.FINE_VERT, S.FINE_FRAG, { uMap: { value: part.texture }, ...gpu.fine.uniforms }, { side: THREE.DoubleSide }));
     mesh.frustumCulled = false;
     mesh.layers.set(1);      // casts a shadow, not in the G-buffer
     mesh.layers.enable(2);   // the fine pass
     group.add(mesh);
-  }
+    return mesh;
+  });
   // feet on the ground, HEIGHT tall
   const box = new THREE.Box3().setFromObject(group), k = HEIGHT / (box.max.y - box.min.y);
   group.scale.setScalar(k);
-  const [x, z] = at ?? [settings.land.start[0], settings.land.start[settings.land.start.length - 1]];
-  group.position.set(x, heightAt(settings.land.terrain, x, z) - box.min.y * k, z);
   gpu.scene.add(group);
   gpu.shadowsDirty = true;
-  return group;
+  const [x, z] = at ?? [settings.land.start[0], settings.land.start[settings.land.start.length - 1]];
+  return spawn(world, [Player, { group, meshes, clips, fps: config.bakeFps, foot: -box.min.y * k, x, z, rot: 0, state: 'idle', t: 0 }]);
 }

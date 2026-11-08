@@ -98,3 +98,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/tree-types` | 6 new tree types: pine, fir, cypress, birch, willow, fruit (the canopy `form` of the `tree` builder) | try, moved to `attempt_1` |
 | `try/rock-types` | 4 new rock types: slab, stack, cluster, split (the `rock-form` builder) | try, moved to `attempt_1` |
 | `try/character` | the fixed human of `backup` (the FlyFF male of the `voxel` branch), drawn 4 times finer than the world | try, moved to `attempt_1` |
+| `try/walk` | the human walks with the arrows (idle and walk clips), the camera follows it | try, moved to `attempt_1` |

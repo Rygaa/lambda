@@ -19,6 +19,7 @@ import { groundCoverSystem } from './systems/groundCover.js';
 import { shadowSystem } from './systems/shadows.js';
 import { renderSystem } from './systems/render.js';
 import { viewSystem } from './systems/view.js';
+import { playerSystem } from './systems/player.js';
 
 // ------------------------------------------------------------------ assets
 // the page is web/index.html: the assets and the worlds are next to web/
@@ -99,7 +100,7 @@ for (const s of [setupGpuSystem, setupUiSystem, spawnGroundCoverSystem, spawnWor
   addSystem(world, s, 'startup');
 for (const s of [
   inputSystem, timeSystem,
-  cameraControlSystem, viewportSystem, cloudSystem,
+  playerSystem, cameraControlSystem, viewportSystem, cloudSystem,
   meshSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem,
 ]) addSystem(world, s);

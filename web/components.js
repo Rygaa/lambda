@@ -1,6 +1,12 @@
 // Components: plain data only. Systems in systems/ give them meaning.
 import { defineComponent } from './ecs/world.js';
 
+// the human (lib/character.js, systems/player.js): its Three.js group and meshes, its baked clips
+// (state -> frames -> one geometry per part), where it stands and faces, its clip and time in it
+export const Player = defineComponent('Player', () => ({
+  group: null, meshes: [], clips: {}, fps: 15, foot: 0, x: 0, z: 0, rot: 0, state: 'idle', t: 0,
+}));
+
 // position on the ground and turn around the up axis
 export const Transform = defineComponent('Transform', () => ({ x: 0, z: 0, rotY: 0 }));
 
