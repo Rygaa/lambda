@@ -116,6 +116,34 @@ layout(location = 0) out vec4 gData;   // light value, material id, world up, pa
 layout(location = 1) out vec4 gNorm;   // view normal (0 = none), linear depth
 `;
 
+// ------------------------------------------------------------------ fine (characters)
+// Characters: drawn on top of the upscaled frame, at screen pixels (4x finer than
+// the world), like the fixed human of the scene tool on the backup branch. It is placed with the low-res camera, then moved to
+// the screen like the blit pass moves the frame (scale, margin, sub-pixel offset). The world in front of it
+// (the depth of the G-buffer) hides it. Its texture colour gets two light bands, like the stones.
+export const FINE_VERT = /* glsl */ `
+uniform vec2 uLowSize;   // the low-res frame, with its 1px border
+uniform vec2 uScreen;    // the canvas, in screen pixels
+uniform vec2 uOffset;
+uniform float uScale;
+uniform vec2 uMargin;
+out vec3 vW;
+out vec3 vN;
+out vec2 vUv;
+out float vDepth;
+void main() {
+  vec4 w = modelMatrix * vec4(position, 1.0);
+  vW = w.xyz;
+  vN = normalize(mat3(modelMatrix) * normal);
+  vUv = uv;
+  vec4 v = viewMatrix * w;
+  vDepth = -v.z;
+  vec4 c = projectionMatrix * v;
+  vec2 low = (c.xy / c.w * 0.5 + 0.5) * uLowSize;              // low-res pixel
+  vec2 scr = (low - 1.0 - uOffset) * uScale + uMargin;          // screen pixel (the blit, the other way)
+  gl_Position = vec4(scr / uScreen * 2.0 - 1.0, c.z / c.w, 1.0);
+}
+`;
 // ------------------------------------------------------------------ meshes
 export const MESH_VERT = /* glsl */ `
 out vec3 vW;
@@ -220,6 +248,28 @@ void main() {
   if (s < 0.0) discard;
   gData = vec4(cloudLight(P) * shadowSoft(P), ${WATER_MID.toFixed(1)}, s, uPal);
   gNorm = vec4(0.0, 0.0, 0.0, vDepth);
+}
+`;
+
+export const FINE_FRAG = COMMON + /* glsl */ `
+uniform sampler2D uMap;
+uniform sampler2D tNorm;   // the G-buffer: view normal, linear depth
+uniform vec2 uOffset;
+uniform float uScale;
+uniform vec2 uMargin;
+in vec3 vW; in vec3 vN; in vec2 vUv; in float vDepth;
+out vec4 outColor;
+void main() {
+  ivec2 q = ivec2(floor((gl_FragCoord.xy - uMargin) / uScale + 1.0 + uOffset));
+  float d = texelFetch(tNorm, q, 0).w;
+  if (d > 0.0 && d < vDepth - 0.05) discard;      // the world is in front
+  vec3 N = normalize(vN);
+  if (!gl_FrontFacing) N = -N;
+  float ndl = dot(N, uSunL);
+  float lv = ndl > 0.0 ? ndl * cloudLight(vW) * shadowHard(vW + N * 0.02) : 0.0;
+  vec3 a = pow(texture(uMap, vUv).rgb, vec3(2.2));
+  vec3 col = lv > 0.09 ? a : a * vec3(0.52, 0.56, 0.74);
+  outColor = vec4(pow(col, vec3(1.0 / 2.2)), 1.0);
 }
 `;
 

@@ -70,6 +70,8 @@ assets/
 ├── palettes.json         every colour, by family, and the themes
 ├── render.json           the camera, the sun, the material ids, the sprite atlases
 ├── textures/             the sprite atlases: grass tufts, flowers, leaf clumps
+├── character/player/     the human: the FlyFF male (from the game Fly For Fun), its parts, clips and textures,
+│                         from the voxel branch (web/lib/character.js)
 ├── rock/
 │   ├── sharp/rock.json
 │   └── round/rock.json

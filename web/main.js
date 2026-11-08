@@ -105,6 +105,11 @@ for (const s of [
 ]) addSystem(world, s);
 
 runStartup(world);
+// the human (lib/character.js): ?char=x,z puts it there, else at the start; ?nochar: none
+if (!params.has('nochar')) {
+  const { addCharacter } = await import('./lib/character.js');
+  await addCharacter(world, params.get('char')?.split(',').map(Number));
+}
 
 function tick(now) {
   getResource(world, Res.Time).now = now;

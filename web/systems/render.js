@@ -41,6 +41,20 @@ export function renderSystem(world) {
   renderer.setClearColor(0x000000, 1);
   renderer.clear(true, false, false);
   renderer.render(gpu.blitScene, gpu.fsCam);
+  if (gpu.fine) finePass(gpu, camera);
+}
+
+// characters at screen pixels on top of the frame (render/shaders.js FINE_VERT, lib/character.js)
+function finePass(gpu, camera) {
+  const { renderer, fine } = gpu;
+  fine.camera.copy(camera, false);
+  fine.camera.layers.set(2);
+  const u = fine.uniforms;
+  u.tNorm.value = gpu.gbuf.textures[1];
+  u.uLowSize.value.set(gpu.gbuf.width, gpu.gbuf.height);
+  renderer.getDrawingBufferSize(u.uScreen.value);
+  renderer.clear(false, true, false);
+  renderer.render(gpu.scene, fine.camera);
 }
 
 // Water (the article's planar reflections): the scene drawn again into a

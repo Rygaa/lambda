@@ -17,6 +17,9 @@ All 3D views use `packages/renderer`. It is the renderer of `pixel-scene` (top v
 - Clouds drift and cast soft shadows. God rays are raymarched through the shadow map. Dust shows only in the light beams. (Article and pixel-scene.)
 - Grass tufts and flowers are camera-facing sprites lit at their base. (Article and pixel-scene.)
 - Tree and bush leaves are camera-facing clump sprites too (`assets/textures/clumps.png`). Each clump is one medium leaf with 2 tiny leaves next to it, with gaps between them, never one round spot. (Your request: you picked "mixed" of 13 tries.)
+- Characters (the human) are drawn 4 times finer than the world, at screen pixels, on top of the frame. The world in
+  front of them still hides them, and they still cast their shadow. Their texture colour gets two light bands: lit, or
+  a darker, bluer shade. (Your request: the fixed human of the scene tool on the `backup` branch.)
 - The camera snaps to the pixel grid. The image is then moved back by the snap error, so movement stays smooth and pixels do not creep. (Article.)
 
 ## Models

@@ -15,6 +15,7 @@ Then open `http://127.0.0.1:8643/web/?world=all-types`.
 - `?seed=<number>`: the same recipe with new shapes and new places.
 - `?theme=dbz` or `?theme=namek`: other colours (see section 6).
 - `?freeze`: time stops (for screenshots that must match pixel by pixel).
+- `?char=<x>,<z>`: where the human stands. The default is the start of the world. `?nochar`: no human.
 
 Keys: the arrows move the camera, the wheel zooms, `C` stops or starts the clouds.
 
