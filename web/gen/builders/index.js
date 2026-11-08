@@ -5,3 +5,4 @@ import './tree.js';
 import './palm.js';
 import './water.js';
 import './building.js';
+import './rock-form.js';

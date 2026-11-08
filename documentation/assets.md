@@ -142,6 +142,8 @@ The types come from `pixel-scene` version-3 (commit `9da4216`, `web/gen/kinds/`)
 - `plant/oak`: the `tree` kind. `big` became `large`.
 - `plant/bush`: the `bush` preset of the `tree` kind. It has one size, `medium`.
 - `plant/palm`: the `palm` kind. `tall` became `large`, and `small` stayed `small`.
+- `rock/slab`, `rock/stack`, `rock/cluster`, `rock/split`: new, not from `pixel-scene` (your request). They use the
+  `rock-form` builder with its `form` value.
 - `plant/pine`, `plant/fir`, `plant/cypress`, `plant/birch`, `plant/willow`, `plant/fruit`: new, not from
   `pixel-scene` (your request). They use the `tree` builder with its `form` value (the canopy shape).
 - `water/puddle`, `water/pond`, `water/lake`, `water/ocean`: the presets of the `water` kind. Its `stream`
@@ -178,8 +180,8 @@ Do each step on a `try/` branch, then move it to `attempt_1` (see `branches.md`)
    (`web/gen/assets.js`, `web/gen/shapes.js`).
 6. To do: worlds that ask by tags, for example "plants with the tag `forest`". Then a type file gets `"tags"`.
 7. Done: the test world `worlds/all-types.json`, with every type in every size, in rows.
-8. To do: new types, one at a time: `rock/flat`, `plant/pine`, `rock/round/medium`, sizes for water,
-   `terrain/mountain` in `small` and `large`.
+8. To do: new types, one at a time: `rock/round/medium`, sizes for water, `terrain/mountain` in `small` and
+   `large`. Done: `plant/pine` and the other new trees, `rock/slab` and the other new rocks.
 9. Done: the type files `terrain/cliff` and `terrain/mountain`, with the numbers that were in the code.
 10. To do: mountains made with noise, and chunks for huge maps.
 11. Done: the builder `building` and the types `building/chichi-house`, `building/buu-house`, `building/capsule-ship`.

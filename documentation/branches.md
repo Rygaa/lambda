@@ -96,3 +96,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/no-wall-rocks` | no small rocks stuck on the cliff walls, and the rule against such fake details | try, moved to `attempt_1` |
 | `try/plants` | tree, bush, and palm leaves are one medium leaf with 2 tiny ones, not round spots (the tree shapes stay the same) | try, moved to `attempt_1` |
 | `try/tree-types` | 6 new tree types: pine, fir, cypress, birch, willow, fruit (the canopy `form` of the `tree` builder) | try, moved to `attempt_1` |
+| `try/rock-types` | 4 new rock types: slab, stack, cluster, split (the `rock-form` builder) | try, moved to `attempt_1` |

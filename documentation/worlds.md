@@ -23,6 +23,7 @@ The worlds:
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
+- `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `meadow`: ponds and puddles.
 - `lakes`: a lake, a river, ponds, and puddles.
 - `rocky`: an autumn forest with many rocks.
@@ -88,6 +89,9 @@ The types today:
 
 - `rock/sharp`: `small`, `medium`, `large`. Palettes `grey`, `sand`, `moss`, `dark`, `cliff`.
 - `rock/round`: `small`, `large`. The same palettes.
+- `rock/slab`: one flat, wide stone. `rock/stack`: 2 or 3 flat stones piled up. `rock/cluster`: one stone with 2 or 3
+  smaller ones at its foot. `rock/split`: one stone split in two halves. All four: `small`, `medium`, `large`, the
+  same palettes, and a new form each time.
 - `plant/oak`: `small`, `medium`, `large`. Palettes `green`, `autumn`, `pine`.
 - `plant/bush`: `medium`. Palettes `green`, `autumn`, `pine`. You walk through it.
 - `plant/palm`: `small`, `large`. Palettes `green`, `autumn`, `pine` (the fronds; the trunk is always `palm`).
