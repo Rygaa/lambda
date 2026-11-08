@@ -94,3 +94,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/nature` | the nature of `pixel-scene` version-3 (commit `9da4216`), sorted with the names of `assets.md` | try, moved to `attempt_1` |
 | `try/mountain-ends` | the free ends of mountain borders stop tier by tier on wavy lines, not in one flat cut | try, moved to `attempt_1` |
 | `try/no-wall-rocks` | no small rocks stuck on the cliff walls, and the rule against such fake details | try, moved to `attempt_1` |
+| `try/plants` | tree, bush, and palm leaves are one medium leaf with 2 tiny ones, not round spots (the tree shapes stay the same) | try, moved to `attempt_1` |
