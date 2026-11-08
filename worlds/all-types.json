@@ -1,7 +1,7 @@
 {
   "name": "All types: every asset type in every size, in rows (rocks, plants, water, buildings), with a mountain border, the ocean, a beach and a dirt path",
   "seed": 1,
-  "size": 56,
+  "size": 68,
   "start": [0, 0],
   "borders": { "west": "terrain/mountain/medium", "east": "water/ocean/medium" },
   "clearings": { "count": 0 },
@@ -10,6 +10,26 @@
     { "paint": "dirt", "path": [[-16, 16], [14, 16]], "width": 1.6 }
   ],
   "props": [
+    { "asset": "plant/birch/small", "at": [[-16, -30, 0]] },
+    { "asset": "plant/birch/medium", "at": [[-12, -30, 0]] },
+    { "asset": "plant/birch/large", "at": [[-8, -30, 0]] },
+    { "asset": "plant/willow/small", "at": [[-4, -30, 0]] },
+    { "asset": "plant/willow/medium", "at": [[0, -30, 0]] },
+    { "asset": "plant/willow/large", "at": [[4, -30, 0]] },
+    { "asset": "plant/fruit/small", "at": [[8, -30, 0]] },
+    { "asset": "plant/fruit/medium", "at": [[12, -30, 0]] },
+    { "asset": "plant/fruit/large", "at": [[16, -30, 0]] },
+
+    { "asset": "plant/pine/small", "at": [[-16, -22, 0]] },
+    { "asset": "plant/pine/medium", "at": [[-12, -22, 0]] },
+    { "asset": "plant/pine/large", "at": [[-8, -22, 0]] },
+    { "asset": "plant/fir/small", "at": [[-4, -22, 0]] },
+    { "asset": "plant/fir/medium", "at": [[0, -22, 0]] },
+    { "asset": "plant/fir/large", "at": [[4, -22, 0]] },
+    { "asset": "plant/cypress/small", "at": [[8, -22, 0]] },
+    { "asset": "plant/cypress/medium", "at": [[12, -22, 0]] },
+    { "asset": "plant/cypress/large", "at": [[16, -22, 0]] },
+
     { "asset": "rock/sharp/small", "at": [[-14, -14, 0]] },
     { "asset": "rock/sharp/medium", "at": [[-11, -14, 0]] },
     { "asset": "rock/sharp/large", "at": [[-7, -14, 0]] },

@@ -1,0 +1,11 @@
+{
+  "about": "A birch: a tall thin white trunk and a narrow egg-shaped canopy, covered in leaf clumps. The values are the ones of plant/oak.",
+  "builder": "tree",
+  "variants": 3,
+  "palettes": {"green": {"trunk": "birch", "canopy": "green"}, "autumn": {"trunk": "birch", "canopy": "autumn"}},
+  "sizes": {
+    "small": {"trunk": 2.2, "r1": 0.16, "r2": 0.11, "trunkY": 1.0, "canopyY": 2.75, "radii": [0.8, 1.15, 0.8], "scale": [0.76, 0.86]},
+    "medium": {"trunk": 2.2, "r1": 0.16, "r2": 0.11, "trunkY": 1.0, "canopyY": 2.75, "radii": [0.8, 1.15, 0.8], "scale": [0.92, 1.08]},
+    "large": {"trunk": 2.2, "r1": 0.16, "r2": 0.11, "trunkY": 1.0, "canopyY": 2.75, "radii": [0.8, 1.15, 0.8], "scale": [1.14, 1.26]}
+  }
+}

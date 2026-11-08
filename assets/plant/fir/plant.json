@@ -1,0 +1,11 @@
+{
+  "about": "A fir: like plant/pine, taller and narrower, with 5 cones.",
+  "builder": "tree",
+  "variants": 3,
+  "palettes": {"pine": {"trunk": "dark", "canopy": "pine"}, "green": {"trunk": "dark", "canopy": "green"}},
+  "sizes": {
+    "small": {"trunk": 0.9, "r1": 0.18, "r2": 0.12, "trunkY": 0.45, "canopyY": 2.55, "radii": [0.9, 1.95, 0.9], "form": "cone", "tiers": 5, "scale": [0.76, 0.86]},
+    "medium": {"trunk": 0.9, "r1": 0.18, "r2": 0.12, "trunkY": 0.45, "canopyY": 2.55, "radii": [0.9, 1.95, 0.9], "form": "cone", "tiers": 5, "scale": [0.92, 1.08]},
+    "large": {"trunk": 0.9, "r1": 0.18, "r2": 0.12, "trunkY": 0.45, "canopyY": 2.55, "radii": [0.9, 1.95, 0.9], "form": "cone", "tiers": 5, "scale": [1.14, 1.26]}
+  }
+}

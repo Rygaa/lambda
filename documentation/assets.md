@@ -142,6 +142,8 @@ The types come from `pixel-scene` version-3 (commit `9da4216`, `web/gen/kinds/`)
 - `plant/oak`: the `tree` kind. `big` became `large`.
 - `plant/bush`: the `bush` preset of the `tree` kind. It has one size, `medium`.
 - `plant/palm`: the `palm` kind. `tall` became `large`, and `small` stayed `small`.
+- `plant/pine`, `plant/fir`, `plant/cypress`, `plant/birch`, `plant/willow`, `plant/fruit`: new, not from
+  `pixel-scene` (your request). They use the `tree` builder with its `form` value (the canopy shape).
 - `water/puddle`, `water/pond`, `water/lake`, `water/ocean`: the presets of the `water` kind. Its `stream`
   became `water/river`. Each has one size, `medium`.
 - The palettes and themes: `web/gen/palettes.js` became `assets/palettes.json`.

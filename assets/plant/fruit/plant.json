@@ -1,0 +1,11 @@
+{
+  "about": "A fruit tree: a short trunk and a low, wide, round canopy, covered in leaf clumps. The values are the ones of plant/oak.",
+  "builder": "tree",
+  "variants": 3,
+  "palettes": {"green": {"trunk": "brown", "canopy": "green"}, "autumn": {"trunk": "brown", "canopy": "autumn"}},
+  "sizes": {
+    "small": {"trunk": 0.9, "r1": 0.18, "r2": 0.13, "trunkY": 0.4, "canopyY": 1.55, "radii": [1.15, 0.85, 1.15], "scale": [0.76, 0.86]},
+    "medium": {"trunk": 0.9, "r1": 0.18, "r2": 0.13, "trunkY": 0.4, "canopyY": 1.55, "radii": [1.15, 0.85, 1.15], "scale": [0.92, 1.08]},
+    "large": {"trunk": 0.9, "r1": 0.18, "r2": 0.13, "trunkY": 0.4, "canopyY": 1.55, "radii": [1.15, 0.85, 1.15], "scale": [1.14, 1.26]}
+  }
+}

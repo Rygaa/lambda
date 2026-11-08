@@ -22,6 +22,7 @@ The worlds:
 
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
+- `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
 - `meadow`: ponds and puddles.
 - `lakes`: a lake, a river, ponds, and puddles.
 - `rocky`: an autumn forest with many rocks.
@@ -90,6 +91,10 @@ The types today:
 - `plant/oak`: `small`, `medium`, `large`. Palettes `green`, `autumn`, `pine`.
 - `plant/bush`: `medium`. Palettes `green`, `autumn`, `pine`. You walk through it.
 - `plant/palm`: `small`, `large`. Palettes `green`, `autumn`, `pine` (the fronds; the trunk is always `palm`).
+- `plant/pine`: 3 cones stacked. `plant/fir`: taller and narrower, 5 cones. `plant/cypress`: tall and narrow, like a
+  flame. All three: `small`, `medium`, `large`. Palettes `pine`, `green`.
+- `plant/birch`: a thin white trunk. `plant/willow`: a bell that hangs low. `plant/fruit`: low, wide, and round.
+  All three: `small`, `medium`, `large`. Palettes `green`, `autumn`.
 - `water/puddle`, `water/pond`, `water/lake`, `water/river`: `medium`. Palettes `clear`, `swamp`, `glacier`.
 - `water/ocean`: `medium`, only for `borders`.
 - `building/chichi-house`, `building/buu-house`, `building/capsule-ship`: `medium`. Palette `classic`. Their front
