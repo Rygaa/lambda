@@ -36,6 +36,8 @@ export const createInput = () => ({
 // cell key -> Set of circles: Blocker data (BlockGrid), Footprint data (CoverGrid);
 // ground: the cliffs (gen/terrain.js) on the BlockGrid, else null
 export const BlockGrid = 'BlockGrid';
+// the tops of the objects that stop a walker by their shape (lib/tops.js)
+export const Tops = 'Tops';
 export const CoverGrid = 'CoverGrid';
 export const createGrid = (ground = null) => ({ cells: new Map(), ground });
 

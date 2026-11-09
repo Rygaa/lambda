@@ -113,6 +113,7 @@ export function setupUiSystem(world) {
   // keys typed in a field of the admin menu are not game keys
   addEventListener('keydown', (e) => { if (e.target.tagName !== 'INPUT') push({ t: 'key', key: e.key }); });
   addEventListener('keyup', (e) => push({ t: 'keyup', key: e.key }));
+  canvas.addEventListener('mousedown', (e) => { if (e.button === 0) push({ t: 'click' }); });
   addEventListener('blur', () => push({ t: 'blur' }));
   addEventListener('resize', () => push({ t: 'resize' }));
   setTimeout(() => (document.getElementById('hint').style.opacity = 0), 7000);

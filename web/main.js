@@ -20,6 +20,7 @@ import { shadowSystem } from './systems/shadows.js';
 import { renderSystem } from './systems/render.js';
 import { viewSystem } from './systems/view.js';
 import { playerSystem } from './systems/player.js';
+import { createTops } from './lib/tops.js';
 import { setupAdminSystem, adminSystem } from './systems/admin.js';
 
 // ------------------------------------------------------------------ assets
@@ -95,6 +96,7 @@ setResource(world, Res.Time, Res.createTime());
 setResource(world, Res.Input, Res.createInput());
 setResource(world, Res.Tuning, Res.createTuning());
 setResource(world, Res.BlockGrid, Res.createGrid(land.terrain));
+setResource(world, Res.Tops, createTops(land.half + 2));
 setResource(world, Res.CoverGrid, Res.createGrid());
 setResource(world, Res.Random, Res.createRandom(5));
 

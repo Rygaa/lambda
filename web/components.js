@@ -3,10 +3,13 @@ import { defineComponent } from './ecs/world.js';
 
 // the human (lib/character.js, systems/player.js): its Three.js group and meshes, its baked clips
 // (state -> frames -> one geometry per part), where it stands and faces, its clip and time in it;
-// jump: the time left of its crouch, its height above the ground and its speed up, the time left of its landing (systems/player.js)
+// y: the height of its feet (null: on the ground under it); jump: the time left of its crouch, in the air or not,
+// its speed up, the time left of its landing; attack: its hit (1 to 4, 0: none), the time left of it, and whether
+// the next hit follows (systems/player.js)
 export const Player = defineComponent('Player', () => ({
-  group: null, meshes: [], clips: {}, fps: 15, foot: 0, x: 0, z: 0, rot: 0, state: 'idle', t: 0,
-  jump: { crouch: 0, air: false, h: 0, vy: 0, land: 0 },
+  group: null, meshes: [], clips: {}, fps: 15, foot: 0, x: 0, z: 0, y: null, rot: 0, state: 'idle', t: 0,
+  jump: { crouch: 0, air: false, vy: 0, land: 0 },
+  attack: { hit: 0, left: 0, queued: false },
 }));
 
 // position on the ground and turn around the up axis

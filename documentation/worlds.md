@@ -17,10 +17,12 @@ Then open `http://127.0.0.1:8643/web/?world=all-types`.
 - `?freeze`: time stops (for screenshots that must match pixel by pixel).
 - `?char=<x>,<z>`: where the human stands. The default is the start of the world. `?nochar`: no human.
 
-Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it run, Space makes it jump, and the camera follows it (with
-`?nochar`, the arrows move the camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top
-left opens a menu that changes the walk speed, the run speed, the jump height, and the zoom while the game runs (`web/systems/admin.js`). Trees, rocks, water and cliff walls stop the human;
-it goes up and down stairs.
+Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it run, Space makes it jump, a click (or
+`F`) attacks (click again for the next of 4 hits), and the camera follows it (with `?nochar`, the arrows move the
+camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top left opens a menu that changes
+the walk speed, the run speed, the jump height, and the zoom while the game runs (`web/systems/admin.js`). Trees,
+water and cliff walls stop the human; it goes up and down stairs. Rocks and buildings stop it by their real shape: it
+can jump onto a rock, walk on it, and fall off it.
 
 The worlds:
 
@@ -164,7 +166,9 @@ A theme replaces palettes by name, so every world works with every theme:
 
 One rule for every object (`web/gen/collision.js`):
 
-- An object lower than 25 % of a person does not stop a walker.
+- A rock or a building stops a walker by its real shape (`web/lib/tops.js`): a walker stands on its top, steps up at
+  most 0.12 at once (so a slope steeper than about 30° stops it), and must jump to get higher.
+- Any other object lower than 25 % of a person does not stop a walker.
 - A tree stops a walker only with its trunk. A bush never does.
 - Water stops a walker, except puddles.
 - A cliff stops a walker: only stairs go up or down.

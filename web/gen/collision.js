@@ -4,6 +4,9 @@
 export const PLAYER_HEIGHT = 1.65 * 0.62;         // the player of pixel-scene: about 1 unit tall
 export const STEP_OVER = 0.25;                    // lower than this share of the player: walk over it
 
+// these families stop a walker by their real shape (lib/tops.js), not by a circle: it can stand on them
+export const BY_SHAPE = ['rock', 'building'];
+
 // shape: { height, blocks? } -> does it stop a walker?
 export function blocks(shape) {
   if (shape.blocks !== undefined) return shape.blocks;

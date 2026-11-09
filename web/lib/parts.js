@@ -1,8 +1,9 @@
 // Spawning generated objects (gen/world.js props) as entities.
 import { spawn, getResource } from '../ecs/world.js';
 import { Transform, Prop, Footprint, Blocker, ShadowCaster } from '../components.js';
-import { Assets, Settings } from '../resources.js';
-import { blocks } from '../gen/collision.js';
+import { Assets, Settings, Tops } from '../resources.js';
+import { blocks, BY_SHAPE } from '../gen/collision.js';
+import { addShape } from './tops.js';
 import { paletteRows } from '../gen/palettes.js';
 import { heightAt } from '../gen/terrain.js';
 
@@ -17,7 +18,9 @@ export function spawnProp(world, p) {
   ];
   if (!shape.circles) pairs.push([Footprint, { x, z, r: shape.radius }]);
   pairs.push([ShadowCaster]);
-  if (blocks(shape) && !shape.circles) pairs.push([Blocker, { x, z, r: shape.blocker.r, h: y + shape.blocker.h }]);
+  // a rock or a building stops a walker by its shape, the others by a circle
+  if (BY_SHAPE.includes(p.family)) addShape(getResource(world, Tops), shape.parts, x, y, z, p.rot);
+  else if (blocks(shape) && !shape.circles) pairs.push([Blocker, { x, z, r: shape.blocker.r, h: y + shape.blocker.h }]);
   const e = spawn(world, ...pairs);
   // a shape that is not round (water): a footprint, and a blocker, per circle;
   // the grass is hidden a little past the circles, up to the shore

@@ -14,6 +14,7 @@ export function inputSystem(world) {
         input.pressed.push({ key: r.key });
         input.keys.add(r.key.toLowerCase());
         break;
+      case 'click': input.pressed.push({ key: 'click' }); break;
       case 'keyup': input.keys.delete(r.key.toLowerCase()); break;
       case 'blur': input.keys.clear(); break;
       case 'resize': input.resized = true; break;

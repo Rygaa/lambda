@@ -101,3 +101,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/walk` | the human walks with the arrows (idle and walk clips), the camera follows it | try, moved to `attempt_1` |
 | `try/admin` | the human runs with Shift; the Admin button opens a menu for the walk speed, the run speed, and the zoom | try, moved to `attempt_1` |
 | `try/jump` | Space makes the human jump (the 4 parts of the jump clip); the Admin menu changes the jump height | try, moved to `attempt_1` |
+| `try/attack` | a click (or F) attacks, 4 hits in a row; rocks and buildings stop the human by their real shape, so it can jump onto them | try, moved to `attempt_1` |
