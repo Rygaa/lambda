@@ -26,9 +26,30 @@ clothes and weapons of the human: head, hair, clothes, gloves, shoes, cap, cloak
 (`web/lib/preview.js`). The items are the FlyFF male parts and the FlyFF weapons and shields of
 `assets/character/player/parts/`, listed in `items.json`; `import-items.mjs` makes both from the FlyFF data folder.
 `Save` writes all these values to `saves/admin.json` (through `web/serve.py`), and the game starts with them;
-`Default` puts back the values of the code, without saving them. Trees,
+`Default` puts back the values of the code, without saving them (not the monsters or the stats). Trees,
 water and cliff walls stop the human; it goes up and down stairs. Rocks and buildings stop it by their real shape: it
-can jump onto a rock, walk on it, and fall off it.
+can jump onto a rock, walk on it, and fall off it (`web/lib/walk.js`).
+
+Monsters and fights. The `Monsters` part of the Admin menu opens a grid of the 569 FlyFF monsters (one picture each).
+A click on one opens its editor: name, model (a grid of the 127 models), level, HP, damage min and max, defense,
+attack delay, walk speed, size, and XP. A change applies at once. `Spawn` puts the monster in front of the human
+(its model is baked the first time, so it comes after a moment), `Copy` makes a new monster from it, `Delete` removes
+it, `Remove all` removes the monsters in the world. `Save` writes the changed monsters to `saves/monsters.json`.
+The `Human` part sets the level, STR, STA, and points of the human, and `Full HP` fills its HP.
+
+A monster is calm: it stands, looks around, and walks near the place where it came. When the human hits it, it
+follows the human and attacks it. It gives up, goes back, and heals when the human dies or goes too far (14 units
+from its place). A dead monster plays its death clip, fades out, and is removed. The human gets its XP; a new level
+gives stat points (the FlyFF table) and full HP. At 0 HP the human lies down for 3 seconds, then stands up in the
+same place with full HP. The rules (damage, HP, chance to hit) are in `web/lib/combat.js`:
+
+- HP = 100 + 10 × level + 5 × STA. Defense = STA / 2. Damage = 2 × STR + 2 × level, ±10 %.
+- A blow hits 95 % of the time, 4 % less for each level the target is above the attacker (at least 40 %).
+- The damage after the defense of the target is at least 1.
+
+On screen: a bar with the name, level, and HP over each monster that was hit, the damage numbers (`miss` for a
+miss), and at the bottom right the level, HP, and XP of the human, its STR and STA, and a `+` button for each while
+it has points (`web/systems/hud.js`).
 
 The worlds:
 

@@ -18,7 +18,8 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 - ECS (`web/ecs/world.js`): components are plain data (`web/components.js`), resources are one of a kind
   (`web/resources.js`), and systems are functions `(world) => void` that run in the order set in `web/main.js`.
   New code follows this rule.
-- The server is `python3 web/serve.py` (port 8643). It serves the files, and it writes one file: `saves/admin.json`.
+- The server is `python3 web/serve.py` (port 8643). It serves the files, and it writes two files: `saves/admin.json`
+  and `saves/monsters.json`.
 - Open `http://localhost:8643/web/?world=rock-types&char=-2.5,-1`. The worlds and the address options are in
   `documentation/worlds.md`.
 
@@ -30,16 +31,25 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | walk, run, jump, attack (4 hits), what stops him | `web/systems/player.js`, `web/lib/tops.js` (rocks and buildings by their shape) |
 | clothes, weapons, shields: models, list, import script | `assets/character/player/parts/`, `items.json`, `import-items.mjs` |
 | the outfit: the Wardrobe resource, a new outfit is baked again | `web/systems/outfit.js` |
+| baking any FlyFF model: load, fix, pose each frame, fine-pass meshes | `web/lib/bake.js` |
 | the Admin menu: sliders, item slots with a picture grid, Save and Default | `web/systems/admin.js`, `web/lib/preview.js` |
-| saved settings, loaded at start | `saves/admin.json` |
+| the monsters: models, list (`monsters.json`), clips per model (`models.json`), levels, import script | `assets/monsters/`, `import-monsters.mjs` |
+| the monsters in the game: bake, spawn, calm or angry, death | `web/lib/monsters.js`, `web/systems/monsters.js` |
+| fights: stats, damage, chance to hit, XP and levels; blows; the bars and numbers on screen | `web/lib/combat.js`, `web/systems/combat.js`, `web/systems/hud.js` |
+| the Monsters and Human parts of the Admin menu | `web/systems/adminFight.js` |
+| what stops a walker (the human and the monsters) | `web/lib/walk.js` |
+| saved settings and stats, changed monsters, loaded at start | `saves/admin.json`, `saves/monsters.json` |
 
 ## 4. The FlyFF data
 
 All FlyFF models and data are in `/Users/mohamedaissabenfodda/Workspace/data_flyff`:
 
-- `models/*.glb`. Their textures are `.ktx2` files in `textures/model/`, and `import-items.mjs` shows how to turn
-  them into `.png` (it needs the `zstd` command). The monster models are `mvr_<name>.glb`.
-- `data/movers.ron`: the monsters, with their level, stats, attack, speed, and experience.
+- `models/*.glb`. Their textures are `.ktx2` files in `textures/model/`; `assets/flyff.mjs` turns them into `.png`
+  (it needs the `zstd` command) and reads the `.ron` files. The monster models are `mvr_<name>.glb`, with their
+  clips inside.
+- The `.ron` files end their lines with `\r\n`: remove the `\r` before you read them.
+- `data/movers.ron`: the monsters (`ai: 2`), with their level, stats, attack, speed, and experience.
+- `data/exp.ron`: the experience of each level and the stat points it gives.
 - `data/models.ron`: an entry with `kind: Mover, index: <mover id>` gives the model and the clips of a monster.
 - `data/motions.ron`: the clips of each model (stand, walk, atk1, dmg1, die1, ...), with their hit frames.
 - `data/items.ron`: the items. Many names are in German.

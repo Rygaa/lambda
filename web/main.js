@@ -23,13 +23,17 @@ import { playerSystem } from './systems/player.js';
 import { createTops } from './lib/tops.js';
 import { setupAdminSystem, adminSystem } from './systems/admin.js';
 import { outfitSystem } from './systems/outfit.js';
+import { monsterSystem } from './systems/monsters.js';
+import { combatSystem } from './systems/combat.js';
+import { setupHudSystem, hudSystem } from './systems/hud.js';
+import { START } from './lib/combat.js';
 
 // ------------------------------------------------------------------ assets
 // the page is web/index.html: the assets and the worlds are next to web/
 const NOCACHE = '?v=' + Date.now();
 const loadJson = async (path) => (await fetch(path + NOCACHE)).json();
-const [meta, palettes, character, items] = await Promise.all(['render', 'palettes', 'character/player/character', 'character/player/items']
-  .map((f) => loadJson(`../assets/${f}.json`)));
+const [meta, palettes, character, items, monsters, models, levels] = await Promise.all(['render', 'palettes', 'character/player/character',
+  'character/player/items', 'monsters/monsters', 'monsters/models', 'monsters/levels'].map((f) => loadJson(`../assets/${f}.json`)));
 const texLoader = new THREE.TextureLoader();
 const loadAtlas = async (info) => {
   const t = await texLoader.loadAsync('../assets/' + info.file + NOCACHE);
@@ -39,7 +43,10 @@ const loadAtlas = async (info) => {
   return t;
 };
 // the settings saved with the Save button of the admin menu (saves/admin.json, web/serve.py); none: the defaults
-const saved = await fetch('../saves/admin.json' + NOCACHE).then((r) => (r.ok ? r.json() : {}), () => ({}));
+const loadSave = (name) => fetch(`../saves/${name}.json` + NOCACHE).then((r) => (r.ok ? r.json() : {}), () => ({}));
+const saved = await loadSave('admin');
+// the monster types the admin menu changed (id -> type, or null: deleted)
+const monsterChanges = (await loadSave('monsters')).changes ?? {};
 const [tufts, clumps, decor] = await Promise.all(['tufts', 'clumps', 'decor'].map((k) => loadAtlas(meta.sprites[k])));
 
 // ------------------------------------------------------------------ world
@@ -100,25 +107,26 @@ setResource(world, Res.Time, Res.createTime());
 setResource(world, Res.Input, Res.createInput());
 setResource(world, Res.Tuning, { ...Res.createTuning(), ...saved.tuning });
 Object.assign(setResource(world, Res.Wardrobe, Res.createWardrobe(character, items)).outfit, saved.outfit);
+setResource(world, Res.Bestiary, Res.createBestiary(monsters.monsters, models.models, levels, monsterChanges));
 setResource(world, Res.BlockGrid, Res.createGrid(land.terrain));
 setResource(world, Res.Tops, createTops(land.half + 2));
 setResource(world, Res.CoverGrid, Res.createGrid());
 setResource(world, Res.Random, Res.createRandom(5));
 
-for (const s of [setupGpuSystem, setupUiSystem, setupAdminSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
+for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
   addSystem(world, s, 'startup');
 for (const s of [
   inputSystem, timeSystem,
-  outfitSystem, playerSystem, cameraControlSystem, viewportSystem, cloudSystem,
+  outfitSystem, playerSystem, monsterSystem, combatSystem, cameraControlSystem, viewportSystem, cloudSystem,
   meshSystem, footprintSystem, groundCoverSystem, shadowSystem,
-  cameraSnapSystem, viewSystem, renderSystem, adminSystem,
+  cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem,
 ]) addSystem(world, s);
 
 runStartup(world);
-// the human (lib/character.js): ?char=x,z puts it there, else at the start; ?nochar: none
+// the human (lib/character.js): ?char=x,z puts it there, else at the start; ?nochar: none. Its stats: the saved ones
 if (!params.has('nochar')) {
   const { addCharacter } = await import('./lib/character.js');
-  await addCharacter(world, params.get('char')?.split(',').map(Number));
+  await addCharacter(world, params.get('char')?.split(',').map(Number), { ...START, ...saved.stats });
 }
 
 function tick(now) {

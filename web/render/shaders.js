@@ -257,9 +257,13 @@ uniform sampler2D tNorm;   // the G-buffer: view normal, linear depth
 uniform vec2 uOffset;
 uniform float uScale;
 uniform vec2 uMargin;
+uniform float uFade;       // 1: seen, 0: gone (a dead monster): fewer pixels, in a 4x4 dither
 in vec3 vW; in vec3 vN; in vec2 vUv; in float vDepth;
 out vec4 outColor;
+const float BAYER[16] = float[16](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
 void main() {
+  ivec2 b = ivec2(gl_FragCoord.xy / uScale) & 3;
+  if (uFade < 1.0 && (BAYER[b.y * 4 + b.x] + 0.5) / 16.0 > uFade) discard;
   ivec2 q = ivec2(floor((gl_FragCoord.xy - uMargin) / uScale + 1.0 + uOffset));
   float d = texelFetch(tNorm, q, 0).w;
   if (d > 0.0 && d < vDepth - 0.05) discard;      // the world is in front

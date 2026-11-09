@@ -4,6 +4,7 @@
   "outfit": { "head": "part_malehead01", "hair": "part_malehair01", "upper": null, "hand": null, "foot": null, "cap": null, "cloak": null, "mask": null, "weapon": null, "shield": null },
   "animations": "mvr_male.glb",
   "clips": { "idle": "genstand", "walk": "genwalk", "run": "genrun", "jumpStart": "genjump1", "jumpUp": "genjump2", "jumpDown": "genjump3", "jumpLand": "genjump4", "attack1": "atkatk1-01", "attack2": "atkatk2-01", "attack3": "atkatk3-01", "attack4": "atkatk4-01", "hit": "gendmg1", "dead": "gendie1" },
+  "hits": { "attack1": 0.4, "attack2": 0.367, "attack3": 0.333, "attack4": 0.267 },
   "bakeFps": 30,
   "radius": 0.3,
   "speed": 4,

@@ -106,3 +106,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/clothes` | the Admin menu changes the clothes of the human: every male part of the FlyFF data (head, hair, clothes, gloves, shoes, cap, cloak, mask) | try, moved to `attempt_1` |
 | `try/items` | the weapons and shields of the FlyFF data in the Admin menu (held on the hand and shield bones); each slot opens a grid of pictures of its items; Save and Default buttons (saves/admin.json) | try, moved to `attempt_1` |
 | `try/how-we-work` | `documentation/how-we-work.md`: the rules, the code map, the FlyFF data, and how to test, for a new chat | try, moved to `attempt_1` |
+| `try/monsters` | the 569 FlyFF monsters (127 models, their clips); the Admin menu edits them and spawns them; they fight back when hit; the human has STR, STA, levels, and XP; HP bars and damage numbers | try, moved to `attempt_1` |

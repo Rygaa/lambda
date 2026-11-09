@@ -2,13 +2,19 @@
 // the walk and run speeds and the jump height of the human (the Tuning resource) and the zoom (the Viewport resource).
 // Its slots change the clothes and weapons of the human (the Wardrobe resource, systems/outfit.js): a slot opens a grid
 // with a picture of each item (lib/preview.js), and a click on a picture puts the item on.
-// Save writes all these values to saves/admin.json (web/serve.py), which the game loads at start (main.js);
-// Default puts back the values of the code (resources.js createTuning, character.json outfit), without saving them.
+// The Monsters part edits and spawns the monsters, the Human part changes the stats of the human (systems/adminFight.js).
+// Save writes all these values to saves/admin.json and the monster changes to saves/monsters.json (web/serve.py), which
+// the game loads at start (main.js); Default puts back the values of the code (resources.js createTuning,
+// character.json outfit), without saving them; it does not touch the monsters or the stats.
 // The markup is in index.html (#admin-button, #admin, #picker).
-import { getResource } from '../ecs/world.js';
-import { Tuning, Viewport, Wardrobe, createTuning } from '../resources.js';
+import { getResource, query, getComponent } from '../ecs/world.js';
+import { Tuning, Viewport, Wardrobe, Bestiary, createTuning } from '../resources.js';
+import { Stats } from '../components.js';
 import { ZOOM_STEP } from './viewport.js';
 import { createPreview } from '../lib/preview.js';
+import { setupMonstersPart, setupHumanPart } from './adminFight.js';
+
+let showHuman = () => {};   // shows the values of the Human part again (systems/adminFight.js)
 
 // one slider: [id, label, read the value, set the value, min, max, step, how to show the value]
 const SLIDERS = [
@@ -61,7 +67,8 @@ export function setupAdminSystem(world) {
     button.addEventListener('click', () => {
       button.blur();
       if (!picker.hidden && picker.dataset.slot === slot) { picker.hidden = true; return; }
-      openPicker(picker, slot, label, items, preview, () => w.outfit[slot] ?? '', (file) => {
+      const picture = (file) => preview(`../assets/character/player/parts/${file}.glb`, { onHead: slot === 'cap' || slot === 'mask' });
+      openPicker(picker, slot, label, items, picture, () => w.outfit[slot] ?? '', (file) => {
         w.outfit[slot] = file || null;
         w.dirty = true;
         wearing();
@@ -70,6 +77,8 @@ export function setupAdminSystem(world) {
     panel.append(row);
   }
   document.getElementById('admin-button').addEventListener('click', () => { if (panel.hidden) picker.hidden = true; });
+  setupMonstersPart(world, panel, picker, preview);
+  showHuman = setupHumanPart(world, panel);
 
   const bar = document.createElement('div');
   bar.className = 'save';
@@ -77,9 +86,12 @@ export function setupAdminSystem(world) {
   const status = bar.querySelector('span');
   bar.querySelector('#admin-save').addEventListener('click', async (e) => {
     e.currentTarget.blur();
-    const data = { tuning: { ...getResource(world, Tuning) }, outfit: { ...w.outfit }, zoom: getResource(world, Viewport).zoom };
-    const res = await fetch('../saves/admin.json', { method: 'POST', body: JSON.stringify(data) }).catch(() => null);
-    status.textContent = res?.ok ? 'saved' : 'not saved (restart web/serve.py)';
+    const human = query(world, [Stats])[0];
+    const data = { tuning: { ...getResource(world, Tuning) }, outfit: { ...w.outfit }, zoom: getResource(world, Viewport).zoom,
+      ...(human === undefined ? {} : { stats: { ...getComponent(world, human, Stats) } }) };
+    const post = (name, body) => fetch(`../saves/${name}.json`, { method: 'POST', body: JSON.stringify(body) }).then((r) => r.ok, () => false);
+    const ok = await Promise.all([post('admin', data), post('monsters', { changes: getResource(world, Bestiary).changes })]);
+    status.textContent = ok.every(Boolean) ? 'saved' : 'not saved (restart web/serve.py)';
   });
   bar.querySelector('#admin-default').addEventListener('click', (e) => {
     e.currentTarget.blur();
@@ -97,9 +109,11 @@ export function setupAdminSystem(world) {
   panel.append(bar);
 }
 
-// the grid of one slot: a picture and the name of each item; a picture is drawn when it scrolls into view
-function openPicker(picker, slot, label, items, preview, current, wear) {
-  picker.dataset.slot = slot;
+// a grid of pictures (the items of a slot, the monsters, the monster models): a picture and the name of each item
+// ({ name, file }); picture(file) -> Promise of its picture, drawn when it scrolls into view (none for file '');
+// current() -> the file chosen now; choose(file) when a picture is clicked
+export function openPicker(picker, key, label, items, picture, current, choose) {
+  picker.dataset.slot = key;
   picker.hidden = false;
   picker.scrollTop = 0;
   picker.innerHTML = `<header><b>${label}</b><span>${items.length}</span><button title="close">×</button></header><div class="grid"></div>`;
@@ -109,7 +123,7 @@ function openPicker(picker, slot, label, items, preview, current, wear) {
     for (const { target, isIntersecting } of entries) {
       if (!isIntersecting) continue;
       seen.unobserve(target);
-      preview(target.dataset.file, slot === 'cap' || slot === 'mask').then((url) => { target.querySelector('img').src = url; }, (err) => console.error(err));
+      picture(target.dataset.file).then((url) => { target.querySelector('img').src = url; }, (err) => console.error(err));
     }
   }, { root: picker });
   for (const { name, file } of items) {
@@ -123,16 +137,20 @@ function openPicker(picker, slot, label, items, preview, current, wear) {
       grid.querySelector('.on')?.classList.remove('on');
       cell.classList.add('on');
       cell.blur();
-      wear(file);
+      choose(file);
     });
     grid.append(cell);
     if (file) seen.observe(cell);
   }
+  grid.querySelector('.on')?.scrollIntoView({ block: 'center' });
 }
 
-// the zoom also changes with the wheel, and its range with the window: keep its slider in step
+// the zoom also changes with the wheel, and its range with the window, and the stats of the human while it fights:
+// keep them in step
 export function adminSystem(world) {
-  if (!document.getElementById('admin').hidden && document.activeElement !== document.getElementById('admin-zoom')) syncZoom(world);
+  if (document.getElementById('admin').hidden) return;
+  if (document.activeElement !== document.getElementById('admin-zoom')) syncZoom(world);
+  showHuman();
 }
 
 function syncZoom(world) {

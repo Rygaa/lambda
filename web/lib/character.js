@@ -1,27 +1,22 @@
 // The human (assets/character/player, the FlyFF male): ported from the voxel branch
-// (game/src/client/character.ts). Its clips (idle, walk, run, the 4 parts of a jump, 4 hits) are baked at load into frames of posed
-// vertices (bakeFps a second); systems/player.js swaps the frames and moves it.
+// (game/src/client/character.ts). Its clips (idle, walk, run, the 4 parts of a jump, 4 hits, hurt, dead) are baked at
+// load into frames of posed vertices (bakeFps a second, lib/bake.js); systems/player.js swaps the frames and moves it.
 // Its parts come from its outfit (the Wardrobe resource, items.json): a head, hair, clothes, a weapon, and a shield; a new
 // outfit is baked again (dress, systems/outfit.js). Parts that are not skinned follow one bone: a weapon or a shield its
 // attach point (attach_rhand, attach_lhand, attach_knuckle, attach_shield), a cap or a mask the head.
-// The fixes of character.ts are kept: fixSecondBones, triangles on transparent texels dropped,
-// faces turned the right way, transparent texels filled, seams welded, normals smoothed over the body.
-// It is drawn 4x finer than the world, on top of the frame (render/shaders.js FINE_VERT, FINE_FRAG), like the
-// fixed human of the scene tool on the backup branch. Layer 1: it casts a shadow; layer 2: the fine pass.
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { getResource, spawn } from '../ecs/world.js';
-import { Player } from '../components.js';
+import { Player, Health, Stats } from '../components.js';
 import { Gpu, Settings, Wardrobe } from '../resources.js';
-import * as S from '../render/shaders.js';
-import { shaderMaterial } from '../render/materials.js';
+import { loadBody, bakeClips, measure, fineMeshes } from './bake.js';
+import { maxHp } from './combat.js';
 
-const BASE = '../assets/character/player/';
-const HEIGHT = 1.05;    // world units: a person is about 1 unit tall (gen/collision.js)
-const HEAD_BONE = THREE.PropertyBinding.sanitizeNodeName('Bip02 Head');
-const STATES = ['idle', 'walk', 'run', 'jumpStart', 'jumpUp', 'jumpDown', 'jumpLand', 'attack1', 'attack2', 'attack3', 'attack4'];
+const BASE = '../assets/character/player/', TEXTURES = BASE + 'parts/textures/';
+export const HEIGHT = 1.05;    // world units: a person is about 1 unit tall (gen/collision.js)
+const STATES = ['idle', 'walk', 'run', 'jumpStart', 'jumpUp', 'jumpDown', 'jumpLand', 'attack1', 'attack2', 'attack3', 'attack4', 'hit', 'dead'];
+const ONCE = (state) => /^(jump|attack|hit|dead)/.test(state);   // these clips play once and stop on their last frame
 
-// the parts of an outfit (slot -> file, null: none or the bare body), as [{ file, bone }] (bone: the attach point of a
+// the parts of an outfit (slot -> file, null: none or the bare body), as [{ url, bone }] (bone: the attach point of a
 // weapon or a shield). A suit replaces the bare upper and lower body, a cap can hide the hair or the head, and a weapon
 // held with both hands leaves no room for a shield
 export function partsOf(outfit, slots) {
@@ -31,215 +26,32 @@ export function partsOf(outfit, slots) {
     cap?.hides !== 'head' && outfit.head, cap?.hides !== 'hair' && outfit.hair,
     ...(outfit.upper ? [outfit.upper] : ['part_maleupper', 'part_malelower']),
     outfit.hand ?? 'part_malehand', outfit.foot ?? 'part_malefoot', outfit.cap, outfit.cloak, outfit.mask,
-  ].filter(Boolean).map((file) => ({ file })).concat(
-    [weapon, shield].filter(Boolean).flatMap(({ file, hold }) => hold.map((h) => ({ file, bone: 'attach_' + h }))));
+  ].filter(Boolean).map((file) => ({ url: `${BASE}parts/${file}.glb` })).concat(
+    [weapon, shield].filter(Boolean).flatMap(({ file, hold }) => hold.map((h) => ({ url: `${BASE}parts/${file}.glb`, bone: 'attach_' + h }))));
 }
 
-// the converter gets the second bone of a vertex wrong: keep the nearest bone, give the other weight to a neighbour
-function fixSecondBones(o) {
-  const bones = o.skeleton.bones;
-  const rest = bones.map((_, i) => new THREE.Vector3().setFromMatrixPosition(o.skeleton.boneInverses[i].clone().invert()));
-  const idx = new Map(bones.map((b, i) => [b, i]));
-  const neighbors = (i) => [bones[i].parent, ...bones[i].children].map((b) => idx.get(b)).filter((k) => k !== undefined);
-  const pos = o.geometry.getAttribute('position'), si = o.geometry.getAttribute('skinIndex'), sw = o.geometry.getAttribute('skinWeight');
-  const v = new THREE.Vector3();
-  for (let i = 0; i < pos.count; i++) {
-    const inf = [];
-    for (let t = 0; t < 4; t++) if (sw.getComponent(i, t) > 0) inf.push([si.getComponent(i, t), sw.getComponent(i, t)]);
-    if (inf.length !== 2) continue;
-    const [[a, wa], [b, wb]] = inf;
-    if (a !== b && neighbors(a).includes(b)) continue;
-    v.fromBufferAttribute(pos, i);
-    const keep = a === b ? a : v.distanceTo(rest[a]) <= v.distanceTo(rest[b]) ? a : b;
-    const near = neighbors(keep).sort((x, y) => v.distanceTo(rest[x]) - v.distanceTo(rest[y]))[0];
-    if (near === undefined) continue;
-    const wKeep = a === b ? wa : keep === a ? wa : wb, wOther = a === b ? wb : keep === a ? wb : wa;
-    si.setXYZW(i, keep, near, 0, 0);
-    sw.setXYZW(i, wKeep, wOther, 0, 0);
-  }
-}
-
-// each transparent texel gets the colour of an opaque neighbour; alphaAt reads the first alpha
-function solidTexture(map) {
-  const img = map.image, cv = document.createElement('canvas');
-  cv.width = img.width; cv.height = img.height;
-  const cx = cv.getContext('2d');
-  cx.drawImage(img, 0, 0);
-  const px = cx.getImageData(0, 0, cv.width, cv.height).data, filled = new Uint8ClampedArray(px);
-  const opaque = new Uint8Array(cv.width * cv.height);
-  for (let i = 0; i < opaque.length; i++) opaque[i] = px[i * 4 + 3] >= 128 ? 1 : 0;
-  for (let pass = 0; pass < 64; pass++) {
-    let changed = 0;
-    const next = opaque.slice();
-    for (let y = 0; y < cv.height; y++) for (let x = 0; x < cv.width; x++) {
-      const i = y * cv.width + x;
-      if (opaque[i]) continue;
-      let r = 0, g = 0, b = 0, c = 0;
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const k = ((y + dy + cv.height) % cv.height) * cv.width + ((x + dx + cv.width) % cv.width);
-        if (opaque[k]) { r += filled[k * 4]; g += filled[k * 4 + 1]; b += filled[k * 4 + 2]; c++; }
-      }
-      if (c) { filled[i * 4] = r / c; filled[i * 4 + 1] = g / c; filled[i * 4 + 2] = b / c; next[i] = 1; changed++; }
-    }
-    opaque.set(next);
-    if (!changed) break;
-  }
-  for (let i = 0; i < opaque.length; i++) filled[i * 4 + 3] = 255;
-  const fcv = document.createElement('canvas');
-  fcv.width = cv.width; fcv.height = cv.height;
-  fcv.getContext('2d').putImageData(new ImageData(filled, cv.width, cv.height), 0, 0);
-  const texture = new THREE.CanvasTexture(fcv);
-  texture.flipY = false;
-  texture.magFilter = texture.minFilter = THREE.NearestFilter;
-  texture.generateMipmaps = false;
-  texture.colorSpace = THREE.NoColorSpace;
-  const alphaAt = (u, w) => {
-    const x = Math.min(cv.width - 1, Math.max(0, Math.floor((((u % 1) + 1) % 1) * cv.width)));
-    const y = Math.min(cv.height - 1, Math.max(0, Math.floor((((w % 1) + 1) % 1) * cv.height)));
-    return px[(y * cv.width + x) * 4 + 3];
-  };
-  return { texture, alphaAt };
-}
-
-// the textures of the parts are .png files in parts/textures (assets/character/player/import-items.mjs)
-export function loader() {
-  const manager = new THREE.LoadingManager();
-  manager.setURLModifier((url) => (/\.(dds|ktx2)$/.test(url) ? BASE + 'parts/textures/' + url.split('/').pop().replace(/\.\w+$/, '.png') : url));
-  return new GLTFLoader(manager);
-}
-
-// the meshes of one file of parts, fixed
-async function loadPart(file) {
-  const gltf = await loader().loadAsync(`${BASE}parts/${file}.glb`);
-  gltf.scene.updateMatrixWorld(true);
-  const parts = [];
-  gltf.scene.traverse((o) => {
-    if (!o.isMesh) return;
-    if (o.isSkinnedMesh) fixSecondBones(o);
-    o.material.map.flipY = false;
-    const { texture, alphaAt } = solidTexture(o.material.map);
-    const pos = o.geometry.getAttribute('position');
-    parts.push({ mesh: o, root: gltf.scene, rigid: !o.isSkinnedMesh, local: o.matrixWorld.clone(),
-      mixer: o.isSkinnedMesh ? new THREE.AnimationMixer(gltf.scene) : null, uv: o.geometry.getAttribute('uv'), alphaAt, texture,
-      bind: Array.from({ length: pos.count }, (_, i) => [pos.getX(i), pos.getY(i), pos.getZ(i)]) });
-  });
-  return parts;
-}
-
-// the body of an outfit: its parts, the seams between them, and the clips. cache: file -> its parts, kept, so a
-// new outfit loads only its new pieces
-async function loadBody(cache, entries, animations) {
-  const get = (key, load) => { if (!cache.has(key)) cache.set(key, load()); return cache.get(key); };
-  const [anim, ...lists] = await Promise.all([get(animations, () => loader().loadAsync(BASE + animations)),
-    ...entries.map(({ file }) => get(file, () => loadPart(file)))]);
-  // a yoyo is one file held twice: each one gets its own bone
-  const parts = lists.flatMap((list, k) => list.map((part) => (entries[k].bone ? { ...part, bone: entries[k].bone } : part)));
-  // seams: vertices of different skinned parts at the same rest place are welded after posing
-  const key = (p) => p.map((c) => Math.round(c * 333)).join(',');
-  const groups = new Map();
-  parts.forEach((part, m) => !part.rigid && part.bind.forEach((p, i) => { const k = key(p); if (!groups.has(k)) groups.set(k, []); groups.get(k).push({ m, i }); }));
-  const seams = [...groups.values()].filter((g) => new Set(g.map((e) => e.m)).size > 1);
-  return { parts, seams, clips: anim.animations };
-}
-
-// one posed frame of the body: one geometry per part, at `time` seconds of `clip`
-function pose({ parts, seams }, clip, time) {
-  for (const part of parts) {
-    if (part.rigid) continue;
-    part.mixer.stopAllAction();
-    part.mixer.clipAction(clip).reset().play();
-    part.mixer.setTime(time);
-    part.root.updateMatrixWorld(true);
-    part.mesh.skeleton.update();
-  }
-  const skeleton = parts.find((p) => !p.rigid).root, M = new THREE.Matrix4();
-  const out = [], hints = [];
-  for (const part of parts) {
-    const o = part.mesh;
-    if (part.rigid) M.multiplyMatrices(skeleton.getObjectByName(part.bone ?? HEAD_BONE).matrixWorld, part.local);
-    const pos = o.geometry.getAttribute('position'), nrm = o.geometry.getAttribute('normal');
-    const arr = new Float32Array(pos.count * 3), hint = [];
-    const v = new THREE.Vector3(), w = new THREE.Vector3();
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i);
-      w.copy(v).addScaledVector(new THREE.Vector3().fromBufferAttribute(nrm, i), 0.01);
-      if (part.rigid) { v.applyMatrix4(M); w.applyMatrix4(M); } else {
-        o.applyBoneTransform(i, v); o.applyBoneTransform(i, w);
-        v.applyMatrix4(o.matrixWorld); w.applyMatrix4(o.matrixWorld);
-      }
-      arr.set([v.x, v.y, v.z], i * 3);
-      hint.push(w.clone().sub(v));
-    }
-    out.push(arr); hints.push(hint);
-  }
-  // the index (on the first frame): no triangles on transparent texels, each triangle faces like its vertex normals
-  parts.forEach((part, m) => {
-    if (part.index) return;
-    const src = part.mesh.geometry, count = src.getAttribute('position').count;
-    const index = src.index ? Array.from(src.index.array) : [...Array(count).keys()];
-    const kept = [], P = (k) => new THREE.Vector3(out[m][k * 3], out[m][k * 3 + 1], out[m][k * 3 + 2]);
-    for (let t = 0; t < index.length; t += 3) {
-      const [a, b, c] = [index[t], index[t + 1], index[t + 2]];
-      const u = (part.uv.getX(a) + part.uv.getX(b) + part.uv.getX(c)) / 3, w = (part.uv.getY(a) + part.uv.getY(b) + part.uv.getY(c)) / 3;
-      if (part.alphaAt(u, w) < 128) continue;
-      const fn = P(b).sub(P(a)).cross(P(c).sub(P(a)));
-      const avg = hints[m][a].clone().add(hints[m][b]).add(hints[m][c]);
-      if (fn.dot(avg) < 0) kept.push(a, c, b); else kept.push(a, b, c);
-    }
-    part.index = kept;
-  });
-  for (const g of seams) {
-    let x = 0, y = 0, z = 0;
-    for (const e of g) { x += out[e.m][e.i * 3]; y += out[e.m][e.i * 3 + 1]; z += out[e.m][e.i * 3 + 2]; }
-    for (const e of g) out[e.m].set([x / g.length, y / g.length, z / g.length], e.i * 3);
-  }
-  // smooth normals over the whole body
-  const nkey = (a, i) => `${Math.round(a[i * 3] * 500)},${Math.round(a[i * 3 + 1] * 500)},${Math.round(a[i * 3 + 2] * 500)}`;
-  const acc = new Map(), A = new THREE.Vector3(), B = new THREE.Vector3(), C = new THREE.Vector3();
-  parts.forEach((part, m) => {
-    const a = out[m], idx = part.index;
-    for (let t = 0; t < idx.length; t += 3) {
-      A.fromArray(a, idx[t] * 3); B.fromArray(a, idx[t + 1] * 3); C.fromArray(a, idx[t + 2] * 3);
-      const fn = B.clone().sub(A).cross(C.clone().sub(A));
-      for (const k of [idx[t], idx[t + 1], idx[t + 2]]) { const kk = nkey(a, k); acc.set(kk, (acc.get(kk) ?? new THREE.Vector3()).add(fn)); }
-    }
-  });
-  return parts.map((part, m) => {
-    const a = out[m], n = new Float32Array(a.length);
-    for (let i = 0; i < a.length / 3; i++) n.set((acc.get(nkey(a, i)) ?? new THREE.Vector3(0, 1, 0)).clone().normalize().toArray(), i * 3);
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(a, 3));
-    g.setAttribute('normal', new THREE.BufferAttribute(n, 3));
-    g.setAttribute('uv', part.uv);
-    g.setIndex(part.index);
-    return g;
-  });
-}
+// the body of an outfit (lib/bake.js loadBody)
+const bodyOf = (cache, config, outfit, slots) => loadBody(cache, partsOf(outfit, slots), BASE + config.animations, TEXTURES);
 
 // the clips and meshes of an outfit (slot -> file): systems/outfit.js puts them on the human
 export async function dress(world, outfit) {
   const gpu = getResource(world, Gpu), { config, slots, cache } = getResource(world, Wardrobe);
-  const body = await loadBody(cache, partsOf(outfit, slots), config.animations);
-  const clips = {};
-  for (const state of STATES) {
-    const clip = body.clips.find((a) => a.name === config.clips[state]);
-    if (!clip) throw new Error(`character: no clip ${config.clips[state]} in ${config.animations}`);
-    // a loop leaves out its last frame (it is the first one again); a part of the jump or a hit plays once, so it keeps it
-    const once = /^(jump|attack)/.test(state), n = Math.max(1, Math.round(clip.duration * config.bakeFps)) + (once ? 1 : 0);
-    clips[state] = Array.from({ length: n }, (_, k) => pose(body, clip, Math.min(clip.duration - 1e-3, k / config.bakeFps)));
-  }
-  const meshes = body.parts.map((part, m) => {
-    const mesh = new THREE.Mesh(clips.idle[0][m], shaderMaterial(gpu.shared, S.FINE_VERT, S.FINE_FRAG, { uMap: { value: part.texture }, ...gpu.fine.uniforms }, { side: THREE.DoubleSide }));
-    mesh.frustumCulled = false;
-    mesh.layers.set(1);      // casts a shadow, not in the G-buffer
-    mesh.layers.enable(2);   // the fine pass
-    return mesh;
-  });
-  return { clips, meshes };
+  const body = await bodyOf(cache, config, outfit, slots);
+  const clips = bakeClips(body, Object.fromEntries(STATES.map((s) => [s, config.clips[s]])), config.bakeFps, ONCE);
+  return { clips, meshes: fineMeshes(gpu, body, clips.idle[0]) };
 }
 
-// spawns the human at (x, z), or at the start of the world, in the outfit of the Wardrobe resource
-export async function addCharacter(world, at) {
+// world units per FlyFF unit: the human is HEIGHT tall, measured on the body of the default outfit at the start of
+// its idle clip (the same size in every outfit: a hat does not make it smaller). Monsters use it too (lib/monsters.js)
+export async function unitScale(world) {
+  const { config, slots, cache } = getResource(world, Wardrobe);
+  const box = measure(await bodyOf(cache, config, config.outfit, slots), config.clips.idle);
+  return { k: HEIGHT / (box.max.y - box.min.y), box };
+}
+
+// spawns the human at (x, z), or at the start of the world, in the outfit of the Wardrobe resource, with its stats
+// (lib/combat.js) and full HP
+export async function addCharacter(world, at, stats) {
   const gpu = getResource(world, Gpu), settings = getResource(world, Settings);
   // the fine pass (systems/render.js): its camera and the uniforms all its materials share
   gpu.fine = {
@@ -248,22 +60,16 @@ export async function addCharacter(world, at) {
       uOffset: gpu.blit.uniforms.uOffset, uScale: gpu.blit.uniforms.uScale, uMargin: gpu.blit.uniforms.uMargin },
   };
   gpu.fine.camera.layers.set(2);
-  const { config, outfit, slots, cache } = getResource(world, Wardrobe);
+  const { config, outfit } = getResource(world, Wardrobe);
   const { clips, meshes } = await dress(world, outfit);
   const group = new THREE.Group();
   for (const mesh of meshes) group.add(mesh);
-  // feet on the ground, HEIGHT tall, measured on the body of the default outfit at the start of its idle clip: the
-  // same size in every outfit (a hat does not make it smaller)
-  const bare = await loadBody(cache, partsOf(config.outfit, slots), config.animations);
-  const box = new THREE.Box3();
-  for (const g of pose(bare, bare.clips.find((a) => a.name === config.clips.idle), 0)) {
-    box.union(new THREE.Box3().setFromBufferAttribute(g.getAttribute('position')));
-    g.dispose();
-  }
-  const k = HEIGHT / (box.max.y - box.min.y);
+  // feet on the ground, HEIGHT tall
+  const { k, box } = await unitScale(world);
   group.scale.setScalar(k);
   gpu.scene.add(group);
   gpu.shadowsDirty = true;
   const [x, z] = at ?? [settings.land.start[0], settings.land.start[settings.land.start.length - 1]];
-  return spawn(world, [Player, { group, meshes, clips, fps: config.bakeFps, foot: -box.min.y * k, x, z, rot: 0, state: 'idle', t: 0 }]);
+  return spawn(world, [Player, { group, meshes, clips, fps: config.bakeFps, foot: -box.min.y * k, x, z, rot: 0, state: 'idle', t: 0 }],
+    [Stats, { ...stats }], [Health, { hp: maxHp(stats), max: maxHp(stats) }]);
 }

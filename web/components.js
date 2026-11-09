@@ -4,12 +4,33 @@ import { defineComponent } from './ecs/world.js';
 // the human (lib/character.js, systems/player.js): its Three.js group and meshes, its baked clips
 // (state -> frames -> one geometry per part), where it stands and faces, its clip and time in it;
 // y: the height of its feet (null: on the ground under it); jump: the time left of its crouch, in the air or not,
-// its speed up, the time left of its landing; attack: its hit (1 to 4, 0: none), the time left of it, and whether
-// the next hit follows (systems/player.js)
+// its speed up, the time left of its landing; attack: its hit (1 to 4, 0: none), the time left of it, whether
+// the next hit follows, and whether this hit has struck (systems/player.js); hurt: the time left of its hurt clip;
+// dead: the time left before it stands up again (0: alive)
 export const Player = defineComponent('Player', () => ({
   group: null, meshes: [], clips: {}, fps: 15, foot: 0, x: 0, z: 0, y: null, rot: 0, state: 'idle', t: 0,
   jump: { crouch: 0, air: false, vy: 0, land: 0 },
-  attack: { hit: 0, left: 0, queued: false },
+  attack: { hit: 0, left: 0, queued: false, struck: false },
+  hurt: 0, dead: 0,
+}));
+
+// the stats of the human (lib/combat.js): its level, its experience in this level, STR, STA, points not spent yet
+export const Stats = defineComponent('Stats', () => ({ level: 1, xp: 0, str: 15, sta: 15, points: 0 }));
+
+// the HP of the human or of a monster
+export const Health = defineComponent('Health', () => ({ hp: 1, max: 1 }));
+
+// a monster (lib/monsters.js, systems/monsters.js): its type (a line of assets/monsters/monsters.json), its Three.js
+// group and meshes, its baked clips, its feet, height and circle, where it stands and faces, its clip and time in
+// it, its spawn point (home).
+//   mode: calm (stands, looks around, walks near home), angry (follows the human and attacks), or dead;
+//   goal: where a calm walk goes; wait: the time before the next calm walk or look; swing: the time in its attack
+//   (null: none); struck: the blow of this swing is dealt; cooldown: the time before the next swing; hurt: the time
+//   left of its hit clip; shown: the time left of its HP bar (systems/hud.js); fade: 1 seen, 0 gone (uFade)
+export const Monster = defineComponent('Monster', () => ({
+  type: null, group: null, meshes: [], clips: {}, fps: 15, foot: 0, height: 1, radius: 0.3, x: 0, z: 0, y: 0, rot: 0,
+  state: 'idle', t: 0, home: [0, 0], mode: 'calm', goal: null, wait: 2, swing: null, struck: false, cooldown: 0,
+  hurt: 0, shown: 0, fade: 1,
 }));
 
 // position on the ground and turn around the up axis

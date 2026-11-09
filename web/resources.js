@@ -31,6 +31,23 @@ export const createWardrobe = (config, items) => ({
   config, slots: items.slots, outfit: { ...config.outfit }, dirty: false, busy: false, next: null, cache: new Map(),
 });
 
+// the monsters (lib/monsters.js, systems/monsters.js, the Monsters part of systems/admin.js):
+//   types: the monster types (assets/monsters/monsters.json with the changes of saves/monsters.json applied);
+//   changes: id -> type (edited or new) or null (deleted), what the admin Save writes to saves/monsters.json;
+//   models: model -> { clips, hitAt } (assets/monsters/models.json); levels: assets/monsters/levels.json (lib/combat.js);
+//   unit: world units per FlyFF unit (lib/character.js unitScale); bakes: model -> { promise, baked, error };
+//   requests: spawns waiting for their bake [{ type, x, z }]
+export const Bestiary = 'Bestiary';
+export const createBestiary = (monsters, models, levels, changes) => {
+  const types = monsters.filter((m) => !(m.id in changes)).concat(Object.values(changes).filter(Boolean));
+  types.sort((a, b) => a.level - b.level || a.id - b.id);
+  return { types, changes, models, levels, unit: 0, bakes: new Map(), requests: [] };
+};
+
+// the fight on screen (systems/hud.js): its elements, the bars over the monsters (entity -> element), the damage
+// numbers [{ el, x, y, z, t }], and the + buttons pressed (['str' | 'sta'])
+export const Hud = 'Hud';
+
 export const Input = 'Input';
 // DOM listeners only push raw records into `pending`; the input system turns
 // them into the per-frame fields below.

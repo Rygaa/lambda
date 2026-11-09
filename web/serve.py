@@ -1,10 +1,11 @@
 # Static server for the repo, with caching off: web/ reads ../assets and ../worlds.
-# It writes one file: saves/admin.json, the settings of the Save button of the admin menu (web/systems/admin.js).
+# It writes two files, for the Save button of the admin menu (web/systems/admin.js): saves/admin.json (the settings and
+# the stats of the human) and saves/monsters.json (the monster types changed in the admin menu).
 #   python3 web/serve.py [port]   then open http://127.0.0.1:8643/web/
 import http.server, functools, json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SAVE = os.path.join(ROOT, 'saves', 'admin.json')
+SAVES = {'/saves/admin.json', '/saves/monsters.json'}
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -13,14 +14,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_POST(self):
-        if self.path.split('?')[0] != '/saves/admin.json':
+        path = self.path.split('?')[0]
+        if path not in SAVES:
             return self.send_error(404)
         try:
             data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))))
         except ValueError:
             return self.send_error(400, 'not JSON')
-        os.makedirs(os.path.dirname(SAVE), exist_ok=True)
-        with open(SAVE, 'w') as f:
+        save = os.path.join(ROOT, path.lstrip('/'))
+        os.makedirs(os.path.dirname(save), exist_ok=True)
+        with open(save, 'w') as f:
             json.dump(data, f, indent=1)
             f.write('\n')
         self.send_response(204)
