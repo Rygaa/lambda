@@ -20,7 +20,10 @@ Then open `http://127.0.0.1:8643/web/?world=all-types`.
 Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it run, Space makes it jump, a click (or
 `F`) attacks (click again for the next of 4 hits), and the camera follows it (with `?nochar`, the arrows move the
 camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top left opens a menu that changes
-the walk speed, the run speed, the jump height, and the zoom while the game runs (`web/systems/admin.js`). Trees,
+the walk speed, the run speed, the jump height, and the zoom while the game runs (`web/systems/admin.js`), and the
+clothes of the human: head, hair, clothes, gloves, shoes, cap, cloak, and mask (`web/systems/outfit.js`). The clothes
+are the FlyFF male parts of `assets/character/player/parts/`, listed in `clothes.json`; `import-clothes.mjs` makes both
+from the FlyFF data folder. Trees,
 water and cliff walls stop the human; it goes up and down stairs. Rocks and buildings stop it by their real shape: it
 can jump onto a rock, walk on it, and fall off it.
 

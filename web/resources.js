@@ -22,6 +22,15 @@ export const createTime = () => ({ now: 0, prev: null, dt: 0, sceneTime: 0, paus
 export const Tuning = 'Tuning';
 export const createTuning = () => ({ walkSpeed: 2.4, runSpeed: 5.2, jumpHeight: 0.7 });
 
+// the clothes of the human (systems/admin.js changes them, systems/outfit.js bakes them, lib/character.js):
+//   config: assets/character/player/character.json; slots: slot -> [{ name, file, hides }] (clothes.json);
+//   outfit: slot -> file (null: none, or the bare body); dirty: the outfit changed; busy: a bake runs;
+//   next: its result { clips, meshes }; cache: file -> its loaded parts
+export const Wardrobe = 'Wardrobe';
+export const createWardrobe = (config, clothes) => ({
+  config, slots: clothes.slots, outfit: { ...config.outfit }, dirty: false, busy: false, next: null, cache: new Map(),
+});
+
 export const Input = 'Input';
 // DOM listeners only push raw records into `pending`; the input system turns
 // them into the per-frame fields below.

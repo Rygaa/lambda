@@ -111,7 +111,7 @@ export function setupUiSystem(world) {
     push({ t: 'wheel', dy: e.deltaY || e.deltaX });
   }, { passive: false });
   // keys typed in a field of the admin menu are not game keys
-  addEventListener('keydown', (e) => { if (e.target.tagName !== 'INPUT') push({ t: 'key', key: e.key }); });
+  addEventListener('keydown', (e) => { if (!['INPUT', 'SELECT'].includes(e.target.tagName)) push({ t: 'key', key: e.key }); });
   addEventListener('keyup', (e) => push({ t: 'keyup', key: e.key }));
   canvas.addEventListener('mousedown', (e) => { if (e.button === 0) push({ t: 'click' }); });
   addEventListener('blur', () => push({ t: 'blur' }));

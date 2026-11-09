@@ -22,12 +22,14 @@ import { viewSystem } from './systems/view.js';
 import { playerSystem } from './systems/player.js';
 import { createTops } from './lib/tops.js';
 import { setupAdminSystem, adminSystem } from './systems/admin.js';
+import { outfitSystem } from './systems/outfit.js';
 
 // ------------------------------------------------------------------ assets
 // the page is web/index.html: the assets and the worlds are next to web/
 const NOCACHE = '?v=' + Date.now();
 const loadJson = async (path) => (await fetch(path + NOCACHE)).json();
-const [meta, palettes] = await Promise.all([loadJson('../assets/render.json'), loadJson('../assets/palettes.json')]);
+const [meta, palettes, character, clothes] = await Promise.all(['render', 'palettes', 'character/player/character', 'character/player/clothes']
+  .map((f) => loadJson(`../assets/${f}.json`)));
 const texLoader = new THREE.TextureLoader();
 const loadAtlas = async (info) => {
   const t = await texLoader.loadAsync('../assets/' + info.file + NOCACHE);
@@ -95,6 +97,7 @@ setResource(world, Res.Viewport, Res.createViewport());
 setResource(world, Res.Time, Res.createTime());
 setResource(world, Res.Input, Res.createInput());
 setResource(world, Res.Tuning, Res.createTuning());
+setResource(world, Res.Wardrobe, Res.createWardrobe(character, clothes));
 setResource(world, Res.BlockGrid, Res.createGrid(land.terrain));
 setResource(world, Res.Tops, createTops(land.half + 2));
 setResource(world, Res.CoverGrid, Res.createGrid());
@@ -104,7 +107,7 @@ for (const s of [setupGpuSystem, setupUiSystem, setupAdminSystem, spawnGroundCov
   addSystem(world, s, 'startup');
 for (const s of [
   inputSystem, timeSystem,
-  playerSystem, cameraControlSystem, viewportSystem, cloudSystem,
+  outfitSystem, playerSystem, cameraControlSystem, viewportSystem, cloudSystem,
   meshSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem, adminSystem,
 ]) addSystem(world, s);
