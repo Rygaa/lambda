@@ -1,7 +1,7 @@
 {
   "name": "FlyFF male",
-  "description": "The player character. Its parts and clothes are in parts/ (import-clothes.mjs, clothes.json), its clips in mvr_male.glb. outfit: slot -> file of parts/, null: none or the bare body.",
-  "outfit": { "head": "part_malehead01", "hair": "part_malehair01", "upper": null, "hand": null, "foot": null, "cap": null, "cloak": null, "mask": null },
+  "description": "The player character. Its parts, clothes, weapons and shields are in parts/ (import-items.mjs, items.json), its clips in mvr_male.glb. outfit: slot -> file of parts/, null: none or the bare body.",
+  "outfit": { "head": "part_malehead01", "hair": "part_malehair01", "upper": null, "hand": null, "foot": null, "cap": null, "cloak": null, "mask": null, "weapon": null, "shield": null },
   "animations": "mvr_male.glb",
   "clips": { "idle": "genstand", "walk": "genwalk", "run": "genrun", "jumpStart": "genjump1", "jumpUp": "genjump2", "jumpDown": "genjump3", "jumpLand": "genjump4", "attack1": "atkatk1-01", "attack2": "atkatk2-01", "attack3": "atkatk3-01", "attack4": "atkatk4-01", "hit": "gendmg1", "dead": "gendie1" },
   "bakeFps": 30,

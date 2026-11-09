@@ -1,4 +1,4 @@
-// The clothes of the human: when the admin menu changes the outfit (the Wardrobe resource), its clips are baked again
+// The clothes and weapons of the human: when the admin menu changes the outfit (the Wardrobe resource), its clips are baked again
 // for the new parts (lib/character.js dress); when the bake is done, the new meshes and clips replace the old ones.
 import { query, getComponent, getResource } from '../ecs/world.js';
 import { Player } from '../components.js';

@@ -1,0 +1,6637 @@
+{
+ "source": "FlyFF data/items.ron (import-items.mjs)",
+ "slots": {
+  "head": [
+   {
+    "name": "Head 01",
+    "file": "part_malehead01"
+   },
+   {
+    "name": "Head 02",
+    "file": "part_malehead02"
+   },
+   {
+    "name": "Head 03",
+    "file": "part_malehead03"
+   },
+   {
+    "name": "Head 04",
+    "file": "part_malehead04"
+   },
+   {
+    "name": "Head 05",
+    "file": "part_malehead05"
+   },
+   {
+    "name": "Head 06",
+    "file": "part_malehead06"
+   },
+   {
+    "name": "Head 07",
+    "file": "part_malehead07"
+   },
+   {
+    "name": "Head 08",
+    "file": "part_malehead08"
+   },
+   {
+    "name": "Head 09",
+    "file": "part_malehead09"
+   },
+   {
+    "name": "Head 10",
+    "file": "part_malehead10"
+   },
+   {
+    "name": "Head 11",
+    "file": "part_malehead11"
+   },
+   {
+    "name": "Head 12",
+    "file": "part_malehead12"
+   },
+   {
+    "name": "Head 13",
+    "file": "part_malehead13"
+   },
+   {
+    "name": "Head 14",
+    "file": "part_malehead14"
+   },
+   {
+    "name": "Head 15",
+    "file": "part_malehead15"
+   }
+  ],
+  "hair": [
+   {
+    "name": "Hair 01",
+    "file": "part_malehair01"
+   },
+   {
+    "name": "Hair 02",
+    "file": "part_malehair02"
+   },
+   {
+    "name": "Hair 03",
+    "file": "part_malehair03"
+   },
+   {
+    "name": "Hair 04",
+    "file": "part_malehair04"
+   },
+   {
+    "name": "Hair 05",
+    "file": "part_malehair05"
+   },
+   {
+    "name": "Hair 06",
+    "file": "part_malehair06"
+   },
+   {
+    "name": "Hair 07",
+    "file": "part_malehair07"
+   },
+   {
+    "name": "Hair 08",
+    "file": "part_malehair08"
+   },
+   {
+    "name": "Hair 09",
+    "file": "part_malehair09"
+   },
+   {
+    "name": "Hair 10",
+    "file": "part_malehair10"
+   }
+  ],
+  "upper": [
+   {
+    "name": "Cotton Rüstung",
+    "file": "part_mvag01upper"
+   },
+   {
+    "name": "Pike Rüstung",
+    "file": "part_mvag02upper"
+   },
+   {
+    "name": "Iner Rüstung",
+    "file": "part_mvag03upper"
+   },
+   {
+    "name": "Petal Rüstung",
+    "file": "part_mmer01upper"
+   },
+   {
+    "name": "Slepint Rüstung",
+    "file": "part_macr01upper"
+   },
+   {
+    "name": "Sardine Rüstung",
+    "file": "part_mass01upper"
+   },
+   {
+    "name": "Seer Rüstung",
+    "file": "part_mmag01upper"
+   },
+   {
+    "name": "Comet Rüstung",
+    "file": "part_mmer03upper"
+   },
+   {
+    "name": "Layered Rüstung",
+    "file": "part_macr03upper"
+   },
+   {
+    "name": "Talin Rüstung",
+    "file": "part_mass03upper"
+   },
+   {
+    "name": "Sorain Rüstung",
+    "file": "part_mmag03upper"
+   },
+   {
+    "name": "Panggril Rüstung",
+    "file": "part_mmer04upper"
+   },
+   {
+    "name": "Cruiser Rüstung",
+    "file": "part_macr04upper"
+   },
+   {
+    "name": "Wedge Rüstung",
+    "file": "part_mass04upper"
+   },
+   {
+    "name": "Teba Rüstung",
+    "file": "part_mmag04upper"
+   },
+   {
+    "name": "Recorn Rüstung",
+    "file": "part_mmer05upper"
+   },
+   {
+    "name": "Rebron Rüstung",
+    "file": "part_macr05upper"
+   },
+   {
+    "name": "Shurand Rüstung",
+    "file": "part_mass05upper"
+   },
+   {
+    "name": "Ahes Rüstung",
+    "file": "part_mmag05upper"
+   },
+   {
+    "name": "Warpon Rüstung",
+    "file": "part_mkin02upper"
+   },
+   {
+    "name": "Wees Rüstung",
+    "file": "part_mkin03upper"
+   },
+   {
+    "name": "Ectro Rüstung",
+    "file": "part_mkinset04upper"
+   },
+   {
+    "name": "Einy Rüstung",
+    "file": "part_mbla02upper"
+   },
+   {
+    "name": "Dayst Rüstung",
+    "file": "part_mbla03upper"
+   },
+   {
+    "name": "Hanes Rüstung",
+    "file": "part_mblaset04upper"
+   },
+   {
+    "name": "Katria Rüstung",
+    "file": "part_mjst02upper"
+   },
+   {
+    "name": "Restra Rüstung",
+    "file": "part_mjst03upper"
+   },
+   {
+    "name": "Neis Rüstung",
+    "file": "part_mjstset04upper"
+   },
+   {
+    "name": "Oska Rüstung",
+    "file": "part_mrag02upper"
+   },
+   {
+    "name": "Asren Rüstung",
+    "file": "part_mrag03upper"
+   },
+   {
+    "name": "Tyrent Rüstung",
+    "file": "part_mragset04upper"
+   },
+   {
+    "name": "Pact Rüstung",
+    "file": "part_mrin02upper"
+   },
+   {
+    "name": "Shupon Rüstung",
+    "file": "part_mrin03upper"
+   },
+   {
+    "name": "Navil Rüstung",
+    "file": "part_mrinset04upper"
+   },
+   {
+    "name": "Alext Rüstung",
+    "file": "part_mbil02upper"
+   },
+   {
+    "name": "Akent Rüstung",
+    "file": "part_mbil03upper"
+   },
+   {
+    "name": "Rody Rüstung",
+    "file": "part_mbilset04upper"
+   },
+   {
+    "name": "Ropang Rüstung",
+    "file": "part_mpsy02upper"
+   },
+   {
+    "name": "Geniun Rüstung",
+    "file": "part_mpsy03upper"
+   },
+   {
+    "name": "Mekatro Rüstung",
+    "file": "part_mpsyset04upper"
+   },
+   {
+    "name": "Myuran Rüstung",
+    "file": "part_mele02upper"
+   },
+   {
+    "name": "Elder Rüstung",
+    "file": "part_mele03upper"
+   },
+   {
+    "name": "Shabel Rüstung",
+    "file": "part_meleset04upper"
+   },
+   {
+    "name": "Knighert Rüstung",
+    "file": "part_mkinset03upper"
+   },
+   {
+    "name": "Blain Rüstung",
+    "file": "part_mblaset03upper"
+   },
+   {
+    "name": "Jesis Rüstung",
+    "file": "part_mjstset03upper"
+   },
+   {
+    "name": "Ranerz Rüstung",
+    "file": "part_mragset03upper"
+   },
+   {
+    "name": "Rimyth Rüstung",
+    "file": "part_mrinset03upper"
+   },
+   {
+    "name": "Billst Rüstung",
+    "file": "part_mbilset03upper"
+   },
+   {
+    "name": "Psykon Rüstung",
+    "file": "part_mpsyset03upper"
+   },
+   {
+    "name": "Ellist Rüstung",
+    "file": "part_meleset03upper"
+   },
+   {
+    "name": "Cruentus Rüstung (M)",
+    "file": "part_mkinset05upper"
+   },
+   {
+    "name": "Noctis Rüstung (M)",
+    "file": "part_mblaset05upper"
+   },
+   {
+    "name": "Velox Rüstung (M)",
+    "file": "part_mjstset05upper"
+   },
+   {
+    "name": "Acer Rüstung (M)",
+    "file": "part_mragset05upper"
+   },
+   {
+    "name": "Revenio Rüstung (M)",
+    "file": "part_mrinset05upper"
+   },
+   {
+    "name": "Grim Rüstung (M)",
+    "file": "part_mbilset05upper"
+   },
+   {
+    "name": "Twilight Rüstung (M)",
+    "file": "part_mpsyset05upper"
+   },
+   {
+    "name": "Nanemvis Rüstung (M)",
+    "file": "part_meleset05upper"
+   },
+   {
+    "name": "Bileire Rüstung (M)",
+    "file": "part_mkinset06upper"
+   },
+   {
+    "name": "Heraud Rüstung (M)",
+    "file": "part_mblaset06upper"
+   },
+   {
+    "name": "Curio Rüstung (M)",
+    "file": "part_mjstset06upper"
+   },
+   {
+    "name": "Hainure Rüstung (M)",
+    "file": "part_mragset06upper"
+   },
+   {
+    "name": "Reine Rüstung (M)",
+    "file": "part_mrinset06upper"
+   },
+   {
+    "name": "Roenier Rüstung (M)",
+    "file": "part_mbilset06upper"
+   },
+   {
+    "name": "Reffiro Rüstung (M)",
+    "file": "part_mpsyset06upper"
+   },
+   {
+    "name": "Lippin Rüstung (M)",
+    "file": "part_meleset06upper"
+   },
+   {
+    "name": "Fortune Rüstung",
+    "file": "part_mmer02upper"
+   },
+   {
+    "name": "Koon Rüstung",
+    "file": "part_mmer06upper"
+   },
+   {
+    "name": "Hodr Rüstung",
+    "file": "part_mmer07upper"
+   },
+   {
+    "name": "Keimay Rüstung",
+    "file": "part_mkin01upper"
+   },
+   {
+    "name": "Revantu Rüstung",
+    "file": "part_mkin04upper"
+   },
+   {
+    "name": "Gricky Rüstung",
+    "file": "part_mkin05upper"
+   },
+   {
+    "name": "Darkbin Rüstung",
+    "file": "part_mbla01upper"
+   },
+   {
+    "name": "Huedom Rüstung",
+    "file": "part_mbla04upper"
+   },
+   {
+    "name": "Labon Rüstung",
+    "file": "part_mbla05upper"
+   },
+   {
+    "name": "Vilet Rüstung",
+    "file": "part_macr02upper"
+   },
+   {
+    "name": "Touflak Rüstung",
+    "file": "part_macr06upper"
+   },
+   {
+    "name": "Silven Rüstung",
+    "file": "part_macr07upper"
+   },
+   {
+    "name": "Henen Rüstung",
+    "file": "part_mjst01upper"
+   },
+   {
+    "name": "Decasron Rüstung",
+    "file": "part_mjst04upper"
+   },
+   {
+    "name": "Claien Rüstung",
+    "file": "part_mjst05upper"
+   },
+   {
+    "name": "Grantus Rüstung",
+    "file": "part_mrag01upper"
+   },
+   {
+    "name": "Mithril Rüstung",
+    "file": "part_mrag04upper"
+   },
+   {
+    "name": "Branto Rüstung",
+    "file": "part_mrag05upper"
+   },
+   {
+    "name": "Gale Rüstung",
+    "file": "part_mass02upper"
+   },
+   {
+    "name": "Beok Rüstung",
+    "file": "part_mass06upper"
+   },
+   {
+    "name": "Dian Rüstung",
+    "file": "part_mass07upper"
+   },
+   {
+    "name": "Mectic Rüstung",
+    "file": "part_mrin01upper"
+   },
+   {
+    "name": "Lordyin Rüstung",
+    "file": "part_mrin04upper"
+   },
+   {
+    "name": "Venopy Rüstung",
+    "file": "part_mrin05upper"
+   },
+   {
+    "name": "Oriene Rüstung",
+    "file": "part_mbil01upper"
+   },
+   {
+    "name": "Snaic Rüstung",
+    "file": "part_mbil04upper"
+   },
+   {
+    "name": "Hanei Rüstung",
+    "file": "part_mbil05upper"
+   },
+   {
+    "name": "Shuffle Rüstung",
+    "file": "part_mmag02upper"
+   },
+   {
+    "name": "Hagal Rüstung",
+    "file": "part_mmag06upper"
+   },
+   {
+    "name": "Maclir Rüstung",
+    "file": "part_mmag07upper"
+   },
+   {
+    "name": "Rendaic Rüstung",
+    "file": "part_mpsy01upper"
+   },
+   {
+    "name": "Kaharn Rüstung",
+    "file": "part_mpsy04upper"
+   },
+   {
+    "name": "Hellieng Rüstung",
+    "file": "part_mpsy05upper"
+   },
+   {
+    "name": "Uon Rüstung",
+    "file": "part_mele01upper"
+   },
+   {
+    "name": "Hyusein Rüstung",
+    "file": "part_mele04upper"
+   },
+   {
+    "name": "Phaharn Rüstung",
+    "file": "part_mele05upper"
+   },
+   {
+    "name": "Shamutra Rüstung",
+    "file": "part_mmerset01upper"
+   },
+   {
+    "name": "Rashadain Rüstung",
+    "file": "part_massset01upper"
+   },
+   {
+    "name": "Forgiel Rüstung",
+    "file": "part_mmagset01upper"
+   },
+   {
+    "name": "Rorend Rüstung",
+    "file": "part_macrset01upper"
+   },
+   {
+    "name": "Blue Sailor Rüstung",
+    "file": "part_mclosailor01suit"
+   },
+   {
+    "name": "Loker Sailor Rüstung",
+    "file": "part_mclosailor02suit"
+   },
+   {
+    "name": "Green Sailor Rüstung",
+    "file": "part_mclosailor03suit"
+   },
+   {
+    "name": "Forkim Sailor Rüstung",
+    "file": "part_mclosailor04suit"
+   },
+   {
+    "name": "Formal School Rüstung",
+    "file": "part_mclokakuran01suit"
+   },
+   {
+    "name": "Catseon Rüstung",
+    "file": "part_mclocatsuit01suit"
+   },
+   {
+    "name": "Baji Rüstung",
+    "file": "part_mclokorean01suit"
+   },
+   {
+    "name": "Santa Rüstung (M)",
+    "file": "part_mclosanta01suit"
+   },
+   {
+    "name": "Rudolph Rüstung (M)",
+    "file": "part_mclorudolf01suit"
+   },
+   {
+    "name": "Bruce Lee Rüstung",
+    "file": "part_mcloisho01suite"
+   },
+   {
+    "name": "Male Yukata",
+    "file": "part_mcloyukata01suit"
+   },
+   {
+    "name": "Dark Vader Rüstung (M)",
+    "file": "part_mdarthvaderupper"
+   },
+   {
+    "name": "Gray Tuxedo Rüstung (M)",
+    "file": "part_mclotuxedo01upper"
+   },
+   {
+    "name": "Black Tuxedo Rüstung (M)",
+    "file": "part_mclotuxedo02upper"
+   },
+   {
+    "name": "Brown Tuxedo Rüstung (M)",
+    "file": "part_mclotuxedo03upper"
+   },
+   {
+    "name": "Police Rüstung (M)",
+    "file": "part_mclopolice01upper"
+   },
+   {
+    "name": "Ninja Rüstung (M)",
+    "file": "part_mninja01upper"
+   },
+   {
+    "name": "Uniform EX Rüstung (M)",
+    "file": "part_mclouniformupper"
+   },
+   {
+    "name": "Spy Rüstung (M)",
+    "file": "part_mclospyupper"
+   },
+   {
+    "name": "Red Soccer Uniform (M)",
+    "file": "part_mclosoccer01upper"
+   },
+   {
+    "name": "White Soccer Uniform (M)",
+    "file": "part_mclosoccer02upper"
+   },
+   {
+    "name": "Blue Soccer Uniform (M)",
+    "file": "part_mclosoccer03upper"
+   },
+   {
+    "name": "Yukata 2006 (M)",
+    "file": "part_mcloyukata02suit"
+   },
+   {
+    "name": "2008 Yukata (M)",
+    "file": "part_mcloyukata03suit"
+   },
+   {
+    "name": "Swimwear (M)",
+    "file": "part_mcloswim01upper"
+   },
+   {
+    "name": "Green Beachwear (M)",
+    "file": "part_mcloswim02upper"
+   },
+   {
+    "name": "Red Beachwear (M)",
+    "file": "part_mcloswim03upper"
+   },
+   {
+    "name": "Black Diver Rüstung(M)",
+    "file": "part_mcloswim04upper"
+   },
+   {
+    "name": "Red Swimwear (M)",
+    "file": "part_mcloswim05upper"
+   },
+   {
+    "name": "Green Swimwear (M)",
+    "file": "part_mcloswim06upper"
+   },
+   {
+    "name": "Modern Black SwimRüstung(M)",
+    "file": "part_mcloswim07upper"
+   },
+   {
+    "name": "Beach SwimRüstung Green(M)",
+    "file": "part_mcloswim08upper"
+   },
+   {
+    "name": "School SwimRüstung (M)",
+    "file": "part_mcloswim09upper"
+   },
+   {
+    "name": "Skeleton Rüstung (M)",
+    "file": "part_mcloskull01upper"
+   },
+   {
+    "name": "Clown Rüstung (M)",
+    "file": "part_mcardgirlupper"
+   },
+   {
+    "name": "Superhero Rüstung (M)",
+    "file": "part_msuperman01upper"
+   },
+   {
+    "name": "Sinbad Rüstung (M)",
+    "file": "part_msinbad01upper"
+   },
+   {
+    "name": "Snowboarder Rüstung (M)",
+    "file": "part_msnowboarder01upper"
+   },
+   {
+    "name": "Snowman Rüstung (M)",
+    "file": "part_mclosnowman01upper"
+   },
+   {
+    "name": "Frog Rüstung (M)",
+    "file": "part_mclofrog01upper"
+   },
+   {
+    "name": "Lamb Rüstung (M)",
+    "file": "part_mclolamb01upper"
+   },
+   {
+    "name": "Teddy Bear Rüstung (M)",
+    "file": "part_mclobear01upper"
+   },
+   {
+    "name": "Bodyguard(M) Rüstung",
+    "file": "part_mclomeninblack01upper"
+   },
+   {
+    "name": "Samurai(M) Rüstung",
+    "file": "part_mclosamurai01upper"
+   },
+   {
+    "name": "Muaythai (M) Rüstung",
+    "file": "part_mclomuaythai01upper"
+   },
+   {
+    "name": "Pirate (M) Rüstung",
+    "file": "part_mclopirate01upper"
+   },
+   {
+    "name": "Vampire (M) Rüstung",
+    "file": "part_mclovampire01upper"
+   },
+   {
+    "name": "Kang shi (M) Rüstung",
+    "file": "part_mclocorpse01upper"
+   },
+   {
+    "name": "Royal Cook (M) Rüstung",
+    "file": "part_mclokorean03upper"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Blue Rüstung",
+    "file": "part_mcloguards01upper"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Red Rüstung",
+    "file": "part_mcloguards02upper"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Yellow Rüstung",
+    "file": "part_mcloguards03upper"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Green Rüstung",
+    "file": "part_mcloguards04upper"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Pink Rüstung",
+    "file": "part_mcloguards05upper"
+   },
+   {
+    "name": "Mummy (M) Rüstung",
+    "file": "part_mclomummy01upper"
+   },
+   {
+    "name": "Primitive (M) Rüstung",
+    "file": "part_mcloprimitive01upper"
+   },
+   {
+    "name": "Casual Rüstung(M)",
+    "file": "part_mclocasual01upper"
+   },
+   {
+    "name": "Hip-Hop Shirt and Pants(M)",
+    "file": "part_mclocasual02upper"
+   },
+   {
+    "name": "Wedding Tuxedo(M)",
+    "file": "part_mclowed01upper"
+   },
+   {
+    "name": "Yukata 2009 (M)",
+    "file": "part_mcloyukata04suit"
+   },
+   {
+    "name": "Martial artist Rüstung(M)",
+    "file": "part_mclomartial01upper"
+   },
+   {
+    "name": "Baseball Rüstung(M)",
+    "file": "part_mclobaseball01upper"
+   },
+   {
+    "name": "Kung Fu Rüstung(M)",
+    "file": "part_mclokungfu01upper"
+   },
+   {
+    "name": "Traditional German Rüstung (M)",
+    "file": "part_mclogerman01upper"
+   },
+   {
+    "name": "Cowboy Rüstung(M)",
+    "file": "part_mclocowboy01upper"
+   },
+   {
+    "name": "Traditional Thailand Rüstung (M)",
+    "file": "part_mclothailand01upper"
+   },
+   {
+    "name": "Traditional Philippines Rüstung (M)",
+    "file": "part_mclophilippines01upper"
+   },
+   {
+    "name": "Traditional Chile Rüstung (M)",
+    "file": "part_mclochile01upper"
+   },
+   {
+    "name": "Rabbit Outfit(M)",
+    "file": "part_mclorabbit03upper"
+   },
+   {
+    "name": "Panda Rüstung(M)",
+    "file": "part_mclopanda01upper"
+   },
+   {
+    "name": "Chipao Panda Rüstung(M)",
+    "file": "part_mclopanda02upper"
+   },
+   {
+    "name": "NFL Uniform(M)",
+    "file": "part_mclofootball01upper"
+   },
+   {
+    "name": "Bull\\'s Rüstung(M)",
+    "file": "part_mclobull01upper"
+   },
+   {
+    "name": "Chef Uniform(M)",
+    "file": "part_mclocook01upper"
+   },
+   {
+    "name": "Gothic Rüstung (M)",
+    "file": "part_mclogoth01upper"
+   },
+   {
+    "name": "SpaceRüstung Outfit(M)",
+    "file": "part_mcloastronaut01upper"
+   },
+   {
+    "name": "Big Bad Wolf Rüstung (M)",
+    "file": "part_mclofairytale01upper"
+   },
+   {
+    "name": "Traditional Native American Outfit (M)",
+    "file": "part_mcloindian01upper"
+   },
+   {
+    "name": "Yetti Rüstung(M)",
+    "file": "part_mcloyeti01upper"
+   },
+   {
+    "name": "Rüstung der Ehre (M)",
+    "file": "part_mmajestyupper"
+   },
+   {
+    "name": "Dragon Yukata (M)",
+    "file": "part_mcloyukata05suit"
+   },
+   {
+    "name": "Cyber Punk Outfit (M)",
+    "file": "part_mclostreetsmartupper"
+   },
+   {
+    "name": "Warlord Outfit (M)",
+    "file": "part_mclowarlordupper"
+   },
+   {
+    "name": "Skipper Outfit (M)",
+    "file": "part_mclocrusinupper"
+   },
+   {
+    "name": "Bathrobe (M)",
+    "file": "part_mcloshowerupper"
+   },
+   {
+    "name": "Space Cadet Uniform (M)",
+    "file": "part_mclouniform02upper"
+   },
+   {
+    "name": "FV-13 Power Armor Rüstung (M)",
+    "file": "part_mclosteelupper"
+   },
+   {
+    "name": "Detective Rüstung (M)",
+    "file": "part_mclodetectiveupper"
+   },
+   {
+    "name": "Sul Bim Tuxedo (M)",
+    "file": "part_mclokorean04upper"
+   },
+   {
+    "name": "Kai Rüstung(M)",
+    "file": "part_mclomartialart01upper"
+   },
+   {
+    "name": "Mad Hatter Rüstung (M)",
+    "file": "part_mclohatter01upper"
+   },
+   {
+    "name": "Leprechaun Rüstung (M)",
+    "file": "part_mcloleprechaun01upper"
+   }
+  ],
+  "hand": [
+   {
+    "name": "Cotton Handschuhe",
+    "file": "part_mvag01hand"
+   },
+   {
+    "name": "Pike Handschuhe",
+    "file": "part_mvag02hand"
+   },
+   {
+    "name": "Iner Handschuhe",
+    "file": "part_mvag03hand"
+   },
+   {
+    "name": "Petal Handschuhe",
+    "file": "part_mmer01hand"
+   },
+   {
+    "name": "Slepint Handschuhe",
+    "file": "part_macr01hand"
+   },
+   {
+    "name": "Sardine Handschuhe",
+    "file": "part_mass01hand"
+   },
+   {
+    "name": "Seer Handschuhe",
+    "file": "part_mmag01hand"
+   },
+   {
+    "name": "Comet Handschuhe",
+    "file": "part_mmer03hand"
+   },
+   {
+    "name": "Layered Handschuhe",
+    "file": "part_macr03hand"
+   },
+   {
+    "name": "Talin Handschuhe",
+    "file": "part_mass03hand"
+   },
+   {
+    "name": "Sorain Handschuhe",
+    "file": "part_mmag03hand"
+   },
+   {
+    "name": "Panggril Handschuhe",
+    "file": "part_mmer04hand"
+   },
+   {
+    "name": "Cruiser Handschuhe",
+    "file": "part_macr04hand"
+   },
+   {
+    "name": "Wedge Handschuhe",
+    "file": "part_mass04hand"
+   },
+   {
+    "name": "Teba Handschuhe",
+    "file": "part_mmag04hand"
+   },
+   {
+    "name": "Recorn Handschuhe",
+    "file": "part_mmer05hand"
+   },
+   {
+    "name": "Rebron Handschuhe",
+    "file": "part_macr05hand"
+   },
+   {
+    "name": "Shurand Handschuhe",
+    "file": "part_mass05hand"
+   },
+   {
+    "name": "Ahes Handschuhe",
+    "file": "part_mmag05hand"
+   },
+   {
+    "name": "Warpon Handschuhe",
+    "file": "part_mkin02hand"
+   },
+   {
+    "name": "Wees Handschuhe",
+    "file": "part_mkin03hand"
+   },
+   {
+    "name": "Ectro Handschuhe",
+    "file": "part_mkinset04hand"
+   },
+   {
+    "name": "Einy Handschuhe",
+    "file": "part_mbla02hand"
+   },
+   {
+    "name": "Dayst Handschuhe",
+    "file": "part_mbla03hand"
+   },
+   {
+    "name": "Hanes Handschuhe",
+    "file": "part_mblaset04hand"
+   },
+   {
+    "name": "Katria Guantlet",
+    "file": "part_mjst02hand"
+   },
+   {
+    "name": "Restra Handschuhe",
+    "file": "part_mjst03hand"
+   },
+   {
+    "name": "Neis Handschuhe",
+    "file": "part_mjstset04hand"
+   },
+   {
+    "name": "Oska Handschuhe",
+    "file": "part_mrag02hand"
+   },
+   {
+    "name": "Asren Handschuhe",
+    "file": "part_mrag03hand"
+   },
+   {
+    "name": "Tyrent Handschuhe",
+    "file": "part_mragset04hand"
+   },
+   {
+    "name": "Pact Handschuhe",
+    "file": "part_mrin02hand"
+   },
+   {
+    "name": "Shupon Handschuhe",
+    "file": "part_mrin03hand"
+   },
+   {
+    "name": "Navil Handschuhe",
+    "file": "part_mrinset04hand"
+   },
+   {
+    "name": "Alext Handschuhe",
+    "file": "part_mbil02hand"
+   },
+   {
+    "name": "Akent Handschuhe",
+    "file": "part_mbil03hand"
+   },
+   {
+    "name": "Rody Handschuhe",
+    "file": "part_mbilset04hand"
+   },
+   {
+    "name": "Ropang Handschuhe",
+    "file": "part_mpsy02hand"
+   },
+   {
+    "name": "Geniun Handschuhe",
+    "file": "part_mpsy03hand"
+   },
+   {
+    "name": "Mekatro Handschuhe",
+    "file": "part_mpsyset04hand"
+   },
+   {
+    "name": "Myuran Handschuhe",
+    "file": "part_mele02hand"
+   },
+   {
+    "name": "Elder Handschuhe",
+    "file": "part_mele03hand"
+   },
+   {
+    "name": "Shabel Handschuhe",
+    "file": "part_meleset04hand"
+   },
+   {
+    "name": "Knighert Handschuhe",
+    "file": "part_mkinset03hand"
+   },
+   {
+    "name": "Blain Handschuhe",
+    "file": "part_mblaset03hand"
+   },
+   {
+    "name": "Jesis Handschuhe",
+    "file": "part_mjstset03hand"
+   },
+   {
+    "name": "Ranerz Handschuhe",
+    "file": "part_mragset03hand"
+   },
+   {
+    "name": "Rimyth Handschuhe",
+    "file": "part_mrinset03hand"
+   },
+   {
+    "name": "Billst Handschuhe",
+    "file": "part_mbilset03hand"
+   },
+   {
+    "name": "Psykon Handschuhe",
+    "file": "part_mpsyset03hand"
+   },
+   {
+    "name": "Ellis Handschuhe",
+    "file": "part_meleset03hand"
+   },
+   {
+    "name": "Cruentus Handschuhe (M)",
+    "file": "part_mkinset05hand"
+   },
+   {
+    "name": "Noctis Handschuhe (M)",
+    "file": "part_mblaset05hand"
+   },
+   {
+    "name": "Velox Handschuhe (M)",
+    "file": "part_mjstset05hand"
+   },
+   {
+    "name": "Acer Handschuhe (M)",
+    "file": "part_mragset05hand"
+   },
+   {
+    "name": "Revenio Handschuhe (M)",
+    "file": "part_mrinset05hand"
+   },
+   {
+    "name": "Grim Handschuhe (M)",
+    "file": "part_mbilset05hand"
+   },
+   {
+    "name": "Twilight Handschuhe (M)",
+    "file": "part_mpsyset05hand"
+   },
+   {
+    "name": "Nanemvis Handschuhe (M)",
+    "file": "part_meleset05hand"
+   },
+   {
+    "name": "Bileire Handschuhe (M)",
+    "file": "part_mkinset06hand"
+   },
+   {
+    "name": "Heraud Handschuhe (M)",
+    "file": "part_mblaset06hand"
+   },
+   {
+    "name": "Curio Handschuhe (M)",
+    "file": "part_mjstset06hand"
+   },
+   {
+    "name": "Hainure Handschuhe (M)",
+    "file": "part_mragset06hand"
+   },
+   {
+    "name": "Reine Handschuhe (M)",
+    "file": "part_mrinset06hand"
+   },
+   {
+    "name": "Roenier Handschuhe (M)",
+    "file": "part_mbilset06hand"
+   },
+   {
+    "name": "Reffiro Handschuhe (M)",
+    "file": "part_mpsyset06hand"
+   },
+   {
+    "name": "Lippin Handschuhe (M)",
+    "file": "part_meleset06hand"
+   },
+   {
+    "name": "Fortune Handschuhe",
+    "file": "part_mmer02hand"
+   },
+   {
+    "name": "Koon Handschuhe",
+    "file": "part_mmer06hand"
+   },
+   {
+    "name": "Hodr Handschuhe",
+    "file": "part_mmer07hand"
+   },
+   {
+    "name": "Keimay Handschuhe",
+    "file": "part_mkin01hand"
+   },
+   {
+    "name": "Revantu Handschuhe",
+    "file": "part_mkin04hand"
+   },
+   {
+    "name": "Gricky Handschuhe",
+    "file": "part_mkin05hand"
+   },
+   {
+    "name": "Darkbin Handschuhe",
+    "file": "part_mbla01hand"
+   },
+   {
+    "name": "Huedom Handschuhe",
+    "file": "part_mbla04hand"
+   },
+   {
+    "name": "Labon Handschuhe",
+    "file": "part_mbla05hand"
+   },
+   {
+    "name": "Vilet Handschuhe",
+    "file": "part_macr02hand"
+   },
+   {
+    "name": "Touflak Handschuhe",
+    "file": "part_macr06hand"
+   },
+   {
+    "name": "Silven Handschuhe",
+    "file": "part_macr07hand"
+   },
+   {
+    "name": "Henen Handschuhe",
+    "file": "part_mjst01hand"
+   },
+   {
+    "name": "Decasron Handschuhe",
+    "file": "part_mjst04hand"
+   },
+   {
+    "name": "Claien Handschuhe",
+    "file": "part_mjst05hand"
+   },
+   {
+    "name": "Grantus Handschuhe",
+    "file": "part_mrag01hand"
+   },
+   {
+    "name": "Mithril Handschuhe",
+    "file": "part_mrag04hand"
+   },
+   {
+    "name": "Branto Handschuhe",
+    "file": "part_mrag05hand"
+   },
+   {
+    "name": "Gale Handschuhe",
+    "file": "part_mass02hand"
+   },
+   {
+    "name": "Beok Handschuhe",
+    "file": "part_mass06hand"
+   },
+   {
+    "name": "Dian Handschuhe",
+    "file": "part_mass07hand"
+   },
+   {
+    "name": "Mectic Handschuhe",
+    "file": "part_mrin01hand"
+   },
+   {
+    "name": "Lordyin Handschuhe",
+    "file": "part_mrin04hand"
+   },
+   {
+    "name": "Venopy Handschuhe",
+    "file": "part_mrin05hand"
+   },
+   {
+    "name": "Oriene Handschuhe",
+    "file": "part_mbil01hand"
+   },
+   {
+    "name": "Snaic Handschuhe",
+    "file": "part_mbil04hand"
+   },
+   {
+    "name": "Hanei Handschuhe",
+    "file": "part_mbil05hand"
+   },
+   {
+    "name": "Shuffle Handschuhe",
+    "file": "part_mmag02hand"
+   },
+   {
+    "name": "Hagal Handschuhe",
+    "file": "part_mmag06hand"
+   },
+   {
+    "name": "Maclir Handschuhe",
+    "file": "part_mmag07hand"
+   },
+   {
+    "name": "Rendaic Handschuhe",
+    "file": "part_mpsy01hand"
+   },
+   {
+    "name": "Kaharn Handschuhe",
+    "file": "part_mpsy04hand"
+   },
+   {
+    "name": "Hellieng Handschuhe",
+    "file": "part_mpsy05hand"
+   },
+   {
+    "name": "Uon Handschuhe",
+    "file": "part_mele01hand"
+   },
+   {
+    "name": "Hyusein Handschuhe",
+    "file": "part_mele04hand"
+   },
+   {
+    "name": "Phaharn Handschuhe",
+    "file": "part_mele05hand"
+   },
+   {
+    "name": "Shamutra Handschuhe",
+    "file": "part_mmerset01hand"
+   },
+   {
+    "name": "Rashadain Handschuhe",
+    "file": "part_massset01hand"
+   },
+   {
+    "name": "Forgiel Handschuhe",
+    "file": "part_mmagset01hand"
+   },
+   {
+    "name": "Rorend Handschuhe",
+    "file": "part_macrset01hand"
+   },
+   {
+    "name": "Formal School Gloves",
+    "file": "part_mclokakuran01gloves"
+   },
+   {
+    "name": "Catseon Gloves",
+    "file": "part_mclocatsuit01gloves"
+   },
+   {
+    "name": "Santa Gloves (M)",
+    "file": "part_mclosanta01gloves"
+   },
+   {
+    "name": "Rudolph Gloves (M)",
+    "file": "part_mclorudolf01gloves"
+   },
+   {
+    "name": "Dark Vader Gloves (M)",
+    "file": "part_mdarthvaderhand"
+   },
+   {
+    "name": "Tuxedo Gloves (M)",
+    "file": "part_mclotuxedo01hand"
+   },
+   {
+    "name": "Black Tuxedo Gloves (M)",
+    "file": "part_mclotuxedo02hand"
+   },
+   {
+    "name": "Brown Tuxedo Gloves (M)",
+    "file": "part_mclotuxedo03hand"
+   },
+   {
+    "name": "Police Gloves (M)",
+    "file": "part_mclopolice01hand"
+   },
+   {
+    "name": "Ninja Gloves (M)",
+    "file": "part_mninja01hand"
+   },
+   {
+    "name": "Uniform EX Gloves (M)",
+    "file": "part_mclouniformhand"
+   },
+   {
+    "name": "Spy Gloves (M)",
+    "file": "part_mclospyhand"
+   },
+   {
+    "name": "Modern Hands(M)",
+    "file": "part_mcloswim07hand"
+   },
+   {
+    "name": "Hands(M)",
+    "file": "part_mcloswim08hand"
+   },
+   {
+    "name": "School SwimRüstung Hand (M)",
+    "file": "part_mcloswim09hand"
+   },
+   {
+    "name": "Skeleton Gloves (M)",
+    "file": "part_mcloskull01hand"
+   },
+   {
+    "name": "Superhero Gloves (M)",
+    "file": "part_msuperman01hand"
+   },
+   {
+    "name": "Snowboarder Gloves (M)",
+    "file": "part_msnowboarder01hand"
+   },
+   {
+    "name": "Snowman Gloves (M)",
+    "file": "part_mclosnowman01hand"
+   },
+   {
+    "name": "Frog Gloves (M)",
+    "file": "part_mclofrog01hand"
+   },
+   {
+    "name": "Lamb Gloves (M)",
+    "file": "part_mclolamb01hand"
+   },
+   {
+    "name": "Teddy Bear Gloves (M)",
+    "file": "part_mclobear01hand"
+   },
+   {
+    "name": "Samurai(M) Gloves",
+    "file": "part_mclosamurai01hand"
+   },
+   {
+    "name": "Muaythai (M) Gloves",
+    "file": "part_mclomuaythai01hand"
+   },
+   {
+    "name": "Vampire (M) Gloves",
+    "file": "part_mclovampire01hand"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Blue Gloves",
+    "file": "part_mcloguards01hand"
+   },
+   {
+    "name": "Mummy (M) Gloves",
+    "file": "part_mclomummy01hand"
+   },
+   {
+    "name": "Casual gloves(M)",
+    "file": "part_mclocasual01hand"
+   },
+   {
+    "name": "Hiphop Gloves(M)",
+    "file": "part_mclocasual02hand"
+   },
+   {
+    "name": "Wedding Ring(M)",
+    "file": "part_mclowed01hand"
+   },
+   {
+    "name": "Hands (M)",
+    "file": "part_mcloyukata04hand"
+   },
+   {
+    "name": "Martial artist Gloves(M)",
+    "file": "part_mclomartial01hand"
+   },
+   {
+    "name": "Baseball Gloves(M)",
+    "file": "part_mclobaseball01hand"
+   },
+   {
+    "name": "Kung Fu Hands(M)",
+    "file": "part_mclokungfu01hand"
+   },
+   {
+    "name": "Traditional German Hands (M)",
+    "file": "part_mclogerman01hand"
+   },
+   {
+    "name": "Cowboy Gloves(M)",
+    "file": "part_mclocowboy01hand"
+   },
+   {
+    "name": "Traditional Thailand Gloves (M)",
+    "file": "part_mclothailand01hand"
+   },
+   {
+    "name": "Traditional Philippines Gloves (M)",
+    "file": "part_mclophilippines01hand"
+   },
+   {
+    "name": "Traditional Chile Hand (M)",
+    "file": "part_mclochile01hand"
+   },
+   {
+    "name": "Rabbit Hand(M)",
+    "file": "part_mclorabbit03hand"
+   },
+   {
+    "name": "Panda Gloves(M)",
+    "file": "part_mclopanda01hand"
+   },
+   {
+    "name": "Chipao Panda Gloves(M)",
+    "file": "part_mclopanda02hand"
+   },
+   {
+    "name": "NFL Gloves(M)",
+    "file": "part_mclofootball01hand"
+   },
+   {
+    "name": "Bull\\'s Glove(M)",
+    "file": "part_mclobull01hand"
+   },
+   {
+    "name": "Chef Gloves(M)",
+    "file": "part_mclocook01hand"
+   },
+   {
+    "name": "Gothic Gloves (M)",
+    "file": "part_mclogoth01hand"
+   },
+   {
+    "name": "SpaceRüstung Gloves(M)",
+    "file": "part_mcloastronaut01hand"
+   },
+   {
+    "name": "Big Bad Wolf Claws (M)",
+    "file": "part_mclofairytale01hand"
+   },
+   {
+    "name": "Traditional Native American Gloves (M)",
+    "file": "part_mcloindian01hand"
+   },
+   {
+    "name": "Yetti Gloves(M)",
+    "file": "part_mcloyeti01hand"
+   },
+   {
+    "name": "Handschuhe der Ehre (M)",
+    "file": "part_mmajestyhand"
+   },
+   {
+    "name": "Cat Punch (White)",
+    "file": "part_mclocatpunch01"
+   },
+   {
+    "name": "Dragon Yukata Hands (M)",
+    "file": "part_mcloyukata05hand"
+   },
+   {
+    "name": "Cyber Punk Gloves (M)",
+    "file": "part_mclostreetsmarthand"
+   },
+   {
+    "name": "Warlord Gloves (M)",
+    "file": "part_mclowarlordhand"
+   },
+   {
+    "name": "Skipper Gloves (M)",
+    "file": "part_mclocrusinhand"
+   },
+   {
+    "name": "Hands (M)",
+    "file": "part_mclouniform02hand"
+   },
+   {
+    "name": "FV-13 Power Armor Gloves (M)",
+    "file": "part_mclosteelhand"
+   },
+   {
+    "name": "Detective Hands (M)",
+    "file": "part_mclodetectivehand"
+   },
+   {
+    "name": "Sul Bim Gloves (M)",
+    "file": "part_mclokorean04hand"
+   },
+   {
+    "name": "Kai Gloves(M)",
+    "file": "part_mclomartialart01hand"
+   },
+   {
+    "name": "Mad Hatter Gloves (M)",
+    "file": "part_mclohatter01hand"
+   },
+   {
+    "name": "Leprechaun Gloves (M)",
+    "file": "part_mcloleprechaun01hand"
+   }
+  ],
+  "foot": [
+   {
+    "name": "Cotton Stiefel",
+    "file": "part_mvag01foot"
+   },
+   {
+    "name": "Pike Stiefel",
+    "file": "part_mvag02foot"
+   },
+   {
+    "name": "Iner Stiefel",
+    "file": "part_mvag03foot"
+   },
+   {
+    "name": "Petal Stiefel",
+    "file": "part_mmer01foot"
+   },
+   {
+    "name": "Slepint Stiefel",
+    "file": "part_macr01foot"
+   },
+   {
+    "name": "Sardine Stiefel",
+    "file": "part_mass01foot"
+   },
+   {
+    "name": "Seer Stiefel",
+    "file": "part_mmag01foot"
+   },
+   {
+    "name": "Comet Stiefel",
+    "file": "part_mmer03foot"
+   },
+   {
+    "name": "Layered Stiefel",
+    "file": "part_macr03foot"
+   },
+   {
+    "name": "Talin Stiefel",
+    "file": "part_mass03foot"
+   },
+   {
+    "name": "Sorain Stiefel",
+    "file": "part_mmag03foot"
+   },
+   {
+    "name": "Panggril Stiefel",
+    "file": "part_mmer04foot"
+   },
+   {
+    "name": "Cruiser Stiefel",
+    "file": "part_macr04foot"
+   },
+   {
+    "name": "Wedge Stiefel",
+    "file": "part_mass04foot"
+   },
+   {
+    "name": "Teba Stiefel",
+    "file": "part_mmag04foot"
+   },
+   {
+    "name": "Recorn Stiefel",
+    "file": "part_mmer05foot"
+   },
+   {
+    "name": "Rebron Stiefel",
+    "file": "part_macr05foot"
+   },
+   {
+    "name": "Shurand Stiefel",
+    "file": "part_mass05foot"
+   },
+   {
+    "name": "Ahes Stiefel",
+    "file": "part_mmag05foot"
+   },
+   {
+    "name": "Warpon Stiefel",
+    "file": "part_mkin02foot"
+   },
+   {
+    "name": "Wees Stiefel",
+    "file": "part_mkin03foot"
+   },
+   {
+    "name": "Ectro Stiefel",
+    "file": "part_mkinset04foot"
+   },
+   {
+    "name": "Einy Stiefel",
+    "file": "part_mbla02foot"
+   },
+   {
+    "name": "Dayst Stiefel",
+    "file": "part_mbla03foot"
+   },
+   {
+    "name": "Hanes Stiefel",
+    "file": "part_mblaset04foot"
+   },
+   {
+    "name": "Katria Stiefel",
+    "file": "part_mjst02foot"
+   },
+   {
+    "name": "Restra Stiefel",
+    "file": "part_mjst03foot"
+   },
+   {
+    "name": "Neis Stiefel",
+    "file": "part_mjstset04foot"
+   },
+   {
+    "name": "Oska Stiefel",
+    "file": "part_mrag02foot"
+   },
+   {
+    "name": "Asren Stiefel",
+    "file": "part_mrag03foot"
+   },
+   {
+    "name": "Tyrent Stiefel",
+    "file": "part_mragset04foot"
+   },
+   {
+    "name": "Pact Stiefel",
+    "file": "part_mrin02foot"
+   },
+   {
+    "name": "Shupon Stiefel",
+    "file": "part_mrin03foot"
+   },
+   {
+    "name": "Navil Stiefel",
+    "file": "part_mrinset04foot"
+   },
+   {
+    "name": "Alext Stiefel",
+    "file": "part_mbil02foot"
+   },
+   {
+    "name": "Akent Stiefel",
+    "file": "part_mbil03foot"
+   },
+   {
+    "name": "Rody Stiefel",
+    "file": "part_mbilset04foot"
+   },
+   {
+    "name": "Ropang Stiefel",
+    "file": "part_mpsy02foot"
+   },
+   {
+    "name": "Geniun Stiefel",
+    "file": "part_mpsy03foot"
+   },
+   {
+    "name": "Mekatro Stiefel",
+    "file": "part_mpsyset04foot"
+   },
+   {
+    "name": "Myuran Stiefel",
+    "file": "part_mele02foot"
+   },
+   {
+    "name": "Elder Stiefel",
+    "file": "part_mele03foot"
+   },
+   {
+    "name": "Shabel Stiefel",
+    "file": "part_meleset04foot"
+   },
+   {
+    "name": "Knighert Stiefel",
+    "file": "part_mkinset03foot"
+   },
+   {
+    "name": "Blain Stiefel",
+    "file": "part_mblaset03foot"
+   },
+   {
+    "name": "Jesis Stiefel",
+    "file": "part_mjstset03foot"
+   },
+   {
+    "name": "Ranerz Stiefel",
+    "file": "part_mragset03foot"
+   },
+   {
+    "name": "Rimyth Stiefel",
+    "file": "part_mrinset03foot"
+   },
+   {
+    "name": "Billst Stiefel",
+    "file": "part_mbilset03foot"
+   },
+   {
+    "name": "Psykon Stiefel",
+    "file": "part_mpsyset03foot"
+   },
+   {
+    "name": "Ellis Stiefel",
+    "file": "part_meleset03foot"
+   },
+   {
+    "name": "Cruentus Stiefel (M)",
+    "file": "part_mkinset05foot"
+   },
+   {
+    "name": "Noctis Stiefel (M)",
+    "file": "part_mblaset05foot"
+   },
+   {
+    "name": "Velox Stiefel (M)",
+    "file": "part_mjstset05foot"
+   },
+   {
+    "name": "Acer Stiefel (M)",
+    "file": "part_mragset05foot"
+   },
+   {
+    "name": "Revenio Stiefel (M)",
+    "file": "part_mrinset05foot"
+   },
+   {
+    "name": "Grim Stiefel (M)",
+    "file": "part_mbilset05foot"
+   },
+   {
+    "name": "Twilight Stiefel (M)",
+    "file": "part_mpsyset05foot"
+   },
+   {
+    "name": "Nanemvis Stiefel (M)",
+    "file": "part_meleset05foot"
+   },
+   {
+    "name": "Bileire Stiefel (M)",
+    "file": "part_mkinset06foot"
+   },
+   {
+    "name": "Heraud Stiefel (M)",
+    "file": "part_mblaset06foot"
+   },
+   {
+    "name": "Curio Stiefel (M)",
+    "file": "part_mjstset06foot"
+   },
+   {
+    "name": "Hainure Stiefel (M)",
+    "file": "part_mragset06foot"
+   },
+   {
+    "name": "Reine Stiefel (M)",
+    "file": "part_mrinset06foot"
+   },
+   {
+    "name": "Roenier Stiefel (M)",
+    "file": "part_mbilset06foot"
+   },
+   {
+    "name": "Reffiro Stiefel (M)",
+    "file": "part_mpsyset06foot"
+   },
+   {
+    "name": "Lippin Stiefel (M)",
+    "file": "part_meleset06foot"
+   },
+   {
+    "name": "Fortune Stiefel",
+    "file": "part_mmer02foot"
+   },
+   {
+    "name": "Koon Stiefel",
+    "file": "part_mmer06foot"
+   },
+   {
+    "name": "Hodr Stiefel",
+    "file": "part_mmer07foot"
+   },
+   {
+    "name": "Keimay Stiefel",
+    "file": "part_mkin01foot"
+   },
+   {
+    "name": "Revantu Stiefel",
+    "file": "part_mkin04foot"
+   },
+   {
+    "name": "Gricky Stiefel",
+    "file": "part_mkin05foot"
+   },
+   {
+    "name": "Darkbin Stiefel",
+    "file": "part_mbla01foot"
+   },
+   {
+    "name": "Huedom Stiefel",
+    "file": "part_mbla04foot"
+   },
+   {
+    "name": "Labon Stiefel",
+    "file": "part_mbla05foot"
+   },
+   {
+    "name": "Vilet Stiefel",
+    "file": "part_macr02foot"
+   },
+   {
+    "name": "Touflak Stiefel",
+    "file": "part_macr06foot"
+   },
+   {
+    "name": "Silven Stiefel",
+    "file": "part_macr07foot"
+   },
+   {
+    "name": "Henen Stiefel",
+    "file": "part_mjst01foot"
+   },
+   {
+    "name": "Decasron Stiefel",
+    "file": "part_mjst04foot"
+   },
+   {
+    "name": "Claien Stiefel",
+    "file": "part_mjst05foot"
+   },
+   {
+    "name": "Grantus Stiefel",
+    "file": "part_mrag01foot"
+   },
+   {
+    "name": "Mithril Stiefel",
+    "file": "part_mrag04foot"
+   },
+   {
+    "name": "Branto Stiefel",
+    "file": "part_mrag05foot"
+   },
+   {
+    "name": "Gale Stiefel",
+    "file": "part_mass02foot"
+   },
+   {
+    "name": "Beok Stiefel",
+    "file": "part_mass06foot"
+   },
+   {
+    "name": "Dian Stiefel",
+    "file": "part_mass07foot"
+   },
+   {
+    "name": "Mectic Stiefel",
+    "file": "part_mrin01foot"
+   },
+   {
+    "name": "Lordyin Stiefel",
+    "file": "part_mrin04foot"
+   },
+   {
+    "name": "Venopy Stiefel",
+    "file": "part_mrin05foot"
+   },
+   {
+    "name": "Oriene Stiefel",
+    "file": "part_mbil01foot"
+   },
+   {
+    "name": "Snaic Stiefel",
+    "file": "part_mbil04foot"
+   },
+   {
+    "name": "Hanei Stiefel",
+    "file": "part_mbil05foot"
+   },
+   {
+    "name": "Shuffle Stiefel",
+    "file": "part_mmag02foot"
+   },
+   {
+    "name": "Hagal Stiefel",
+    "file": "part_mmag06foot"
+   },
+   {
+    "name": "Maclir Stiefel",
+    "file": "part_mmag07foot"
+   },
+   {
+    "name": "Rendaic Stiefel",
+    "file": "part_mpsy01foot"
+   },
+   {
+    "name": "Kaharn Stiefel",
+    "file": "part_mpsy04foot"
+   },
+   {
+    "name": "Hellieng Stiefel",
+    "file": "part_mpsy05foot"
+   },
+   {
+    "name": "Uon Stiefel",
+    "file": "part_mele01foot"
+   },
+   {
+    "name": "Hyusein Stiefel",
+    "file": "part_mele04foot"
+   },
+   {
+    "name": "Phaharn Stiefel",
+    "file": "part_mele05foot"
+   },
+   {
+    "name": "Shamutra Stiefel",
+    "file": "part_mmerset01foot"
+   },
+   {
+    "name": "Rashadain Stiefel",
+    "file": "part_massset01foot"
+   },
+   {
+    "name": "Forgiel Stiefel",
+    "file": "part_mmagset01foot"
+   },
+   {
+    "name": "Rorend Stiefel",
+    "file": "part_macrset01foot"
+   },
+   {
+    "name": "Blue Sailor Shoes",
+    "file": "part_mclosailor01shoes"
+   },
+   {
+    "name": "Loker Sailor Shoes",
+    "file": "part_mclosailor02shoes"
+   },
+   {
+    "name": "Green Sailor Shoes",
+    "file": "part_mclosailor03shoes"
+   },
+   {
+    "name": "Forkim Sailor Shoes",
+    "file": "part_mclosailor04shoes"
+   },
+   {
+    "name": "Formal School Shoes",
+    "file": "part_mclokakuran01shoes"
+   },
+   {
+    "name": "Catseon Shoes",
+    "file": "part_mclocatsuit01shoes"
+   },
+   {
+    "name": "Baji Shoes",
+    "file": "part_mclokorean01shoes"
+   },
+   {
+    "name": "Warm Slippers",
+    "file": "part_mshowarmsl-01"
+   },
+   {
+    "name": "Santa Shoes (M)",
+    "file": "part_mclosanta01shoes"
+   },
+   {
+    "name": "Rudolph Shoes (M)",
+    "file": "part_mclorudolf01shoes"
+   },
+   {
+    "name": "Martial Arts Shoes",
+    "file": "part_mcloisho01boots"
+   },
+   {
+    "name": "Male Zouri",
+    "file": "part_mcloyukata01shoes"
+   },
+   {
+    "name": "Dark Vader Shoes (M)",
+    "file": "part_mdarthvaderfoot"
+   },
+   {
+    "name": "Gray Tuxedo Shoes (M)",
+    "file": "part_mclotuxedo01foot"
+   },
+   {
+    "name": "Black Tuxedo shoes (M)",
+    "file": "part_mclotuxedo02foot"
+   },
+   {
+    "name": "Brown Tuxedo Shoes (M)",
+    "file": "part_mclotuxedo03foot"
+   },
+   {
+    "name": "Police Shoes (M)",
+    "file": "part_mclopolice01foot"
+   },
+   {
+    "name": "Ninja Shoes (M)",
+    "file": "part_mninja01foot"
+   },
+   {
+    "name": "Uniform EX Shoes (M)",
+    "file": "part_mclouniformfoot"
+   },
+   {
+    "name": "Spy Shoes (M)",
+    "file": "part_mclospyfoot"
+   },
+   {
+    "name": "Blue Soccer Shoes (M)",
+    "file": "part_mclosoccer01foot"
+   },
+   {
+    "name": "Red Soccer Shoes (M)",
+    "file": "part_mclosoccer02foot"
+   },
+   {
+    "name": "White Soccer Shoes (M)",
+    "file": "part_mclosoccer03foot"
+   },
+   {
+    "name": "Geta 2006 (M)",
+    "file": "part_mcloyukata02shoes"
+   },
+   {
+    "name": "Geta 2008 (M)",
+    "file": "part_mcloyukata03shoes"
+   },
+   {
+    "name": "Slipper (M)",
+    "file": "part_mcloswim01foot"
+   },
+   {
+    "name": "Green Summer Sneakers (M)",
+    "file": "part_mcloswim02foot"
+   },
+   {
+    "name": "Red Summer Sneakers (M)",
+    "file": "part_mcloswim03foot"
+   },
+   {
+    "name": "Black Diver Flipers (M)",
+    "file": "part_mcloswim04foot"
+   },
+   {
+    "name": "Red Beach Shoes (M)",
+    "file": "part_mcloswim05foot"
+   },
+   {
+    "name": "Green Beach Shoes (M)",
+    "file": "part_mcloswim06foot"
+   },
+   {
+    "name": "Modern Aqua Shoes(M)",
+    "file": "part_mcloswim07foot"
+   },
+   {
+    "name": "Brown Sandal(M)",
+    "file": "part_mcloswim08foot"
+   },
+   {
+    "name": "Kid\\'s sandal (M)",
+    "file": "part_mcloswim09foot"
+   },
+   {
+    "name": "Skeleton Shoes (M)",
+    "file": "part_mcloskull01foot"
+   },
+   {
+    "name": "Clown Shoes (M)",
+    "file": "part_mcardgirlfoot"
+   },
+   {
+    "name": "Superhero Shoes (M)",
+    "file": "part_msuperman01foot"
+   },
+   {
+    "name": "Sinbad Shoes (M)",
+    "file": "part_msinbad01foot"
+   },
+   {
+    "name": "Snowboarder Shoes (M)",
+    "file": "part_msnowboarder01boots"
+   },
+   {
+    "name": "Snowman Shoes (M)",
+    "file": "part_mclosnowman01foot"
+   },
+   {
+    "name": "Frog Shoes (M)",
+    "file": "part_mclofrog01foot"
+   },
+   {
+    "name": "Lamb Shoes (M)",
+    "file": "part_mclolamb01foot"
+   },
+   {
+    "name": "Teddy Bear Shoes (M)",
+    "file": "part_mclobear01foot"
+   },
+   {
+    "name": "Bodyguard(M) Shoes",
+    "file": "part_mclomeninblack01foot"
+   },
+   {
+    "name": "Samurai(M) Shoes",
+    "file": "part_mclosamurai01foot"
+   },
+   {
+    "name": "Muaythai (M) Shoes",
+    "file": "part_mclomuaythai01foot"
+   },
+   {
+    "name": "Pirate (M) Shoes",
+    "file": "part_mclopirate01foot"
+   },
+   {
+    "name": "Vampire (M) Shoes",
+    "file": "part_mclovampire01foot"
+   },
+   {
+    "name": "Kang shi (M) Shoes",
+    "file": "part_mclocorpse01foot"
+   },
+   {
+    "name": "Royal Cook (M) Shoes",
+    "file": "part_mclokorean03foot"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Blue Stiefel",
+    "file": "part_mcloguards01foot"
+   },
+   {
+    "name": "Mummy (M) Shoes",
+    "file": "part_mclomummy01foot"
+   },
+   {
+    "name": "Primitive (M) Shoes",
+    "file": "part_mcloprimitive01foot"
+   },
+   {
+    "name": "Casual shoes(M) ",
+    "file": "part_mclocasual01foot"
+   },
+   {
+    "name": "Hip-Hop Sneakers(M)",
+    "file": "part_mclocasual02foot"
+   },
+   {
+    "name": "Wedding Shoes(M)",
+    "file": "part_mclowed01foot"
+   },
+   {
+    "name": "Geta 2009 (M)",
+    "file": "part_mcloyukata04shoes"
+   },
+   {
+    "name": "Martial artist Shoes(M)",
+    "file": "part_mclomartial01foot"
+   },
+   {
+    "name": "Baseball Shoes(M)",
+    "file": "part_mclobaseball01foot"
+   },
+   {
+    "name": "Kung Fu Feet(M)",
+    "file": "part_mclokungfu01foot"
+   },
+   {
+    "name": "Traditional German Shoes (M)",
+    "file": "part_mclogerman01foot"
+   },
+   {
+    "name": "Cowboy Shoes(M)",
+    "file": "part_mclocowboy01foot"
+   },
+   {
+    "name": "Traditional Thailand Shoes (M)",
+    "file": "part_mclothailand01foot"
+   },
+   {
+    "name": "Traditional Philippines Shoes (M)",
+    "file": "part_mclophilippines01foot"
+   },
+   {
+    "name": "Traditional Chile Shoes (M)",
+    "file": "part_mclochile01foot"
+   },
+   {
+    "name": "Rabbit Shoes (M)",
+    "file": "part_mclorabbit03foot"
+   },
+   {
+    "name": "Panda Shoes(M)",
+    "file": "part_mclopanda01foot"
+   },
+   {
+    "name": "Chipao Panda Shoes(M)",
+    "file": "part_mclopanda02foot"
+   },
+   {
+    "name": "NFL Shoes(M)",
+    "file": "part_mclofootball01foot"
+   },
+   {
+    "name": "Bulls\\'s Shoes(M)",
+    "file": "part_mclobull01foot"
+   },
+   {
+    "name": "Chef Shoes(M)",
+    "file": "part_mclocook01foot"
+   },
+   {
+    "name": "Gothic Shoes (M)",
+    "file": "part_mclogoth01foot"
+   },
+   {
+    "name": "SpaceRüstung Shoes(M)",
+    "file": "part_mcloastronaut01foot"
+   },
+   {
+    "name": "Big Bad Wolf Shoes (M)",
+    "file": "part_mclofairytale01foot"
+   },
+   {
+    "name": "Traditional Native American Footwear (M)",
+    "file": "part_mcloindian01foot"
+   },
+   {
+    "name": "Yetti Shoes(M)",
+    "file": "part_mcloyeti01foot"
+   },
+   {
+    "name": "Stiefel der Ehre (M)",
+    "file": "part_mmajestyfoot"
+   },
+   {
+    "name": "Dragon Geta (M)",
+    "file": "part_mcloyukata05shoes"
+   },
+   {
+    "name": "Cyber Punk Shoes (M)",
+    "file": "part_mclostreetsmartfoot"
+   },
+   {
+    "name": "Warlord Shoes (M)",
+    "file": "part_mclowarlordfoot"
+   },
+   {
+    "name": "Skipper Shoes (M)",
+    "file": "part_mclocrusinfoot"
+   },
+   {
+    "name": "Bathroom Slippers (M)",
+    "file": "part_mcloshowerfoot"
+   },
+   {
+    "name": "Space Cadet Stiefel (M)",
+    "file": "part_mclouniform02foot"
+   },
+   {
+    "name": "FV-13 Power Armor Stiefel (M)",
+    "file": "part_mclosteelfoot"
+   },
+   {
+    "name": "Detective Shoes (M)",
+    "file": "part_mclodetectivefoot"
+   },
+   {
+    "name": "Sul Bim Shoes (M)",
+    "file": "part_mclokorean04foot"
+   },
+   {
+    "name": "Kai Shoes(M)",
+    "file": "part_mclomartialart01foot"
+   },
+   {
+    "name": "Mad Hatter Shoes (M)",
+    "file": "part_mclohatter01foot"
+   },
+   {
+    "name": "Leprechaun Shoes (M)",
+    "file": "part_mcloleprechaun01foot"
+   }
+  ],
+  "cap": [
+   {
+    "name": "Pike Helm",
+    "file": "part_mvag02cap"
+   },
+   {
+    "name": "Iner Helm",
+    "file": "part_mvag03cap"
+   },
+   {
+    "name": "Petal Helm",
+    "file": "part_mmer01cap"
+   },
+   {
+    "name": "Slepint Helm",
+    "file": "part_macr01cap"
+   },
+   {
+    "name": "Sardine Helm",
+    "file": "part_mass01cap"
+   },
+   {
+    "name": "Seer Helm",
+    "file": "part_mmag01cap"
+   },
+   {
+    "name": "Comet Helm",
+    "file": "part_mmer03cap"
+   },
+   {
+    "name": "Layered Helm",
+    "file": "part_macr03cap"
+   },
+   {
+    "name": "Talin Helm",
+    "file": "part_mass03cap"
+   },
+   {
+    "name": "Sorain Helm",
+    "file": "part_mmag03cap"
+   },
+   {
+    "name": "Panggril Helm",
+    "file": "part_mmer04cap"
+   },
+   {
+    "name": "Cruiser Helm",
+    "file": "part_macr04cap"
+   },
+   {
+    "name": "Wedge Helm",
+    "file": "part_mass04cap"
+   },
+   {
+    "name": "Teba Helm",
+    "file": "part_mmag04cap"
+   },
+   {
+    "name": "Recorn Helm",
+    "file": "part_mmer05cap"
+   },
+   {
+    "name": "Rebron Helm",
+    "file": "part_macr05cap"
+   },
+   {
+    "name": "Shurand Helm",
+    "file": "part_mass05cap"
+   },
+   {
+    "name": "Ahes Helm",
+    "file": "part_mmag05cap"
+   },
+   {
+    "name": "Warpon Helm",
+    "file": "part_mkin02cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Wees Helm",
+    "file": "part_mkin03cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Ectro Helm",
+    "file": "part_mkinset04cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Einy Helm",
+    "file": "part_mbla02cap"
+   },
+   {
+    "name": "Dayst Helm",
+    "file": "part_mbla03cap"
+   },
+   {
+    "name": "Hanes Helm",
+    "file": "part_mblaset04cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Katria Helm",
+    "file": "part_mjst02cap"
+   },
+   {
+    "name": "Restra Helm",
+    "file": "part_mjst03cap"
+   },
+   {
+    "name": "Neis Helm",
+    "file": "part_mjstset04cap"
+   },
+   {
+    "name": "Oska Helm",
+    "file": "part_mrag02cap"
+   },
+   {
+    "name": "Asren Helm",
+    "file": "part_mrag03cap"
+   },
+   {
+    "name": "Tyrent Helm",
+    "file": "part_mragset04cap"
+   },
+   {
+    "name": "Pact Helm",
+    "file": "part_mrin02cap"
+   },
+   {
+    "name": "Shupon Helm",
+    "file": "part_mrin03cap"
+   },
+   {
+    "name": "Navil Helm",
+    "file": "part_mrinset04cap"
+   },
+   {
+    "name": "Alext Helm",
+    "file": "part_mbil02cap"
+   },
+   {
+    "name": "Akent Helm",
+    "file": "part_mbil03cap"
+   },
+   {
+    "name": "Rody Helm",
+    "file": "part_mbilset04cap"
+   },
+   {
+    "name": "Ropang Helm",
+    "file": "part_mpsy02cap"
+   },
+   {
+    "name": "Geniun Helm",
+    "file": "part_mpsy03cap"
+   },
+   {
+    "name": "Mekatro Helm",
+    "file": "part_mpsyset04cap"
+   },
+   {
+    "name": "Myuran Helm",
+    "file": "part_mele02cap"
+   },
+   {
+    "name": "Elder Helm",
+    "file": "part_mele03cap"
+   },
+   {
+    "name": "Shabel Helm",
+    "file": "part_meleset04cap"
+   },
+   {
+    "name": "Knighert Helm",
+    "file": "part_mkinset03cap"
+   },
+   {
+    "name": "Blain Helm",
+    "file": "part_mblaset03cap"
+   },
+   {
+    "name": "Jesis Helm",
+    "file": "part_mjstset03cap"
+   },
+   {
+    "name": "Ranerz Helm",
+    "file": "part_mragset03cap"
+   },
+   {
+    "name": "Rimyth Helm",
+    "file": "part_mrinset03cap"
+   },
+   {
+    "name": "Billst Helm",
+    "file": "part_mbilset03cap"
+   },
+   {
+    "name": "Psykon Helm",
+    "file": "part_mpsyset03cap"
+   },
+   {
+    "name": "Ellis Helm",
+    "file": "part_meleset03cap"
+   },
+   {
+    "name": "Cruentus Helm (M)",
+    "file": "part_mkinset05cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Noctis Helm (M)",
+    "file": "part_mblaset05cap"
+   },
+   {
+    "name": "Velox Helm (M)",
+    "file": "part_mjstset05cap"
+   },
+   {
+    "name": "Acer Helm (M)",
+    "file": "part_mragset05cap"
+   },
+   {
+    "name": "Revenio Helm (M)",
+    "file": "part_mrinset05cap"
+   },
+   {
+    "name": "Grim Helm (M)",
+    "file": "part_mbilset05cap"
+   },
+   {
+    "name": "Twilight Helm (M)",
+    "file": "part_mpsyset05cap"
+   },
+   {
+    "name": "Nanemvis Helm (M)",
+    "file": "part_meleset05cap"
+   },
+   {
+    "name": "Bileire Helm (M)",
+    "file": "part_mkinset06cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Heraud Helm (M)",
+    "file": "part_mblaset06cap"
+   },
+   {
+    "name": "Curio Helm (M)",
+    "file": "part_mjstset06cap"
+   },
+   {
+    "name": "Hainure Helm (M)",
+    "file": "part_mragset06cap"
+   },
+   {
+    "name": "Reine Helm (M)",
+    "file": "part_mrinset06cap"
+   },
+   {
+    "name": "Roenier Helm (M)",
+    "file": "part_mbilset06cap"
+   },
+   {
+    "name": "Reffiro Helm (M)",
+    "file": "part_mpsyset06cap"
+   },
+   {
+    "name": "Lippin Helm (M)",
+    "file": "part_meleset06cap"
+   },
+   {
+    "name": "Fortune Helm",
+    "file": "part_mmer02cap"
+   },
+   {
+    "name": "Koon Helm",
+    "file": "part_mmer06cap"
+   },
+   {
+    "name": "Hodr Helm",
+    "file": "part_mmer07cap"
+   },
+   {
+    "name": "Keimay Helm",
+    "file": "part_mkin01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Revantu Helm",
+    "file": "part_mkin04cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Gricky Helm",
+    "file": "part_mkin05cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Darkbin Helm",
+    "file": "part_mbla01cap"
+   },
+   {
+    "name": "Huedom Helm",
+    "file": "part_mbla04cap"
+   },
+   {
+    "name": "Labon Helm",
+    "file": "part_mbla05cap"
+   },
+   {
+    "name": "Vilet Helm",
+    "file": "part_macr02cap"
+   },
+   {
+    "name": "Touflak Helm",
+    "file": "part_macr06cap"
+   },
+   {
+    "name": "Silven Helm",
+    "file": "part_macr07cap"
+   },
+   {
+    "name": "Henen Helm",
+    "file": "part_mjst01cap"
+   },
+   {
+    "name": "Decasron Helm",
+    "file": "part_mjst04cap"
+   },
+   {
+    "name": "Claien Helm",
+    "file": "part_mjst05cap"
+   },
+   {
+    "name": "Grantus Helm",
+    "file": "part_mrag01cap"
+   },
+   {
+    "name": "Mithril Helm",
+    "file": "part_mrag04cap"
+   },
+   {
+    "name": "Branto Helm",
+    "file": "part_mrag05cap"
+   },
+   {
+    "name": "Gale Helm",
+    "file": "part_mass02cap"
+   },
+   {
+    "name": "Beok Helm",
+    "file": "part_mass06cap"
+   },
+   {
+    "name": "Dian Helm",
+    "file": "part_mass07cap"
+   },
+   {
+    "name": "Mectic Helm",
+    "file": "part_mrin01cap"
+   },
+   {
+    "name": "Lordyin Helm",
+    "file": "part_mrin04cap"
+   },
+   {
+    "name": "Venopy Helm",
+    "file": "part_mrin05cap"
+   },
+   {
+    "name": "Oriene Helm",
+    "file": "part_mbil01cap"
+   },
+   {
+    "name": "Snaic Helm",
+    "file": "part_mbil04cap"
+   },
+   {
+    "name": "Hanei Helm",
+    "file": "part_mbil05cap"
+   },
+   {
+    "name": "Shuffle Helm",
+    "file": "part_mmag02cap"
+   },
+   {
+    "name": "Hagal Helm",
+    "file": "part_mmag06cap"
+   },
+   {
+    "name": "Maclir Helm",
+    "file": "part_mmag07cap"
+   },
+   {
+    "name": "Rendaic Helm",
+    "file": "part_mpsy01cap"
+   },
+   {
+    "name": "Kaharn Helm",
+    "file": "part_mpsy04cap"
+   },
+   {
+    "name": "Hellieng Helm",
+    "file": "part_mpsy05cap"
+   },
+   {
+    "name": "Uon Helm",
+    "file": "part_mele01cap"
+   },
+   {
+    "name": "Hyusein Helm",
+    "file": "part_mele04cap"
+   },
+   {
+    "name": "Phaharn Helm",
+    "file": "part_mele05cap"
+   },
+   {
+    "name": "Shamutra Helm",
+    "file": "part_mmerset01cap"
+   },
+   {
+    "name": "Rashadain Helm",
+    "file": "part_massset01cap"
+   },
+   {
+    "name": "Forgiel Helm",
+    "file": "part_mmagset01cap"
+   },
+   {
+    "name": "Rorend Helm",
+    "file": "part_macrset01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Blue Sailor Hat",
+    "file": "part_mclosailor01hat"
+   },
+   {
+    "name": "Loker Sailor Hat",
+    "file": "part_mclosailor02hat"
+   },
+   {
+    "name": "Green Sailor Hat",
+    "file": "part_mclosailor03hat"
+   },
+   {
+    "name": "Forkim Sailor Hat",
+    "file": "part_mclosailor04hat"
+   },
+   {
+    "name": "Formal School Hat",
+    "file": "part_mclokakuran01hat"
+   },
+   {
+    "name": "Catseon Hat",
+    "file": "part_mclocatsuit01hat"
+   },
+   {
+    "name": "Star Hair Band",
+    "file": "part_mhatstarha"
+   },
+   {
+    "name": "Mushroom Hat",
+    "file": "part_mhatmushro"
+   },
+   {
+    "name": "Santa Hat (M)",
+    "file": "part_mclosanta01hat"
+   },
+   {
+    "name": "Rudolph Hat (M)",
+    "file": "part_mclorudolf01hat"
+   },
+   {
+    "name": "Dark Vader Hat (M)",
+    "file": "part_mdarthvadercap",
+    "hides": "head"
+   },
+   {
+    "name": "Police Hat (M)",
+    "file": "part_mclopolice01cap"
+   },
+   {
+    "name": "Turban (M)",
+    "file": "part_mhatturban01"
+   },
+   {
+    "name": "Devil Hairband",
+    "file": "part_mhatdevil01"
+   },
+   {
+    "name": "HimmlischeHairband",
+    "file": "part_mhatangel01"
+   },
+   {
+    "name": "Ninja Hat (M)",
+    "file": "part_mninja01cap"
+   },
+   {
+    "name": "Spy Hat (M)",
+    "file": "part_mclospycap"
+   },
+   {
+    "name": "Skeleton Mask (M)",
+    "file": "part_mcloskull01mask",
+    "hides": "hair"
+   },
+   {
+    "name": "Clown Hat (M)",
+    "file": "part_mcardgirlcap"
+   },
+   {
+    "name": "Sinbad Turban (M)",
+    "file": "part_msinbad01cap"
+   },
+   {
+    "name": "Snowboarder Hat (M) Hat",
+    "file": "part_msnowboarder01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Snowman Hat (M)",
+    "file": "part_mclosnowman01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Frog Hat (M)",
+    "file": "part_mclofrog01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Lamb Hat (M)",
+    "file": "part_mclolamb01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Teddy Bear Hat (M)",
+    "file": "part_mclobear01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Flower Hair (M) Gold",
+    "file": "part_mclowig01go",
+    "hides": "hair"
+   },
+   {
+    "name": "Flower Hair (M) Pink",
+    "file": "part_mclowig01p",
+    "hides": "hair"
+   },
+   {
+    "name": "Flower Hair (M) Blue",
+    "file": "part_mclowig01b",
+    "hides": "hair"
+   },
+   {
+    "name": "Bomb Hair (M) Brown",
+    "file": "part_mclowig02br",
+    "hides": "hair"
+   },
+   {
+    "name": "Bomb Hair (M) Red",
+    "file": "part_mclowig02r",
+    "hides": "hair"
+   },
+   {
+    "name": "Bomb Hair (M) Blue",
+    "file": "part_mclowig02b",
+    "hides": "hair"
+   },
+   {
+    "name": "Splendid Whirlpool Hair (M)",
+    "file": "part_mclowig03r",
+    "hides": "hair"
+   },
+   {
+    "name": "Passionate Whirlpool Hair (M)",
+    "file": "part_mclowig03o",
+    "hides": "hair"
+   },
+   {
+    "name": "Elegant Whirlpool Hair (M)",
+    "file": "part_mclowig03v",
+    "hides": "hair"
+   },
+   {
+    "name": "Moussed Hair (M) Black",
+    "file": "part_mclowig04bl",
+    "hides": "hair"
+   },
+   {
+    "name": "Moussed Hair (M) Brown",
+    "file": "part_mclowig04br",
+    "hides": "hair"
+   },
+   {
+    "name": "Moussed Hair (M) Green",
+    "file": "part_mclowig04sb",
+    "hides": "hair"
+   },
+   {
+    "name": "Cactus Hair (M) Gold",
+    "file": "part_mclowig05go",
+    "hides": "hair"
+   },
+   {
+    "name": "Cactus Hair (M) Silver",
+    "file": "part_mclowig05s",
+    "hides": "hair"
+   },
+   {
+    "name": "Cactus Hair (M) Red",
+    "file": "part_mclowig05r",
+    "hides": "hair"
+   },
+   {
+    "name": "Mohawk (M) Brown",
+    "file": "part_mclowig06br",
+    "hides": "hair"
+   },
+   {
+    "name": "Mohawk (M) Red",
+    "file": "part_mclowig06r",
+    "hides": "hair"
+   },
+   {
+    "name": "Mohawk (M) Orange",
+    "file": "part_mclowig06o",
+    "hides": "hair"
+   },
+   {
+    "name": "Warrior Hair (M) Black",
+    "file": "part_mclowig07bl",
+    "hides": "hair"
+   },
+   {
+    "name": "Warrior Hair (M) Blue",
+    "file": "part_mclowig07b",
+    "hides": "hair"
+   },
+   {
+    "name": "Warrior Hair (M) Brown",
+    "file": "part_mclowig07br",
+    "hides": "hair"
+   },
+   {
+    "name": "Luxury Hair (M) Black",
+    "file": "part_mclowig08bl",
+    "hides": "hair"
+   },
+   {
+    "name": "Luxury Hair (M) Violet",
+    "file": "part_mclowig08v",
+    "hides": "hair"
+   },
+   {
+    "name": "Luxury Hair (M) Brown",
+    "file": "part_mclowig08br",
+    "hides": "hair"
+   },
+   {
+    "name": "Wind Hair (M) Brown",
+    "file": "part_mclowig09br",
+    "hides": "hair"
+   },
+   {
+    "name": "Wind Hair (M) Silver",
+    "file": "part_mclowig09s",
+    "hides": "hair"
+   },
+   {
+    "name": "Wind Hair (M) Blue",
+    "file": "part_mclowig09b",
+    "hides": "hair"
+   },
+   {
+    "name": "Sphinx Hair (M) Blue",
+    "file": "part_mclowig10b",
+    "hides": "hair"
+   },
+   {
+    "name": "Sphinx Hair (M) Green",
+    "file": "part_mclowig10g",
+    "hides": "hair"
+   },
+   {
+    "name": "Sphinx Hair (M) Violet",
+    "file": "part_mclowig10v",
+    "hides": "hair"
+   },
+   {
+    "name": "Samurai(M) Hat",
+    "file": "part_mclosamurai01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Muaythai (M) Hat",
+    "file": "part_mclomuaythai01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Pirate (M) Hat",
+    "file": "part_mclopirate01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Vampire (M) Hat",
+    "file": "part_mclovampire01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Kang shi (M) Hat",
+    "file": "part_mclocorpse01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Royal Cook (M) Hat",
+    "file": "part_mclokorean03cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Blue Helm",
+    "file": "part_mcloguards01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Red Helm",
+    "file": "part_mcloguards02cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Yellow Helm",
+    "file": "part_mcloguards03cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Green Helm",
+    "file": "part_mcloguards04cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Madrigal Wächter-(M) Pink Helm",
+    "file": "part_mcloguards05cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Mummy (M) Hat",
+    "file": "part_mclomummy01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Casual beanie(M)",
+    "file": "part_mclocasual01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Hip-Hop Cap and Bandana(M)",
+    "file": "part_mclocasual02cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Wedding Hair(M)",
+    "file": "part_mclowed01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Martial artist Hair(M)",
+    "file": "part_mclomartial01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Baseball Cap(M)",
+    "file": "part_mclobaseball01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Kung Fu Hat(M)",
+    "file": "part_mclokungfu01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Traditional German Hat (M)",
+    "file": "part_mclogerman01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Cowboy Hat(M)",
+    "file": "part_mclocowboy01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Traditional Thailand Hat (M)",
+    "file": "part_mclothailand01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Traditional Philippines Hat (M)",
+    "file": "part_mclophilippines01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Traditional Chile Hat (M)",
+    "file": "part_mclochile01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Rabbit Hat(M)",
+    "file": "part_mclorabbit03cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Panda Hat(M)",
+    "file": "part_mclopanda01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Chipao Panda Hat(M)",
+    "file": "part_mclopanda02cap",
+    "hides": "hair"
+   },
+   {
+    "name": "NFL Helm(M)",
+    "file": "part_mclofootball01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Bull\\'s Hat(M)",
+    "file": "part_mclobull01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Chef Hat(M)",
+    "file": "part_mclocook01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Gothic Hat (M)",
+    "file": "part_mclogoth01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "SpaceRüstung Hat(M)",
+    "file": "part_mcloastronaut01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Big Bad Wolf Hat (M)",
+    "file": "part_mclofairytale01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Traditional Native American Headset (M)",
+    "file": "part_mcloindian01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Yetti Hat(M)",
+    "file": "part_mcloyeti01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Pumpkin Mask",
+    "file": "part_mclopumkincap",
+    "hides": "hair"
+   },
+   {
+    "name": "Helm der Ehre (M)",
+    "file": "part_mmajestycap",
+    "hides": "hair"
+   },
+   {
+    "name": "Cyber Punk Hat (M)",
+    "file": "part_mclostreetsmartcap",
+    "hides": "hair"
+   },
+   {
+    "name": "Warlord Headpiece (M)",
+    "file": "part_mclowarlordcap",
+    "hides": "hair"
+   },
+   {
+    "name": "Skipper Cap (M)",
+    "file": "part_mclocrusincap",
+    "hides": "hair"
+   },
+   {
+    "name": "Shower Cap (M)",
+    "file": "part_mcloshowercap",
+    "hides": "hair"
+   },
+   {
+    "name": "Space Cadet Hair (M)",
+    "file": "part_mclouniform02cap",
+    "hides": "hair"
+   },
+   {
+    "name": "FV-13 Power Armor Helm (M)",
+    "file": "part_mclosteelcap",
+    "hides": "hair"
+   },
+   {
+    "name": "Detective Hat (M)",
+    "file": "part_mclodetectivecap",
+    "hides": "hair"
+   },
+   {
+    "name": "Jester Hat von Iblis",
+    "file": "part_mcloiblis01hat"
+   },
+   {
+    "name": "Jester Hat von Bubble",
+    "file": "part_mclobubble01hat"
+   },
+   {
+    "name": "Jester Hat von Shade",
+    "file": "part_mcloshade01hat"
+   },
+   {
+    "name": "Sul Bim Hat (M) ",
+    "file": "part_mclokorean04cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Kai Hat(M)",
+    "file": "part_mclomartialart01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Mad Hatter\\'s Hat (M)",
+    "file": "part_mclohatter01cap",
+    "hides": "hair"
+   },
+   {
+    "name": "Leprechaun Hat (M)",
+    "file": "part_mcloleprechaun01cap",
+    "hides": "hair"
+   }
+  ],
+  "cloak": [
+   {
+    "name": "Umhang von Strong",
+    "file": "part_malecloakstrong"
+   },
+   {
+    "name": "Umhang von Accord",
+    "file": "part_malecloakaccord"
+   },
+   {
+    "name": "Umhang von Quick",
+    "file": "part_malecloakquick"
+   },
+   {
+    "name": "Umhang von Wisdom",
+    "file": "part_malecloakwisdom"
+   },
+   {
+    "name": "Umhang Test",
+    "file": "part_malecloakslogo00"
+   },
+   {
+    "name": "Umhang 01",
+    "file": "part_malecloakslogo01"
+   },
+   {
+    "name": "Umhang 02",
+    "file": "part_malecloakslogo02"
+   },
+   {
+    "name": "Umhang 03",
+    "file": "part_malecloakslogo03"
+   },
+   {
+    "name": "Umhang 04",
+    "file": "part_malecloakslogo04"
+   },
+   {
+    "name": "Umhang 05",
+    "file": "part_malecloakslogo05"
+   },
+   {
+    "name": "Umhang 06",
+    "file": "part_malecloakslogo06"
+   },
+   {
+    "name": "Umhang 07",
+    "file": "part_malecloakslogo07"
+   },
+   {
+    "name": "Umhang 08",
+    "file": "part_malecloakslogo08"
+   },
+   {
+    "name": "Umhang 09",
+    "file": "part_malecloakslogo09"
+   },
+   {
+    "name": "Umhang 10",
+    "file": "part_malecloakslogo10"
+   },
+   {
+    "name": "Umhang 11",
+    "file": "part_malecloakslogo11"
+   },
+   {
+    "name": "Umhang 12",
+    "file": "part_malecloakslogo12"
+   },
+   {
+    "name": "Umhang 13",
+    "file": "part_malecloakslogo13"
+   },
+   {
+    "name": "Umhang 14",
+    "file": "part_malecloakslogo14"
+   },
+   {
+    "name": "Umhang 15",
+    "file": "part_malecloakslogo15"
+   },
+   {
+    "name": "Umhang 16",
+    "file": "part_malecloakslogo16"
+   },
+   {
+    "name": "Umhang 17",
+    "file": "part_malecloakslogo17"
+   },
+   {
+    "name": "Umhang 18",
+    "file": "part_malecloakslogo18"
+   },
+   {
+    "name": "Umhang 19",
+    "file": "part_malecloakslogo19"
+   },
+   {
+    "name": "Umhang 20",
+    "file": "part_malecloakslogo20"
+   },
+   {
+    "name": "School Event Gift",
+    "file": "part_malecloakschool"
+   },
+   {
+    "name": "Gaia Umhang",
+    "file": "part_malecloakgaia"
+   },
+   {
+    "name": "Dark Vader Umhang",
+    "file": "part_mdarthvadercape"
+   },
+   {
+    "name": "Dragon Umhang(Untradable)",
+    "file": "part_mdragoncape"
+   },
+   {
+    "name": "Umhang von Bravery",
+    "file": "part_malecloaknew01"
+   },
+   {
+    "name": "Umhang von honor",
+    "file": "part_malecloaknew02"
+   },
+   {
+    "name": "Umhang von the Sea God",
+    "file": "part_malecloakmajesty"
+   },
+   {
+    "name": "USA Flag Umhang",
+    "file": "part_malecloakamerica"
+   },
+   {
+    "name": "Chile Flag Umhang",
+    "file": "part_malecloakchile"
+   },
+   {
+    "name": "European Union Flag Umhang",
+    "file": "part_malecloakeu"
+   },
+   {
+    "name": "Japan Flag Umhang",
+    "file": "part_malecloakjapan"
+   },
+   {
+    "name": "Philippines Flag Umhang",
+    "file": "part_malecloakphilippine"
+   },
+   {
+    "name": "Taiwan Flag Umhang",
+    "file": "part_malecloaktaiwan"
+   },
+   {
+    "name": "Thailand Flag Umhang",
+    "file": "part_malecloakthailand"
+   },
+   {
+    "name": "Brazil Flag Umhang",
+    "file": "part_malecloakbrazil"
+   },
+   {
+    "name": "Canada Flag Umhang",
+    "file": "part_malecloakcanada"
+   },
+   {
+    "name": "Hong Kong Flag Umhang",
+    "file": "part_malecloakhongkong"
+   },
+   {
+    "name": "Venezuela Flag Umhang",
+    "file": "part_malecloakvenezuela"
+   },
+   {
+    "name": "Star Sign Umhang (Aries)",
+    "file": "part_malecloakaries"
+   },
+   {
+    "name": "Star Sign Umhang (Taurus)",
+    "file": "part_malecloaktaurus"
+   },
+   {
+    "name": "Star Sign Umhang (Gemini)",
+    "file": "part_malecloakgemini"
+   },
+   {
+    "name": "Star Sign Umhang (Cancer)",
+    "file": "part_malecloakcancer"
+   },
+   {
+    "name": "Star Sign Umhang (Leo)",
+    "file": "part_malecloakleo"
+   },
+   {
+    "name": "Star Sign Umhang (Virgo)",
+    "file": "part_malecloakvirgo"
+   },
+   {
+    "name": "Star Sign Umhang (Libra)",
+    "file": "part_malecloaklibra"
+   },
+   {
+    "name": "Star Sign Umhang (Scorpion)",
+    "file": "part_malecloakscorpius"
+   },
+   {
+    "name": "Star Sign Umhang (Sagittarius)",
+    "file": "part_malecloaksagittarius"
+   },
+   {
+    "name": "Star Sign Umhang (Capricorn)",
+    "file": "part_malecloakcapricornus"
+   },
+   {
+    "name": "Star Sign Umhang (Aquarius)",
+    "file": "part_malecloakaquarius"
+   },
+   {
+    "name": "Star Sign Umhang (Pisces)",
+    "file": "part_malecloakpisces"
+   },
+   {
+    "name": "Star Sign Umhang (Serpent)",
+    "file": "part_malecloakophiuchus"
+   },
+   {
+    "name": "Umhang von Hero",
+    "file": "part_malecloakhero01"
+   },
+   {
+    "name": "Umhang von Australia",
+    "file": "part_malecloakaustralia"
+   },
+   {
+    "name": "Umhang von France",
+    "file": "part_malecloakfrance"
+   },
+   {
+    "name": "Umhang von United Kingdom",
+    "file": "part_malecloakgb"
+   },
+   {
+    "name": "Umhang von Germany",
+    "file": "part_malecloakgermany"
+   },
+   {
+    "name": "Umhang von Italy",
+    "file": "part_malecloakitaly"
+   },
+   {
+    "name": "Umhang von Spain",
+    "file": "part_malecloakspain"
+   },
+   {
+    "name": "Umhang von Argentina",
+    "file": "part_malecloakargentina"
+   },
+   {
+    "name": "Umhang von Columbia",
+    "file": "part_malecloakcolombia"
+   },
+   {
+    "name": "Umhang von Mexico",
+    "file": "part_malecloakmexico"
+   },
+   {
+    "name": "Umhang von Peru",
+    "file": "part_malecloakperu"
+   },
+   {
+    "name": "Umhang von Russia",
+    "file": "part_malecloakrussian"
+   },
+   {
+    "name": "Umhang von Vietnam",
+    "file": "part_malecloakvietnam"
+   },
+   {
+    "name": "Umhang von the Rat",
+    "file": "part_mcloakmouse"
+   },
+   {
+    "name": "Umhang von the Ox",
+    "file": "part_mcloakcow"
+   },
+   {
+    "name": "Umhang von the Tiger",
+    "file": "part_mcloaktiger"
+   },
+   {
+    "name": "Umhang von the Rabbit",
+    "file": "part_mcloakrabbit"
+   },
+   {
+    "name": "Umhang von the Dragon",
+    "file": "part_mcloakdragon"
+   },
+   {
+    "name": "Umhang von the Snake",
+    "file": "part_mcloaksnake"
+   },
+   {
+    "name": "Umhang von the Horse",
+    "file": "part_mcloakhorse"
+   },
+   {
+    "name": "Umhang von the Sheep",
+    "file": "part_mcloaksheep"
+   },
+   {
+    "name": "Umhang von the Monkey",
+    "file": "part_mcloakmonkey"
+   },
+   {
+    "name": "Umhang von the Rooster",
+    "file": "part_mcloakchicken"
+   },
+   {
+    "name": "Umhang von the Dog",
+    "file": "part_mcloakdog"
+   },
+   {
+    "name": "Umhang von the Pig",
+    "file": "part_mcloakpig"
+   },
+   {
+    "name": "Four-leaf clover box",
+    "file": "part_mcloakclover"
+   },
+   {
+    "name": "Superhero Umhang (M)",
+    "file": "part_msuperman01cape"
+   },
+   {
+    "name": "Korea Umhang(Untradable)",
+    "file": "part_mclotaeguk"
+   },
+   {
+    "name": "Champion\\'s Umhang",
+    "file": "part_mherocape02"
+   },
+   {
+    "name": "Rays and Clouds Umhang",
+    "file": "part_malecloakcloud"
+   },
+   {
+    "name": "Double Dragon Umhang",
+    "file": "part_malecloaktwindragons"
+   },
+   {
+    "name": "Yin-Yang Umhang",
+    "file": "part_malecloakyinyang"
+   },
+   {
+    "name": "FITA Umhang",
+    "file": "part_mcloakfita"
+   },
+   {
+    "name": "IDS_PROPITEM_TXT_012036",
+    "file": "part_mcloakclock01"
+   },
+   {
+    "name": "IDS_PROPITEM_TXT_012038",
+    "file": "part_mcloakrose01"
+   },
+   {
+    "name": "IDS_PROPITEM_TXT_012040",
+    "file": "part_mcloakflower01"
+   }
+  ],
+  "mask": [
+   {
+    "name": "Goggles",
+    "file": "part_mmasgogle"
+   },
+   {
+    "name": "Butterfly Mask",
+    "file": "part_mmasbutter"
+   },
+   {
+    "name": "Iron Mask",
+    "file": "part_mmasironma"
+   },
+   {
+    "name": "Shiny Glasses",
+    "file": "part_mmassunglass"
+   },
+   {
+    "name": "Paco Mask",
+    "file": "part_mmasball01"
+   },
+   {
+    "name": "Foraim Mask",
+    "file": "part_mmasball02"
+   },
+   {
+    "name": "Carnival Mask",
+    "file": "part_mmasball03"
+   },
+   {
+    "name": "Bluebird Mask",
+    "file": "part_mmasball04"
+   },
+   {
+    "name": "Ponycat Mask",
+    "file": "part_mmasball05"
+   },
+   {
+    "name": "Fortrin Mask",
+    "file": "part_mmasball06"
+   },
+   {
+    "name": "Bluenine Mask",
+    "file": "part_mmasball07"
+   },
+   {
+    "name": "Fucat Mask",
+    "file": "part_mmasball08"
+   },
+   {
+    "name": "Fashion Sunglasses (Red)",
+    "file": "part_mmasfashionglass01"
+   },
+   {
+    "name": "Fashion Sunglasses (Orange)",
+    "file": "part_mmasfashionglass02"
+   },
+   {
+    "name": "Fashion Sunglasses (Green)",
+    "file": "part_mmasfashionglass03"
+   },
+   {
+    "name": "Sunglasses (Black)",
+    "file": "part_mmassunglass01"
+   },
+   {
+    "name": "Sunglasses (White)",
+    "file": "part_mmassunglass02"
+   },
+   {
+    "name": "Sunglasses (Red)",
+    "file": "part_mmassunglass03"
+   },
+   {
+    "name": "Sunglasses (Blue)",
+    "file": "part_mmassunglass04"
+   },
+   {
+    "name": "Glasses (Red)",
+    "file": "part_mmasglass01"
+   },
+   {
+    "name": "Glasses (Yellow)",
+    "file": "part_mmasglass02"
+   },
+   {
+    "name": "Glasses (Black)",
+    "file": "part_mmasglass03"
+   },
+   {
+    "name": "Glasses (Purple)",
+    "file": "part_mmasglass04"
+   },
+   {
+    "name": "Glasses (Green)",
+    "file": "part_mmasglass05"
+   },
+   {
+    "name": "Mini Glasses (White)",
+    "file": "part_mmasminiglass01"
+   },
+   {
+    "name": "Mini Glasses (Red)",
+    "file": "part_mmasminiglass02"
+   },
+   {
+    "name": "Mini Glasses (Blue)",
+    "file": "part_mmasminiglass03"
+   },
+   {
+    "name": "Rimless Glasses (White)",
+    "file": "part_mmasminiglass04"
+   },
+   {
+    "name": "Rimless Glasses (Blue)",
+    "file": "part_mmasminiglass05"
+   },
+   {
+    "name": "Rimless Glasses (Purple)",
+    "file": "part_mmasminiglass06"
+   },
+   {
+    "name": "Taeguk",
+    "file": "part_meve0401mtaeguk"
+   },
+   {
+    "name": "Fool Glasses",
+    "file": "part_mmaskglass01"
+   },
+   {
+    "name": "Ball Mask 09",
+    "file": "part_mmasball09"
+   },
+   {
+    "name": "Rudolph\\'s Nose",
+    "file": "part_mmasrudolfnose"
+   },
+   {
+    "name": "Neko Soul Mask",
+    "file": "part_mmasksoul01"
+   }
+  ],
+  "weapon": [
+   {
+    "name": "Rodney Axt",
+    "file": "item_weaaxecurin",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Morrow Axt",
+    "file": "item_weaaxesteel",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Curning Axt",
+    "file": "item_weaaxecrenil",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Shyadin Axt",
+    "file": "item_weaaxesephir",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Bronze Axt",
+    "file": "item_weaaxegorn",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Grang Axt",
+    "file": "item_weaaxevain",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Drone Axt",
+    "file": "item_weaaxetoorin",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Proem Axt",
+    "file": "item_weaaxekarm",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Corin Axt",
+    "file": "item_weaaxebattle",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Crow Axt",
+    "file": "item_weaaxeaction",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Raptor Axt",
+    "file": "item_weaaxewar",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Berk Axt",
+    "file": "item_weaaxezailon",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Ardalin Axt",
+    "file": "item_weaaxeforge",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Dolphin Axt",
+    "file": "item_weaaxegalaxy",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Bonebar Axt",
+    "file": "item_weaaxeribten",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Luxior Axt",
+    "file": "item_weaaxecantes",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Exhaust Axt",
+    "file": "item_weaaxestormp",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Shakyfin Axt",
+    "file": "item_weaaxeneedre",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Hitch Axt",
+    "file": "item_weaaxephante",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Catchy Axt",
+    "file": "item_weaaxebuterf",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Fellpeed Axt",
+    "file": "item_weaaxedriff",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Darcro Axt",
+    "file": "item_weaaxesaints",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Waturan Axt",
+    "file": "item_weaaxeflaper",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lichiky Axt",
+    "file": "item_weaaxewitche",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Two Handed Axt",
+    "file": "item_weaaxttwohan",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Great Axt",
+    "file": "item_weaaxtgreata",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Kergnition",
+    "file": "item_weaaxtkergni",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lurknition",
+    "file": "item_weaaxtlurkni",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Avnition",
+    "file": "item_weaaxtavniti",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Kanainition",
+    "file": "item_weaaxtkanain",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Orcanition",
+    "file": "item_weaaxtorcani",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Linition",
+    "file": "item_weaaxtliniti",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Hardinition",
+    "file": "item_weaaxthardin",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Woodness Bogen",
+    "file": "item_weabowwoode",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Greentin Bogen",
+    "file": "item_weabowgreen",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Stienger Bogen",
+    "file": "item_weabowstinge",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Clasemit Bogen",
+    "file": "item_weabowclassi",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Redianer Bogen",
+    "file": "item_weabowredwin",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Cristia Bogen",
+    "file": "item_weabowcrysta",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Irun Bogen",
+    "file": "item_weabowiron",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Refometi Bogen",
+    "file": "item_weabowlayere",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Curusier Bogen",
+    "file": "item_weabowcrusad",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Siggers Bogen",
+    "file": "item_weabowsiege",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Fullarch Bogen",
+    "file": "item_weabowmetal",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Setien Bogen",
+    "file": "item_weabowsentin",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Varife Bogen",
+    "file": "item_weabowvelinj",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Defnan Bogen",
+    "file": "item_weabowdarkne",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Hydron Bogen",
+    "file": "item_weabowhydra",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Cenatin Bogen",
+    "file": "item_weabowsaint",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Cyron Bogen",
+    "file": "item_weabowciclon",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sionic Bogen",
+    "file": "item_weabowsaythp",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Regen Bogen",
+    "file": "item_weabowragonat",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Fiont Bogen",
+    "file": "item_weabowphioni",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Brouton Bogen",
+    "file": "item_weabowbrikie",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sevoy Bogen",
+    "file": "item_weabowseinti",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Plim Stick",
+    "file": "item_weachemay",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Scull Stick",
+    "file": "item_weachesirin",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Huey Stick",
+    "file": "item_weachetim",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Kudos Stick",
+    "file": "item_weachebopol",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sayram Stick",
+    "file": "item_weachespim",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Saint Stick",
+    "file": "item_weachepero",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Flury Stick",
+    "file": "item_weachegogo",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ninegale Stick",
+    "file": "item_weachegale",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Mirth Stick",
+    "file": "item_weachezanne",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sizzle Stick",
+    "file": "item_weachehein",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sealine Stick",
+    "file": "item_weachepeppermin",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Pinacle Stick",
+    "file": "item_weacheextreme",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Rave Stick",
+    "file": "item_weachemarple",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Fanta Stick",
+    "file": "item_weachecherry",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Moralemine Stick",
+    "file": "item_weachefairmine",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Shinewing Stick",
+    "file": "item_weacheshabere",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Shalow Stick",
+    "file": "item_weacherequer",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Prede Stick",
+    "file": "item_weachemorain",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Leoss Stick",
+    "file": "item_weachepierli",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Forlas Stick",
+    "file": "item_weachelabad",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Shait Stick",
+    "file": "item_weachevailem",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Garlain Stick",
+    "file": "item_weachemaret",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Overam Knuckle",
+    "file": "item_weaknucram",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Sardine Knuckle",
+    "file": "item_weaknuspeck",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Twit Knuckle",
+    "file": "item_weaknubeetle",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Xeno Knuckle",
+    "file": "item_weaknusledge",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Side Knuckle",
+    "file": "item_weaknuspike",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Talin Knuckle",
+    "file": "item_weaknumega",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Rigor Knuckle",
+    "file": "item_weaknuwedge",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Rampart Knuckle",
+    "file": "item_weaknurobin",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Revenant Knuckle",
+    "file": "item_weaknutrocal",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Marvel Knuckle",
+    "file": "item_weaknushark",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Overpass Knuckle",
+    "file": "item_weaknusplin",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Gravity Knuckle",
+    "file": "item_weaknuazuma",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Corean Knuckle",
+    "file": "item_weaknuscalem",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Fistomber Knuckle",
+    "file": "item_weaknuredorn",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Edoren Knuckle",
+    "file": "item_weaknusamure",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Skellock Knuckle",
+    "file": "item_weaknunecryn",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Goldross Knuckle",
+    "file": "item_weaknucrossa",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Blesever Knuckle",
+    "file": "item_weaknuclawre",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Muncuto Knuckle",
+    "file": "item_weaknucrecen",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Federhorn Knuckle",
+    "file": "item_weaknuviolek",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Knighteel Knuckle",
+    "file": "item_weaknumetilv",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Lordorbl Knuckle",
+    "file": "item_weaknublarmo",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Mile Stab",
+    "file": "item_weastacron",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Nile Stab",
+    "file": "item_weastasailwi",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Inner Stab",
+    "file": "item_weastaid",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Herald Stab",
+    "file": "item_weastaseer",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Addself Stab",
+    "file": "item_weastaego",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sign Stab",
+    "file": "item_weastasorain",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ignis Stab",
+    "file": "item_weastaspecto",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Teba Stab",
+    "file": "item_weastajessy",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sline Stab",
+    "file": "item_weastacosmo",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Starwheel Stab",
+    "file": "item_weastawaterp",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Karzam Stab",
+    "file": "item_weastaolin",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Astrol Stab",
+    "file": "item_weastawiz",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sheikane Stab",
+    "file": "item_weastabishap",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Twenkeen Stab",
+    "file": "item_weastaguadfo",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ruofl Stab",
+    "file": "item_weastaflorel",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Featherwing Stab",
+    "file": "item_weastabirdin",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Holyous Stab",
+    "file": "item_weastacrosse",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Portel Stab",
+    "file": "item_weastamazeri",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Mariner Stab",
+    "file": "item_weastadarkhi",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Remodic Stab",
+    "file": "item_weastahexago",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Elfyren Stab",
+    "file": "item_weastafairel",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Fosharpen Stab",
+    "file": "item_weastaangeli",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Wooden Schwert",
+    "file": "item_weaswowooden",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Long Schwert",
+    "file": "item_weaswonormal",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Hand Claw",
+    "file": "item_weaswohandsa",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Parmil Schwert",
+    "file": "item_weaswoleaf",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Crimson Schwert",
+    "file": "item_weaswopenel",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Petal Schwert",
+    "file": "item_weaswoflower",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Blink Schwert",
+    "file": "item_weaswostar",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Outlaw Schwert",
+    "file": "item_weaswoslogge",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Fairslender Schwert",
+    "file": "item_weaswofairli",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Clip Schwert",
+    "file": "item_weaswoturtle",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Tao Schwert",
+    "file": "item_weaswooval",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Sepal Schwert",
+    "file": "item_weaswojaim",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Cylos Schwert",
+    "file": "item_weaswohansel",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Invader Schwert",
+    "file": "item_weaswocomet",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Stitch Schwert",
+    "file": "item_weaswopricke",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Multiblade Schwert",
+    "file": "item_weaswosubbla",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Panggril Schwert",
+    "file": "item_weaswobigmas",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Carnage Schwert",
+    "file": "item_weaswosavage",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Janitor Schwert",
+    "file": "item_weaswoknocke",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Blue Jade Schwert",
+    "file": "item_weaswobluesh",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Zeroth Schwert",
+    "file": "item_weaswoshyer",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Emeryl Schwert",
+    "file": "item_weasworowben",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Chainsing Schwert",
+    "file": "item_weaswokhaica",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Harpion Schwert",
+    "file": "item_weaswoaxilow",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Smiter Schwert",
+    "file": "item_weaswobreake",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Shadeving Schwert",
+    "file": "item_weasworunaic",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Hotter Schwert",
+    "file": "item_weaswofireis",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Bastard Schwert",
+    "file": "item_weaswtbastar",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Two Handed Schwert",
+    "file": "item_weaswttwohan",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Darkonizer",
+    "file": "item_weaswtdarkon",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Adaptizer",
+    "file": "item_weaswtadapti",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Zweigazer",
+    "file": "item_weaswtzweiga",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Kaleonizer",
+    "file": "item_weaswtkaleon",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Gootnizer",
+    "file": "item_weaswtgootni",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Hauntizer",
+    "file": "item_weaswthaunti",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Clock Slayer",
+    "file": "item_weaswtclocks",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Seal Wand",
+    "file": "item_weawanglass",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Cubic Wand",
+    "file": "item_weawancrystal",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Epi Wand",
+    "file": "item_weawanpearl",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Niz Wand",
+    "file": "item_weawantopaz",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Ruby Wand",
+    "file": "item_weawancatsey",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Kalis Wand",
+    "file": "item_weawanbloody",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Poly Wand",
+    "file": "item_weawanmerr",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Mekerhill Wand",
+    "file": "item_weawanaurora",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Naz Wand",
+    "file": "item_weawanopel",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Zerem Wand",
+    "file": "item_weawanmisty",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "BlueBogen Wand",
+    "file": "item_weawanrainbo",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Mirage Wand",
+    "file": "item_weawanillusi",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Aris Wand",
+    "file": "item_weawanflupim",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Moira Wand",
+    "file": "item_weawandivine",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Arcadia Wand",
+    "file": "item_weawanneplus",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Taris Wand",
+    "file": "item_weawantripal",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Jalate Wand",
+    "file": "item_weawaneruld",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Kroril Wand",
+    "file": "item_weawanrismil",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Rekis Wand",
+    "file": "item_weawanfacus",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Daris Wand",
+    "file": "item_weawanblackw",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lorai Wand",
+    "file": "item_weawanhollat",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Itun",
+    "file": "item_weayoyiron",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Slepint",
+    "file": "item_weayoysleepe",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Client",
+    "file": "item_weayoycleepe",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Tensu",
+    "file": "item_weayoytripin",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Emporer",
+    "file": "item_weayoyimperial",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Dicein",
+    "file": "item_weayoydeathf",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Miragle",
+    "file": "item_weayoymirage",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ridener",
+    "file": "item_weayoyridert",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Firee",
+    "file": "item_weayoyfreeha",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Immote",
+    "file": "item_weayoyhiper",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Stencil",
+    "file": "item_weayoystealth",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Repoyit",
+    "file": "item_weayoyredeye",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Gelonde",
+    "file": "item_weayoygoldbu",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Wingfull",
+    "file": "item_weayoywingfo",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Anakun",
+    "file": "item_weayoyaquabr",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Circern",
+    "file": "item_weayoycisica",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Mishend",
+    "file": "item_weayoyhander",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Slinfes",
+    "file": "item_weayoysharpn",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Akane",
+    "file": "item_weayoyaranet",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Clantob",
+    "file": "item_weayoyclipeus",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Enaphoon",
+    "file": "item_weayoyeclips",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Coroner",
+    "file": "item_weayoycorses",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Dretra Schwert",
+    "file": "item_weaswoset01",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Taytra Axt",
+    "file": "item_weaaxeset01",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Yakshadain Stick",
+    "file": "item_weacheset01",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Clrael Wand",
+    "file": "item_weawanset01",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Shamerel Stab",
+    "file": "item_weastaset01",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Yakadain Knuckle",
+    "file": "item_weaknuset01",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Tritium Schwert",
+    "file": "item_weaswopericuum",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Tritium Axt",
+    "file": "item_weaaxepericuum",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Tritium Stick",
+    "file": "item_weachepericuum",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Tritium Knuckle",
+    "file": "item_weaknupericuum",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Tritium Wand",
+    "file": "item_weawanpericuum",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Tritium Yoyo",
+    "file": "item_weayoypericuum",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Tritium Bogen",
+    "file": "item_weabowpericuum",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Tritium Stab",
+    "file": "item_weastapericuum",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Eisen von Clockworks",
+    "file": "item_weaswobroad",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Wächter-Schwert",
+    "file": "item_weaswosuho",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Wächter-Big Schwert",
+    "file": "item_weaswtsuho",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Wächter-Axt",
+    "file": "item_weaaxesuho",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Wächter-Groß Axt",
+    "file": "item_weaaxtsuho",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Wächter-Knuckle",
+    "file": "item_weaknusuho",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Wächter-Stick",
+    "file": "item_weachesuho",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Wächter-Wand",
+    "file": "item_weawansuho",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Wächter-Stab",
+    "file": "item_weastasuho",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Wächter-Bogen",
+    "file": "item_weabowsuho",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Wächter-Yo-Yo",
+    "file": "item_weayoysuho",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Historisches Schwert",
+    "file": "item_weaswodwarf",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Historisches GroßSchwert",
+    "file": "item_weaswtdwarf",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Historische Axt",
+    "file": "item_weaaxedwarf",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Historische Großaxt",
+    "file": "item_weaaxtdwarf",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Historisches Knuckle",
+    "file": "item_weaknudwarf",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Historischer Stick",
+    "file": "item_weachedwarf",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Historischer Wand",
+    "file": "item_weawandwarf",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Historischer Stab",
+    "file": "item_weastadwarf",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Historischer Bogen",
+    "file": "item_weabowdwarf",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Historisches Yo-Yo",
+    "file": "item_weayoydwarf",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Himmlisches Schwert",
+    "file": "item_weaswoangel",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Himmlisches GroßSchwert",
+    "file": "item_weaswtangel",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Himmlisches Axt",
+    "file": "item_weaaxeangel",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Himmlische Großaxt",
+    "file": "item_weaaxtangel",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Himmlischer Knuckle",
+    "file": "item_weaknuangel",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Himmlischer Stick",
+    "file": "item_weacheangel",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Himmlischer Wand",
+    "file": "item_weawanangel",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Himmlischer Stab",
+    "file": "item_weastaangel",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Himmlischer Bogen",
+    "file": "item_weabowangel",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Himmlisches Yo-Yo",
+    "file": "item_weayoyangel",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Legendäres Goldenes Schwert",
+    "file": "item_weaswolegendg",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Legendäres Goldenes GroßSchwert",
+    "file": "item_weaswtlegendg",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Legendäre Goldene Axt",
+    "file": "item_weaaxelegendg",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Legendäse Goldene Großaxt",
+    "file": "item_weaaxtlegendg",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Legendärer Goldener Knuckle",
+    "file": "item_weaknulegendg",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Legendärer Goldener Stick",
+    "file": "item_weachelegendg",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Legendärer Goldener Wand",
+    "file": "item_weawanlegendg",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Legendärer Goldener Stab",
+    "file": "item_weastalegendg",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Legendärer Goldener Bogen",
+    "file": "item_weabowlegendg",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Legendäres Goldenes Yo-Yo",
+    "file": "item_weayoylegendg",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Bloody Schwert",
+    "file": "item_weaswobloody",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Bloody Slayer",
+    "file": "item_weaswtbloody",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Bloody Axt",
+    "file": "item_weaaxebloody",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Bloody Zweihanded Axt",
+    "file": "item_weaaxtbloody",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Bloody Knuckle",
+    "file": "item_weaknubloody",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Bloody Stick",
+    "file": "item_weachebloody",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Bloody Wand",
+    "file": "item_weawanbloody2",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Bloody Stab",
+    "file": "item_weastabloody",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Bloody Bogen",
+    "file": "item_weabowbloody",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Bloody Yo-Yo",
+    "file": "item_weayoybloody",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Ancient Einhand Schwert",
+    "file": "item_weaswoancient",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Ultimate Ancient Zweihand Schwert",
+    "file": "item_weaswtancient",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Ancient Einhand Axt",
+    "file": "item_weaaxeancient",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Ultimate Ancient Zweihand Axt",
+    "file": "item_weaaxtancient",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Ancient Knuckle",
+    "file": "item_weaknuancient",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Ultimate Ancient Stick",
+    "file": "item_weacheancient",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Ancient Wand",
+    "file": "item_weawanancient",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Ultimate Ancient Stab",
+    "file": "item_weastaancient",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Ancient Bogen",
+    "file": "item_weabowancient",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Ancient Yo-Yo",
+    "file": "item_weayoyancient",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Vampire Blade",
+    "file": "item_weaswovempire",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Ultimate Vampire Slayer",
+    "file": "item_weaswtvempire",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Vampire Axt",
+    "file": "item_weaaxevempire",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Ultimate Vampire Zweihand Axt",
+    "file": "item_weaaxtvempire",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Vampire Knuckle",
+    "file": "item_weaknuvempire",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Ultimate Vampire Stick",
+    "file": "item_weachevempire",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Vampire Wand",
+    "file": "item_weawanvempire",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Ultimate Vampire Stab",
+    "file": "item_weastavempire",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Vampire Bogen",
+    "file": "item_weabowvempire",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultimate Vampire Yo-Yo",
+    "file": "item_weayoyvempire",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Pieceslayer",
+    "file": "item_weaswtpeace",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lasterslayer",
+    "file": "item_weaswtlaster",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Piecenition",
+    "file": "item_weaaxtpeace",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lasternition",
+    "file": "item_weaaxtlaster",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Collector",
+    "file": "item_gentoocolnormal",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "V3 Collector",
+    "file": "item_gentoocolvthree",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Power  Collector",
+    "file": "item_gentoocolpower",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Ultra  Collector",
+    "file": "item_gentoocolultra",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Kehin Schwert",
+    "file": "item_weaswokehin",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Zirkan Schwert",
+    "file": "item_weaswozirkan",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Strad Schwert",
+    "file": "item_weaswostrad",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Sibak Schwert",
+    "file": "item_weaswosibak",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Karmel Schwert",
+    "file": "item_weaswokarmel",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Sparkling Schwert",
+    "file": "item_weaswogemini",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Meryl Stick",
+    "file": "item_weachemeryl",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "PaPang Stick",
+    "file": "item_weachepapang",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Dain Stick",
+    "file": "item_weachedain",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Sephy Stick",
+    "file": "item_weachesephy",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Bosl Stick",
+    "file": "item_weachebosl",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Nefume Wand",
+    "file": "item_weawannefume",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Dazzle Wand",
+    "file": "item_weawandazzle",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Peny Wand",
+    "file": "item_weawanpeny",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Eclipse Wand",
+    "file": "item_weawaneclips",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Saint Wand",
+    "file": "item_weawansaint",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Shuprim Stab",
+    "file": "item_weastashupri",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Papanew Stab",
+    "file": "item_weastapapane",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Pinsi Stab",
+    "file": "item_weastapinsi",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Leafgale Stab",
+    "file": "item_weastaleafga",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Venhill Stab",
+    "file": "item_weastavenhil",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Pazion Knuckle",
+    "file": "item_weaknupazion",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Prenil Knuckle",
+    "file": "item_weaknuprenil",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Salamander Knuckle",
+    "file": "item_weaknusalama",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Gigaton Knuckle",
+    "file": "item_weaknugigato",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Appel Knuckle",
+    "file": "item_weaknuappel",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Grabber Axt",
+    "file": "item_weaaxegrabber",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Crest Axt",
+    "file": "item_weaaxecrest",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Canine Axt",
+    "file": "item_weaaxecanine",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Crawler Axt",
+    "file": "item_weaaxecrawle",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Frenetic Axt",
+    "file": "item_weaaxefrenet",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Crimson Schwert",
+    "file": "item_weaswoseed",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Heart Stone",
+    "file": "item_evebaldiahart",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Bruce Lee Fist",
+    "file": "item_mcloisho01knuck",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Police Club",
+    "file": "item_weaclub",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Apple Wheat-Gluten",
+    "file": "item_weaswoapple",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Bamboo Stick",
+    "file": "item_weaswobamboo",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Blood Red Umbrella",
+    "file": "item_weaswoumbrella01",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Pink Parasol",
+    "file": "item_weaswoparasol",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Schwert",
+    "file": "item_weaswolusika",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Gladiator Schwert",
+    "file": "item_weaswtlusika",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Axt",
+    "file": "item_weaaxelusika",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Gladiator Axt",
+    "file": "item_weaaxtlusika",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Fist",
+    "file": "item_weaknulusika",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Stick",
+    "file": "item_weachelusika",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Wand",
+    "file": "item_weawanlusika",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Stab",
+    "file": "item_weastalusika",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Bogen",
+    "file": "item_weabowlusika",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Yo-Yo",
+    "file": "item_weayoylusika",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Crystal Schwert",
+    "file": "item_weaswocrystal",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Gladiator Crystal Schwert",
+    "file": "item_weaswtcrystal",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Crystal Axt",
+    "file": "item_weaaxecrystal",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Gladiator Crystal Axt",
+    "file": "item_weaaxtcrystal",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Fist",
+    "file": "item_weaknucrystal",
+    "hold": [
+     "knuckle"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Stick",
+    "file": "item_weachecrystal",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Wand",
+    "file": "item_weawanrustiacrystal",
+    "hold": [
+     "rhand"
+    ]
+   },
+   {
+    "name": "Lusaka\\'s Stab",
+    "file": "item_weastacrystal",
+    "hold": [
+     "rhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Bogen",
+    "file": "item_weabowcrystal",
+    "hold": [
+     "lhand"
+    ],
+    "bothHands": true
+   },
+   {
+    "name": "Lusaka\\'s Yo-Yo",
+    "file": "item_weayoycrystal",
+    "hold": [
+     "rhand",
+     "lhand"
+    ],
+    "bothHands": true
+   }
+  ],
+  "shield": [
+   {
+    "name": "Green Schild",
+    "file": "item_armshiwooden",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Round Schild",
+    "file": "item_armshibuckle",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Sentinel Schild",
+    "file": "item_armshiguard",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Sparkle Schild",
+    "file": "item_armshiturtle",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Shurain Schild",
+    "file": "item_armshiscale",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Gyro Schild",
+    "file": "item_armshininesh",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Vortex Schild",
+    "file": "item_armshidrain",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Plus Schild",
+    "file": "item_armshicross",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Plate Schild",
+    "file": "item_armshitower",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Kite Schild",
+    "file": "item_armshiheart",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Aster Schild",
+    "file": "item_armshistar",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Comet Schild",
+    "file": "item_armshicresce",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Icicle Schild",
+    "file": "item_armshilucid",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Hileitine Schild",
+    "file": "item_armshihillra",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Coien Schild",
+    "file": "item_armshicoivel",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Rukenshia Schild",
+    "file": "item_armshirukhoa",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Toeffin Schild",
+    "file": "item_armshitowrie",
+    "hold": [
+     "shield"
+    ]
+   },
+   {
+    "name": "Catepo Schild",
+    "file": "item_armshicatacop",
+    "hold": [
+     "shield"
+    ]
+   }
+  ]
+ }
+}

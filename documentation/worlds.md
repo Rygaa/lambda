@@ -21,9 +21,12 @@ Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it ru
 `F`) attacks (click again for the next of 4 hits), and the camera follows it (with `?nochar`, the arrows move the
 camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top left opens a menu that changes
 the walk speed, the run speed, the jump height, and the zoom while the game runs (`web/systems/admin.js`), and the
-clothes of the human: head, hair, clothes, gloves, shoes, cap, cloak, and mask (`web/systems/outfit.js`). The clothes
-are the FlyFF male parts of `assets/character/player/parts/`, listed in `clothes.json`; `import-clothes.mjs` makes both
-from the FlyFF data folder. Trees,
+clothes and weapons of the human: head, hair, clothes, gloves, shoes, cap, cloak, mask, weapon, and shield
+(`web/systems/outfit.js`). Each slot opens a grid of pictures of its items, so you see an item before you put it on
+(`web/lib/preview.js`). The items are the FlyFF male parts and the FlyFF weapons and shields of
+`assets/character/player/parts/`, listed in `items.json`; `import-items.mjs` makes both from the FlyFF data folder.
+`Save` writes all these values to `saves/admin.json` (through `web/serve.py`), and the game starts with them;
+`Default` puts back the values of the code, without saving them. Trees,
 water and cliff walls stop the human; it goes up and down stairs. Rocks and buildings stop it by their real shape: it
 can jump onto a rock, walk on it, and fall off it.
 

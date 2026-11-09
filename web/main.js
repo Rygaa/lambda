@@ -28,7 +28,7 @@ import { outfitSystem } from './systems/outfit.js';
 // the page is web/index.html: the assets and the worlds are next to web/
 const NOCACHE = '?v=' + Date.now();
 const loadJson = async (path) => (await fetch(path + NOCACHE)).json();
-const [meta, palettes, character, clothes] = await Promise.all(['render', 'palettes', 'character/player/character', 'character/player/clothes']
+const [meta, palettes, character, items] = await Promise.all(['render', 'palettes', 'character/player/character', 'character/player/items']
   .map((f) => loadJson(`../assets/${f}.json`)));
 const texLoader = new THREE.TextureLoader();
 const loadAtlas = async (info) => {
@@ -38,6 +38,8 @@ const loadAtlas = async (info) => {
   t.colorSpace = THREE.NoColorSpace;
   return t;
 };
+// the settings saved with the Save button of the admin menu (saves/admin.json, web/serve.py); none: the defaults
+const saved = await fetch('../saves/admin.json' + NOCACHE).then((r) => (r.ok ? r.json() : {}), () => ({}));
 const [tufts, clumps, decor] = await Promise.all(['tufts', 'clumps', 'decor'].map((k) => loadAtlas(meta.sprites[k])));
 
 // ------------------------------------------------------------------ world
@@ -93,11 +95,11 @@ setResource(world, Res.Settings, {
   },
 });
 setResource(world, Res.Assets, { meta, tex: { tufts, clumps, decor }, shapes });
-setResource(world, Res.Viewport, Res.createViewport());
+setResource(world, Res.Viewport, { ...Res.createViewport(), zoom: saved.zoom ?? 0 });
 setResource(world, Res.Time, Res.createTime());
 setResource(world, Res.Input, Res.createInput());
-setResource(world, Res.Tuning, Res.createTuning());
-setResource(world, Res.Wardrobe, Res.createWardrobe(character, clothes));
+setResource(world, Res.Tuning, { ...Res.createTuning(), ...saved.tuning });
+Object.assign(setResource(world, Res.Wardrobe, Res.createWardrobe(character, items)).outfit, saved.outfit);
 setResource(world, Res.BlockGrid, Res.createGrid(land.terrain));
 setResource(world, Res.Tops, createTops(land.half + 2));
 setResource(world, Res.CoverGrid, Res.createGrid());
