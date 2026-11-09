@@ -1,5 +1,5 @@
 // The human (assets/character/player, the FlyFF male): ported from the voxel branch
-// (game/src/client/character.ts). Its clips (idle, walk, run) are baked once at load into frames of posed
+// (game/src/client/character.ts). Its clips (idle, walk, run, the 4 parts of a jump) are baked once at load into frames of posed
 // vertices (bakeFps a second); systems/player.js swaps the frames and moves it.
 // The fixes of character.ts are kept: fixSecondBones, triangles on transparent texels dropped,
 // faces turned the right way, transparent texels filled, seams welded, normals smoothed over the body.
@@ -189,10 +189,11 @@ export async function addCharacter(world, at) {
   const config = await (await fetch(BASE + 'character.json')).json();
   const body = await loadBody(config);
   const clips = {};
-  for (const state of ['idle', 'walk', 'run']) {
+  for (const state of ['idle', 'walk', 'run', 'jumpStart', 'jumpUp', 'jumpDown', 'jumpLand']) {
     const clip = body.clips.find((a) => a.name === config.clips[state]);
     if (!clip) throw new Error(`character: no clip ${config.clips[state]} in ${config.animations}`);
-    const n = Math.max(1, Math.round(clip.duration * config.bakeFps));
+    // a loop leaves out its last frame (it is the first one again); a part of the jump plays once, so it keeps it
+    const once = state.startsWith('jump'), n = Math.max(1, Math.round(clip.duration * config.bakeFps)) + (once ? 1 : 0);
     clips[state] = Array.from({ length: n }, (_, k) => pose(body, clip, Math.min(clip.duration - 1e-3, k / config.bakeFps)));
   }
   const group = new THREE.Group();

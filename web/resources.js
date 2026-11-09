@@ -20,7 +20,7 @@ export const createTime = () => ({ now: 0, prev: null, dt: 0, sceneTime: 0, paus
 
 // values the admin menu changes while the game runs (systems/admin.js)
 export const Tuning = 'Tuning';
-export const createTuning = () => ({ walkSpeed: 2.4, runSpeed: 5.2 });
+export const createTuning = () => ({ walkSpeed: 2.4, runSpeed: 5.2, jumpHeight: 0.7 });
 
 export const Input = 'Input';
 // DOM listeners only push raw records into `pending`; the input system turns

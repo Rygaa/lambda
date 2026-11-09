@@ -1,6 +1,8 @@
 // The human walks: the arrows (or W A S D) move it on the ground, Shift makes it run, it turns to face where it goes, and the
 // camera follows it. What stops a walker stops it (gen/collision.js, the BlockGrid), and so does a step
 // higher than terrain STEP (a cliff wall); stairs are a slope, so it goes up and down them.
+// Space makes it jump (Tuning jumpHeight), and it can steer in the air. The 4 parts of the jump clip: a crouch on
+// the ground, going up, falling, and the crouch of the landing (cut short when it moves on).
 import * as THREE from 'three';
 import { query, getComponent, getResource } from '../ecs/world.js';
 import { Player, CameraRig } from '../components.js';
@@ -10,6 +12,7 @@ import { heightAt, STEP } from '../gen/terrain.js';
 
 // the speeds its walk and run clips were made for: at other speeds (the admin menu) the clip plays faster or slower
 const CLIP_SPEED = { walk: 2.4, run: 5.2 };
+const GRAVITY = 20;     // world units a second, each second
 const RADIUS = 0.2;     // it keeps this far from what stops it
 const KEYS = { up: ['arrowup', 'w', 'z'], down: ['arrowdown', 's'], left: ['arrowleft', 'a', 'q'], right: ['arrowright', 'd'] };
 
@@ -26,12 +29,27 @@ export function playerSystem(world) {
     if (down('down')) mv.sub(groundFwd);
     if (down('right')) mv.add(R);
     if (down('left')) mv.sub(R);
-    const state = mv.lengthSq() === 0 ? 'idle' : input.keys.has('shift') ? 'run' : 'walk';
+    const moving = mv.lengthSq() > 0, running = input.keys.has('shift');
+    const j = p.jump;
+    const clipTime = (state) => (p.clips[state].length - 1) / p.fps;
+    // Space: it crouches on the ground first (jumpStart), then leaves the ground
+    if (!j.air && !j.crouch && input.pressed.some(({ key }) => key === ' ')) j.crouch = clipTime('jumpStart');
+    if (j.crouch > 0) {
+      j.crouch = Math.max(0, j.crouch - time.dt);
+      if (!j.crouch) { j.air = true; j.h = 0; j.vy = Math.sqrt(2 * GRAVITY * tuning.jumpHeight); }
+    } else if (j.air) {
+      j.h += j.vy * time.dt;
+      j.vy -= GRAVITY * time.dt;
+      if (j.h <= 0) { j.air = false; j.h = 0; j.land = clipTime('jumpLand'); }
+    } else j.land = Math.max(0, j.land - time.dt);
+    const ground = moving ? (running ? 'run' : 'walk') : 'idle';
+    const state = j.crouch > 0 ? 'jumpStart' : j.air ? (j.vy > 0 ? 'jumpUp' : 'jumpDown')
+      : j.land > 0 && !moving ? 'jumpLand' : ground;
     if (state !== p.state) { p.state = state; p.t = 0; }
-    const speed = state === 'run' ? tuning.runSpeed : tuning.walkSpeed;
-    p.t += time.dt * (state === 'idle' ? 1 : speed / CLIP_SPEED[state]);
+    const speed = running ? tuning.runSpeed : tuning.walkSpeed;
+    p.t += time.dt * (CLIP_SPEED[state] ? speed / CLIP_SPEED[state] : 1);
     let moved = false;
-    if (state !== 'idle') {
+    if (moving) {
       mv.normalize();
       p.rot = Math.atan2(mv.x, mv.z);
       const d = speed * time.dt, l = settings.walkLimit;
@@ -44,9 +62,11 @@ export function playerSystem(world) {
       }
     }
     // the frame of its clip
-    const frames = p.clips[p.state], frame = frames[Math.floor(p.t * p.fps) % frames.length];
+    // the walk, run and idle clips loop; a part of the jump stops on its last frame
+    const frames = p.clips[p.state], k = Math.floor(p.t * p.fps);
+    const frame = frames[p.state.startsWith('jump') ? Math.min(k, frames.length - 1) : k % frames.length];
     p.meshes.forEach((mesh, m) => { mesh.geometry = frame[m]; });
-    p.group.position.set(p.x, heightAt(terrain, p.x, p.z) + p.foot, p.z);
+    p.group.position.set(p.x, heightAt(terrain, p.x, p.z) + p.foot + j.h, p.z);
     p.group.rotation.y = p.rot;
     // its shadow moves with it
     if (moved || state !== 'idle') getResource(world, Gpu).shadowsDirty = true;

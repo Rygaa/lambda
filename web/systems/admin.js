@@ -1,5 +1,5 @@
 // The admin menu: the button at the top left opens it. Its sliders change values while the game runs:
-// the walk and run speeds of the human (the Tuning resource) and the zoom (the Viewport resource).
+// the walk and run speeds and the jump height of the human (the Tuning resource) and the zoom (the Viewport resource).
 // The markup is in index.html (#admin-button, #admin).
 import { getResource } from '../ecs/world.js';
 import { Tuning, Viewport } from '../resources.js';
@@ -9,12 +9,13 @@ import { ZOOM_STEP } from './viewport.js';
 const SLIDERS = [
   ['walk', 'Walk speed', (w) => getResource(w, Tuning).walkSpeed, (w, v) => { getResource(w, Tuning).walkSpeed = v; }, 0.5, 8, 0.1, (v) => v.toFixed(1)],
   ['run', 'Run speed (Shift)', (w) => getResource(w, Tuning).runSpeed, (w, v) => { getResource(w, Tuning).runSpeed = v; }, 1, 16, 0.1, (v) => v.toFixed(1)],
+  ['jump', 'Jump height (Space)', (w) => getResource(w, Tuning).jumpHeight, (w, v) => { getResource(w, Tuning).jumpHeight = v; }, 0.2, 4, 0.1, (v) => v.toFixed(1)],
   ['zoom', 'Zoom', (w) => getResource(w, Viewport).zoom, (w, v) => { const vp = getResource(w, Viewport); vp.zoom = v; vp.dirty = true; }, 0, 0, ZOOM_STEP, (v) => v.toFixed(2)],
 ];
 
 export function setupAdminSystem(world) {
   const panel = document.getElementById('admin');
-  document.getElementById('admin-button').addEventListener('click', () => { panel.hidden = !panel.hidden; syncZoom(world); });
+  document.getElementById('admin-button').addEventListener('click', (e) => { panel.hidden = !panel.hidden; syncZoom(world); e.currentTarget.blur(); });
   for (const [id, label, get, set, min, max, step, show] of SLIDERS) {
     const row = document.createElement('label');
     row.innerHTML = `<span>${label}</span><output></output><input type="range" min="${min}" max="${max}" step="${step}">`;
