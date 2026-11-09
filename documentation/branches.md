@@ -18,6 +18,7 @@ The official copy is on GitHub, in `Rygaa/lambda`.
 | `worlds/` | the world recipes (see `documentation/worlds.md`) |
 | `web/` | the code that makes and draws the worlds, in the browser (`web/serve.py`) |
 | `documentation/branches.md` | this guide |
+| `documentation/how-we-work.md` | how to work on the project, where the code is, and how to test it: read it first in a new chat |
 | `documentation/assets.md` | how the assets are sorted and named, and the plan to build it |
 | `documentation/worlds.md` | how to open a world, and how to write one |
 | `documentation/building/` | how to build a building from a reference image, with examples and tools (see its `README.md`) |
@@ -104,3 +105,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/attack` | a click (or F) attacks, 4 hits in a row; rocks and buildings stop the human by their real shape, so it can jump onto them | try, moved to `attempt_1` |
 | `try/clothes` | the Admin menu changes the clothes of the human: every male part of the FlyFF data (head, hair, clothes, gloves, shoes, cap, cloak, mask) | try, moved to `attempt_1` |
 | `try/items` | the weapons and shields of the FlyFF data in the Admin menu (held on the hand and shield bones); each slot opens a grid of pictures of its items; Save and Default buttons (saves/admin.json) | try, moved to `attempt_1` |
+| `try/how-we-work` | `documentation/how-we-work.md`: the rules, the code map, the FlyFF data, and how to test, for a new chat | try, moved to `attempt_1` |
