@@ -103,4 +103,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/jump` | Space makes the human jump (the 4 parts of the jump clip); the Admin menu changes the jump height | try, moved to `attempt_1` |
 | `try/attack` | a click (or F) attacks, 4 hits in a row; rocks and buildings stop the human by their real shape, so it can jump onto them | try, moved to `attempt_1` |
 | `try/clothes` | the Admin menu changes the clothes of the human: every male part of the FlyFF data (head, hair, clothes, gloves, shoes, cap, cloak, mask) | try, moved to `attempt_1` |
-| `try/items` | the weapons and shields of the FlyFF data in the Admin menu (held on the hand and shield bones); each slot opens a grid of pictures of its items; Save and Default buttons (saves/admin.json) | try |
+| `try/items` | the weapons and shields of the FlyFF data in the Admin menu (held on the hand and shield bones); each slot opens a grid of pictures of its items; Save and Default buttons (saves/admin.json) | try, moved to `attempt_1` |
