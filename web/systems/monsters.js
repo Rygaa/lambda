@@ -4,6 +4,7 @@
 //   the hit frame of models.json, then attackDelay seconds before the next one). It gives up, goes home and heals
 //   when the human dies or when it is more than LEASH from home;
 //   dead: its death clip, then it fades out and is removed.
+// When the look changes (the Look resource), each monster gets the meshes and clips of the new look once they are made.
 // It walks on the ground like the human (lib/walk.js) and does not jump.
 import * as THREE from 'three';
 import { query, getComponent, getResource, sendEvent, destroyEntity } from '../ecs/world.js';
@@ -11,7 +12,8 @@ import { Monster, Player, Health } from '../components.js';
 import { Settings, Time, Gpu, BlockGrid, Tops, Bestiary } from '../resources.js';
 import { MonsterBlow } from '../events.js';
 import { free, groundAt } from '../lib/walk.js';
-import { bakeModel, spawnMonster } from '../lib/monsters.js';
+import { bakeModel, spawnMonster, monsterLook } from '../lib/monsters.js';
+import { lookOf } from '../lib/voxels.js';
 
 const ROAM = 3;       // a calm walk ends at most this far from home
 const LEASH = 14;     // an angry monster this far from home gives up
@@ -25,10 +27,11 @@ export function monsterSystem(world) {
   const b = getResource(world, Bestiary), time = getResource(world, Time), gpu = getResource(world, Gpu);
   // the spawns waiting for their bake (none without the human: its fine pass draws them)
   if (gpu.fine) b.requests = b.requests.filter(({ type, x, z, rot }) => {
-    const bake = bakeModel(world, type.model);
-    if (bake.baked) spawnMonster(world, type, bake.baked, x, z, rot);
-    return !bake.baked && !bake.error;
+    const bake = bakeModel(world, type.model), drawn = bake.baked && monsterLook(world, type, bake.baked);
+    if (drawn) spawnMonster(world, type, bake.baked, drawn, x, z, rot);
+    return !drawn && !bake.error;
   });
+  const look = lookOf(world)?.key ?? null;
 
   const settings = getResource(world, Settings), grid = getResource(world, BlockGrid), tops = getResource(world, Tops);
   const terrain = settings.land.terrain, dt = time.dt;
@@ -36,6 +39,7 @@ export function monsterSystem(world) {
   const humanAlive = !!p && p.dead <= 0;
   for (const e of query(world, [Monster, Health])) {
     const m = getComponent(world, e, Monster), health = getComponent(world, e, Health), type = m.type;
+    if (m.look !== look) restyle(world, m);
     const clipTime = (state) => (m.clips[state].length - 1) / m.fps;
     let next = 'idle', goal = null, speed = 0, stopAt = 0.05;
 
@@ -124,4 +128,16 @@ export function monsterSystem(world) {
     m.group.rotation.y = m.rot;
     if (moved || m.state !== 'idle') gpu.shadowsDirty = true;
   }
+}
+
+// the meshes and clips of the look now, once they are made (lib/monsters.js monsterLook)
+function restyle(world, m) {
+  const drawn = monsterLook(world, m.type, bakeModel(world, m.type.model).baked);
+  if (!drawn) return;
+  for (const mesh of m.meshes) { m.group.remove(mesh); mesh.material.dispose(); }
+  for (const mesh of drawn.meshes) { mesh.material.uniforms.uFade.value = m.fade; m.group.add(mesh); }
+  m.meshes = drawn.meshes;
+  m.clips = drawn.clips;
+  m.look = drawn.look;
+  getResource(world, Gpu).shadowsDirty = true;
 }

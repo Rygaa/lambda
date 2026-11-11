@@ -11,7 +11,7 @@ import { createGround, paint, groundAt, pathShape, rectShape, circleShape, PAINT
 export const AMOUNTS = { none: 0, few: 0.3, some: 1, many: 2.5, lots: 6 };
 const CLEARINGS = { none: 0, few: 2, some: 3, many: 4, lots: 4 };   // the shaders take at most 4
 
-const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'borders', 'islands', 'clearings', 'cliffs', 'ground', 'props'];
+const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'borders', 'islands', 'clearings', 'cliffs', 'ground', 'props', 'objects'];
 // recipe "clouds": how much of the ground their shadows cover -> the CloudLayer edges (lo, hi)
 export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02] };
 const LINE_FIELDS = ['asset', 'params', 'amount', 'count', 'palette', 'spacing', 'gap', 'near', 'avoid', 'on', 'at'];
@@ -86,7 +86,18 @@ export function buildRecipe(cache, recipe) {
   const lines = (recipe.props ?? []).map((line, i) => prepare(b, line, i));
   lines.sort((p, q) => (!!p.line.near - !!q.line.near) || q.size - p.size);
   for (const l of lines) place(b, l);
+  b.objects = objectsOf(recipe.objects ?? []);
   return finish(b);
+}
+
+// recipe "objects": [{ object (a name of assets/objects/objects.json), at: [[x, z, rot], ...] }] -> one line each
+// { object, x, z, rot } (rot: radians, default 0). The names are checked when the world spawns (systems/objects.js)
+function objectsOf(lines) {
+  return lines.flatMap((line, i) => {
+    check(line, ['object', 'at'], `objects[${i}]`);
+    if (typeof line.object !== 'string') bad(`objects[${i}]`, 'object: a name of assets/objects/objects.json');
+    return (line.at ?? []).map(([x, z, rot = 0]) => ({ object: line.object, x, z, rot }));
+  });
 }
 
 // recipe "cliffs": { asset, count, palette, stairs } -> the values buildCliffs takes

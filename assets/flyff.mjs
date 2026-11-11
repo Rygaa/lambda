@@ -27,6 +27,37 @@ export function texturesOf(glb) {
   return (json.images ?? []).map(({ uri }) => path.basename(uri, path.extname(uri)));
 }
 
+// the box of a .glb file (all its meshes, through its node tree), in FlyFF units: [x0, y0, z0, x1, y1, z1], or null
+// (no mesh). Each mesh counts for the box of its POSITION accessor, so it can be a little larger than the shape
+export function boxOf(glb) {
+  const json = JSON.parse(glb.subarray(20, 20 + glb.readUInt32LE(12)).toString());
+  const mul = (a, b) => { const o = new Array(16).fill(0); for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) for (let k = 0; k < 4; k++) o[c * 4 + r] += a[k * 4 + r] * b[c * 4 + k]; return o; };
+  const local = (n) => {
+    if (n.matrix) return n.matrix;
+    const [x, y, z, w] = n.rotation ?? [0, 0, 0, 1], [sx, sy, sz] = n.scale ?? [1, 1, 1], [tx, ty, tz] = n.translation ?? [0, 0, 0];
+    return [(1 - 2 * (y * y + z * z)) * sx, 2 * (x * y + z * w) * sx, 2 * (x * z - y * w) * sx, 0,
+      2 * (x * y - z * w) * sy, (1 - 2 * (x * x + z * z)) * sy, 2 * (y * z + x * w) * sy, 0,
+      2 * (x * z + y * w) * sz, 2 * (y * z - x * w) * sz, (1 - 2 * (x * x + y * y)) * sz, 0, tx, ty, tz, 1];
+  };
+  const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+  const walk = (i, parent) => {
+    const node = json.nodes[i], m = mul(parent, local(node));
+    if (node.mesh !== undefined) for (const prim of json.meshes[node.mesh].primitives) {
+      const a = json.accessors[prim.attributes.POSITION];
+      for (let c = 0; c < 8; c++) {
+        const v = [0, 1, 2].map((k) => ((c >> k) & 1 ? a.max[k] : a.min[k]));
+        for (let r = 0; r < 3; r++) {
+          const x = m[r] * v[0] + m[4 + r] * v[1] + m[8 + r] * v[2] + m[12 + r];
+          lo[r] = Math.min(lo[r], x); hi[r] = Math.max(hi[r], x);
+        }
+      }
+    }
+    for (const child of node.children ?? []) walk(child, m);
+  };
+  for (const root of json.scenes[json.scene ?? 0].nodes) walk(root, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+  return lo[0] > hi[0] ? null : [...lo, ...hi];
+}
+
 // the first (largest) level of a .ktx2 file, as RGBA pixels, then as a .png
 export function ktx2ToPng(buf) {
   const vk = buf.readUInt32LE(12), w = buf.readUInt32LE(20), h = buf.readUInt32LE(24), scheme = buf.readUInt32LE(44);

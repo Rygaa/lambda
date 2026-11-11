@@ -26,12 +26,19 @@ export const Health = defineComponent('Health', () => ({ hp: 1, max: 1 }));
 //   mode: calm (stands, looks around, walks near home), angry (follows the human and attacks), or dead;
 //   goal: where a calm walk goes; wait: the time before the next calm walk or look; swing: the time in its attack
 //   (null: none); struck: the blow of this swing is dealt; cooldown: the time before the next swing; hurt: the time
-//   left of its hit clip; shown: the time left of its HP bar (systems/hud.js); fade: 1 seen, 0 gone (uFade)
+//   left of its hit clip; shown: the time left of its HP bar (systems/hud.js); fade: 1 seen, 0 gone (uFade);
+//   look: the look its meshes and clips are in (lib/voxels.js lookOf key, null: as it is)
 export const Monster = defineComponent('Monster', () => ({
-  type: null, group: null, meshes: [], clips: {}, fps: 15, foot: 0, height: 1, radius: 0.3, x: 0, z: 0, y: 0, rot: 0,
+  type: null, group: null, meshes: [], clips: {}, look: null, fps: 15, foot: 0, height: 1, radius: 0.3, x: 0, z: 0, y: 0, rot: 0,
   state: 'idle', t: 0, home: [0, 0], mode: 'calm', goal: null, wait: 2, swing: null, struck: false, cooldown: 0,
   hurt: 0, shown: 0, fade: 1,
 }));
+
+// a FlyFF decor object (assets/objects, systems/objects.js): its name in objects.json, where it stands and its turn;
+// group: its meshes (fine pass, with their textures), once its model is loaded; cubes: { key, mesh } its last look
+// made of cubes (lib/voxels.js lookOf key); busy: cubes are being made; box: its box in the world; placed: put by the
+// admin menu (systems/adminObjects.js), not by the world recipe
+export const Decor = defineComponent('Decor', () => ({ object: '', x: 0, z: 0, rot: 0, group: null, cubes: null, busy: false, box: null, placed: false }));
 
 // position on the ground and turn around the up axis
 export const Transform = defineComponent('Transform', () => ({ x: 0, z: 0, rotY: 0 }));

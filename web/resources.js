@@ -22,13 +22,32 @@ export const createTime = () => ({ now: 0, prev: null, dt: 0, sceneTime: 0, paus
 export const Tuning = 'Tuning';
 export const createTuning = () => ({ walkSpeed: 2.4, runSpeed: 5.2, jumpHeight: 0.7 });
 
+// how things are drawn (the Look part of systems/admin.js): voxel: made of small cubes (lib/voxels.js,
+// systems/voxels.js) or as they are; px: the edge of a cube, in pixels of the frame (1 / ppu world units each),
+// 0.5 to 6 (the rocks, plants and cliffs stop at 1: lib/voxels.js lookOf);
+// light: 'surface' (lit like the shape it comes from) or 'cube' (each cube face by its own normal)
+export const Look = 'Look';
+export const createLook = () => ({ voxel: false, px: 1, light: 'surface' });
+
+// the voxel work (systems/voxels.js): palette: the colours of the textured cubes (lib/voxels.js createPalette);
+// key: the look the rocks, plants and cliffs are drawn in now (null: as they are); queue: the jobs not sent yet
+// [{ entity } | { chunk }]; pool: the voxel workers, shared with the bodies (lib/voxelPool.js); sent: id -> job sent
+// to them; next: the
+// next id; done: their answers, not used yet; chunks: the cliff pieces of this look, shown all at once when they are
+// all made; chunksLeft: the pieces not made yet
+export const Voxels = 'Voxels';
+export const createVoxels = (palette, pool) => ({
+  palette, pool, key: null, queue: [], sent: new Map(), next: 0, done: [], chunks: [], chunksLeft: 0,
+});
+
 // the clothes and weapons of the human (systems/admin.js changes them, systems/outfit.js bakes them, lib/character.js):
 //   config: assets/character/player/character.json; slots: slot -> [{ name, file, hides, hold, bothHands }] (items.json);
 //   outfit: slot -> file (null: none, or the bare body); dirty: the outfit changed; busy: a bake runs;
-//   next: its result { clips, meshes }; cache: file -> its loaded parts
+//   next: its result { clips, meshes }; cache: file -> its loaded parts; look: the look (lib/voxels.js lookOf key,
+//   null: as it is) of its last bake
 export const Wardrobe = 'Wardrobe';
 export const createWardrobe = (config, items) => ({
-  config, slots: items.slots, outfit: { ...config.outfit }, dirty: false, busy: false, next: null, cache: new Map(),
+  config, slots: items.slots, outfit: { ...config.outfit }, dirty: false, busy: false, next: null, cache: new Map(), look: null,
 });
 
 // the monsters (lib/monsters.js, systems/monsters.js, the Monsters part of systems/admin.js):
@@ -36,7 +55,14 @@ export const createWardrobe = (config, items) => ({
 //   changes: id -> type (edited or new) or null (deleted), what the admin Save writes to saves/monsters.json;
 //   models: model -> { clips, hitAt } (assets/monsters/models.json); levels: assets/monsters/levels.json (lib/combat.js);
 //   unit: world units per FlyFF unit (lib/character.js unitScale); bakes: model -> { promise, baked, error };
-//   requests: spawns waiting for their bake [{ type, x, z }]
+//   requests: spawns waiting for their bake [{ type, x, z }]. A bake also keeps its frames made of cubes
+//   (baked.looks: look key @ scale -> { clips }, lib/monsters.js monsterLook)
+// the FlyFF decor objects (systems/objects.js): names: name -> { model, scale } (assets/objects/objects.json); models: model ->
+// a promise of { parts, box } (its meshes, still, and its box); unit: world units per FlyFF unit (lib/character.js
+// unitScale), 0 until known
+export const Objects = 'Objects';
+export const createObjects = (names) => ({ names, models: new Map(), unit: 0, unitAsked: false });
+
 export const Bestiary = 'Bestiary';
 export const createBestiary = (monsters, models, levels, changes) => {
   const types = monsters.filter((m) => !(m.id in changes)).concat(Object.values(changes).filter(Boolean));

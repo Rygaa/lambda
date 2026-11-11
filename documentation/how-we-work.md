@@ -5,7 +5,8 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 ## 1. Rules
 
 - Branches, moving work to `attempt_1`, and pushing: `documentation/branches.md`. Short version: new work goes on a
-  new `try/<name>` branch made from `attempt_1`; push only when the user asks.
+  new `try/<name>` branch made from `attempt_1`; push only when the user asks. `attempt_2` is `attempt_1` plus the
+  voxel look and the FlyFF decor objects in our style.
 - Commit messages are in French.
 - Screenshots for the user always have labels (a number and a caption for each picture).
 - For visual choices, show options and let the user decide. Keep things simple.
@@ -38,6 +39,9 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | fights: stats, damage, chance to hit, XP and levels; blows; the bars and numbers on screen | `web/lib/combat.js`, `web/systems/combat.js`, `web/systems/hud.js` |
 | the Monsters and Human parts of the Admin menu | `web/systems/adminFight.js` |
 | what stops a walker (the human and the monsters) | `web/lib/walk.js` |
+| the look, Normal or Voxel (the switch in the Admin menu): the converter to cubes, the workers that make them and save them, and the swap of what is drawn | `web/lib/voxels.js`, `web/lib/voxelPool.js`, `web/lib/voxelWorker.js`, `web/systems/voxels.js` |
+| the 1018 FlyFF decor objects (chairs, boxes, fences, lamps, houses, trees...): models, list (`objects.json`: name, scale for the few made too big or too small, size), import script; in the worlds (recipe `objects`) and the Objects part of the Admin menu, at our sizes, in cubes with the look | `assets/objects/`, `import-objects.mjs`, `web/systems/objects.js`, `web/systems/adminObjects.js` |
+| the FlyFF objects in the style of our world: textures turned into our stone and green leaf palettes, drawn with the world | `web/lib/objectStyle.js`, `web/render/shaders.js` (DECOR_FRAG) |
 | saved settings and stats, changed monsters, loaded at start | `saves/admin.json`, `saves/monsters.json` |
 
 ## 4. The FlyFF data
@@ -53,6 +57,8 @@ All FlyFF models and data are in `/Users/mohamedaissabenfodda/Workspace/data_fly
 - `data/models.ron`: an entry with `kind: Mover, index: <mover id>` gives the model and the clips of a monster.
 - `data/motions.ron`: the clips of each model (stand, walk, atk1, dmg1, die1, ...), with their hit frames.
 - `data/items.ron`: the items. Many names are in German.
+- `models/obj_*.glb`: 1018 decor objects (chairs, boxes, fences, lamps, tents, houses, trees, rocks of each region).
+  Their size is the one next to the FlyFF human, except a few (their maps scale them).
 
 ## 5. Testing without a screen
 

@@ -19,13 +19,21 @@ Then open `http://127.0.0.1:8643/web/?world=all-types`.
 
 Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it run, Space makes it jump, a click (or
 `F`) attacks (click again for the next of 4 hits), and the camera follows it (with `?nochar`, the arrows move the
-camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top left opens a menu that changes
+camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top left opens a menu. Its `Look` part
+switches between `Normal` and `Voxel`: rocks, plants, cliffs, the human and the monsters are drawn with small cubes on
+a grid, with the cube size in pixels (0.5 to 6, 1 by default; rocks, plants and cliffs stop at 1, because nothing
+smaller than a pixel shows on them) and its light (`like the shape` or `each face`). Only the picture changes: the
+shapes, what stops the human, and the fights stay the same (`web/lib/voxels.js`, `web/systems/voxels.js`). Leaves,
+water, grass and the ground stay as they are. The cubes are made by workers, one per core of the computer but one,
+for the world and the bodies alike (`web/lib/voxelPool.js`, `web/lib/voxelWorker.js`). Each result is saved in the
+browser (IndexedDB, `lambda-voxels`) under the hash of what made it, so the same world, outfit and cube size come back
+at once, even after a reload. To free that space, clear the site data of the browser. The menu also changes
 the walk speed, the run speed, the jump height, and the zoom while the game runs (`web/systems/admin.js`), and the
 clothes and weapons of the human: head, hair, clothes, gloves, shoes, cap, cloak, mask, weapon, and shield
 (`web/systems/outfit.js`). Each slot opens a grid of pictures of its items, so you see an item before you put it on
 (`web/lib/preview.js`). The items are the FlyFF male parts and the FlyFF weapons and shields of
 `assets/character/player/parts/`, listed in `items.json`; `import-items.mjs` makes both from the FlyFF data folder.
-`Save` writes all these values to `saves/admin.json` (through `web/serve.py`), and the game starts with them;
+`Save` writes all these values (with the look) to `saves/admin.json` (through `web/serve.py`), and the game starts with them;
 `Default` puts back the values of the code, without saving them (not the monsters or the stats). Trees,
 water and cliff walls stop the human; it goes up and down stairs. Rocks and buildings stop it by their real shape: it
 can jump onto a rock, walk on it, and fall off it (`web/lib/walk.js`).
@@ -36,6 +44,9 @@ attack delay, walk speed, size, and XP. A change applies at once. `Spawn` puts t
 (its model is baked the first time, so it comes after a moment), `Copy` makes a new monster from it, `Delete` removes
 it, `Remove all` removes the monsters in the world. `Save` writes the changed monsters to `saves/monsters.json`.
 The `Human` part sets the level, STR, STA, and points of the human, and `Full HP` fills its HP.
+The `Objects` part places FlyFF decor objects in any world: its button opens a grid of the 1018 objects (one picture
+each, and a search box), `Size` shows the size of the chosen one, `Place` puts it in front of the human, facing it, and
+`Remove all` removes the objects placed this way (`web/systems/adminObjects.js`). They are not saved.
 
 A monster is calm: it stands, looks around, and walks near the place where it came. When the human hits it, it
 follows the human and attacks it. It gives up, goes back, and heals when the human dies or goes too far (14 units
@@ -57,6 +68,7 @@ The worlds:
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
+- `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `meadow`: ponds and puddles.
 - `lakes`: a lake, a river, ponds, and puddles.
 - `rocky`: an autumn forest with many rocks.
@@ -97,6 +109,18 @@ The fields of a world:
 - `cliffs`: plateaus in levels, with rock walls and stairs (section 4). No `cliffs`: flat ground.
 - `clearings`: open places with light: `amount` or `count` (at most 4), `radius` [min, max], `light` [min, max].
 - `props`: one line per group of objects. Big objects are placed first.
+- `objects`: FlyFF decor objects (the 1018 of `assets/objects`: chairs, boxes, fences, lamps, tents, houses, trees,
+  rocks...), one line per object type: `{ "object": "bench", "at": [[x, z, turn], ...] }` (turn in radians, default
+  0). The names are in `assets/objects/objects.json`: the FlyFF name without `obj_` (`rustiachair01`), and a short
+  name for the first 30 (`bench`). They are placed where `at` says, nothing else moves for them. They are drawn in the
+  style of our world (`web/lib/objectStyle.js`): with the world, so with our pixels, light bands and 1 px outline,
+  each colour of their textures turned into the nearest of our stone palettes or our green leaf palettes (green and
+  pine, lit like our leaves), then smoothed so few specks are left (the pictures stay). Their sizes are brought to
+  ours: next to the human, FlyFF objects are a little bigger when small and much bigger when big (a house 17 m
+  high), so a height h becomes 0.7 h / (1 + 0.7 h / 6): a bench 0.9, a lamp 1.2, a house 4, a tree 3.8, never more
+  than 6 (`objectScale`). They follow the `Look` switch: cubes never smaller than 1 px, like the rocks; a big object
+  gets bigger cubes, so the computer does not run out of memory. Each one stops a walker by a circle, and no grass
+  grows under it (`web/systems/objects.js`).
 
 ## 3. A line of `props`
 

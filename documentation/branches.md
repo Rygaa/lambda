@@ -7,6 +7,10 @@ This guide says how to work with `attempt_1`, the official branch of Projet Lamb
 - `attempt_1` is the official version: stable, well structured, and it changes little.
 - Every other branch is a place to try ideas. A try can be messy, and it can fail.
 - A piece moves to `attempt_1` only when it works and is clean.
+- `attempt_2` is made from `attempt_1`, with the same rules. It adds the voxel look (the `Look` switch: Normal or
+  Voxel) and the 1018 FlyFF decor objects in the style of our world (the recipe `objects` and the Objects part of the
+  Admin menu). It came from `try/voxel-switch`, `try/flyff-objects` and `try/flyff-style`, without their variants:
+  the objects are only in our style (not with their FlyFF textures).
 
 The official copy is on GitHub, in `Rygaa/lambda`.
 
@@ -107,3 +111,6 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/items` | the weapons and shields of the FlyFF data in the Admin menu (held on the hand and shield bones); each slot opens a grid of pictures of its items; Save and Default buttons (saves/admin.json) | try, moved to `attempt_1` |
 | `try/how-we-work` | `documentation/how-we-work.md`: the rules, the code map, the FlyFF data, and how to test, for a new chat | try, moved to `attempt_1` |
 | `try/monsters` | the 569 FlyFF monsters (127 models, their clips); the Admin menu edits them and spawns them; they fight back when hit; the human has STR, STA, levels, and XP; HP bars and damage numbers | try, moved to `attempt_1` |
+| `try/voxel-switch` | a `Look` switch in the Admin menu: Normal, or Voxel (the converter of the `voxel` branch, ported to `web/`), with the cube size and light; the cubes are made by one worker per core and saved in the browser | try, moved to `attempt_2` |
+| `try/flyff-objects` | (made from `try/voxel-switch`) the 1018 FlyFF decor objects imported (chairs, boxes, fences, lamps, houses, trees...), placed by the recipe `objects` or by the Objects part of the Admin menu (a grid with a search box), drawn with their textures and made of cubes by the `Look` switch; the `flyff-objects` world shows 30 | try, moved to `attempt_2` |
+| `try/flyff-style` | (made from `try/flyff-objects`) the FlyFF objects in the style of our world: drawn with the world, their textures turned into our stone and green leaf palettes and smoothed ("flat palettes", picked over one palette per part and one per texel); the default, with FlyFF textures as a choice in the Look part of the Admin menu; their sizes brought to ours (big ones shrink most, at most 6 m) | try, moved to `attempt_2` |

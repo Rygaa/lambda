@@ -66,6 +66,8 @@ function solidTexture(map) {
   fcv.getContext('2d').putImageData(new ImageData(filled, cv.width, cv.height), 0, 0);
   const texture = new THREE.CanvasTexture(fcv);
   texture.flipY = false;
+  // a uv can go past the picture (a FlyFF banner): it repeats, like in FlyFF and in the cubes (lib/voxelWorker.js)
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   texture.magFilter = texture.minFilter = THREE.NearestFilter;
   texture.generateMipmaps = false;
   texture.colorSpace = THREE.NoColorSpace;
@@ -233,13 +235,14 @@ export function measure(body, name) {
 }
 
 // the meshes of a body for the fine pass, showing `frame`; uFade (0 to 1) fades them out (render/shaders.js FINE_FRAG)
-export function fineMeshes(gpu, body, frame) {
-  return body.parts.map((part, m) => {
-    const mesh = new THREE.Mesh(frame[m], shaderMaterial(gpu.shared, S.FINE_VERT, S.FINE_FRAG,
-      { uMap: { value: part.texture }, uFade: { value: 1 }, ...gpu.fine.uniforms }, { side: THREE.DoubleSide }));
-    mesh.frustumCulled = false;
-    mesh.layers.set(1);      // casts a shadow, not in the G-buffer
-    mesh.layers.enable(2);   // the fine pass
-    return mesh;
-  });
+export const fineMeshes = (gpu, body, frame) => body.parts.map((part, m) => fineMesh(gpu, part.texture, frame[m]));
+
+// one mesh for the fine pass, with its texture (a part, or the voxel palette: lib/voxels.js)
+export function fineMesh(gpu, texture, geometry) {
+  const mesh = new THREE.Mesh(geometry, shaderMaterial(gpu.shared, S.FINE_VERT, S.FINE_FRAG,
+    { uMap: { value: texture }, uFade: { value: 1 }, ...gpu.fine.uniforms }, { side: THREE.DoubleSide }));
+  mesh.frustumCulled = false;
+  mesh.layers.set(1);      // casts a shadow, not in the G-buffer
+  mesh.layers.enable(2);   // the fine pass
+  return mesh;
 }

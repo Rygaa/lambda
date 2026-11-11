@@ -63,4 +63,4 @@ export function discsOf(shape, p) {
 }
 
 // what the game needs from a finished builder
-export const finish = (b) => ({ props: b.props, glades: b.glades, half: b.half, start: b.start, shapes: b.cache, terrain: b.terrain, ground: b.ground, clouds: b.clouds, rays: b.rays });
+export const finish = (b) => ({ props: b.props, glades: b.glades, half: b.half, start: b.start, shapes: b.cache, terrain: b.terrain, ground: b.ground, clouds: b.clouds, rays: b.rays, objects: b.objects ?? [] });

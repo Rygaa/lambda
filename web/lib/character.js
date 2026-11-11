@@ -7,8 +7,9 @@
 import * as THREE from 'three';
 import { getResource, spawn } from '../ecs/world.js';
 import { Player, Health, Stats } from '../components.js';
-import { Gpu, Settings, Wardrobe } from '../resources.js';
-import { loadBody, bakeClips, measure, fineMeshes } from './bake.js';
+import { Gpu, Settings, Wardrobe, Voxels } from '../resources.js';
+import { loadBody, bakeClips, measure, fineMeshes, fineMesh } from './bake.js';
+import { lookOf, voxelClips } from './voxels.js';
 import { maxHp } from './combat.js';
 
 const BASE = '../assets/character/player/', TEXTURES = BASE + 'parts/textures/';
@@ -33,12 +34,17 @@ export function partsOf(outfit, slots) {
 // the body of an outfit (lib/bake.js loadBody)
 const bodyOf = (cache, config, outfit, slots) => loadBody(cache, partsOf(outfit, slots), BASE + config.animations, TEXTURES);
 
-// the clips and meshes of an outfit (slot -> file): systems/outfit.js puts them on the human
+// the clips and meshes of an outfit (slot -> file), in the look now: systems/outfit.js puts them on the human.
+// Made of cubes (lib/voxels.js), each frame is one mesh, with the colours of the voxel palette; the cubes are on the
+// grid of the human, so they turn and move with it
 export async function dress(world, outfit) {
-  const gpu = getResource(world, Gpu), { config, slots, cache } = getResource(world, Wardrobe);
+  const gpu = getResource(world, Gpu), { config, slots, cache } = getResource(world, Wardrobe), look = lookOf(world);
   const body = await bodyOf(cache, config, outfit, slots);
   const clips = bakeClips(body, Object.fromEntries(STATES.map((s) => [s, config.clips[s]])), config.bakeFps, ONCE);
-  return { clips, meshes: fineMeshes(gpu, body, clips.idle[0]) };
+  if (!look) return { clips, meshes: fineMeshes(gpu, body, clips.idle[0]), look: null };
+  const cubes = await voxelClips(world, body, clips, look.size / (await unitScale(world)).k, look.normals);
+  for (const frames of Object.values(clips)) for (const frame of frames) for (const g of frame) g.dispose();
+  return { clips: cubes, meshes: [fineMesh(gpu, getResource(world, Voxels).palette.texture, cubes.idle[0][0])], look: look.key };
 }
 
 // world units per FlyFF unit: the human is HEIGHT tall, measured on the body of the default outfit at the start of
@@ -60,7 +66,8 @@ export async function addCharacter(world, at, stats) {
       uOffset: gpu.blit.uniforms.uOffset, uScale: gpu.blit.uniforms.uScale, uMargin: gpu.blit.uniforms.uMargin },
   };
   gpu.fine.camera.layers.set(2);
-  const { config, outfit } = getResource(world, Wardrobe);
+  const wardrobe = getResource(world, Wardrobe), { config, outfit } = wardrobe;
+  wardrobe.look = lookOf(world)?.key ?? null;
   const { clips, meshes } = await dress(world, outfit);
   const group = new THREE.Group();
   for (const mesh of meshes) group.add(mesh);

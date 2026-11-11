@@ -14,6 +14,10 @@ import { cameraControlSystem, cameraSnapSystem } from './systems/camera.js';
 import { viewportSystem } from './systems/viewport.js';
 import { cloudSystem } from './systems/clouds.js';
 import { meshSystem } from './systems/meshes.js';
+import { voxelSystem } from './systems/voxels.js';
+import { objectSystem } from './systems/objects.js';
+import { createPalette } from './lib/voxels.js';
+import { createPool } from './lib/voxelPool.js';
 import { footprintSystem } from './systems/footprints.js';
 import { groundCoverSystem } from './systems/groundCover.js';
 import { shadowSystem } from './systems/shadows.js';
@@ -32,8 +36,8 @@ import { START } from './lib/combat.js';
 // the page is web/index.html: the assets and the worlds are next to web/
 const NOCACHE = '?v=' + Date.now();
 const loadJson = async (path) => (await fetch(path + NOCACHE)).json();
-const [meta, palettes, character, items, monsters, models, levels] = await Promise.all(['render', 'palettes', 'character/player/character',
-  'character/player/items', 'monsters/monsters', 'monsters/models', 'monsters/levels'].map((f) => loadJson(`../assets/${f}.json`)));
+const [meta, palettes, character, items, monsters, models, levels, objects] = await Promise.all(['render', 'palettes', 'character/player/character',
+  'character/player/items', 'monsters/monsters', 'monsters/models', 'monsters/levels', 'objects/objects'].map((f) => loadJson(`../assets/${f}.json`)));
 const texLoader = new THREE.TextureLoader();
 const loadAtlas = async (info) => {
   const t = await texLoader.loadAsync('../assets/' + info.file + NOCACHE);
@@ -106,7 +110,10 @@ setResource(world, Res.Viewport, { ...Res.createViewport(), zoom: saved.zoom ?? 
 setResource(world, Res.Time, Res.createTime());
 setResource(world, Res.Input, Res.createInput());
 setResource(world, Res.Tuning, { ...Res.createTuning(), ...saved.tuning });
+setResource(world, Res.Look, { ...Res.createLook(), ...saved.look });
+setResource(world, Res.Voxels, Res.createVoxels(createPalette(), createPool()));
 Object.assign(setResource(world, Res.Wardrobe, Res.createWardrobe(character, items)).outfit, saved.outfit);
+setResource(world, Res.Objects, Res.createObjects(objects.objects));
 setResource(world, Res.Bestiary, Res.createBestiary(monsters.monsters, models.models, levels, monsterChanges));
 setResource(world, Res.BlockGrid, Res.createGrid(land.terrain));
 setResource(world, Res.Tops, createTops(land.half + 2));
@@ -118,7 +125,7 @@ for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem
 for (const s of [
   inputSystem, timeSystem,
   outfitSystem, playerSystem, monsterSystem, combatSystem, cameraControlSystem, viewportSystem, cloudSystem,
-  meshSystem, footprintSystem, groundCoverSystem, shadowSystem,
+  meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem,
 ]) addSystem(world, s);
 

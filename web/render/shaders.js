@@ -177,6 +177,48 @@ void main() {
 }
 `;
 
+// FlyFF decor objects in our style (systems/objects.js, lib/objectStyle.js): like the stones, but the palette row of
+// each pixel comes from a texture of rows (uMap: red = the row, green = 1 for a leaf row; for cubes, the voxel palette
+// holds these codes). A leaf row is a canopy palette (its light ramp, lit like the leaves, darker in a shadow).
+// Both sides of a face are drawn (a FlyFF flag is one thin cloth); the back one is lit from its side
+export const DECOR_VERT = /* glsl */ `
+out vec3 vW;
+out vec3 vN;
+out vec2 vUv;
+out float vDepth;
+void main() {
+  vec4 w = modelMatrix * vec4(position, 1.0);
+  vW = w.xyz;
+  vN = normalize(mat3(modelMatrix) * normal);
+  vUv = uv;
+  vec4 v = viewMatrix * w;
+  vDepth = -v.z;
+  gl_Position = projectionMatrix * v;
+}
+`;
+export const DECOR_FRAG = COMMON + GBUF_OUT + /* glsl */ `
+uniform float uMid;
+uniform sampler2D uMap;
+in vec3 vW; in vec3 vN; in vec2 vUv; in float vDepth;
+void main() {
+  if (vW.y < uClipY) discard;
+  vec3 N = normalize(vN);
+  if (!gl_FrontFacing) N = -N;
+  float ndl = dot(N, uSunL);
+  vec4 code = texture(uMap, vUv);
+  float row = floor(code.r * 255.0 + 0.5);
+  if (code.g > 0.5) {
+    float lv = ((ndl * 0.5 + 0.5) * (0.78 + 0.22 * cloudLight(vW)) - 0.10) * (0.6 + 0.4 * shadowHard(vW + N * 0.02));
+    gData = vec4(lv, 4.0, N.y, row);
+  } else {
+    float lv = 0.0;
+    if (ndl > 0.0) lv = ndl * cloudLight(vW) * shadowHard(vW + N * 0.02);
+    gData = vec4(lv, uMid, N.y, row);
+  }
+  gNorm = vec4(normalize(mat3(viewMatrix) * N), vDepth);
+}
+`;
+
 // The ground: grass, or the paint of gen/ground.js there (palette row of the
 // ground family). Pavement has tile joints, fields have furrows.
 export function groundFrag() {

@@ -1,7 +1,7 @@
 // Startup systems: run once, in this order (see main.js).
 import * as THREE from 'three';
 import { spawn, getResource, setResource } from '../ecs/world.js';
-import { GroundCover, GroundPlane, DustField, CameraRig, OrthoView, CloudLayer, Glade } from '../components.js';
+import { GroundCover, GroundPlane, DustField, CameraRig, OrthoView, CloudLayer, Glade, Decor } from '../components.js';
 import { Assets, Gpu, Settings, Random, Input, ActiveView } from '../resources.js';
 import * as S from '../render/shaders.js';
 import { shaderMaterial, pieceMaterials } from '../render/materials.js';
@@ -184,6 +184,7 @@ export function spawnWorldSystem(world) {
   const land = settings.land;
   spawn(world, [GroundPlane]);
   for (const p of land.props) spawnProp(world, p);
+  for (const { object, x, z, rot } of land.objects) spawn(world, [Decor, { object, x, z, rot }]);
   for (const g of land.glades) spawn(world, [Glade, { x: g.x, z: g.z, r: g.r, k: g.k }]);
   const [lo, hi] = land.clouds ?? [];
   spawn(world, [CloudLayer, land.clouds ? { lo, hi } : {}]);
