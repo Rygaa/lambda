@@ -1,5 +1,7 @@
 // The human (assets/character/player, the FlyFF male): ported from the voxel branch
-// (game/src/client/character.ts). Its clips (idle, walk, run, the 4 parts of a jump, 4 hits, hurt, dead) are baked at
+// (game/src/client/character.ts). Its clips (idle, walk, run, the 4 parts of a jump, 4 hits, hurt, dead, and each hit
+// while it walks or runs: attack1Walk, attack1Run..., its legs from walk or run, and the end of each hit when no hit
+// follows: attack1End, attack1EndWalk, attack1EndRun...) are baked at
 // load into frames of posed vertices (bakeFps a second, lib/bake.js); systems/player.js swaps the frames and moves it.
 // Its parts come from its outfit (the Wardrobe resource, items.json): a head, hair, clothes, a weapon, and a shield; a new
 // outfit is baked again (dress, systems/outfit.js). Parts that are not skinned follow one bone: a weapon or a shield its
@@ -8,13 +10,15 @@ import * as THREE from 'three';
 import { getResource, spawn } from '../ecs/world.js';
 import { Player, Health, Stats } from '../components.js';
 import { Gpu, Settings, Wardrobe, Voxels } from '../resources.js';
-import { loadBody, bakeClips, measure, fineMeshes, fineMesh } from './bake.js';
+import { loadBody, bakeClips, measure, fineMeshes, fineMesh, loader } from './bake.js';
+import { retarget } from './retarget.js';
 import { lookOf, voxelClips } from './voxels.js';
 import { maxHp } from './combat.js';
 
 const BASE = '../assets/character/player/', TEXTURES = BASE + 'parts/textures/';
 export const HEIGHT = 1.05;    // world units: a person is about 1 unit tall (gen/collision.js)
 const STATES = ['idle', 'walk', 'run', 'jumpStart', 'jumpUp', 'jumpDown', 'jumpLand', 'attack1', 'attack2', 'attack3', 'attack4', 'hit', 'dead'];
+const BLEND = 0.25;   // seconds: the end of a hit melts into idle, walk or run (ending)
 const ONCE = (state) => /^(jump|attack|hit|dead)/.test(state);   // these clips play once and stop on their last frame
 
 // the parts of an outfit (slot -> file, null: none or the bare body), as [{ url, bone }] (bone: the attach point of a
@@ -32,7 +36,23 @@ export function partsOf(outfit, slots) {
 }
 
 // the body of an outfit (lib/bake.js loadBody)
-const bodyOf = (cache, config, outfit, slots) => loadBody(cache, partsOf(outfit, slots), BASE + config.animations, TEXTURES);
+async function bodyOf(cache, config, outfit, slots) {
+  const body = await loadBody(cache, partsOf(outfit, slots), BASE + config.animations, TEXTURES);
+  return config.borrowed ? { ...body, clips: [...body.clips, ...await borrowed(cache, config)] } : body;
+}
+
+// the clips of other skeletons that the human uses (config.borrowed: [{ file, rig }], lib/retarget.js), moved onto
+// ours once
+function borrowed(cache, config) {
+  if (!cache.has('borrowed')) {
+    cache.set('borrowed', (async () => {
+      const ours = (await loader(TEXTURES).loadAsync(BASE + config.animations)).scene, used = [...Object.values(config.clips), ...Object.values(config.recover ?? {})];
+      const files = await Promise.all(config.borrowed.map(({ file }) => loader(TEXTURES).loadAsync(BASE + file)));
+      return files.flatMap((gltf, i) => retarget(gltf, config.borrowed[i].rig, ours, used));
+    })());
+  }
+  return cache.get('borrowed');
+}
 
 // the clips and meshes of an outfit (slot -> file), in the look now: systems/outfit.js puts them on the human.
 // Made of cubes (lib/voxels.js), each frame is one mesh, with the colours of the voxel palette; the cubes are on the
@@ -40,11 +60,36 @@ const bodyOf = (cache, config, outfit, slots) => loadBody(cache, partsOf(outfit,
 export async function dress(world, outfit) {
   const gpu = getResource(world, Gpu), { config, slots, cache } = getResource(world, Wardrobe), look = lookOf(world);
   const body = await bodyOf(cache, config, outfit, slots);
-  const clips = bakeClips(body, Object.fromEntries(STATES.map((s) => [s, config.clips[s]])), config.bakeFps, ONCE);
+  const names = Object.fromEntries(STATES.map((s) => [s, config.clips[s]]));
+  for (const s of STATES.filter((s) => s.startsWith('attack'))) {
+    names[s + 'Walk'] = { clip: config.clips[s], legs: config.clips.walk };
+    names[s + 'Run'] = { clip: config.clips[s], legs: config.clips.run };
+  }
+  for (const s of STATES.filter((s) => s.startsWith('attack'))) {
+    names[s + 'End'] = { frames: ending(config, s, null) };
+    names[s + 'EndWalk'] = { frames: ending(config, s, config.clips.walk) };
+    names[s + 'EndRun'] = { frames: ending(config, s, config.clips.run) };
+  }
+  const clips = bakeClips(body, names, config.bakeFps, ONCE);
   if (!look) return { clips, meshes: fineMeshes(gpu, body, clips.idle[0]), look: null };
   const cubes = await voxelClips(world, body, clips, look.size / (await unitScale(world)).k, look.normals);
   for (const frames of Object.values(clips)) for (const frame of frames) for (const g of frame) g.dispose();
   return { clips: cubes, meshes: [fineMesh(gpu, getResource(world, Voxels).palette.texture, cubes.idle[0][0])], look: look.key };
+}
+
+// the end of the hit `state` when no hit follows it: its way back (config.recover: a clip, if it has one), then its
+// last pose melts in BLEND seconds into the start of idle (legs null), or of walk or run (legs: the clip of the legs,
+// which walk all along)
+function ending(config, state, legs) {
+  return (find, fps) => {
+    const back = config.recover?.[state] && find(config.recover[state]), last = back ?? find(config.clips[state]);
+    const to = find(legs ?? config.clips.idle), nBack = back ? Math.round(back.duration * fps) : 0, nBlend = Math.round(BLEND * fps);
+    return Array.from({ length: nBack + nBlend + 1 }, (_, k) => {
+      const w = Math.max(0, (k - nBack) / nBlend), from = { clip: last, time: back ? Math.min(k / fps, last.duration) : last.duration, weight: 1 - w };
+      return legs ? [{ ...from, only: 'top' }, { clip: to, time: k / fps, weight: w, only: 'top', loop: true }, { clip: to, time: k / fps, only: 'legs', loop: true }]
+        : [from, { clip: to, time: 0, weight: w }];
+    });
+  };
 }
 
 // world units per FlyFF unit: the human is HEIGHT tall, measured on the body of the default outfit at the start of

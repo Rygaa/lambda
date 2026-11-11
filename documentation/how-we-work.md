@@ -28,7 +28,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 
 | What | Where |
 | --- | --- |
-| the human (the FlyFF male): parts, clips baked into frames at load | `web/lib/character.js`, `assets/character/player/` |
+| the human (the FlyFF male): parts, clips baked into frames at load; sword hits of another skeleton (Quaternius, CC0) moved onto it | `web/lib/character.js`, `web/lib/retarget.js`, `assets/character/player/`, `assets/character/player/ual/` |
 | walk, run, jump, attack (4 hits), what stops him | `web/systems/player.js`, `web/lib/tops.js` (rocks and buildings by their shape) |
 | clothes, weapons, shields: models, list, import script | `assets/character/player/parts/`, `items.json`, `import-items.mjs` |
 | the outfit: the Wardrobe resource, a new outfit is baked again | `web/systems/outfit.js` |

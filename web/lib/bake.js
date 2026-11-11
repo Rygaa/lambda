@@ -132,13 +132,37 @@ export async function loadBody(cache, entries, animations, textures) {
   return { parts, seams, clips: anim.gltf.animations };
 }
 
-// one posed frame of the body: one geometry per part, at `time` seconds of `clip`
-export function pose({ parts, seams }, clip, time) {
+// the bones of the legs of the human (assets/character/player): its root and pelvis, the spine that holds the thighs,
+// and the legs. A mixed frame (pose `legs`) takes them from one clip (walk, run) and the other bones from another (a hit)
+const LEGS = new Set(['Bip02', 'Bip02_Pelvis', 'Bip02_Spine', 'Bip02_L_Thigh', 'Bip02_L_Calf', 'Bip02_L_Foot',
+  'Bip02_R_Thigh', 'Bip02_R_Calf', 'Bip02_R_Foot']);
+const halves = new WeakMap();   // clip -> { legs, top }: its tracks of the legs, and the others
+function halfOf(clip, legs) {
+  if (!halves.has(clip)) {
+    const ofLegs = (t) => LEGS.has(t.name.split('.')[0]);
+    halves.set(clip, { legs: new THREE.AnimationClip(clip.name + '/legs', clip.duration, clip.tracks.filter(ofLegs)),
+      top: new THREE.AnimationClip(clip.name + '/top', clip.duration, clip.tracks.filter((t) => !ofLegs(t))) });
+  }
+  return halves.get(clip)[legs ? 'legs' : 'top'];
+}
+
+// one posed frame of the body: one geometry per part, at `time` seconds of `clip`. legs ({ clip, time }): the legs
+// at that time of that clip instead (it loops). Or `clip` is a list of layers mixed by their weights: [{ clip, time,
+// weight (1), only ('legs', 'top': only those bones), loop (the time wraps) }]
+export function pose({ parts, seams }, clip, time, legs = null) {
+  const layers = Array.isArray(clip) ? clip
+    : legs ? [{ clip, time, only: 'top' }, { clip: legs.clip, time: legs.time, only: 'legs', loop: true }] : [{ clip, time }];
   for (const part of parts) {
     if (part.rigid) continue;
     part.mixer.stopAllAction();
-    part.mixer.clipAction(clip).reset().play();
-    part.mixer.setTime(time);
+    const actions = layers.map((l) => {
+      const action = part.mixer.clipAction(l.only ? halfOf(l.clip, l.only === 'legs') : l.clip).reset().play();
+      action.setEffectiveWeight(l.weight ?? 1);
+      return action;
+    });
+    part.mixer.setTime(0);
+    layers.forEach((l, i) => { actions[i].time = l.loop ? l.time % l.clip.duration : Math.min(l.time, l.clip.duration - 1e-3); });
+    part.mixer.update(0);
     part.root.updateMatrixWorld(true);
     part.mesh.skeleton.update();
   }
@@ -211,15 +235,17 @@ export function pose({ parts, seams }, clip, time) {
   });
 }
 
-// the frames of some clips of a body: state -> clip name -> frames (each one geometry per part), `fps` a second.
+// the frames of some clips of a body: state -> clip name (or { clip, legs: the clip of the legs }, or { frames: (find
+// a clip by name, fps) -> the layers of each frame (pose) }) -> frames (each one geometry per part), `fps` a second.
 // A loop leaves out its last frame (it is the first one again); a clip that plays once (once(state)) keeps it
 export function bakeClips(body, names, fps, once = () => false) {
   const clips = {};
+  const find = (name) => body.clips.find((a) => a.name === name) ?? (() => { throw new Error(`no clip ${name}`); })();
   for (const [state, name] of Object.entries(names)) {
-    const clip = body.clips.find((a) => a.name === name);
-    if (!clip) throw new Error(`no clip ${name}`);
+    if (name.frames) { clips[state] = name.frames(find, fps).map((layers) => pose(body, layers)); continue; }
+    const clip = find(name.clip ?? name), legs = name.legs && find(name.legs);
     const n = Math.max(1, Math.round(clip.duration * fps)) + (once(state) ? 1 : 0);
-    clips[state] = Array.from({ length: n }, (_, k) => pose(body, clip, Math.min(clip.duration - 1e-3, k / fps)));
+    clips[state] = Array.from({ length: n }, (_, k) => pose(body, clip, Math.min(clip.duration - 1e-3, k / fps), legs && { clip: legs, time: k / fps }));
   }
   return clips;
 }

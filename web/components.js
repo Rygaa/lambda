@@ -10,7 +10,7 @@ import { defineComponent } from './ecs/world.js';
 export const Player = defineComponent('Player', () => ({
   group: null, meshes: [], clips: {}, fps: 15, foot: 0, x: 0, z: 0, y: null, rot: 0, state: 'idle', t: 0,
   jump: { crouch: 0, air: false, vy: 0, land: 0 },
-  attack: { hit: 0, left: 0, queued: false, struck: false },
+  attack: { hit: 0, end: 0, left: 0, queued: false, struck: false },
   hurt: 0, dead: 0,
 }));
 

@@ -10,7 +10,8 @@ This guide says how to work with `attempt_1`, the official branch of Projet Lamb
 - `attempt_2` is made from `attempt_1`, with the same rules. It adds the voxel look (the `Look` switch: Normal or
   Voxel) and the 1018 FlyFF decor objects in the style of our world (the recipe `objects` and the Objects part of the
   Admin menu). It came from `try/voxel-switch`, `try/flyff-objects` and `try/flyff-style`, without their variants:
-  the objects are only in our style (not with their FlyFF textures).
+  the objects are only in our style (not with their FlyFF textures). Then came `try/attack-move` and
+  `try/ual-attacks`: the human keeps walking while it hits, and its 4 sword hits come from Quaternius (CC0).
 
 The official copy is on GitHub, in `Rygaa/lambda`.
 
@@ -114,3 +115,5 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/voxel-switch` | a `Look` switch in the Admin menu: Normal, or Voxel (the converter of the `voxel` branch, ported to `web/`), with the cube size and light; the cubes are made by one worker per core and saved in the browser | try, moved to `attempt_2` |
 | `try/flyff-objects` | (made from `try/voxel-switch`) the 1018 FlyFF decor objects imported (chairs, boxes, fences, lamps, houses, trees...), placed by the recipe `objects` or by the Objects part of the Admin menu (a grid with a search box), drawn with their textures and made of cubes by the `Look` switch; the `flyff-objects` world shows 30 | try, moved to `attempt_2` |
 | `try/flyff-style` | (made from `try/flyff-objects`) the FlyFF objects in the style of our world: drawn with the world, their textures turned into our stone and green leaf palettes and smoothed ("flat palettes", picked over one palette per part and one per texel); the default, with FlyFF textures as a choice in the Look part of the Admin menu; their sizes brought to ours (big ones shrink most, at most 6 m) | try, moved to `attempt_2` |
+| `try/attack-move` | (made from `attempt_2`) the human keeps walking while it attacks: its legs walk or run and the rest of it hits (clips mixed by bones, `attack1Walk`, `attack1Run`...), the hit goes where it faces | try, moved to `attempt_2` |
+| `try/ual-attacks` | (made from `try/attack-move`) the 4 hits of the human are sword hits of the Universal Animation Library 1 and 2 of Quaternius (CC0, `assets/character/player/ual/`), moved onto the FlyFF skeleton (`web/lib/retarget.js`); its legs still walk or run while it hits; when no hit follows, the hit ends with its way back (`recover`) melting into idle, walk or run, instead of jumping to idle | try, moved to `attempt_2` |
