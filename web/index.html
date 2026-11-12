@@ -98,6 +98,48 @@
   #hud .me.spend .stat button { visibility: visible; }
   #hud .me .pts { color: #b8d86a; }
   #hud .me .pts:empty { display: none; }
+  #hud .me .mp i { background: #5a8ee0; }
+  #hud .mbar.aim span { color: #fff4c0; font-weight: bold; }
+  #hud .mbar.aim .bar { border-color: #fff4c0; }
+  #hud .float.note { color: #c8d0c0; font-size: 12px; }
+  #hud .float.hp { color: #ff9a8a; font-size: 13px; }
+  #hud .float.mp { color: #9ac0ff; font-size: 13px; }
+  #skillbar { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); display: flex; gap: 4px; align-items: stretch;
+    font: 10px/1.2 ui-monospace, Menlo, monospace; color: #e6f3c4; }
+  #skillbar .sk { position: relative; width: 84px; height: 48px; padding: 3px 4px; box-sizing: border-box; overflow: hidden; display: grid; align-content: space-between;
+    background: #0b2a20dd; border: 1px solid #e6f3c433; border-radius: 4px; }
+  #skillbar .sk b { position: absolute; right: 4px; top: 2px; color: #b8d86a; font-size: 12px; }
+  #skillbar .sk span { padding-right: 12px; font-weight: bold; }
+  #skillbar .sk small { opacity: 0.75; font-size: 9px; white-space: nowrap; }
+  #skillbar .sk i { position: absolute; inset: auto 0 0 0; background: #00000088; pointer-events: none; }
+  #skillbar .sk.off { opacity: 0.45; }
+  #skillbar .sk.on { border-color: #fff4c0; }
+  #skillbar .sk.pot.hp span { color: #ff9a8a; }
+  #skillbar .sk.pot.mp span { color: #9ac0ff; }
+  #skillbar button { white-space: nowrap; }
+  #skillbar button, #skills button, #inventory header button { font: inherit; color: #e6f3c4; background: #0b2a20dd; border: 1px solid #e6f3c433; border-radius: 4px; cursor: pointer; }
+  #skills, #inventory { position: fixed; right: 196px; bottom: 66px; width: 320px; display: grid; gap: 6px; padding: 8px; color: #e6f3c4;
+    background: #0b2a20f2; border: 1px solid #e6f3c455; border-radius: 4px; font: 11px/1.3 ui-monospace, Menlo, monospace; }
+  #skills[hidden], #inventory[hidden] { display: none; }
+  #skills header, #inventory header { display: flex; gap: 8px; align-items: center; }
+  #skills header span, #inventory header span { flex: 1; opacity: 0.7; }
+  #skills .row { display: grid; grid-template-columns: 14px 1fr auto 24px; gap: 6px; align-items: center; }
+  #skills .row b { color: #b8d86a; }
+  #skills .row small { display: block; opacity: 0.7; }
+  #skills .row button { color: #0b2a20; background: #b8d86a; border: 0; }
+  #skills .row button:disabled { opacity: 0.25; cursor: default; }
+  #inventory h3 { margin: 2px 0 0; font-size: 11px; color: #b8d86a; }
+  #inventory .worn { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  #inventory .slot { display: grid; gap: 2px; }
+  #inventory .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  #inventory .cell { position: relative; display: grid; gap: 2px; justify-items: center; padding: 3px; font: 10px/1.2 ui-monospace, Menlo, monospace;
+    color: inherit; background: #ffffff0d; border: 1px solid #e6f3c422; border-radius: 3px; cursor: pointer; }
+  #inventory .cell:hover { border-color: #e6f3c488; }
+  #inventory .cell.empty { min-height: 60px; align-content: center; opacity: 0.5; cursor: default; }
+  #inventory .cell img { width: 52px; height: 52px; }
+  #inventory .cell img:not([src]) { visibility: hidden; }
+  #inventory .cell span { width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #inventory .cell em { position: absolute; right: 3px; top: 2px; font-style: normal; color: #fff4c0; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -108,7 +150,7 @@
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="hint">arrows: walk · shift: run · space: jump · click: attack · wheel: zoom · C: clouds</div>
+<div id="hint">arrows: walk · shift: run · space: jump · click: attack · 1-4: skills (mouse on a monster) · 5 6: potions · I: bag · K: skills · wheel: zoom · C: clouds</div>
 <button id="admin-button">⚙ Admin</button>
 <div id="admin" hidden></div>
 <div id="picker" hidden></div>

@@ -1,26 +1,27 @@
 // The human (assets/character/player, the FlyFF male): ported from the voxel branch
-// (game/src/client/character.ts). Its clips (idle, walk, run, the 4 parts of a jump, 4 hits, hurt, dead, and each hit
-// while it walks or runs: attack1Walk, attack1Run..., its legs from walk or run, and the end of each hit when no hit
-// follows: attack1End, attack1EndWalk, attack1EndRun...) are baked at
+// (game/src/client/character.ts). Its clips (the clips of character.json: idle, walk, run, the 4 parts of a jump, 4
+// sword hits, 2 punches, hurt, dead, the skill clips; and each hit or punch while it walks or runs: attack1Walk,
+// attack1Run, punch1Walk..., its legs from walk or run, and the end of each when no hit follows: attack1End,
+// attack1EndWalk, attack1EndRun...) are baked at
 // load into frames of posed vertices (bakeFps a second, lib/bake.js); systems/player.js swaps the frames and moves it.
 // Its parts come from its outfit (the Wardrobe resource, items.json): a head, hair, clothes, a weapon, and a shield; a new
 // outfit is baked again (dress, systems/outfit.js). Parts that are not skinned follow one bone: a weapon or a shield its
 // attach point (attach_rhand, attach_lhand, attach_knuckle, attach_shield), a cap or a mask the head.
 import * as THREE from 'three';
 import { getResource, spawn } from '../ecs/world.js';
-import { Player, Health, Stats } from '../components.js';
+import { Player, Health, Stats, Mana, Skills } from '../components.js';
 import { Gpu, Settings, Wardrobe, Voxels } from '../resources.js';
 import { loadBody, bakeClips, measure, fineMeshes, fineMesh, loader } from './bake.js';
 import { retarget } from './retarget.js';
 import { lookOf, voxelClips } from './voxels.js';
 import { voxelBody, BODIES } from './voxelBody.js';
-import { maxHp } from './combat.js';
+import { maxHp, maxMp } from './combat.js';
 
 const BASE = '../assets/character/player/', TEXTURES = BASE + 'parts/textures/';
 export const HEIGHT = 1.05;    // world units: a person is about 1 unit tall (gen/collision.js)
-const STATES = ['idle', 'walk', 'run', 'jumpStart', 'jumpUp', 'jumpDown', 'jumpLand', 'attack1', 'attack2', 'attack3', 'attack4', 'hit', 'dead'];
 const BLEND = 0.25;   // seconds: the end of a hit melts into idle, walk or run (ending)
-const ONCE = (state) => /^(jump|attack|hit|dead)/.test(state);   // these clips play once and stop on their last frame
+export const ONCE = (state) => !/^(idle|walk|run)$/.test(state);   // these clips play once and stop on their last frame
+const HITS = (state) => /^(attack|punch)\d$/.test(state);         // these get a version while it walks or runs, and an end
 
 // the parts of an outfit (slot -> file, null: none or the bare body), as [{ url, bone }] (bone: the attach point of a
 // weapon or a shield). A suit replaces the bare upper and lower body, a cap can hide the hair or the head, and a weapon
@@ -61,12 +62,12 @@ function borrowed(cache, config) {
 export async function dress(world, outfit) {
   const gpu = getResource(world, Gpu), { config, slots, cache } = getResource(world, Wardrobe), look = lookOf(world);
   const body = await bodyOf(cache, config, outfit, slots);
-  const names = Object.fromEntries(STATES.map((s) => [s, config.clips[s]]));
-  for (const s of STATES.filter((s) => s.startsWith('attack'))) {
+  const names = { ...config.clips }, hits = Object.keys(config.clips).filter(HITS);
+  for (const s of hits) {
     names[s + 'Walk'] = { clip: config.clips[s], legs: config.clips.walk };
     names[s + 'Run'] = { clip: config.clips[s], legs: config.clips.run };
   }
-  for (const s of STATES.filter((s) => s.startsWith('attack'))) {
+  for (const s of hits) {
     names[s + 'End'] = { frames: ending(config, s, null) };
     names[s + 'EndWalk'] = { frames: ending(config, s, config.clips.walk) };
     names[s + 'EndRun'] = { frames: ending(config, s, config.clips.run) };
@@ -107,8 +108,8 @@ export async function unitScale(world) {
 }
 
 // spawns the human at (x, z), or at the start of the world, in the outfit of the Wardrobe resource, with its stats
-// (lib/combat.js) and full HP
-export async function addCharacter(world, at, stats) {
+// (lib/combat.js), full HP and MP, and the levels of its skills (skill id -> level, 0: not learned)
+export async function addCharacter(world, at, stats, levels = {}) {
   const gpu = getResource(world, Gpu), settings = getResource(world, Settings);
   // the fine pass (systems/render.js): its camera and the uniforms all its materials share
   gpu.fine = {
@@ -129,5 +130,6 @@ export async function addCharacter(world, at, stats) {
   gpu.shadowsDirty = true;
   const [x, z] = at ?? [settings.land.start[0], settings.land.start[settings.land.start.length - 1]];
   return spawn(world, [Player, { group, meshes, clips, fps: config.bakeFps, foot: -box.min.y * k, x, z, rot: 0, state: 'idle', t: 0 }],
-    [Stats, { ...stats }], [Health, { hp: maxHp(stats), max: maxHp(stats) }]);
+    [Stats, { ...stats }], [Health, { hp: maxHp(stats), max: maxHp(stats) }], [Mana, { mp: maxMp(stats), max: maxMp(stats) }],
+    [Skills, { levels: { ...levels } }]);
 }

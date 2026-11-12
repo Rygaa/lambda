@@ -10,12 +10,24 @@ import { defineComponent } from './ecs/world.js';
 export const Player = defineComponent('Player', () => ({
   group: null, meshes: [], clips: {}, fps: 15, foot: 0, x: 0, z: 0, y: null, rot: 0, state: 'idle', t: 0,
   jump: { crouch: 0, air: false, vy: 0, land: 0 },
-  attack: { hit: 0, end: 0, left: 0, queued: false, struck: false },
+  attack: { hit: 0, end: 0, left: 0, queued: false, struck: false, kind: 'attack' },
   hurt: 0, dead: 0,
 }));
 
-// the stats of the human (lib/combat.js): its level, its experience in this level, STR, STA, points not spent yet
-export const Stats = defineComponent('Stats', () => ({ level: 1, xp: 0, str: 15, sta: 15, points: 0 }));
+// the stats of the human (lib/combat.js): its level, its experience in this level, STR, STA, points not spent yet,
+// skill points not spent yet (systems/skills.js)
+export const Stats = defineComponent('Stats', () => ({ level: 1, xp: 0, str: 15, sta: 15, points: 0, skillPoints: 0 }));
+
+// the MP of the human: the skills cost it (systems/skills.js), it comes back slowly and with MP potions
+export const Mana = defineComponent('Mana', () => ({ mp: 1, max: 1 }));
+
+// the skills of the human (lib/skills.js, systems/skills.js): skill id -> its level (0: not open yet) and the
+// seconds before it can start again; active: the step of a skill playing now (null: none); combo: the next step of a
+// combo and the seconds left to press its key ({ id, step, left }, null: none); aim: the monster under the mouse
+export const Skills = defineComponent('Skills', () => ({ levels: {}, cooldowns: {}, active: null, combo: null, aim: null }));
+
+// a potion on the ground (systems/drops.js): which one, where, its meshes, and the seconds it has been there
+export const Drop = defineComponent('Drop', () => ({ potion: 'hp', x: 0, z: 0, y: 0, group: null, t: 0 }));
 
 // the HP of the human or of a monster
 export const Health = defineComponent('Health', () => ({ hp: 1, max: 1 }));
@@ -27,11 +39,13 @@ export const Health = defineComponent('Health', () => ({ hp: 1, max: 1 }));
 //   goal: where a calm walk goes; wait: the time before the next calm walk or look; swing: the time in its attack
 //   (null: none); struck: the blow of this swing is dealt; cooldown: the time before the next swing; hurt: the time
 //   left of its hit clip; shown: the time left of its HP bar (systems/hud.js); fade: 1 seen, 0 gone (uFade);
-//   look: the look its meshes and clips are in (lib/voxels.js lookOf key, null: as it is)
+//   look: the look its meshes and clips are in (lib/voxels.js lookOf key, null: as it is); stun: the time left it
+//   cannot move or hit (systems/skills.js Shield Bash); spot: the place of the world recipe it comes back to after
+//   its death ({ type, x, z }, null: spawned by the admin menu)
 export const Monster = defineComponent('Monster', () => ({
   type: null, group: null, meshes: [], clips: {}, look: null, fps: 15, foot: 0, height: 1, radius: 0.3, x: 0, z: 0, y: 0, rot: 0,
   state: 'idle', t: 0, home: [0, 0], mode: 'calm', goal: null, wait: 2, swing: null, struck: false, cooldown: 0,
-  hurt: 0, shown: 0, fade: 1,
+  hurt: 0, shown: 0, fade: 1, stun: 0, spot: null,
 }));
 
 // a FlyFF decor object (assets/objects, systems/objects.js): its name in objects.json, where it stands and its turn;

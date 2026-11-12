@@ -33,14 +33,18 @@ import { monsterSystem } from './systems/monsters.js';
 import { combatSystem } from './systems/combat.js';
 import { setupHudSystem, hudSystem } from './systems/hud.js';
 import { loadingSystem } from './systems/loading.js';
+import { setupSkillsSystem, skillSystem } from './systems/skills.js';
+import { setupInventorySystem, inventorySystem } from './systems/inventory.js';
+import { dropSystem } from './systems/drops.js';
 import { START } from './lib/combat.js';
 
 // ------------------------------------------------------------------ assets
 // the page is web/index.html: the assets and the worlds are next to web/
 const NOCACHE = '?v=' + Date.now();
 const loadJson = async (path) => (await fetch(path + NOCACHE)).json();
-const [meta, palettes, character, items, monsters, models, levels, objects] = await Promise.all(['render', 'palettes', 'character/player/character',
-  'character/player/items', 'monsters/monsters', 'monsters/models', 'monsters/levels', 'objects/objects'].map((f) => loadJson(`../assets/${f}.json`)));
+const [meta, palettes, character, items, monsters, models, levels, objects, skills, potions] = await Promise.all(['render', 'palettes', 'character/player/character',
+  'character/player/items', 'monsters/monsters', 'monsters/models', 'monsters/levels', 'objects/objects', 'character/player/skills', 'items/potions']
+  .map((f) => loadJson(`../assets/${f}.json`)));
 const texLoader = new THREE.TextureLoader();
 const loadAtlas = async (info) => {
   const t = await texLoader.loadAsync('../assets/' + info.file + NOCACHE);
@@ -74,6 +78,9 @@ function showErrors(fn) {
   }
 }
 const params = new URLSearchParams(location.search);
+// ?player: a player who starts as a Vagabond (level 1, its clothes, a wooden sword and shield in its bag, no admin
+// menu, nothing saved); else the admin, with what saves/admin.json has
+const player = params.has('player');
 // ?world=<name>: worlds/<name>.json (default meadow), ?seed=<n> changes its seed
 const recipe = await loadRecipe(params.get('world') || 'meadow');
 // "map": a part of a FlyFF map, worlds/maps/<name>.json (gen/map.js)
@@ -96,6 +103,7 @@ const COVER = 32;
 const world = createWorld();
 setResource(world, Res.Settings, {
   canvas: document.getElementById('c'),
+  player,                           // ?player: a Vagabond, no admin menu
   fixed: params.has('fixed'),       // exact 480x270 frame
   freeze: params.has('freeze'),     // no motion: for image comparisons
   theme,                            // colour theme (assets/palettes.json "themes"), or null
@@ -118,7 +126,8 @@ setResource(world, Res.Viewport, { ...Res.createViewport(), zoom: saved.zoom ?? 
 setResource(world, Res.Time, Res.createTime());
 setResource(world, Res.Input, Res.createInput());
 setResource(world, Res.Tuning, { ...Res.createTuning(), ...saved.tuning });
-setResource(world, Res.Look, { ...Res.createLook(), ...saved.look });
+// ?look=normal or voxel wins over the saved look
+setResource(world, Res.Look, { ...Res.createLook(), ...saved.look, ...(params.has('look') ? { voxel: params.get('look') === 'voxel' } : {}) });
 // the cubes of this world made beforehand (worlds/baked/<world>.bin, lib/voxelSaved.js), if there are; ?bake makes them
 const pool = createPool(), palette = createPalette();
 if (params.has('bake')) pool.keepAll();
@@ -127,19 +136,27 @@ else {
   if (res?.ok) pool.useBaked(fromFile(await res.arrayBuffer()), palette.index);
 }
 setResource(world, Res.Voxels, Res.createVoxels(palette, pool));
-Object.assign(setResource(world, Res.Wardrobe, Res.createWardrobe(character, items)).outfit, saved.outfit);
+Object.assign(setResource(world, Res.Wardrobe, Res.createWardrobe(character, items)).outfit, player ? character.vagrant.outfit : saved.outfit);
+setResource(world, Res.Inventory, Res.createInventory(player ? character.vagrant.bag.map((file) => ({ file })) : [], potions.potions));
+const book = setResource(world, Res.Skillbook, skills);
 setResource(world, Res.Objects, Res.createObjects(objects.objects));
-setResource(world, Res.Bestiary, Res.createBestiary(monsters.monsters, models.models, levels, monsterChanges));
+const bestiary = setResource(world, Res.Bestiary, Res.createBestiary(monsters.monsters, models.models, levels, monsterChanges));
+// the monsters of the world recipe: they spawn once the human is there, and come back after their death
+for (const [i, { id, at }] of (recipe.monsters ?? []).entries()) {
+  const type = bestiary.types.find((t) => t.id === id);
+  if (!type) showErrors(() => { throw new Error(`world recipe, monsters[${i}]: no monster ${id} in assets/monsters/monsters.json`); });
+  for (const [x, z] of at) { const spot = { type, x, z }; bestiary.requests.push({ ...spot, spot }); }
+}
 setResource(world, Res.BlockGrid, Res.createGrid(land.terrain));
 setResource(world, Res.Tops, createTops(land.half + 2));
 setResource(world, Res.CoverGrid, Res.createGrid());
 setResource(world, Res.Random, Res.createRandom(5));
 
-for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
+for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem, setupSkillsSystem, setupInventorySystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
   addSystem(world, s, 'startup');
 for (const s of [
   inputSystem, timeSystem,
-  outfitSystem, playerSystem, monsterSystem, combatSystem, cameraControlSystem, viewportSystem, cloudSystem,
+  outfitSystem, skillSystem, playerSystem, monsterSystem, combatSystem, dropSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem,
   coverChunkSystem, meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem, loadingSystem,
 ]) addSystem(world, s);
@@ -148,7 +165,9 @@ runStartup(world);
 // the human (lib/character.js): ?char=x,z puts it there, else at the start; ?nochar: none. Its stats: the saved ones
 if (!params.has('nochar')) {
   const { addCharacter } = await import('./lib/character.js');
-  await addCharacter(world, params.get('char')?.split(',').map(Number), { ...START, ...saved.stats });
+  // the admin knows every skill at level 1; a Vagabond learns them with skill points
+  const levels = Object.fromEntries(book.skills.map((s) => [s.id, player ? 0 : 1]));
+  await addCharacter(world, params.get('char')?.split(',').map(Number), player ? { ...START } : { ...START, ...saved.stats }, levels);
 }
 
 function tick(now) {

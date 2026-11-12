@@ -1,0 +1,7 @@
+{
+ "about": "The potions: a monster drops them (chance: 0 to 1, web/systems/drops.js), the human drinks them (web/systems/inventory.js). model: a FlyFF item model in models/ (import-potions.mjs); hp, mp: what one gives back.",
+ "potions": {
+  "hp": { "name": "HP potion", "model": "item_genpotdrivithig", "hp": 80, "chance": 0.5, "key": "5" },
+  "mp": { "name": "MP potion", "model": "item_genpotrefr04", "mp": 40, "chance": 0.3, "key": "6" }
+ }
+}

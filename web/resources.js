@@ -1,7 +1,8 @@
 // Resources: one-of-a-kind data, keyed by name. Plain data or Three.js handles.
 
 export const Settings = 'Settings';
-// { canvas, land, fixed, freeze, theme, half, grassHalf, walkLimit, ppu, basis }
+// { canvas, land, fixed, freeze, theme, half, grassHalf, walkLimit, ppu, basis, player }
+//   player: ?player, a player who starts as a Vagabond (no admin menu)
 
 export const Assets = 'Assets';
 // { meta, tex: { tufts, clumps, decor }, shapes (gen/shapes.js) }
@@ -56,7 +57,8 @@ export const createWardrobe = (config, items) => ({
 //   changes: id -> type (edited or new) or null (deleted), what the admin Save writes to saves/monsters.json;
 //   models: model -> { clips, hitAt } (assets/monsters/models.json); levels: assets/monsters/levels.json (lib/combat.js);
 //   unit: world units per FlyFF unit (lib/character.js unitScale); bakes: model -> { promise, baked, error };
-//   requests: spawns waiting for their bake [{ type, x, z }]. A bake also keeps its frames made of cubes
+//   requests: spawns waiting for their bake [{ type, x, z, spot }]; later: monsters of the world recipe that come back
+//   after their death [{ spot, left: seconds }]. A bake also keeps its frames made of cubes
 //   (baked.looks: look key @ scale -> { clips }, lib/monsters.js monsterLook)
 // the FlyFF decor objects (systems/objects.js): names: name -> { model, scale } (assets/objects/objects.json); models: model ->
 // a promise of { parts, box } (its meshes, still, and its box); unit: world units per FlyFF unit (lib/character.js
@@ -68,12 +70,22 @@ export const Bestiary = 'Bestiary';
 export const createBestiary = (monsters, models, levels, changes) => {
   const types = monsters.filter((m) => !(m.id in changes)).concat(Object.values(changes).filter(Boolean));
   types.sort((a, b) => a.level - b.level || a.id - b.id);
-  return { types, changes, models, levels, unit: 0, bakes: new Map(), requests: [] };
+  return { types, changes, models, levels, unit: 0, bakes: new Map(), requests: [], later: [] };
 };
 
 // the fight on screen (systems/hud.js): its elements, the bars over the monsters (entity -> element), the damage
 // numbers [{ el, x, y, z, t }], and the + buttons pressed (['str' | 'sta'])
 export const Hud = 'Hud';
+
+// the bag of the human (systems/inventory.js): bag: [{ file } (a weapon or a shield) | { potion, count }];
+// potions: assets/items/potions.json; open: its window is shown; actions: the clicks in its window, not done yet;
+// version: changes when the bag or the worn items change (its window is drawn again)
+export const Inventory = 'Inventory';
+export const createInventory = (bag, potions) => ({ bag, potions, open: false, actions: [], version: 0 });
+
+// the skills (assets/character/player/skills.json, lib/skills.js): skills (the steps of the dash chosen), maxLevel,
+// perLevel
+export const Skillbook = 'Skillbook';
 
 export const Input = 'Input';
 // DOM listeners only push raw records into `pending`; the input system turns
@@ -83,6 +95,7 @@ export const createInput = () => ({
   keys: new Set(),
   wheel: [],               // { dy }
   pressed: [],             // { key }
+  mouse: null,             // { x, y }: where the mouse is, in CSS pixels of the canvas (null: not on it yet)
   resized: false,
 });
 

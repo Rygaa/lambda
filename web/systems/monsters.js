@@ -4,6 +4,8 @@
 //   the hit frame of models.json, then attackDelay seconds before the next one). It gives up, goes home and heals
 //   when the human dies or when it is more than LEASH from home;
 //   dead: its death clip, then it fades out and is removed.
+//   stunned (stun > 0, systems/skills.js Shield Bash): it stands in its hit clip, it does not move or hit.
+// A monster of the world recipe (spot) comes back at its place RESPAWN seconds after it is gone.
 // When the look changes (the Look resource), each monster gets the meshes and clips of the new look once they are made.
 // It walks on the ground like the human (lib/walk.js) and does not jump.
 import * as THREE from 'three';
@@ -23,13 +25,20 @@ const CHASE = 1.5;    // it follows the human this much faster than it walks
 const REACH = 0.3;    // it attacks when this close to the human (between their circles)
 const FADE = 1;       // seconds to fade out after its death clip
 const HUMAN = 0.2;    // the radius of the human (systems/player.js RADIUS)
+const RESPAWN = 15;   // seconds before a monster of the world recipe comes back
 
 export function monsterSystem(world) {
   const b = getResource(world, Bestiary), time = getResource(world, Time), gpu = getResource(world, Gpu);
+  // the monsters of the world recipe that come back
+  b.later = b.later.filter((l) => {
+    if ((l.left -= time.dt) > 0) return true;
+    b.requests.push({ ...l.spot, spot: l.spot });
+    return false;
+  });
   // the spawns waiting for their bake (none without the human: its fine pass draws them)
-  if (gpu.fine) b.requests = b.requests.filter(({ type, x, z, rot }) => {
+  if (gpu.fine) b.requests = b.requests.filter(({ type, x, z, rot, spot = null }) => {
     const bake = bakeModel(world, type.model), drawn = bake.baked && monsterLook(world, type, bake.baked);
-    if (drawn) spawnMonster(world, type, bake.baked, drawn, x, z, rot);
+    if (drawn) getComponent(world, spawnMonster(world, type, bake.baked, drawn, x, z, rot), Monster).spot = spot;
     return !drawn && !bake.error;
   });
   const look = lookOf(world)?.key ?? null;
@@ -53,6 +62,7 @@ export function monsterSystem(world) {
           gpu.scene.remove(m.group);
           for (const mesh of m.meshes) mesh.material.dispose();
           gpu.shadowsDirty = true;
+          if (m.spot) b.later.push({ spot: m.spot, left: RESPAWN });
           destroyEntity(world, e);
           continue;
         }
@@ -61,13 +71,17 @@ export function monsterSystem(world) {
       m.cooldown = Math.max(0, m.cooldown - dt);
       m.hurt = Math.max(0, m.hurt - dt);
       m.shown = Math.max(0, m.shown - dt);
+      m.stun = Math.max(0, m.stun - dt);
       if (m.mode === 'angry' && (!humanAlive || Math.hypot(m.x - m.home[0], m.z - m.home[1]) > LEASH)) {
         m.mode = 'calm';
         m.swing = null;
         m.goal = [...m.home];
         health.hp = health.max;
       }
-      if (m.mode === 'angry') {
+      if (m.stun > 0) {
+        m.swing = null;
+        next = 'hit';
+      } else if (m.mode === 'angry') {
         const dx = p.x - m.x, dz = p.z - m.z, d = Math.hypot(dx, dz), reach = m.radius + HUMAN + REACH;
         m.rot = Math.atan2(dx, dz);
         if (m.swing !== null) {

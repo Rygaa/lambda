@@ -131,6 +131,8 @@ export function setupUiSystem(world) {
   addEventListener('keydown', (e) => { if (!['INPUT', 'SELECT'].includes(e.target.tagName)) push({ t: 'key', key: e.key }); });
   addEventListener('keyup', (e) => push({ t: 'keyup', key: e.key }));
   canvas.addEventListener('mousedown', (e) => { if (e.button === 0) push({ t: 'click' }); });
+  // where the mouse is on the canvas: the target of a skill (systems/skills.js)
+  canvas.addEventListener('mousemove', (e) => { const r = canvas.getBoundingClientRect(); push({ t: 'move', x: e.clientX - r.left, y: e.clientY - r.top }); });
   addEventListener('blur', () => push({ t: 'blur' }));
   addEventListener('resize', () => push({ t: 'resize' }));
   setTimeout(() => (document.getElementById('hint').style.opacity = 0), 7000);

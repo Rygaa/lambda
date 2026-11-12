@@ -1,0 +1,28 @@
+{
+ "about": "The skills of the Vagabond (web/lib/skills.js, web/systems/skills.js). A skill point opens a skill (level 1) or raises it, up to maxLevel; each level after the first gives perLevel more damage. key: the key that starts it; needs: what the human must hold (sword: a sword in the weapon slot, shield: a shield); mp: its cost; cooldown: seconds before it can start again. steps: the hits of a combo, one press each (window: seconds to press again after a step; the cooldown starts when the combo ends). A step: clip (a state of character.json clips), rate (how much faster it plays), hits (seconds of the clip when a blow lands), power (times the damage of a hit), rush (seconds of the clip when the human rushes: behind its target, or distance forward), range, arc (degrees in front), around (every monster within range), stun (seconds the monster cannot move or hit). target: it needs a monster under the mouse, within range.",
+ "maxLevel": 5,
+ "perLevel": 0.2,
+ "skills": [
+  {
+   "id": "dash", "name": "Dash Strike", "key": "1", "needs": "sword", "mp": 15, "cooldown": 6,
+   "target": { "range": 6, "behind": 0.8 },
+   "steps": [{ "clip": "dash", "rate": 1.3, "rush": [0.1, 0.45], "hits": [0.6], "power": 1.5, "range": 2.5 }]
+  },
+  {
+   "id": "slash", "name": "Triple Slash", "key": "2", "needs": "sword", "mp": 10, "cooldown": 5, "window": 1.5,
+   "steps": [
+    { "clip": "slash1", "rate": 1.8, "hits": [0.9], "power": 1, "range": 2, "arc": 140 },
+    { "clip": "slash2", "rate": 1.8, "hits": [0.23, 0.77, 1.3], "power": 0.5, "range": 2, "arc": 140 },
+    { "clip": "slash3", "rate": 1.8, "hits": [0.77], "power": 2, "range": 2.2, "arc": 160 }
+   ]
+  },
+  {
+   "id": "wheel", "name": "Keen Wheel", "key": "3", "needs": "sword", "mp": 20, "cooldown": 8,
+   "steps": [{ "clip": "wheel", "rate": 1.5, "hits": [0.6, 1.0, 1.2], "power": 0.8, "range": 2.5, "around": true }]
+  },
+  {
+   "id": "bash", "name": "Shield Bash", "key": "4", "needs": "shield", "mp": 12, "cooldown": 10,
+   "steps": [{ "clip": "bash", "rate": 1.2, "rush": [0.1, 0.4], "distance": 2, "hits": [0.4], "power": 1, "range": 1.4, "arc": 120, "stun": 1.5 }]
+  }
+ ]
+}

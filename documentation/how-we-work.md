@@ -24,7 +24,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
   New code follows this rule.
 - The server is `python3 web/serve.py` (port 8643). It serves the files, and it writes two files: `saves/admin.json`
   and `saves/monsters.json`.
-- Open `http://localhost:8643/web/?world=rock-types&char=-2.5,-1`. The worlds and the address options are in
+- Open `http://localhost:8643/web/?world=rock-types&char=-2.5,-1`. Fights: `?world=combat&player&look=normal`. The worlds and the address options are in
   `documentation/worlds.md`.
 
 ## 3. What exists
@@ -48,6 +48,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | the 1018 FlyFF decor objects (chairs, boxes, fences, lamps, houses, trees...): models, list (`objects.json`: name, scale for the few made too big or too small, size), import script; in the worlds (recipe `objects`) and the Objects part of the Admin menu, at our sizes, in cubes with the look | `assets/objects/`, `import-objects.mjs`, `web/systems/objects.js`, `web/systems/adminObjects.js` |
 | the FlyFF objects in the style of our world: textures turned into our stone and green leaf palettes, drawn with the world | `web/lib/objectStyle.js`, `web/render/shaders.js` (DECOR_FRAG) |
 | a part of a FlyFF map as a world (recipe `map`): import script, map files, heights, water, paints, objects at FlyFF size, archived objects, our trees and big-leaf plants for its trees and leafy plants; grass in squares around the camera in a big world | `worlds/maps/`, `web/gen/map.js`, `assets/objects/archived.json`, `web/systems/coverChunks.js` |
+| the Vagabond (`?player`): its bag (wear, take off, drink), MP, skills on keys 1-4 with skill points, the monster under the mouse, potions dropped by monsters; the recipe `monsters` and their return | `web/systems/inventory.js`, `web/lib/skills.js`, `web/systems/skills.js`, `assets/character/player/skills.json`, `web/lib/screen.js`, `web/systems/drops.js`, `assets/items/` |
 | saved settings and stats, changed monsters, loaded at start | `saves/admin.json`, `saves/monsters.json` |
 
 ## 4. The FlyFF data

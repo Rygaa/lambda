@@ -12,7 +12,7 @@ import { buildMap, FLYFF } from './map.js';
 export const AMOUNTS = { none: 0, few: 0.3, some: 1, many: 2.5, lots: 6 };
 const CLEARINGS = { none: 0, few: 2, some: 3, many: 4, lots: 4 };   // the shaders take at most 4
 
-const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'pavement', 'map', 'trees', 'plants', 'borders', 'islands', 'clearings', 'cliffs', 'ground', 'props', 'objects'];
+const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'pavement', 'map', 'trees', 'plants', 'borders', 'islands', 'clearings', 'cliffs', 'ground', 'props', 'objects', 'monsters'];
 // recipe "clouds": how much of the ground their shadows cover -> the CloudLayer edges (lo, hi)
 export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02] };
 const LINE_FIELDS = ['asset', 'params', 'amount', 'count', 'palette', 'spacing', 'gap', 'near', 'avoid', 'on', 'at'];
@@ -49,6 +49,11 @@ function assetOf(line, where) {
 // recipe: the parsed JSON; map: the parsed worlds/maps/<recipe.map>.json, when it has one (gen/map.js)
 export function buildRecipe(cache, recipe, map = null) {
   check(recipe, WORLD_FIELDS, 'world');
+  // monsters: [{ id, at: [[x, z], ...] }], placed by main.js (systems/monsters.js)
+  (recipe.monsters ?? []).forEach((line, i) => {
+    check(line, ['id', 'at'], `monsters[${i}]`);
+    if (!Number.isInteger(line.id) || !Array.isArray(line.at)) bad(`monsters[${i}]`, 'give an "id" of assets/monsters/monsters.json and "at": [[x, z], ...]');
+  });
   if (map && (recipe.cliffs || recipe.borders || recipe.ground)) bad('world', 'a world with a "map" takes its ground from it: no "cliffs", "borders" or "ground"');
   const half = map ? ((map.heights.length - 1) * map.step * FLYFF) / 2 : (recipe.size ?? 40) / 2;
   const b = createWorldBuilder(cache, recipe.seed ?? 1, half);

@@ -11,7 +11,7 @@
 // character.json outfit), without saving them; it does not touch the monsters or the stats.
 // The markup is in index.html (#admin-button, #admin, #picker).
 import { getResource, query, getComponent } from '../ecs/world.js';
-import { Tuning, Viewport, Wardrobe, Bestiary, Look, createTuning, createLook } from '../resources.js';
+import { Tuning, Viewport, Wardrobe, Bestiary, Look, Settings, createTuning, createLook } from '../resources.js';
 import { Stats } from '../components.js';
 import { ZOOM_STEP } from './viewport.js';
 import { createPreview } from '../lib/preview.js';
@@ -37,6 +37,8 @@ const SLOTS = [
 ];
 
 export function setupAdminSystem(world) {
+  // a player (?player) has no admin menu
+  if (getResource(world, Settings).player) { document.getElementById('admin-button').style.display = 'none'; return; }
   const panel = document.getElementById('admin'), refresh = [];   // refresh: show the values again
   document.getElementById('admin-button').addEventListener('click', (e) => { panel.hidden = !panel.hidden; syncZoom(world); e.currentTarget.blur(); });
   refresh.push(setupLookPart(world, panel));

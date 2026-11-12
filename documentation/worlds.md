@@ -16,6 +16,9 @@ Then open `http://127.0.0.1:8643/web/?world=all-types`.
 - `?theme=dbz` or `?theme=namek`: other colours (see section 6).
 - `?freeze`: time stops (for screenshots that must match pixel by pixel).
 - `?char=<x>,<z>`: where the human stands. The default is the start of the world. `?nochar`: no human.
+- `?player`: a player, not the admin: a Vagabond at level 1 (section "The Vagabond" below), with no Admin button,
+  and nothing of `saves/admin.json` (outfit, stats). Nothing is saved: a reload starts a new Vagabond.
+- `?look=normal` or `?look=voxel`: wins over the saved look (a test in `normal` does not wait for cubes).
 
 Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it run, Space makes it jump, a click (or
 `F`) attacks (click again for the next of 4 hits), and the camera follows it (with `?nochar`, the arrows move the
@@ -86,6 +89,35 @@ On screen: a bar with the name, level, and HP over each monster that was hit, th
 miss), and at the bottom right the level, HP, and XP of the human, its STR and STA, and a `+` button for each while
 it has points (`web/systems/hud.js`).
 
+The Vagabond (`?player`), fights like League of Legends:
+
+- It starts at level 1 in the vagrant clothes of FlyFF (`part_mvag01upper`, `hand`, `foot`), with a wooden sword
+  (`item_weaswowooden`) and a wooden shield (`item_armshiwooden`) in its bag, not worn (`character.json` `vagrant`).
+- The bag: the `I` key or the `Bag` button. A click on a weapon or a shield wears it (what was worn goes to the bag), a
+  click on a worn one takes it off, a click on a potion drinks it (`web/systems/inventory.js`). With no weapon, a click
+  gives 2 punches (Quaternius `Punch_Jab`, `Punch_Cross`) that hit half as hard as the sword.
+- MP: 50 + 5 × level, 1 back each second; the skills cost it. A level fills HP and MP.
+- Skills (`assets/character/player/skills.json`, `web/lib/skills.js`, `web/systems/skills.js`): each level gives a
+  skill point; the `K` key (or the `Skills` button) opens the window where a point opens a skill or raises it (up to
+  level 5, 20 % more damage each level). Keys `1` to `4` start them; the bar at the bottom shows each one with its
+  level, MP, cooldown, and grey when it cannot start (not learned, no sword or shield, no MP). Too soon, or no
+  target, a short text says why. While a skill plays, the human does not walk, jump or attack.
+- To test: the `Level +1` button of the bar gives the experience of the next level (its points, a skill point, full
+  HP and MP).
+
+  | Key | Skill | Needs | MP, cooldown | What it does |
+  | --- | --- | --- | --- | --- |
+  | 1 | Dash Strike | sword | 15, 6 s | on the monster under the mouse, within 6: rushes behind it in a blink, turns, hits it ×1.5 |
+  | 2 | Triple Slash | sword | 10, 5 s | a combo: press 2 again during a hit or 1.5 s after it, 3 hits (FlyFF Clean Hit, Brandish, Over Cutter), the last ×2; the cooldown starts after it |
+  | 3 | Keen Wheel | sword | 20, 8 s | spins (FlyFF Keen Wheel), 3 blows on every monster within 2.5 |
+  | 4 | Shield Bash | shield | 12, 10 s | rushes 2 forward (stops at the first monster), hits it and stuns it 1.5 s (Quaternius `Shield_Dash_RM`) |
+
+  The monster under the mouse gets its bar lit (`web/lib/screen.js`); a skill turns the human to it.
+- Potions (`assets/items/potions.json`, FlyFF models copied by `assets/items/import-potions.mjs`): a dead monster
+  drops an HP potion (half the time) and an MP potion (3 times in 10) at its place; the human picks them when it walks
+  on them; they are gone after 60 s (`web/systems/drops.js`). Key `5` drinks an HP potion (+80 HP), `6` an MP potion
+  (+40 MP).
+
 The worlds:
 
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
@@ -93,6 +125,8 @@ The worlds:
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
+- `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),
+  to try the fights and the skills: `?world=combat&player&look=normal`.
 - `voxel-bench`: a small world with a bit of everything (cliffs, rocks, trees, 3 FlyFF houses, tents, lamps, a fence
   and a bench), to measure the cost of the cubes.
 - `flarine`: the centre of the FlyFF city Flarine (its 3 squares, the bridges and the river), as in FlyFF (recipe
@@ -176,6 +210,9 @@ The fields of a world:
   gets bigger cubes, so the computer does not run out of memory. The cubes of a model are made once for each cube size
   and shared by its copies. Each one stops a walker by a circle, and no grass
   grows under it (`web/systems/objects.js`).
+- `monsters`: FlyFF monsters placed in the world, one line per monster type: `{ "id": 21, "at": [[x, z], ...] }` (the
+  `id` of `assets/monsters/monsters.json`). They spawn when the human is there, and each comes back at its place 15 s
+  after its death (`web/systems/monsters.js`).
 
 ## 3. A line of `props`
 
