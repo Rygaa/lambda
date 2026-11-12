@@ -18,6 +18,7 @@ import { voxelSystem } from './systems/voxels.js';
 import { objectSystem } from './systems/objects.js';
 import { createPalette } from './lib/voxels.js';
 import { createPool } from './lib/voxelPool.js';
+import { fromFile } from './lib/voxelSaved.js';
 import { footprintSystem } from './systems/footprints.js';
 import { groundCoverSystem } from './systems/groundCover.js';
 import { coverChunkSystem } from './systems/coverChunks.js';
@@ -31,6 +32,7 @@ import { outfitSystem } from './systems/outfit.js';
 import { monsterSystem } from './systems/monsters.js';
 import { combatSystem } from './systems/combat.js';
 import { setupHudSystem, hudSystem } from './systems/hud.js';
+import { loadingSystem } from './systems/loading.js';
 import { START } from './lib/combat.js';
 
 // ------------------------------------------------------------------ assets
@@ -117,7 +119,14 @@ setResource(world, Res.Time, Res.createTime());
 setResource(world, Res.Input, Res.createInput());
 setResource(world, Res.Tuning, { ...Res.createTuning(), ...saved.tuning });
 setResource(world, Res.Look, { ...Res.createLook(), ...saved.look });
-setResource(world, Res.Voxels, Res.createVoxels(createPalette(), createPool()));
+// the cubes of this world made beforehand (worlds/baked/<world>.bin, lib/voxelSaved.js), if there are; ?bake makes them
+const pool = createPool(), palette = createPalette();
+if (params.has('bake')) pool.keepAll();
+else {
+  const res = await fetch(`../worlds/baked/${encodeURIComponent(params.get('world') || 'meadow')}.bin` + NOCACHE).catch(() => null);
+  if (res?.ok) pool.useBaked(fromFile(await res.arrayBuffer()), palette.index);
+}
+setResource(world, Res.Voxels, Res.createVoxels(palette, pool));
 Object.assign(setResource(world, Res.Wardrobe, Res.createWardrobe(character, items)).outfit, saved.outfit);
 setResource(world, Res.Objects, Res.createObjects(objects.objects));
 setResource(world, Res.Bestiary, Res.createBestiary(monsters.monsters, models.models, levels, monsterChanges));
@@ -132,7 +141,7 @@ for (const s of [
   inputSystem, timeSystem,
   outfitSystem, playerSystem, monsterSystem, combatSystem, cameraControlSystem, viewportSystem, cloudSystem,
   coverChunkSystem, meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
-  cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem,
+  cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem, loadingSystem,
 ]) addSystem(world, s);
 
 runStartup(world);

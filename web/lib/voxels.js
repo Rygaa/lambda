@@ -128,15 +128,40 @@ export function triangles(geometry, matrix = null) {
   return { p, nrm, uv };
 }
 
+// a sheet seen from both sides (gen/solids.js sheet: each triangle twice, one per side) has only its side facing up
+// left: else its two sides make two layers of cubes, and the top one gets the normal of the side under it (it looks
+// dark). Other triangles stay. tris: of triangles(), without uv
+export function oneSided({ p, nrm }) {
+  const key = (t, order) => order.map((c) => `${p[t + c * 3].toFixed(4)},${p[t + c * 3 + 1].toFixed(4)},${p[t + c * 3 + 2].toFixed(4)}`).join('|');
+  const seen = new Map();
+  for (let t = 0; t < p.length; t += 9) seen.set(key(t, [0, 1, 2]), t);
+  const drop = new Set();
+  for (let t = 0; t < p.length; t += 9) {
+    if (drop.has(t)) continue;
+    // the same corners turned the other way (any start)
+    const twin = [[0, 2, 1], [2, 1, 0], [1, 0, 2]].map((o) => seen.get(key(t, o))).find((u) => u !== undefined && u !== t);
+    if (twin === undefined) continue;
+    const ny = (q) => (p[q + 5] - p[q + 2]) * (p[q + 6] - p[q]) - (p[q + 3] - p[q]) * (p[q + 8] - p[q + 2]);
+    drop.add(ny(t) >= ny(twin) ? twin : t);
+  }
+  if (!drop.size) return { p, nrm, uv: null };
+  const keep = [];
+  for (let t = 0; t < p.length; t += 9) if (!drop.has(t)) keep.push(t);
+  const P = new Float32Array(keep.length * 9), N = new Float32Array(keep.length * 9);
+  keep.forEach((t, i) => { P.set(p.subarray(t, t + 9), i * 9); N.set(nrm.subarray(t, t + 9), i * 9); });
+  return { p: P, nrm: N, uv: null };
+}
+
 // ------------------------------------------------------------------ still textured meshes
 // textured meshes that do not move (a FlyFF decor object, systems/objects.js) made of cubes on the grid of the world:
 // one geometry (world units, with the uv of the palette), or null. size: the cube edge in world units. Their side
-// toward the camera wins, like the rocks (lib/voxelCore.js voxelize view)
-export async function voxelStill(world, meshes, size, normals) {
-  const v = getResource(world, Voxels), view = getResource(world, Settings).basis.F.clone().negate().toArray();
+// toward the camera wins, like the rocks (lib/voxelCore.js voxelize view). local: in the units of their parent
+// instead (the cubes of a model, for all its copies, whatever their turn: so the side facing up wins)
+export async function voxelStill(world, meshes, size, normals, local = false) {
+  const v = getResource(world, Voxels), view = local ? [0, 1, 0] : getResource(world, Settings).basis.F.clone().negate().toArray();
   const sources = meshes.map((mesh) => {
     mesh.updateMatrixWorld(true);
-    return { tris: triangles(mesh.geometry, mesh.matrixWorld), texture: shareTexture(v, mesh.material.uniforms.uMap.value) };
+    return { tris: triangles(mesh.geometry, local ? mesh.matrix : mesh.matrixWorld), texture: shareTexture(v, mesh.material.uniforms.uMap.value) };
   });
   const { meshes: [arrays] } = await v.pool.run({ sources, size, opts: { normals, fill: true, view }, colors: 1 },
     sources.flatMap((s) => [s.tris.p.buffer, s.tris.nrm.buffer, s.tris.uv?.buffer].filter(Boolean)));

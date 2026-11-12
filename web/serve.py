@@ -1,11 +1,13 @@
 # Static server for the repo, with caching off: web/ reads ../assets and ../worlds.
 # It writes two files, for the Save button of the admin menu (web/systems/admin.js): saves/admin.json (the settings and
-# the stats of the human) and saves/monsters.json (the monster types changed in the admin menu).
+# the stats of the human) and saves/monsters.json (the monster types changed in the admin menu). And the cubes of a world
+# made beforehand: worlds/baked/<world>.bin, sent by the page opened with ?bake (web/lib/voxelSaved.js).
 #   python3 web/serve.py [port]   then open http://127.0.0.1:8643/web/
-import http.server, functools, json, os, sys
+import http.server, functools, json, os, re, shutil, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAVES = {'/saves/admin.json', '/saves/monsters.json'}
+BAKED = re.compile(r'^/worlds/baked/[A-Za-z0-9_-]+\.bin$')
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -15,6 +17,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         path = self.path.split('?')[0]
+        if BAKED.match(path):
+            save = os.path.join(ROOT, path.lstrip('/'))
+            os.makedirs(os.path.dirname(save), exist_ok=True)
+            with open(save + '.part', 'wb') as f:
+                left = int(self.headers.get('Content-Length', 0))
+                while left > 0:
+                    chunk = self.rfile.read(min(left, 1 << 20))
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    left -= len(chunk)
+            if left > 0:
+                os.remove(save + '.part')
+                return self.send_error(400, 'cut short')
+            shutil.move(save + '.part', save)
+            self.send_response(204)
+            self.end_headers()
+            return
         if path not in SAVES:
             return self.send_error(404)
         try:

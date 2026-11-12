@@ -54,7 +54,7 @@ export function setupObjectsPart(world, panel, picker, preview) {
       if (!d.placed) continue;
       for (const mesh of [...(d.group ? d.group.children : []), d.cubes?.mesh].filter(Boolean)) mesh.material.dispose();
       if (d.group) gpu.scene.remove(d.group);
-      if (d.cubes?.mesh) { gpu.scene.remove(d.cubes.mesh); d.cubes.mesh.geometry.dispose(); }
+      if (d.cubes?.mesh) gpu.scene.remove(d.cubes.mesh);    // its geometry stays: the copies of its model share it
       destroyEntity(world, ent);
     }
     gpu.shadowsDirty = true;

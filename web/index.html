@@ -12,6 +12,15 @@
     font: 12px/1.4 ui-monospace, Menlo, monospace; text-shadow: 0 1px 0 #0b2a20;
     pointer-events: none; transition: opacity 1s;
   }
+  #loading {
+    position: fixed; inset: 0; display: grid; place-content: center; gap: 10px; justify-items: center; z-index: 10;
+    color: #e6f3c4; background: #13392c; font: 12px/1.4 ui-monospace, Menlo, monospace; transition: opacity .5s;
+  }
+  #loading b { font-size: 14px; letter-spacing: 1px; }
+  #loading div { width: min(320px, 70vw); height: 8px; border: 1px solid #e6f3c455; border-radius: 4px; overflow: hidden; }
+  #loading i { display: block; height: 100%; width: 0; background: #b8d86a; transition: width .2s; }
+  #loading span { opacity: .7; }
+  #loading.gone { opacity: 0; pointer-events: none; }
   #fps {
     position: fixed; right: 12px; top: 10px; color: #e6f3c4; opacity: .85;
     font: 12px/1.4 ui-monospace, Menlo, monospace; text-shadow: 0 1px 0 #0b2a20;
@@ -105,6 +114,7 @@
 <div id="picker" hidden></div>
 <div id="fps"></div>
 <div id="hud"></div>
+<div id="loading"><b>Loading</b><div><i></i></div><span>the world</span></div>
 <script type="module" src="main.js"></script>
 </body>
 </html>

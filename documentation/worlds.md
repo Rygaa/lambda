@@ -20,14 +20,24 @@ Then open `http://127.0.0.1:8643/web/?world=all-types`.
 Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it run, Space makes it jump, a click (or
 `F`) attacks (click again for the next of 4 hits), and the camera follows it (with `?nochar`, the arrows move the
 camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top left opens a menu. Its `Look` part
-switches between `Normal` and `Voxel`: rocks, plants, cliffs, the human and the monsters are drawn with small cubes on
-a grid, with the cube size in pixels (0.5 to 6, 1 by default; rocks, plants and cliffs stop at 1, because nothing
-smaller than a pixel shows on them) and its light (`like the shape` or `each face`). Only the picture changes: the
-shapes, what stops the human, and the fights stay the same (`web/lib/voxels.js`, `web/systems/voxels.js`). Leaves,
-water, grass and the ground stay as they are. The cubes are made by workers, one per core of the computer but one,
-for the world and the bodies alike (`web/lib/voxelPool.js`, `web/lib/voxelWorker.js`). Each result is saved in the
-browser (IndexedDB, `lambda-voxels`) under the hash of what made it, so the same world, outfit and cube size come back
-at once, even after a reload. To free that space, clear the site data of the browser. The menu also changes
+switches between `Normal` and `Voxel` (the default): rocks, plants, cliffs, FlyFF objects, the human and the monsters
+are drawn with small cubes, with the cube size in pixels (0.5 to 6, 1 by default; rocks, plants and cliffs stop at 1,
+because nothing smaller than a pixel shows on them; 0.5 is too much for the human: its 907 frames need 5 GB, the page
+gets 3.7) and its light (`like the shape` or `each face`). Only the picture changes: the shapes, what stops the human,
+and the fights stay the same (`web/lib/voxels.js`, `web/systems/voxels.js`). Leaves, water, grass and the ground stay
+as they are (the ground of a FlyFF map too). The cubes of a shape or a FlyFF model are made once and every copy uses
+them, turned with it. They are made by workers, one per core of the computer but one, for the world and the bodies
+alike (`web/lib/voxelPool.js`, `web/lib/voxelWorker.js`). Each result is saved in the browser (IndexedDB,
+`lambda-voxels`) under the hash of what made it, so the same world, outfit and cube size come back faster, even after
+a reload. To free that space, clear the site data of the browser.
+
+A loading screen with a bar covers the page until the world is all there, in cubes (`web/systems/loading.js`). To
+make a world load fast even the first time, make its cubes beforehand: open it once with `&bake`
+(`?world=flarine&bake`); when the loading screen is gone, the page sends all its cubes to `web/serve.py`, which writes
+`worlds/baked/<world>.bin` (`web/lib/voxelSaved.js`). The next loads read that file and need no worker: Flarine is
+ready in about 20 s instead of 50. A job not in the file (the world, a shape, the outfit or the look changed since)
+is made as before, so an old file is never wrong, only slower: bake again after a change. The files are big (Flarine:
+hundreds of MB, most for the frames of the human), so git leaves them out (`.gitignore`). The menu also changes
 the walk speed, the run speed, the jump height, and the zoom while the game runs (`web/systems/admin.js`), and the
 clothes and weapons of the human: head, hair, clothes, gloves, shoes, cap, cloak, mask, weapon, and shield
 (`web/systems/outfit.js`). Each slot opens a grid of pictures of its items, so you see an item before you put it on
@@ -147,7 +157,8 @@ The fields of a world:
   ours: next to the human, FlyFF objects are a little bigger when small and much bigger when big (a house 17 m
   high), so a height h becomes 0.7 h / (1 + 0.7 h / 6): a bench 0.9, a lamp 1.2, a house 4, a tree 3.8, never more
   than 6 (`objectScale`). They follow the `Look` switch: cubes never smaller than 1 px, like the rocks; a big object
-  gets bigger cubes, so the computer does not run out of memory. Each one stops a walker by a circle, and no grass
+  gets bigger cubes, so the computer does not run out of memory. The cubes of a model are made once for each cube size
+  and shared by its copies. Each one stops a walker by a circle, and no grass
   grows under it (`web/systems/objects.js`).
 
 ## 3. A line of `props`

@@ -24,10 +24,11 @@ export const createTuning = () => ({ walkSpeed: 2.4, runSpeed: 5.2, jumpHeight: 
 
 // how things are drawn (the Look part of systems/admin.js): voxel: made of small cubes (lib/voxels.js,
 // systems/voxels.js) or as they are; px: the edge of a cube, in pixels of the frame (1 / ppu world units each),
-// 0.5 to 6 (the rocks, plants and cliffs stop at 1: lib/voxels.js lookOf);
-// light: 'surface' (lit like the shape it comes from) or 'cube' (each cube face by its own normal)
+// 0.5 to 6 (the rocks, plants and cliffs stop at 1: lib/voxels.js lookOf); light: 'surface' (lit like the shape it
+// comes from) or 'cube' (each cube face by its own normal). By default made of cubes of one pixel (half a pixel: the
+// human alone would need 5 GB, the page gets 3.7)
 export const Look = 'Look';
-export const createLook = () => ({ voxel: false, px: 1, light: 'surface' });
+export const createLook = () => ({ voxel: true, px: 1, light: 'surface' });
 
 // the voxel work (systems/voxels.js): palette: the colours of the textured cubes (lib/voxels.js createPalette);
 // key: the look the rocks, plants and cliffs are drawn in now (null: as they are); queue: the jobs not sent yet
@@ -61,7 +62,7 @@ export const createWardrobe = (config, items) => ({
 // a promise of { parts, box } (its meshes, still, and its box); unit: world units per FlyFF unit (lib/character.js
 // unitScale), 0 until known
 export const Objects = 'Objects';
-export const createObjects = (names) => ({ names, models: new Map(), unit: 0, unitAsked: false });
+export const createObjects = (names) => ({ names, models: new Map(), cubes: new Map(), unit: 0, unitAsked: false });
 
 export const Bestiary = 'Bestiary';
 export const createBestiary = (monsters, models, levels, changes) => {

@@ -1,19 +1,24 @@
 // The look of the rocks, plants and cliffs (the Look resource): as they are, or made of cubes (lib/voxels.js). Only the
 // geometry drawn is swapped: the shapes, what stops a walker, and the materials stay the same, so the switch goes
 // both ways. The human and the monsters follow the look too (systems/outfit.js, systems/monsters.js).
-// The cubes are on the grid of the world (one cube is `px` pixels of the frame, at least 1). The voxel workers make them
-// (lib/voxelPool.js), so the game does not stop: the objects nearest to the camera first, then the cliffs, in square
-// pieces (CHUNK units) shown all at once when they are all made. Each object keeps its cubes for its last look, so going
-// back to it is at once. Leaves (sprites), water, grass and the ground stay as they are.
+// One cube is `px` pixels of the frame, at least 1. The voxel workers make them (lib/voxelPool.js), so the game does not
+// stop: the objects nearest to the camera first, then the cliffs, on the grid of the world, in square pieces (CHUNK
+// units) shown all at once when they are all made. The copies of one shape share its cubes (made once, in the units of
+// the shape, turned with each copy), so a forest of 300 trees from 12 shapes makes 12 jobs. Each object keeps its cubes
+// for its last look, so going back to it is at once. Leaves (sprites), water, grass and the ground stay as they are.
 import * as THREE from 'three';
 import { query, added, getComponent, hasComponent, getResource } from '../ecs/world.js';
 import { Prop, SceneObject, GroundPlane, CameraRig } from '../components.js';
 import { Voxels, Gpu, Settings } from '../resources.js';
-import { lookOf, triangles, toGeometry } from '../lib/voxels.js';
+import { lookOf, triangles, toGeometry, oneSided } from '../lib/voxels.js';
 
 const AHEAD = 2;         // jobs of the world sent to the pool for each worker (the bodies go before the ones that wait)
 const CHUNK = 4;         // world units: the side of a piece of cliff
 const FLAT = ['leaves', 'water'];   // roles that stay as they are
+const UP = [0, 1, 0];     // the cubes of a shape are for all its turns: where two faces meet in one cube (a thin leaf),
+                         // the one facing up wins (the camera looks down on it whatever its turn)
+const MAX_CELLS = 16e6;  // the cubes of one shape fill at most this many cells of its box: a bigger one (a giant tree of a
+                         // FlyFF map) gets bigger cubes, else a worker is slow and runs out of memory (as systems/objects.js)
 
 export function voxelSystem(world) {
   // the look of the world: its cubes are never smaller than a pixel (lib/voxels.js lookOf)
@@ -22,6 +27,8 @@ export function voxelSystem(world) {
   if (key !== v.key) {
     v.key = key;
     v.queue = [];
+    // the shapes still being made for the old look: their answers will be dropped, so they are asked again next time
+    for (const job of v.sent.values()) if (job.shared) job.shared.looks.delete(job.shared.key);
     v.sent.clear();
     for (const e of query(world, [Prop, SceneObject])) { showShape(world, e); if (look) v.queue.push({ entity: e }); }
     dropChunks(world, v);
@@ -41,7 +48,7 @@ export function voxelSystem(world) {
     const job = v.sent.get(id);
     v.sent.delete(id);
     if (!job || !look) continue;
-    if (job.entity !== undefined) putCubes(world, job, meshes);
+    if (job.shared) shapeDone(world, job.shared, meshes);
     else putChunk(world, v, job, meshes);
     gpu.shadowsDirty = true;
   }
@@ -61,42 +68,63 @@ export function voxelSystem(world) {
 const viewOf = (world) => getResource(world, Settings).basis.F.clone().negate().toArray();
 
 // ------------------------------------------------------------------ objects
-// the job of an object: the triangles of each of its meshes, placed and turned like it, on the grid of the world
-// (null: it kept its cubes for this look, and shows them now)
+// the cubes of the shapes in each look: the first geometry of a shape -> look key -> { geometries (one per mesh, or
+// null while they are made), waiting: the entities to give them to }
+const shapes = new WeakMap();
+
+// the job of an object: the cubes of its shape, if no copy of it asked for them yet: the triangles of each of its
+// meshes, in the units of the shape (null: they are made or being made; it gets them when they are there)
 function propJob(world, job, look) {
   const so = getComponent(world, job.entity, SceneObject);
   const meshes = so.meshes.filter(({ role }) => !FLAT.includes(role)).map(({ mesh }) => mesh);
   for (const mesh of meshes) mesh.userData.shape ??= mesh.geometry;
   if (!meshes.length) return null;
   if (meshes.every((mesh) => mesh.userData.cubes?.key === look.key)) { showCubes(so); return null; }
-  so.group.updateMatrixWorld(true);
-  job.meshes = meshes;
+  const first = meshes[0].userData.shape;
+  if (!shapes.has(first)) shapes.set(first, new Map());
+  const looks = shapes.get(first);
+  let shared = looks.get(look.key);
+  if (shared) {
+    if (shared.geometries) putCubes(world, job.entity, shared, look.key);
+    else shared.waiting.push(job.entity);
+    return null;
+  }
+  looks.set(look.key, (shared = { geometries: null, waiting: [job.entity], key: look.key, looks }));
+  job.shared = shared;
+  const box = new THREE.Box3();
+  for (const mesh of meshes) {
+    mesh.userData.shape.computeBoundingBox();
+    box.union(mesh.userData.shape.boundingBox);
+  }
+  const s = box.getSize(new THREE.Vector3()), size = Math.max(look.size, Math.cbrt((s.x * s.y * s.z) / MAX_CELLS));
   // one source per mesh, each its own colour, so each mesh gets its own cubes
   return {
-    sources: meshes.map((mesh, c) => ({ tris: triangles(mesh.userData.shape, so.group.matrixWorld), color: c })),
-    size: look.size, opts: { normals: look.normals, fill: true, view: viewOf(world) }, colors: meshes.length,
+    sources: meshes.map((mesh, c) => ({ tris: oneSided(triangles(mesh.userData.shape, mesh.matrix)), color: c })),
+    size, opts: { normals: look.normals, fill: true, view: UP }, colors: meshes.length,
   };
 }
 
-// the cubes of an object have come: each mesh gets its own, moved back to the object
-function putCubes(world, { entity, meshes, key }, arrays) {
+// the cubes of a shape have come: to every copy that waits for them
+function shapeDone(world, shared, arrays) {
+  shared.geometries = arrays.map((a) => toGeometry(a));
+  for (const e of shared.waiting.splice(0)) putCubes(world, e, shared, shared.key);
+}
+
+// an object gets the cubes of its shape: each mesh its own
+function putCubes(world, entity, { geometries }, key) {
   if (!hasComponent(world, entity, SceneObject)) return;
-  const so = getComponent(world, entity, SceneObject), p = so.group.position;
-  meshes.forEach((mesh, c) => {
-    mesh.userData.cubes?.geometry?.dispose();
-    mesh.userData.cubes = { key, geometry: toGeometry(arrays[c])?.translate(-p.x, -p.y, -p.z) ?? null };
-  });
+  const so = getComponent(world, entity, SceneObject);
+  so.meshes.filter(({ role }) => !FLAT.includes(role)).forEach(({ mesh }, c) => { mesh.userData.cubes = { key, geometry: geometries[c] }; });
   showCubes(so);
 }
 
-// an object made of cubes. Each mesh turns back by the turn of the object, so its cubes stay square with the world
+// an object made of cubes (they turn with it)
 function showCubes(so) {
   for (const { mesh } of so.meshes) {
     const cubes = mesh.userData.cubes;
     if (!cubes) continue;
     mesh.geometry = cubes.geometry ?? mesh.userData.shape;
     mesh.visible = !!cubes.geometry;
-    mesh.rotation.y = -so.group.rotation.y;
   }
 }
 
@@ -106,13 +134,15 @@ function showShape(world, e) {
     if (!mesh.userData.shape) continue;
     mesh.geometry = mesh.userData.shape;
     mesh.visible = true;
-    mesh.rotation.y = 0;
   }
 }
 
 // ------------------------------------------------------------------ cliffs
-// the cliff meshes (systems/meshes.js: the plateau tops, the walls, the stairs) of the ground plane
+// the cliff meshes (systems/meshes.js: the plateau tops, the walls, the stairs) of the ground plane. A FlyFF map has
+// none: its ground and its water stay as they are, like the ground of the other worlds (in cubes of a pixel its
+// slopes would look the same, from millions of cubes)
 function cliffMeshes(world) {
+  if (getResource(world, Settings).land.terrain?.kind === 'map') return [];
   const e = query(world, [GroundPlane, SceneObject])[0];
   return e === undefined ? [] : getComponent(world, e, SceneObject).group.children.filter((m) => !m.userData.cube);
 }

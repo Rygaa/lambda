@@ -4,9 +4,10 @@
 // drawn in the style of our world: with the world, its textures turned into our palette rows (lib/objectStyle.js,
 // render/shaders.js DECOR_FRAG), so it gets our pixels, light bands and outline. It stops a walker by a circle, and
 // the grass does not grow under it.
-// It follows the look (the Look resource, lib/voxels.js): made of cubes on the grid of the world, never smaller than a
-// pixel like the rocks, by the voxel workers; a big object gets bigger cubes (MAX_CELLS). Each object keeps its cubes
-// for its last look.
+// It follows the look (the Look resource, lib/voxels.js): made of cubes never smaller than a pixel like the rocks, by
+// the voxel workers; a big object gets bigger cubes (MAX_CELLS). The cubes of a model are made once for each cube size
+// (in steps of STEP) and every copy of it uses them, turned with it: so a city of 2000 objects from 76 models makes a
+// few hundred jobs, not 2000. Each object keeps its cubes for its last look.
 import * as THREE from 'three';
 import { query, getComponent, addComponent, getResource } from '../ecs/world.js';
 import { Decor, Blocker, Footprint } from '../components.js';
@@ -32,6 +33,8 @@ const CLEAR = 2.2; // world units: the parts of a FlyFF map object higher than t
 const SHRINK = 0.7, CEILING = 6;
 const MAX_CELLS = 16e6;   // the cubes of one object fill at most this many cells of its box: a bigger object (a house,
                           // a giant tree) gets bigger cubes, else a worker runs out of memory
+const STEP = 2 ** (1 / 8);  // the cube sizes of a model (in its own units) go by this step: a copy of it at another
+                            // scale gets cubes at most 4.5% off its size, and shares them with the copies near it
 
 export function objectSystem(world) {
   const o = getResource(world, Objects), gpu = getResource(world, Gpu);
@@ -128,19 +131,27 @@ function decorMesh(world, gpu, map, geometry) {
   return mesh;
 }
 
-// the object made of cubes in a look, by the voxel workers: one mesh, square with the world (not turned with the object)
+// the object made of cubes in a look: the cubes of its model at about its cube size (made the first time a copy asks
+// for them, by the voxel workers, in the units of the model), in one mesh placed and turned like the object
 function makeCubes(world, gpu, d, look) {
   d.busy = true;
-  d.group.updateMatrixWorld(true);
-  const { key } = look, p = d.group.position.clone();
+  const o = getResource(world, Objects), k = d.group.scale.x;
   const s = d.box.getSize(new THREE.Vector3()), size = Math.max(look.size, Math.cbrt((s.x * s.y * s.z) / MAX_CELLS));
-  voxelStill(world, d.group.children, size, look.normals).then((geometry) => {
-    if (d.cubes?.mesh) { gpu.scene.remove(d.cubes.mesh); d.cubes.mesh.geometry.dispose(); }
-    geometry?.translate(-p.x, -p.y, -p.z);
+  const step = STEP ** Math.round(Math.log(size / k) / Math.log(STEP));
+  const name = `${o.names[d.object].model}/${step.toPrecision(6)}/${look.normals}`;
+  if (!o.cubes.has(name)) o.cubes.set(name, voxelStill(world, d.group.children, step, look.normals, true));
+  o.cubes.get(name).then((geometry) => {
+    if (d.cubes?.mesh) gpu.scene.remove(d.cubes.mesh);
     const mesh = geometry && decorMesh(world, gpu, getResource(world, Voxels).palette.texture, geometry);
-    if (mesh) { mesh.position.copy(p); mesh.visible = false; gpu.scene.add(mesh); }
-    d.cubes = { key, mesh };
+    if (mesh) {
+      mesh.position.copy(d.group.position);
+      mesh.quaternion.copy(d.group.quaternion);
+      mesh.scale.copy(d.group.scale);
+      mesh.visible = false;
+      gpu.scene.add(mesh);
+    }
+    d.cubes = { key: look.key, mesh };
     d.busy = false;
     gpu.shadowsDirty = true;
-  }, (err) => { console.error('object cubes:', err); d.cubes = { key, mesh: null }; d.busy = false; });
+  }, (err) => { console.error('object cubes:', err); d.cubes = { key: look.key, mesh: null }; d.busy = false; });
 }
