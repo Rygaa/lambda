@@ -25,8 +25,8 @@ Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it ru
 camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top left opens a menu. Its `Look` part
 switches between `Normal` and `Voxel` (the default): rocks, plants, cliffs, FlyFF objects, the human and the monsters
 are drawn with small cubes, with the cube size in pixels (0.5 to 6, 1 by default; rocks, plants and cliffs stop at 1,
-because nothing smaller than a pixel shows on them; 0.5 is too much for the human: its 907 frames need 5 GB, the page
-gets 3.7) and its light (`like the shape` or `each face`). Only the picture changes: the shapes, what stops the human,
+because nothing smaller than a pixel shows on them; the human always has cubes of 0.5 px, whatever the cube size:
+`HUMAN_PX` in `web/lib/voxels.js`) and its light (`like the shape` or `each face`). Only the picture changes: the shapes, what stops the human,
 and the fights stay the same (`web/lib/voxels.js`, `web/systems/voxels.js`). Leaves, water, grass and the ground stay
 as they are (the ground of a FlyFF map too). The cubes of a shape or a FlyFF model are made once and every copy uses
 them, turned with it. They are made by workers, one per core of the computer but one, for the world and the bodies
@@ -44,6 +44,11 @@ Since `try/voxel-perf`, the Voxel look loads much faster and with much less memo
   back to the grid of the body (`web/lib/voxelBody.js`, drawn as instances of one cube). The places are taken 2 times
   closer than the cubes, so no hole opens where the body stretches. `?bodies=free` leaves the cubes off the grid,
   `?bodies=frames` makes the cubes of every frame as before (to compare).
+
+A new outfit (an item put on or taken off, in the Admin menu or the bag) does not stop the game: the human is baked
+again (about 900 frames, `web/lib/bake.js` bakeClips) and made of cubes (`web/lib/voxelBody.js`) in slices of 8 ms,
+with a frame of the game drawn between them, and it keeps its old outfit until the new one is ready (about 2 s). The
+monsters are baked the same way. Before, the game stopped for about 2 s.
 
 The shadows of the world are drawn once into their own map; when only the human or the monsters move, they are drawn
 alone on a copy of it (`web/systems/shadows.js`).

@@ -169,7 +169,7 @@ export function pose({ parts, seams }, clip, time, legs = null) {
     part.mesh.skeleton.update();
   }
   const skeleton = parts.find((p) => !p.rigid).root, M = new THREE.Matrix4();
-  const out = [], hints = [];
+  const out = [], hints = [], v = new THREE.Vector3(), w = new THREE.Vector3(), n = new THREE.Vector3();
   for (const part of parts) {
     const o = part.mesh;
     // a rigid mesh of the same file as the skin (a monster) moves with its parent bone; one of its own file (a cap,
@@ -179,17 +179,17 @@ export function pose({ parts, seams }, clip, time, legs = null) {
       else M.multiplyMatrices(skeleton.getObjectByName(part.bone ?? HEAD_BONE).matrixWorld, part.local);
     }
     const pos = o.geometry.getAttribute('position'), nrm = o.geometry.getAttribute('normal');
-    const arr = new Float32Array(pos.count * 3), hint = [];
-    const v = new THREE.Vector3(), w = new THREE.Vector3();
+    // the hints (where each normal points once posed) are only for the index, made on the first frame
+    const arr = new Float32Array(pos.count * 3), hint = part.index ? null : [];
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i);
-      w.copy(v).addScaledVector(new THREE.Vector3().fromBufferAttribute(nrm, i), 0.01);
-      if (part.rigid) { v.applyMatrix4(M); w.applyMatrix4(M); } else {
-        o.applyBoneTransform(i, v); o.applyBoneTransform(i, w);
-        v.applyMatrix4(o.matrixWorld); w.applyMatrix4(o.matrixWorld);
+      if (hint) w.copy(v).addScaledVector(n.fromBufferAttribute(nrm, i), 0.01);
+      if (part.rigid) { v.applyMatrix4(M); if (hint) w.applyMatrix4(M); } else {
+        o.applyBoneTransform(i, v); v.applyMatrix4(o.matrixWorld);
+        if (hint) { o.applyBoneTransform(i, w); w.applyMatrix4(o.matrixWorld); }
       }
-      arr.set([v.x, v.y, v.z], i * 3);
-      hint.push(w.clone().sub(v));
+      arr[i * 3] = v.x; arr[i * 3 + 1] = v.y; arr[i * 3 + 2] = v.z;
+      if (hint) hint.push(w.clone().sub(v));
     }
     out.push(arr); hints.push(hint);
   }
@@ -214,20 +214,37 @@ export function pose({ parts, seams }, clip, time, legs = null) {
     for (const e of g) { x += out[e.m][e.i * 3]; y += out[e.m][e.i * 3 + 1]; z += out[e.m][e.i * 3 + 2]; }
     for (const e of g) out[e.m].set([x / g.length, y / g.length, z / g.length], e.i * 3);
   }
-  // smooth normals over the whole body
-  const nkey = (a, i) => `${Math.round(a[i * 3] * 500)},${Math.round(a[i * 3 + 1] * 500)},${Math.round(a[i * 3 + 2] * 500)}`;
-  const acc = new Map(), A = new THREE.Vector3(), B = new THREE.Vector3(), C = new THREE.Vector3();
+  // smooth normals over the whole body: the vertices at one place (rounded) share one sum of the face normals around
+  // them. Each vertex gets the number of its place once (group), the sums are in one array (sum: 3 numbers a place)
+  const groupOf = new Map(), groups = out.map((a) => {
+    const g = new Int32Array(a.length / 3);
+    for (let i = 0; i < g.length; i++) {
+      const key = `${Math.round(a[i * 3] * 500)},${Math.round(a[i * 3 + 1] * 500)},${Math.round(a[i * 3 + 2] * 500)}`;
+      let k = groupOf.get(key);
+      if (k === undefined) groupOf.set(key, (k = groupOf.size));
+      g[i] = k;
+    }
+    return g;
+  });
+  const sum = new Float64Array(groupOf.size * 3), used = new Uint8Array(groupOf.size);
   parts.forEach((part, m) => {
-    const a = out[m], idx = part.index;
+    const a = out[m], idx = part.index, g = groups[m];
     for (let t = 0; t < idx.length; t += 3) {
-      A.fromArray(a, idx[t] * 3); B.fromArray(a, idx[t + 1] * 3); C.fromArray(a, idx[t + 2] * 3);
-      const fn = B.clone().sub(A).cross(C.clone().sub(A));
-      for (const k of [idx[t], idx[t + 1], idx[t + 2]]) { const kk = nkey(a, k); acc.set(kk, (acc.get(kk) ?? new THREE.Vector3()).add(fn)); }
+      const i = idx[t] * 3, j = idx[t + 1] * 3, k = idx[t + 2] * 3;
+      const bx = a[j] - a[i], by = a[j + 1] - a[i + 1], bz = a[j + 2] - a[i + 2];
+      const cx = a[k] - a[i], cy = a[k + 1] - a[i + 1], cz = a[k + 2] - a[i + 2];
+      const fx = by * cz - bz * cy, fy = bz * cx - bx * cz, fz = bx * cy - by * cx;
+      for (const q of [idx[t], idx[t + 1], idx[t + 2]]) { const s = g[q]; sum[s * 3] += fx; sum[s * 3 + 1] += fy; sum[s * 3 + 2] += fz; used[s] = 1; }
     }
   });
   return parts.map((part, m) => {
-    const a = out[m], n = new Float32Array(a.length);
-    for (let i = 0; i < a.length / 3; i++) n.set((acc.get(nkey(a, i)) ?? new THREE.Vector3(0, 1, 0)).clone().normalize().toArray(), i * 3);
+    const a = out[m], n = new Float32Array(a.length), group = groups[m];
+    for (let i = 0; i < a.length / 3; i++) {
+      const s = group[i];
+      if (!used[s]) { n[i * 3 + 1] = 1; continue; }
+      const x = sum[s * 3], y = sum[s * 3 + 1], z = sum[s * 3 + 2], len = Math.sqrt(x * x + y * y + z * z) || 1;
+      n[i * 3] = x * (1 / len); n[i * 3 + 1] = y * (1 / len); n[i * 3 + 2] = z * (1 / len);
+    }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(a, 3));
     g.setAttribute('normal', new THREE.BufferAttribute(n, 3));
@@ -239,15 +256,31 @@ export function pose({ parts, seams }, clip, time, legs = null) {
 
 // the frames of some clips of a body: state -> clip name (or { clip, legs: the clip of the legs }, or { frames: (find
 // a clip by name, fps) -> the layers of each frame (pose) }) -> frames (each one geometry per part), `fps` a second.
-// A loop leaves out its last frame (it is the first one again); a clip that plays once (once(state)) keeps it
-export function bakeClips(body, names, fps, once = () => false) {
+// A loop leaves out its last frame (it is the first one again); a clip that plays once (once(state)) keeps it.
+// The human has about 900 frames (2 s of work): after each SLICE ms the page draws a frame, so the game does not stop
+// while a new outfit or a monster is baked
+const SLICE = 8;
+export async function bakeClips(body, names, fps, once = () => false) {
   const clips = {};
   const find = (name) => body.clips.find((a) => a.name === name) ?? (() => { throw new Error(`no clip ${name}`); })();
+  let since = performance.now();
+  const breathe = async () => {
+    if (performance.now() - since < SLICE) return;
+    await new Promise((r) => setTimeout(r));
+    since = performance.now();
+  };
   for (const [state, name] of Object.entries(names)) {
-    if (name.frames) { clips[state] = name.frames(find, fps).map((layers) => pose(body, layers)); continue; }
+    const frames = (clips[state] = []);
+    if (name.frames) {
+      for (const layers of name.frames(find, fps)) { frames.push(pose(body, layers)); await breathe(); }
+      continue;
+    }
     const clip = find(name.clip ?? name), legs = name.legs && find(name.legs);
     const n = Math.max(1, Math.round(clip.duration * fps)) + (once(state) ? 1 : 0);
-    clips[state] = Array.from({ length: n }, (_, k) => pose(body, clip, Math.min(clip.duration - 1e-3, k / fps), legs && { clip: legs, time: k / fps }));
+    for (let k = 0; k < n; k++) {
+      frames.push(pose(body, clip, Math.min(clip.duration - 1e-3, k / fps), legs && { clip: legs, time: k / fps }));
+      await breathe();
+    }
   }
   return clips;
 }

@@ -28,7 +28,7 @@ export function loadingSystem(world) {
     parts.push(['cliffs in cubes', v.chunksLeft ? 0 : pieces, pieces]);
   }
   const bodies = lookOf(world)?.key ?? null, human = query(world, [Player])[0], w = getResource(world, Wardrobe);
-  if (human !== undefined) parts.push(['the human', !w.busy && !w.dirty && w.look === bodies ? 1 : 0, 1]);
+  if (human !== undefined) parts.push(['the human', !w.busy && !w.dirty && w.look === (lookOf(world)?.human.key ?? null) ? 1 : 0, 1]);
   const monsters = query(world, [Monster]).map((e) => getComponent(world, e, Monster));
   const asked = getResource(world, Bestiary).requests.length;
   parts.push(['monsters', monsters.filter((m) => m.look === bodies).length, monsters.length + asked]);

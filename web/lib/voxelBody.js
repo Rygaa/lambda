@@ -28,10 +28,23 @@ function colorsOf(texture) {
   return at;
 }
 
+// after each SLICE ms of work the page draws a frame, so the game does not stop while a body gets its cubes (the
+// human at half a pixel: about 150 ms)
+const SLICE = 8;
+function breather() {
+  let since = performance.now();
+  return async () => {
+    if (performance.now() - since < SLICE) return;
+    await new Promise((r) => setTimeout(r));
+    since = performance.now();
+  };
+}
+
 // the outside cubes of one frame (one geometry per part), with where each comes from. size: the cube edge, in the
 // units of the body. -> { count, part, tri (3 vertex indices a cube), bary (2), local (3: the centre from its place,
 // along the triangle edge, across it, along its normal), rgb }
-function shellOf(parts, frame, size) {
+async function shellOf(parts, frame, size) {
+  const breathe = breather();
   const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
   for (const g of frame) {
     const p = g.getAttribute('position').array;
@@ -41,9 +54,10 @@ function shellOf(parts, frame, size) {
   const [nx, ny, nz] = n, cells = nx * ny * nz;
   const score = new Float32Array(cells).fill(-9), src = new Int32Array(cells).fill(-1);
   const triOf = new Int32Array(cells), ba = new Float32Array(cells), bb = new Float32Array(cells);
-  frame.forEach((g, m) => {
+  for (const [m, g] of frame.entries()) {
     const p = g.getAttribute('position').array, index = g.index.array;
     for (let t = 0; t < index.length; t += 3) {
+      if (t % 300 === 0) await breathe();
       const i0 = index[t] * 3, i1 = index[t + 1] * 3, i2 = index[t + 2] * 3;
       const ax = p[i0], ay = p[i0 + 1], az = p[i0 + 2];
       const abx = p[i1] - ax, aby = p[i1 + 1] - ay, abz = p[i1 + 2] - az;
@@ -75,7 +89,8 @@ function shellOf(parts, frame, size) {
         }
       }
     }
-  });
+  }
+  await breathe();
   // the outside: the empty cells reached from the border of the box; a cube is kept if it touches one
   const outside = new Uint8Array(cells), queue = new Int32Array(cells);
   let head = 0, tail = 0;
@@ -85,6 +100,7 @@ function shellOf(parts, frame, size) {
   for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) { seed(x + nx * y); seed(x + nx * (y + ny * (nz - 1))); }
   const sxy = nx * ny;
   while (head < tail) {
+    if (head % 65536 === 0) await breathe();
     const k = queue[head++], x = k % nx, y = Math.floor(k / nx) % ny, z = Math.floor(k / sxy);
     if (x > 0) seed(k - 1); if (x < nx - 1) seed(k + 1);
     if (y > 0) seed(k - nx); if (y < ny - 1) seed(k + nx);
@@ -92,6 +108,7 @@ function shellOf(parts, frame, size) {
   }
   const kept = [];
   for (let k = 0; k < cells; k++) {
+    if (k % 65536 === 0) await breathe();
     if (src[k] < 0) continue;
     const x = k % nx, y = Math.floor(k / nx) % ny, z = Math.floor(k / sxy);
     if (x === 0 || y === 0 || z === 0 || x === nx - 1 || y === ny - 1 || z === nz - 1 ||
@@ -100,7 +117,8 @@ function shellOf(parts, frame, size) {
   const count = kept.length, part = new Uint8Array(count), tri = new Uint32Array(count * 3), bary = new Float32Array(count * 2);
   const local = new Float32Array(count * 3), rgb = new Uint32Array(count);
   const colors = parts.map((pt) => colorsOf(pt.texture)), P = [0, 0, 0], E = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-  kept.forEach((k, q) => {
+  for (const [q, k] of kept.entries()) {
+    if (q % 4096 === 0) await breathe();
     const m = src[k], g = frame[m], index = g.index.array, t = triOf[k];
     part[q] = m;
     tri.set([index[t], index[t + 1], index[t + 2]], q * 3);
@@ -113,7 +131,7 @@ function shellOf(parts, frame, size) {
     const u = uv.getX(index[t]) * w + uv.getX(index[t + 1]) * ba[k] + uv.getX(index[t + 2]) * bb[k];
     const v = uv.getY(index[t]) * w + uv.getY(index[t + 1]) * ba[k] + uv.getY(index[t + 2]) * bb[k];
     rgb[q] = colors[m](u, v);
-  });
+  }
   return { count, part, tri, bary, local, rgb };
 }
 
@@ -141,11 +159,12 @@ export const BODIES = new URLSearchParams(location.search).get('bodies') ?? 'sna
 // between them; on the grid, the cubes that fall in one cell are drawn on top of each other
 const DENSE = Number(new URLSearchParams(location.search).get('dense') ?? 2);
 
-// the cubes of a body: made once from the first idle frame of `clips` (lib/bake.js bakeClips). -> { mesh(): a new mesh
-// of them for one body (lib/bake.js showFrame shows a frame on it), count }. size: the cube edge in the units of the
-// body; normals: each cube lit like the surface it comes from (else each face by its own normal); snap: on the grid
-export function voxelBody(world, body, clips, size, normals, snap = true) {
-  const shell = shellOf(body.parts, clips.idle[0], size / DENSE), v = getResource(world, Voxels), gpu = getResource(world, Gpu);
+// the cubes of a body: made once from the first idle frame of `clips` (lib/bake.js bakeClips). -> a promise of
+// { mesh(): a new mesh of them for one body (lib/bake.js showFrame shows a frame on it), count }. size: the cube edge
+// in the units of the body; normals: each cube lit like the surface it comes from (else each face by its own normal);
+// snap: on the grid
+export async function voxelBody(world, body, clips, size, normals, snap = true) {
+  const shell = await shellOf(body.parts, clips.idle[0], size / DENSE), v = getResource(world, Voxels), gpu = getResource(world, Gpu);
   const SIDE = 256, uv = new Float32Array(shell.count * 2);
   for (let q = 0; q < shell.count; q++) {
     const i = paletteAdd(v.palette, shell.rgb[q]);

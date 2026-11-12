@@ -10,16 +10,18 @@ import { getResource } from '../ecs/world.js';
 import { Look, Settings, Voxels } from '../resources.js';
 
 // the look now (the Look resource): null when things are drawn as they are, else { key, size (the cube edge, world
-// units), normals (surface light), world: { key, size } }. The human and the monsters are drawn 4 times finer than
-// the world, so they show cubes down to a quarter of a pixel; the rocks, plants and cliffs (world) show nothing
-// smaller than a pixel, so their cubes are never smaller than WORLD_MIN pixels
-const WORLD_MIN = 1;
+// units), normals (surface light), world: { key, size }, human: { key, size } }. The human and the monsters are drawn
+// 4 times finer than the world, so they show cubes down to a quarter of a pixel; the rocks, plants and cliffs (world)
+// show nothing smaller than a pixel, so their cubes are never smaller than WORLD_MIN pixels. The monsters follow the
+// cube size of the Look; the human always has cubes of HUMAN_PX pixels (made once, lib/voxelBody.js, so it costs
+// little), whatever the cube size
+const WORLD_MIN = 1, HUMAN_PX = 0.5;
 export function lookOf(world) {
   const look = getResource(world, Look);
   if (!look.voxel) return null;
   const ppu = getResource(world, Settings).ppu, px = Math.max(WORLD_MIN, look.px);
   return { key: `${look.px}/${look.light}`, size: look.px / ppu, normals: look.light === 'surface',
-    world: { key: `${px}/${look.light}`, size: px / ppu } };
+    world: { key: `${px}/${look.light}`, size: px / ppu }, human: { key: `${HUMAN_PX}/${look.light}`, size: HUMAN_PX / ppu } };
 }
 
 // ------------------------------------------------------------------ palette

@@ -10,7 +10,7 @@ import { lookOf } from '../lib/voxels.js';
 export function outfitSystem(world) {
   const w = getResource(world, Wardrobe), e = query(world, [Player])[0];
   if (e === undefined) return;
-  const look = lookOf(world)?.key ?? null;
+  const look = lookOf(world)?.human.key ?? null;   // its cubes do not follow the cube size (lib/voxels.js)
   if (!w.busy && w.look !== look) w.dirty = true;
   if (w.dirty && !w.busy) {
     w.dirty = false;

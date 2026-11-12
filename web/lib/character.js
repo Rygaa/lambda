@@ -57,8 +57,8 @@ function borrowed(cache, config) {
 }
 
 // the clips and meshes of an outfit (slot -> file), in the look now: systems/outfit.js puts them on the human.
-// Made of cubes (lib/voxels.js), each frame is one mesh, with the colours of the voxel palette; the cubes are on the
-// grid of the human, so they turn and move with it
+// Made of cubes (lib/voxels.js, always HUMAN_PX pixels: lookOf human), with the colours of the voxel palette; the
+// cubes are on the grid of the human, so they turn and move with it
 export async function dress(world, outfit) {
   const gpu = getResource(world, Gpu), { config, slots, cache } = getResource(world, Wardrobe), look = lookOf(world);
   const body = await bodyOf(cache, config, outfit, slots);
@@ -72,16 +72,16 @@ export async function dress(world, outfit) {
     names[s + 'EndWalk'] = { frames: ending(config, s, config.clips.walk) };
     names[s + 'EndRun'] = { frames: ending(config, s, config.clips.run) };
   }
-  const clips = bakeClips(body, names, config.bakeFps, ONCE);
+  const clips = await bakeClips(body, names, config.bakeFps, ONCE);
   if (!look) return { clips, meshes: fineMeshes(gpu, body, clips.idle[0]), look: null };
   if (BODIES !== 'frames') {
-    const t = performance.now(), cubes = voxelBody(world, body, clips, look.size / (await unitScale(world)).k, look.normals, BODIES === 'snap');
+    const t = performance.now(), cubes = await voxelBody(world, body, clips, look.human.size / (await unitScale(world)).k, look.normals, BODIES === 'snap');
     console.log(`[bench] human: ${cubes.count} cubes in ${Math.round(performance.now() - t)} ms`);
-    return { clips, meshes: [cubes.mesh()], look: look.key };
+    return { clips, meshes: [cubes.mesh()], look: look.human.key };
   }
-  const cubes = await voxelClips(world, body, clips, look.size / (await unitScale(world)).k, look.normals);
+  const cubes = await voxelClips(world, body, clips, look.human.size / (await unitScale(world)).k, look.normals);
   for (const frames of Object.values(clips)) for (const frame of frames) for (const g of frame) g.dispose();
-  return { clips: cubes, meshes: [fineMesh(gpu, getResource(world, Voxels).palette.texture, cubes.idle[0][0])], look: look.key };
+  return { clips: cubes, meshes: [fineMesh(gpu, getResource(world, Voxels).palette.texture, cubes.idle[0][0])], look: look.human.key };
 }
 
 // the end of the hit `state` when no hit follows it: its way back (config.recover: a clip, if it has one), then its
@@ -119,7 +119,7 @@ export async function addCharacter(world, at, stats, levels = {}) {
   };
   gpu.fine.camera.layers.set(2);
   const wardrobe = getResource(world, Wardrobe), { config, outfit } = wardrobe;
-  wardrobe.look = lookOf(world)?.key ?? null;
+  wardrobe.look = lookOf(world)?.human.key ?? null;
   const { clips, meshes } = await dress(world, outfit);
   const group = new THREE.Group();
   for (const mesh of meshes) group.add(mesh);

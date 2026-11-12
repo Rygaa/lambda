@@ -26,7 +26,7 @@ export function bakeModel(world, model) {
       b.unit ||= (await unitScale(world)).k;
       const url = BASE + model + '.glb', { clips: names } = b.models[model];
       const body = await loadBody(new Map(), [{ url }], url, BASE + 'textures/');
-      bake.baked = { body, clips: bakeClips(body, names, FPS, ONCE), box: measure(body, names.idle), looks: new Map() };
+      bake.baked = { body, clips: await bakeClips(body, names, FPS, ONCE), box: measure(body, names.idle), looks: new Map() };
     })().catch((err) => { bake.error = err; console.error(`monster ${model}:`, err); });
     b.bakes.set(model, bake);
   }
@@ -41,8 +41,12 @@ export function monsterLook(world, type, baked) {
   const k = getResource(world, Bestiary).unit * type.size, key = `${look.key}@${k}`;
   let cubes = baked.looks.get(key);
   if (BODIES !== 'frames') {
-    if (!cubes) baked.looks.set(key, (cubes = voxelBody(world, baked.body, baked.clips, look.size / k, look.normals, BODIES === 'snap')));
-    return { clips: baked.clips, meshes: [cubes.mesh()], look: look.key };
+    if (!cubes) {
+      baked.looks.set(key, (cubes = { body: null }));
+      voxelBody(world, baked.body, baked.clips, look.size / k, look.normals, BODIES === 'snap').then((body) => { cubes.body = body; }, (err) => console.error(err));
+    }
+    if (!cubes.body) return null;
+    return { clips: baked.clips, meshes: [cubes.body.mesh()], look: look.key };
   }
   if (!cubes) {
     baked.looks.set(key, (cubes = { clips: null }));

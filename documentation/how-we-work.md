@@ -8,7 +8,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
   new `try/<name>` branch made from `attempt_1` (or `attempt_2`); push only when the user asks. Never `git merge` into
   an attempt branch: copy the files with `git checkout <branch> -- <files>`. `attempt_2` is `attempt_1` plus the voxel
   look (the default, with a loading screen until all is in cubes), the FlyFF decor objects in our style, the sword hits
-  of Quaternius, and the FlyFF city Flarine (`?world=flarine`). Which assets are FlyFF, ours or archived:
+  of Quaternius, and the FlyFF city Flarine (`?world=flarine`). In Voxel the human always has cubes of 0.5 px. Which assets are FlyFF, ours or archived:
   `documentation/assets.md`, section 7.
 - Commit messages are in French.
 - Screenshots for the user always have labels (a number and a caption for each picture).
@@ -44,7 +44,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | what stops a walker (the human and the monsters) | `web/lib/walk.js` |
 | the look, Normal or Voxel (the switch in the Admin menu, Voxel by default): the converter to cubes, the workers that make them and save them, the cubes of a world made beforehand (`?bake`, `worlds/baked/`), and the swap of what is drawn | `web/lib/voxels.js`, `web/lib/voxelPool.js`, `web/lib/voxelWorker.js`, `web/lib/voxelSaved.js`, `web/systems/voxels.js` |
 | the loading screen: a bar until the world is all there in cubes | `web/systems/loading.js` |
-| (`try/voxel-perf`) the human and the monsters made of cubes once, the cubes moved with the body; the cube maker reads only the rows with cubes, nothing saved in IndexedDB; the shadows of the world drawn once | `web/lib/voxelBody.js`, `web/lib/voxelCore.js`, `web/systems/shadows.js` |
+| (`try/voxel-perf`) the human and the monsters made of cubes once, the cubes moved with the body (the human always 0.5 px: `try/human-cubes`); the cube maker reads only the rows with cubes, nothing saved in IndexedDB; the shadows of the world drawn once | `web/lib/voxelBody.js`, `web/lib/voxelCore.js`, `web/systems/shadows.js` |
 | the 1018 FlyFF decor objects (chairs, boxes, fences, lamps, houses, trees...): models, list (`objects.json`: name, scale for the few made too big or too small, size), import script; in the worlds (recipe `objects`) and the Objects part of the Admin menu, at our sizes, in cubes with the look | `assets/objects/`, `import-objects.mjs`, `web/systems/objects.js`, `web/systems/adminObjects.js` |
 | the FlyFF objects in the style of our world: textures turned into our stone and green leaf palettes, drawn with the world | `web/lib/objectStyle.js`, `web/render/shaders.js` (DECOR_FRAG) |
 | a part of a FlyFF map as a world (recipe `map`): import script, map files, heights, water, paints, objects at FlyFF size, archived objects, our trees and big-leaf plants for its trees and leafy plants; grass in squares around the camera in a big world | `worlds/maps/`, `web/gen/map.js`, `assets/objects/archived.json`, `web/systems/coverChunks.js` |
