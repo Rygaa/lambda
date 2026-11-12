@@ -5,8 +5,11 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 ## 1. Rules
 
 - Branches, moving work to `attempt_1`, and pushing: `documentation/branches.md`. Short version: new work goes on a
-  new `try/<name>` branch made from `attempt_1`; push only when the user asks. `attempt_2` is `attempt_1` plus the
-  voxel look and the FlyFF decor objects in our style.
+  new `try/<name>` branch made from `attempt_1` (or `attempt_2`); push only when the user asks. Never `git merge` into
+  an attempt branch: copy the files with `git checkout <branch> -- <files>`. `attempt_2` is `attempt_1` plus the voxel
+  look (the default, with a loading screen until all is in cubes), the FlyFF decor objects in our style, the sword hits
+  of Quaternius, and the FlyFF city Flarine (`?world=flarine`). Which assets are FlyFF, ours or archived:
+  `documentation/assets.md`, section 7.
 - Commit messages are in French.
 - Screenshots for the user always have labels (a number and a caption for each picture).
 - For visual choices, show options and let the user decide. Keep things simple.
@@ -77,3 +80,10 @@ with Chromium and `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swifts
   `page.screenshot` hangs.
 - To test clicks in the Admin menu, slow the game instead (`requestAnimationFrame = (cb) => setTimeout(cb, 1000)`), so
   `page.screenshot` works.
+- The look is Voxel by default: a world is ready only when the loading screen is gone
+  (`document.getElementById('loading')` missing or with `dataset.done`); tick until then. With millions of cubes,
+  swiftshader takes minutes a frame: use the graphics card instead (`--use-angle=metal --enable-gpu
+  --ignore-gpu-blocklist`).
+- A big world (Flarine) loads fast only with its cubes made beforehand: open it once with `&bake`
+  (`documentation/worlds.md`). Without the file it still works, in about a minute.
+- The Browser pane of the app stops the game while it is hidden (no frames): test there only when it is shown.
