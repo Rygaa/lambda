@@ -26,6 +26,15 @@ export const Mana = defineComponent('Mana', () => ({ mp: 1, max: 1 }));
 // combo and the seconds left to press its key ({ id, step, left }, null: none); aim: the monster under the mouse
 export const Skills = defineComponent('Skills', () => ({ levels: {}, cooldowns: {}, active: null, combo: null, aim: null }));
 
+// a ki blast of a skill (systems/blasts.js, skills.json step `blast`): its spec, its power (times the damage), its
+// time (seconds of the clip of the skill, faster by rate); phase: charge (a ball grows in the hands), fly (a ball goes
+// forward), beam (a beam goes forward and stays), fade (it shrinks and is gone); x, y, z: where it leaves from and
+// dx, dz its way (set when it is fired); head: how far it has gone; dug: how far its trench is dug; fade: the seconds
+// left of its end; hit: the monsters it has hit
+export const Blast = defineComponent('Blast', () => ({
+  spec: null, power: 1, rate: 1, t: 0, phase: 'charge', x: 0, y: 0, z: 0, dx: 0, dz: 1, head: 0, dug: 0, fade: 0, hit: [],
+}));
+
 // a potion on the ground (systems/drops.js): which one, where, its meshes, and the seconds it has been there
 export const Drop = defineComponent('Drop', () => ({ potion: 'hp', x: 0, z: 0, y: 0, group: null, t: 0 }));
 

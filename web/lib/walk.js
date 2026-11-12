@@ -5,12 +5,14 @@
 import { isBlocked } from './footprints.js';
 import { topAt } from './tops.js';
 import { heightAt, wetAt, STEP } from '../gen/terrain.js';
+import { depthAt } from './craters.js';
 
 export const LEDGE = 0.12;   // it steps up onto a top at most this much higher than its feet: a slope steeper than
                              // about 30° stops it (the human must jump onto a rock)
 
-// the ground under a point: the terrain, or the top of a rock or a building
-export const groundAt = (terrain, tops, x, z) => Math.max(heightAt(terrain, x, z), topAt(tops, x, z));
+// the ground under a point: the terrain (down in a hole: the Craters resource, lib/craters.js), or the top of a rock or
+// a building
+export const groundAt = (terrain, tops, x, z, craters = null) => Math.max(heightAt(terrain, x, z) - depthAt(craters, x, z), topAt(tops, x, z));
 
 // can a walker of radius r go from (x0, z0) to (x, z) with its feet at y? no tree or water within r, no top of a rock
 // or a building more than LEDGE above its feet, and no cliff wall up or down. A point of its circle that is already

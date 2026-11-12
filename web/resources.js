@@ -105,6 +105,12 @@ export const BlockGrid = 'BlockGrid';
 // the tops of the objects that stop a walker by their shape (lib/tops.js)
 export const Tops = 'Tops';
 export const CoverGrid = 'CoverGrid';
+// the holes dug in the ground (lib/craters.js createCraters)
+export const Craters = 'Craters';
+// the ki blasts drawn this frame and the dirt that flies (systems/blasts.js): { mesh (null until the human is there),
+// sparks: [{ x, y, z, vx, vy, vz, size, color, life }] }
+export const Ki = 'Ki';
+export const createKi = () => ({ mesh: null, sparks: [] });
 export const createGrid = (ground = null) => ({ cells: new Map(), ground });
 
 export const Random = 'Random';

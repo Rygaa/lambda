@@ -190,6 +190,41 @@ void main() {
 }
 `;
 
+// a hole dug in the ground (lib/craters.js, systems/craters.js): like the stones, but darker the deeper it goes, so it
+// reads as a hole: aDug is how far under the ground a point is. A face more than DEEP down gets no sun, and a floor
+// that deep takes the darkest band (shade) instead of the band of tops
+export const CRATER_VERT = /* glsl */ `
+in float aDug;
+out vec3 vW;
+out vec3 vN;
+out float vDepth;
+out float vDug;
+void main() {
+  vec4 w = modelMatrix * vec4(position, 1.0);
+  vW = w.xyz;
+  vN = normalize(mat3(modelMatrix) * normal);
+  vDug = aDug;
+  vec4 v = viewMatrix * w;
+  vDepth = -v.z;
+  gl_Position = projectionMatrix * v;
+}
+`;
+export const CRATER_FRAG = COMMON + GBUF_OUT + /* glsl */ `
+uniform float uMid;
+uniform float uPal;
+in vec3 vW; in vec3 vN; in float vDepth; in float vDug;
+const float DEEP = 0.22;
+void main() {
+  if (vW.y < uClipY) discard;
+  vec3 N = normalize(vN);
+  float ndl = dot(N, uSunL);
+  float lv = ndl > 0.0 ? ndl * cloudLight(vW) * shadowHard(vW + N * 0.02) : 0.0;
+  if (vDug > DEEP) lv = 0.0;
+  gData = vec4(lv, uMid, N.y > 0.5 && vDug <= DEEP ? 1.0 : 0.0, uPal);
+  gNorm = vec4(normalize(mat3(viewMatrix) * N), vDepth);
+}
+`;
+
 // FlyFF decor objects in our style (systems/objects.js, lib/objectStyle.js): like the stones, but the palette row of
 // each pixel comes from a texture of rows (uMap: red = the row, green = 1 for a leaf row; for cubes, the voxel palette
 // holds these codes). A leaf row is a canopy palette (its light ramp, lit like the leaves, darker in a shadow).
@@ -241,9 +276,12 @@ export function groundFrag(bricks = false) {
   return COMMON + GBUF_OUT + /* glsl */ `
 uniform sampler2D uGround;   // one paint per channel (sand, dirt, pavement, field), 0.5 on its edge
 uniform vec3 uGroundBox;     // x, z of its corner, its size (world units)
+uniform sampler2D uDug;      // the holes (lib/craters.js): a dug cell is not ground, the cubes of the hole are there
+uniform vec3 uDugBox;        // x, z of its corner, its size (world units)
 in vec3 vW; in vec3 vN; in float vDepth;
 void main() {
   vec3 P = vW;
+  if (texture(uDug, (P.xz - uDugBox.xy) / uDugBox.z).r > 0.0) discard;
   vec4 g = texture(uGround, (P.xz - uGroundBox.xy) / uGroundBox.z);
   float row = 0.0, most = 0.5;
   if (g.r > most) { most = g.r; row = ${GROUND_ROW.sand}; }
@@ -336,6 +374,27 @@ void main() {
   vec3 a = pow(texture(uMap, vUv).rgb, vec3(2.2));
   vec3 col = lv > 0.09 ? a : a * vec3(0.52, 0.56, 0.74);
   outColor = vec4(pow(col, vec3(1.0 / 2.2)), 1.0);
+}
+`;
+
+// ki blasts and the dirt they throw (systems/blasts.js): cubes drawn in the fine pass like the bodies (FINE_VERT with
+// instances), in their own colour (a texel of the voxel palette), not lit by the sun: the ki shines. Each face of a
+// cube a little darker by its side, so the cubes show
+export const KI_FRAG = /* glsl */ `
+uniform sampler2D uMap;
+uniform sampler2D tNorm;
+uniform vec2 uOffset;
+uniform float uScale;
+uniform vec2 uMargin;
+in vec3 vW; in vec3 vN; in vec2 vUv; in float vDepth;
+out vec4 outColor;
+void main() {
+  ivec2 q = ivec2(floor((gl_FragCoord.xy - uMargin) / uScale + 1.0 + uOffset));
+  float d = texelFetch(tNorm, q, 0).w;
+  if (d > 0.0 && d < vDepth - 0.05) discard;      // the world is in front
+  vec3 N = normalize(vN);
+  float face = N.y > 0.5 ? 1.0 : (abs(N.x) > 0.5 ? 0.92 : 0.86);
+  outColor = vec4(texture(uMap, vUv).rgb * face, 1.0);
 }
 `;
 

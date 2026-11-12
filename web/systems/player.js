@@ -14,7 +14,7 @@
 import * as THREE from 'three';
 import { query, getComponent, getResource, sendEvent } from '../ecs/world.js';
 import { Player, CameraRig, Health, Skills } from '../components.js';
-import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe } from '../resources.js';
+import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe, Craters } from '../resources.js';
 import { Swing } from '../events.js';
 import { free, groundAt as groundOf, LEDGE } from '../lib/walk.js';
 import { showFrame } from '../lib/bake.js';
@@ -36,8 +36,8 @@ export function playerSystem(world) {
   const { R, groundFwd } = settings.basis;
   const down = (k) => KEYS[k].some((key) => input.keys.has(key));
   const pressed = (k) => input.pressed.some(({ key }) => key.toLowerCase() === k);
-  // the ground under its centre: the terrain, or the top of a rock or a building
-  const groundAt = (x, z) => groundOf(terrain, tops, x, z);
+  // the ground under its centre: the terrain (or a hole in it), or the top of a rock or a building
+  const craters = getResource(world, Craters), groundAt = (x, z) => groundOf(terrain, tops, x, z, craters);
   for (const e of query(world, [Player, Health])) {
     const p = getComponent(world, e, Player), health = getComponent(world, e, Health);
     const j = p.jump, a = p.attack, dt = time.dt, skill = getComponent(world, e, Skills)?.active ?? null;

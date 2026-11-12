@@ -2,12 +2,13 @@
 import * as THREE from 'three';
 import { added, removed, changed, addComponent, hasComponent, getComponent, getResource } from '../ecs/world.js';
 import { Transform, Prop, ShadowCaster, SceneObject, GroundPlane, GroundCover, DustField } from '../components.js';
-import { Assets, Gpu, Settings } from '../resources.js';
+import { Assets, Gpu, Settings, Craters } from '../resources.js';
 import * as S from '../render/shaders.js';
 import { shaderMaterial } from '../render/materials.js';
 import { spriteGeometry, spriteUniforms } from '../lib/sprites.js';
 import { FAMILY, paletteRows } from '../gen/palettes.js';
 import { heightAt, terrainGeometry } from '../gen/terrain.js';
+import { CELL } from '../lib/craters.js';
 
 // the meshes of one generated object: [{ mesh, role }]; rows: palette family -> row
 // (a part with its own `palette` name keeps it)
@@ -35,14 +36,15 @@ function placeGroup(world, e) {
   so.group.rotation.y = t.rotY;
 }
 
-// the ground paints (gen/ground.js) as a texture, read with linear filtering
-function groundUniforms(ground) {
+// the ground paints (gen/ground.js) as a texture, read with linear filtering; and the holes dug in it (lib/craters.js)
+function groundUniforms(ground, craters) {
   const n = ground?.n ?? 1;
   const tex = new THREE.DataTexture(ground?.data ?? new Uint8Array(4), n, n, THREE.RGBAFormat);
   tex.magFilter = tex.minFilter = THREE.LinearFilter;
   tex.needsUpdate = true;
   const ext = ground?.ext ?? 1;
-  return { uGround: { value: tex }, uGroundBox: { value: new THREE.Vector3(-ext, -ext, 2 * ext) } };
+  return { uGround: { value: tex }, uGroundBox: { value: new THREE.Vector3(-ext, -ext, 2 * ext) },
+    uDug: { value: craters.texture }, uDugBox: { value: new THREE.Vector3(-craters.ext, -craters.ext, craters.n * CELL) } };
 }
 
 export function meshSystem(world) {
@@ -52,7 +54,7 @@ export function meshSystem(world) {
 
   for (const e of added(world, GroundPlane)) {
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2),
-      shaderMaterial(gpu.shared, S.MESH_VERT, S.groundFrag(settings.land.pavement === 'bricks'), groundUniforms(settings.land.ground)));
+      shaderMaterial(gpu.shared, S.MESH_VERT, S.groundFrag(settings.land.pavement === 'bricks'), groundUniforms(settings.land.ground, getResource(world, Craters))));
     gpu.scene.add(mesh);
     addComponent(world, e, SceneObject, { group: mesh, meshes: [] });
     // cliffs: the plateau tops look like the ground; the walls and the stairs are stone

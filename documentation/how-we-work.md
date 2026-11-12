@@ -8,7 +8,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
   new `try/<name>` branch made from `attempt_1` (or `attempt_2`); push only when the user asks. Never `git merge` into
   an attempt branch: copy the files with `git checkout <branch> -- <files>`. `attempt_2` is `attempt_1` plus the voxel
   look (the default, with a loading screen until all is in cubes), the FlyFF decor objects in our style, the sword hits
-  of Quaternius, and the FlyFF city Flarine (`?world=flarine`). In Voxel the human always has cubes of 0.5 px. Which assets are FlyFF, ours or archived:
+  of Quaternius, and the FlyFF city Flarine (`?world=flarine`). In Voxel the human always has cubes of 0.5 px. Two ki skills, the Kikoha (R) and the Kamehameha (T), dig holes in the ground. Which assets are FlyFF, ours or archived:
   `documentation/assets.md`, section 7.
 - Commit messages are in French.
 - Screenshots for the user always have labels (a number and a caption for each picture).
@@ -49,6 +49,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | the FlyFF objects in the style of our world: textures turned into our stone and green leaf palettes, drawn with the world | `web/lib/objectStyle.js`, `web/render/shaders.js` (DECOR_FRAG) |
 | a part of a FlyFF map as a world (recipe `map`): import script, map files, heights, water, paints, objects at FlyFF size, archived objects, our trees and big-leaf plants for its trees and leafy plants; grass in squares around the camera in a big world | `worlds/maps/`, `web/gen/map.js`, `assets/objects/archived.json`, `web/systems/coverChunks.js` |
 | the Vagabond (`?player`): its bag (wear, take off, drink), MP, skills on keys 1-4 with skill points, the monster under the mouse, potions dropped by monsters; the recipe `monsters` and their return | `web/systems/inventory.js`, `web/lib/skills.js`, `web/systems/skills.js`, `assets/character/player/skills.json`, `web/lib/screen.js`, `web/systems/drops.js`, `assets/items/` |
+| the Kikoha (R) and the Kamehameha (T): ki made of cubes that digs holes in the ground (shapes named in `skills.json` `holes`); their clips made of key poses, skill clips made of several clips | `web/systems/blasts.js`, `web/lib/craters.js`, `web/systems/craters.js`, `web/lib/poses.js` |
 | saved settings and stats, changed monsters, loaded at start | `saves/admin.json`, `saves/monsters.json` |
 
 ## 4. The FlyFF data

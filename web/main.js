@@ -27,6 +27,9 @@ import { renderSystem } from './systems/render.js';
 import { viewSystem } from './systems/view.js';
 import { playerSystem } from './systems/player.js';
 import { createTops } from './lib/tops.js';
+import { createCraters } from './lib/craters.js';
+import { blastSystem } from './systems/blasts.js';
+import { craterSystem } from './systems/craters.js';
 import { setupAdminSystem, adminSystem } from './systems/admin.js';
 import { outfitSystem } from './systems/outfit.js';
 import { monsterSystem } from './systems/monsters.js';
@@ -150,13 +153,15 @@ for (const [i, { id, at }] of (recipe.monsters ?? []).entries()) {
 setResource(world, Res.BlockGrid, Res.createGrid(land.terrain));
 setResource(world, Res.Tops, createTops(land.half + 2));
 setResource(world, Res.CoverGrid, Res.createGrid());
+setResource(world, Res.Craters, createCraters(land.half + 2));
+setResource(world, Res.Ki, Res.createKi());
 setResource(world, Res.Random, Res.createRandom(5));
 
 for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem, setupSkillsSystem, setupInventorySystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
   addSystem(world, s, 'startup');
 for (const s of [
   inputSystem, timeSystem,
-  outfitSystem, skillSystem, playerSystem, monsterSystem, combatSystem, dropSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem,
+  outfitSystem, skillSystem, blastSystem, craterSystem, playerSystem, monsterSystem, combatSystem, dropSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem,
   coverChunkSystem, meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem, loadingSystem,
 ]) addSystem(world, s);

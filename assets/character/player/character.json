@@ -1,6 +1,6 @@
 {
   "name": "FlyFF male",
-  "description": "The player character. Its parts, clothes, weapons and shields are in parts/ (import-items.mjs, items.json), its clips in mvr_male.glb; the sword hits, the punches (punch1, punch2) and the dash and bash of the skills come from ual/ (Quaternius, CC0), moved onto its skeleton (borrowed, web/lib/retarget.js); the other skill clips (slash1, slash2, slash3, wheel) are FlyFF skill clips of mvr_male.glb (skills.json). outfit: slot -> file of parts/, null: none or the bare body. vagrant: the player who starts (?player): its outfit over this one, and its bag (web/systems/inventory.js).",
+  "description": "The player character. Its parts, clothes, weapons and shields are in parts/ (import-items.mjs, items.json), its clips in mvr_male.glb; the sword hits, the punches (punch1, punch2) and the dash and bash of the skills come from ual/ (Quaternius, CC0), moved onto its skeleton (borrowed, web/lib/retarget.js); the other skill clips (slash1, slash2, slash3, wheel) are FlyFF skill clips of mvr_male.glb (skills.json). sequences: a skill clip made of several clips one after the other (web/lib/character.js sequence); poses: a clip made of key poses, from a clip pose with bones pointed along directions of the body [right, up, forward] (web/lib/poses.js), for the Kamehameha and the Kikoha (no free clip has them); outfit: slot -> file of parts/, null: none or the bare body. vagrant: the player who starts (?player): its outfit over this one, and its bag (web/systems/inventory.js).",
   "outfit": { "head": "part_malehead01", "hair": "part_malehair01", "upper": null, "hand": null, "foot": null, "cap": null, "cloak": null, "mask": null, "weapon": null, "shield": null },
   "vagrant": { "outfit": { "upper": "part_mvag01upper", "hand": "part_mvag01hand", "foot": "part_mvag01foot", "weapon": null, "shield": null }, "bag": ["item_weaswowooden", "item_armshiwooden"] },
   "animations": "mvr_male.glb",
@@ -9,6 +9,37 @@
     "dash": "Sword_Dash_RM", "slash1": "sklvagcleanhit", "slash2": "sklvagbrandish", "slash3": "sklvagovercutter", "wheel": "sklmerkeenwheel", "bash": "Shield_Dash_RM" },
   "recover": { "attack1": "Sword_Regular_A_Rec", "attack2": "Sword_Regular_B_Rec" },
   "borrowed": [{ "file": "ual/ual2.glb", "rig": "ue" }, { "file": "ual/ual1.glb", "rig": "rigify" }],
+  "sequences": {
+    "kikoha": [{ "clip": "kiko" }],
+    "kamehameha": [{ "clip": "kame" }]
+  },
+  "poses": {
+    "kiko": [
+      { "at": 0, "base": ["genstand", 0] },
+      { "at": 0.15, "base": ["genstand", 0], "turn": { "Spine": -15 }, "point": { "R UpperArm": [0.4, -0.6, -0.6], "R ForeArm": [0, 0.3, 1], "R Hand": [0, 1, 0.3], "L UpperArm": [0.35, -0.9, -0.15], "L ForeArm": [0.1, -0.5, 0.8], "R Thigh": [0.3, -1, 0.3], "R Calf": [0.12, -1, -0.1], "L Thigh": [-0.3, -1, -0.3], "L Calf": [-0.1, -1, -0.15] } },
+      { "at": 0.32, "base": ["genstand", 0], "turn": { "Spine": 25 }, "point": { "R UpperArm": [0.02, 0.08, 1], "R ForeArm": [0, 0.1, 1], "R Hand": [0, 1, 0.15], "L UpperArm": [0.35, -0.9, -0.15], "L ForeArm": [0.1, -0.5, 0.8], "R Thigh": [0.3, -1, 0.3], "R Calf": [0.12, -1, -0.1], "L Thigh": [-0.3, -1, -0.3], "L Calf": [-0.1, -1, -0.15] } },
+      { "at": 0.95, "base": ["genstand", 0], "turn": { "Spine": 25 }, "point": { "R UpperArm": [0.02, 0.08, 1], "R ForeArm": [0, 0.1, 1], "R Hand": [0, 1, 0.15], "L UpperArm": [0.35, -0.9, -0.15], "L ForeArm": [0.1, -0.5, 0.8], "R Thigh": [0.3, -1, 0.3], "R Calf": [0.12, -1, -0.1], "L Thigh": [-0.3, -1, -0.3], "L Calf": [-0.1, -1, -0.15] } },
+      { "at": 1.05, "base": ["genstand", 0], "turn": { "Spine": 30 }, "point": { "Spine": [0, 1, -0.15], "R UpperArm": [0.02, 0.08, 1], "R ForeArm": [0, 0.1, 1], "R Hand": [0, 1, 0.05], "L UpperArm": [0.35, -0.9, -0.15], "L ForeArm": [0.1, -0.5, 0.8], "R Thigh": [0.3, -1, 0.3], "R Calf": [0.12, -1, -0.1], "L Thigh": [-0.3, -1, -0.3], "L Calf": [-0.1, -1, -0.15] } },
+      { "at": 1.45, "base": ["genstand", 0], "turn": { "Spine": 25 }, "point": { "R UpperArm": [0.02, 0.08, 1], "R ForeArm": [0, 0.1, 1], "R Hand": [0, 1, 0.15], "L UpperArm": [0.35, -0.9, -0.15], "L ForeArm": [0.1, -0.5, 0.8], "R Thigh": [0.3, -1, 0.3], "R Calf": [0.12, -1, -0.1], "L Thigh": [-0.3, -1, -0.3], "L Calf": [-0.1, -1, -0.15] } },
+      { "at": 1.8, "base": ["genstand", 0] }
+    ],
+    "kame": [
+      { "at": 0, "base": ["genstand", 0] },
+      { "at": 0.35, "base": ["genstand", 0], "turn": { "Spine": -30 },
+        "point": { "R UpperArm": [0.3, -0.85, -0.4], "R ForeArm": [-0.1, -0.1, 1], "L UpperArm": [0.55, -0.75, 0.3], "L ForeArm": [0.9, -0.2, -0.1],
+          "R Thigh": [0.35, -1, 0.2], "R Calf": [0.15, -1, -0.15], "L Thigh": [-0.35, -1, -0.25], "L Calf": [-0.1, -1, -0.15] } },
+      { "at": 1.5, "base": ["genstand", 0], "turn": { "Spine": -34 },
+        "point": { "R UpperArm": [0.3, -0.85, -0.45], "R ForeArm": [-0.1, -0.1, 1], "L UpperArm": [0.55, -0.75, 0.3], "L ForeArm": [0.9, -0.2, -0.1],
+          "R Thigh": [0.35, -1, 0.2], "R Calf": [0.15, -1, -0.15], "L Thigh": [-0.35, -1, -0.25], "L Calf": [-0.1, -1, -0.15] } },
+      { "at": 1.7, "base": ["genstand", 0],
+        "point": { "R UpperArm": [-0.12, 0.05, 1], "R ForeArm": [-0.15, 0.05, 1], "L UpperArm": [0.12, 0.05, 1], "L ForeArm": [0.15, 0.05, 1],
+          "R Thigh": [0.35, -1, 0.3], "R Calf": [0.15, -1, -0.1], "L Thigh": [-0.35, -1, -0.35], "L Calf": [-0.1, -1, -0.2] } },
+      { "at": 2.8, "base": ["genstand", 0],
+        "point": { "R UpperArm": [-0.12, 0.05, 1], "R ForeArm": [-0.15, 0.05, 1], "L UpperArm": [0.12, 0.05, 1], "L ForeArm": [0.15, 0.05, 1],
+          "R Thigh": [0.35, -1, 0.3], "R Calf": [0.15, -1, -0.1], "L Thigh": [-0.35, -1, -0.35], "L Calf": [-0.1, -1, -0.2] } },
+      { "at": 3.1, "base": ["genstand", 0] }
+    ]
+  },
   "hits": { "attack1": 0.2, "attack2": 0.25, "attack3": 0.8, "attack4": 0.65, "punch1": 0.25, "punch2": 0.3 },
   "bakeFps": 30,
   "radius": 0.3,

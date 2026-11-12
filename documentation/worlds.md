@@ -116,8 +116,21 @@ The Vagabond (`?player`), fights like League of Legends:
   | 2 | Triple Slash | sword | 10, 5 s | a combo: press 2 again during a hit or 1.5 s after it, 3 hits (FlyFF Clean Hit, Brandish, Over Cutter), the last ×2; the cooldown starts after it |
   | 3 | Keen Wheel | sword | 20, 8 s | spins (FlyFF Keen Wheel), 3 blows on every monster within 2.5 |
   | 4 | Shield Bash | shield | 12, 10 s | rushes 2 forward (stops at the first monster), hits it and stuns it 1.5 s (Quaternius `Shield_Dash_RM`) |
+  | R | Kikoha | nothing | 25, 6 s | the right arm straight forward, the palm open toward the enemy: a ball of ki grows in the palm (0.65 s), then flies forward going down (15 a second, up to 9) and bursts on the first monster or on the ground: every monster within 1.3 is hit ×2.5, and it digs a big crater (hole `large`) |
+  | T | Kamehameha | nothing | 40, 12 s | the hands at the hip, a ball of ki grows (1.2 s), then both arms push a beam forward (up to 14) for 1.1 s: each monster it touches is hit ×3.5, and it digs a trench in the ground under it (hole `normal`) |
 
   The monster under the mouse gets its bar lit (`web/lib/screen.js`); a skill turns the human to it.
+- Ki blasts (`web/systems/blasts.js`, the `blast` of a step in `skills.json`): the Kikoha and the Kamehameha are made
+  of cubes snapped on a grid (in both looks), drawn in the fine pass in their own colours, not lit by the sun
+  (`KI_FRAG`). They dig the ground (the Kikoha where it bursts, the Kamehameha where it passes) (`web/lib/craters.js`, `web/systems/craters.js`): cells
+  of 0.1 go down whole cubes, the ground is not drawn there (`groundFrag` reads the depths as a texture) and cubes of
+  earth are drawn instead, darker the deeper they are (`CRATER_FRAG`); dirt and grass fly out, the grass is gone, and
+  walkers go down into the trench (`web/lib/walk.js` groundAt). FlyFF floor objects (the squares of Flarine) are not
+  dug: the hole stays under them. The shape of a hole is one of the `holes` of `skills.json`, named by the `hole` of a
+  blast, so it is one word to swap: `normal` (radius 0.65, 4 cubes deep) and `large` (radius 0.95, 6 cubes deep).
+  The clips of the Kikoha and the Kamehameha are made of key poses (`character.json` `poses`, `web/lib/poses.js`):
+  no free clip has them (searched: Quaternius, KayKit, Mixamo, itch.io). A skill clip can also be several clips one
+  after the other (`sequences`, `web/lib/character.js`).
 - Potions (`assets/items/potions.json`, FlyFF models copied by `assets/items/import-potions.mjs`): a dead monster
   drops an HP potion (half the time) and an MP potion (3 times in 10) at its place; the human picks them when it walks
   on them; they are gone after 60 s (`web/systems/drops.js`). Key `5` drinks an HP potion (+80 HP), `6` an MP potion

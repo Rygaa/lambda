@@ -11,7 +11,7 @@
 import * as THREE from 'three';
 import { query, getComponent, getResource, sendEvent, destroyEntity } from '../ecs/world.js';
 import { Monster, Player, Health } from '../components.js';
-import { Settings, Time, Gpu, BlockGrid, Tops, Bestiary } from '../resources.js';
+import { Settings, Time, Gpu, BlockGrid, Tops, Bestiary, Craters } from '../resources.js';
 import { MonsterBlow } from '../events.js';
 import { free, groundAt } from '../lib/walk.js';
 import { showFrame } from '../lib/bake.js';
@@ -138,7 +138,7 @@ export function monsterSystem(world) {
     const frames = m.clips[m.state], k = Math.floor(m.t * m.fps);
     const frame = frames[m.state === 'idle' || m.state === 'walk' ? k % frames.length : Math.min(k, frames.length - 1)];
     showFrame(m.meshes, frame);
-    m.y = groundAt(terrain, tops, m.x, m.z);
+    m.y = groundAt(terrain, tops, m.x, m.z, getResource(world, Craters));
     m.group.position.set(m.x, m.y + m.foot, m.z);
     m.group.rotation.y = m.rot;
     if (moved || m.state !== 'idle') gpu.bodiesDirty = true;

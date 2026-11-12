@@ -1,5 +1,5 @@
 // The skills of the human (assets/character/player/skills.json, lib/skills.js), like the spells of League of Legends:
-// keys 1 to 4 start them, the bar at the bottom shows them, the window of the K key (or its button) opens or raises
+// their keys (1 to 4, R, T) start them, the bar at the bottom shows them, the window of the K key (or its button) opens or raises
 // them with skill points (one each level, lib/combat.js gainXp).
 //   A skill starts when it is learned, the human holds what it needs (a sword, a shield), it has the MP and its
 //   cooldown is over; else a short text says why. While it plays, the human does not walk, jump or attack
@@ -10,10 +10,11 @@
 //   `behind` past it, turns to it and hits only it. A combo (Triple Slash) has several steps: press the key again
 //   during a step or within `window` seconds after it for the next one; its cooldown starts when the combo ends.
 //   A skill turns the human to the monster under the mouse, if there is one.
+//   A step with a `blast` (Kikoha, Kamehameha) sends a ki blast along with its clip (systems/blasts.js).
 // MP comes back by MP_REGEN a second. The `Level +1` button of the bar gives the experience of the next level, to test.
 import * as THREE from 'three';
-import { query, getComponent, getResource, sendEvent } from '../ecs/world.js';
-import { Player, Skills, Mana, Stats, Monster } from '../components.js';
+import { query, getComponent, getResource, sendEvent, spawn } from '../ecs/world.js';
+import { Player, Skills, Mana, Stats, Monster, Blast } from '../components.js';
 import { Input, Time, Wardrobe, Skillbook, Inventory, BlockGrid, Tops, Settings, Gpu, Bestiary } from '../resources.js';
 import { Swing, Damage } from '../events.js';
 import { whyNot, powerOf, holds } from '../lib/skills.js';
@@ -31,14 +32,14 @@ export function setupSkillsSystem(world) {
   const book = getResource(world, Skillbook), potions = getResource(world, Inventory).potions;
   const bar = document.createElement('div');
   bar.id = 'skillbar';
-  bar.innerHTML = book.skills.map((s) => `<div class="sk" data-id="${s.id}"><b>${s.key}</b><span>${s.name}</span><small></small><i></i></div>`).join('')
+  bar.innerHTML = book.skills.map((s) => `<div class="sk" data-id="${s.id}"><b>${s.key.toUpperCase()}</b><span>${s.name}</span><small></small><i></i></div>`).join('')
     + Object.entries(potions).map(([id, p]) => `<div class="sk pot ${id}" data-potion="${id}"><b>${p.key}</b><span>${p.name}</span><small></small></div>`).join('')
     + '<button data-open="inventory">Bag (I)</button><button data-open="skills">Skills (K)</button><button data-level>Level +1</button>';
   const win = document.createElement('div');
   win.id = 'skills';
   win.hidden = true;
   win.innerHTML = `<header><b>Vagabond</b><span class="pts"></span><button data-close>×</button></header>`
-    + book.skills.map((s) => `<div class="row" data-id="${s.id}"><b>${s.key}</b><div><strong>${s.name}</strong><small>needs a ${s.needs} · ${s.mp} MP · ${s.cooldown} s`
+    + book.skills.map((s) => `<div class="row" data-id="${s.id}"><b>${s.key.toUpperCase()}</b><div><strong>${s.name}</strong><small>${s.needs === 'nothing' ? 'bare hands' : `needs a ${s.needs}`} · ${s.mp} MP · ${s.cooldown} s`
       + `${s.steps.length > 1 ? ` · combo of ${s.steps.length}` : ''}${s.target ? ` · a monster under the mouse, ${s.target.range} m` : ''}</small></div><output></output><button data-learn="${s.id}">+</button></div>`).join('');
   document.body.append(bar, win);
   ui = { bar, win, learn: [], levelUp: 0, said: 0 };
@@ -119,6 +120,8 @@ const byId = (book, id) => book.skills.find((s) => s.id === id);
 // a step of a skill starts: the human turns to its target (or the monster under the mouse) and its rush is set
 function begin(world, p, sk, skill, step, target) {
   const st = skill.steps[step], clips = p.clips[st.clip];
+  // a ki blast: systems/blasts.js plays it along with the clip
+  if (st.blast) spawn(world, [Blast, { spec: st.blast, power: powerOf(getResource(world, Skillbook), st, sk.levels[skill.id] ?? 1), rate: st.rate ?? 1 }]);
   const a = { skill, step, clip: st.clip, rate: st.rate ?? 1, t: 0, end: (clips.length - 1) / p.fps, struck: 0, target, queued: false, rush: null };
   const look = target ?? sk.aim;
   if (look !== null) {
@@ -199,7 +202,7 @@ function drawUi(world, sk, mana, s, book, outfit, slots) {
     el.classList.toggle('off', !combo && whyNot({ ...skill, cooldown: 0 }, { ...sk, cooldowns: {} }, outfit, slots, mana.mp) !== null);
     el.classList.toggle('on', sk.active?.skill === skill || combo);
     el.querySelector('small').textContent = !level ? 'locked' : combo ? `combo ${sk.combo.step + 1}/${skill.steps.length}` : !holds(outfit, slots, skill.needs) ? `needs a ${skill.needs}` : `Lv ${level} · ${skill.mp} MP`;
-    el.querySelector('i').style.height = `${(100 * cd) / skill.cooldown}%`;
+    el.querySelector('i').style.height = `${skill.cooldown ? (100 * cd) / skill.cooldown : 0}%`;
   }
   for (const el of ui.bar.querySelectorAll('.sk[data-potion]')) {
     const count = inv.bag.find((it) => it.potion === el.dataset.potion)?.count ?? 0;

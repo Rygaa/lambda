@@ -13,6 +13,7 @@ import { Player, Health, Stats, Mana, Skills } from '../components.js';
 import { Gpu, Settings, Wardrobe, Voxels } from '../resources.js';
 import { loadBody, bakeClips, measure, fineMeshes, fineMesh, loader } from './bake.js';
 import { retarget } from './retarget.js';
+import { posedClip } from './poses.js';
 import { lookOf, voxelClips } from './voxels.js';
 import { voxelBody, BODIES } from './voxelBody.js';
 import { maxHp, maxMp } from './combat.js';
@@ -40,7 +41,20 @@ export function partsOf(outfit, slots) {
 // the body of an outfit (lib/bake.js loadBody)
 async function bodyOf(cache, config, outfit, slots) {
   const body = await loadBody(cache, partsOf(outfit, slots), BASE + config.animations, TEXTURES);
-  return config.borrowed ? { ...body, clips: [...body.clips, ...await borrowed(cache, config)] } : body;
+  const clips = [...body.clips, ...(config.borrowed ? await borrowed(cache, config) : [])];
+  return { ...body, clips: [...clips, ...await posed(cache, config, clips)] };
+}
+
+// the clips made of key poses (config.poses, lib/poses.js), from the clips of the body, made once
+function posed(cache, config, clips) {
+  if (!cache.has('posed')) {
+    cache.set('posed', (async () => {
+      const ours = (await loader(TEXTURES).loadAsync(BASE + config.animations)).scene;
+      const find = (n) => clips.find((c) => c.name === n) ?? (() => { throw new Error(`poses: no clip ${n}`); })();
+      return Object.entries(config.poses ?? {}).map(([id, keys]) => posedClip(id, keys, ours, find));
+    })());
+  }
+  return cache.get('posed');
 }
 
 // the clips of other skeletons that the human uses (config.borrowed: [{ file, rig }], lib/retarget.js), moved onto
@@ -48,7 +62,9 @@ async function bodyOf(cache, config, outfit, slots) {
 function borrowed(cache, config) {
   if (!cache.has('borrowed')) {
     cache.set('borrowed', (async () => {
-      const ours = (await loader(TEXTURES).loadAsync(BASE + config.animations)).scene, used = [...Object.values(config.clips), ...Object.values(config.recover ?? {})];
+      const ours = (await loader(TEXTURES).loadAsync(BASE + config.animations)).scene;
+      const used = [...Object.values(config.clips), ...Object.values(config.recover ?? {}), ...Object.values(config.sequences ?? {}).flat().map((part) => part.clip),
+        ...Object.values(config.poses ?? {}).flat().flatMap((key) => key.base ?? []).filter((v) => typeof v === 'string')];
       const files = await Promise.all(config.borrowed.map(({ file }) => loader(TEXTURES).loadAsync(BASE + file)));
       return files.flatMap((gltf, i) => retarget(gltf, config.borrowed[i].rig, ours, used));
     })());
@@ -63,6 +79,7 @@ export async function dress(world, outfit) {
   const gpu = getResource(world, Gpu), { config, slots, cache } = getResource(world, Wardrobe), look = lookOf(world);
   const body = await bodyOf(cache, config, outfit, slots);
   const names = { ...config.clips }, hits = Object.keys(config.clips).filter(HITS);
+  for (const [s, parts] of Object.entries(config.sequences ?? {})) names[s] = { frames: sequence(parts) };
   for (const s of hits) {
     names[s + 'Walk'] = { clip: config.clips[s], legs: config.clips.walk };
     names[s + 'Run'] = { clip: config.clips[s], legs: config.clips.run };
@@ -82,6 +99,31 @@ export async function dress(world, outfit) {
   const cubes = await voxelClips(world, body, clips, look.human.size / (await unitScale(world)).k, look.normals);
   for (const frames of Object.values(clips)) for (const frame of frames) for (const g of frame) g.dispose();
   return { clips: cubes, meshes: [fineMesh(gpu, getResource(world, Voxels).palette.texture, cubes.idle[0][0])], look: look.human.key };
+}
+
+// a clip made of parts one after the other (config.sequences: a skill that charges, holds, then shoots). A part:
+// clip, from and to (the seconds of the clip it plays, default all of it), rate (faster or slower), seconds (how long
+// it lasts, default its window at its rate), loop (when it lasts longer than its window, it plays it again, else it
+// stops on its last frame). Each part melts into the next in SEQ_BLEND seconds
+const SEQ_BLEND = 0.12;
+function sequence(parts) {
+  return (find, fps) => {
+    const out = [];
+    let last = null;
+    for (const part of parts) {
+      const clip = find(part.clip), from = part.from ?? 0, to = Math.min(part.to ?? clip.duration, clip.duration - 1e-3);
+      const rate = part.rate ?? 1, n = Math.max(1, Math.round((part.seconds ?? (to - from) / rate) * fps)), nBlend = last ? Math.round(SEQ_BLEND * fps) : 0;
+      let at = null;
+      for (let k = 0; k < n; k++) {
+        const play = (k / fps) * rate, time = part.loop && to > from ? from + (play % (to - from)) : Math.min(to, from + play);
+        at = { clip, time };
+        const w = nBlend ? Math.min(1, (k + 1) / nBlend) : 1;
+        out.push(w < 1 ? [{ ...last, weight: 1 - w }, { ...at, weight: w }] : [at]);
+      }
+      last = at;
+    }
+    return out;
+  };
 }
 
 // the end of the hit `state` when no hit follows it: its way back (config.recover: a clip, if it has one), then its
