@@ -155,7 +155,7 @@ function recentre({ sdf, box }) {
 
 // the grid cells near the water, each vertex with its distance to the shore;
 // deep: further in than this, big coarse quads instead (all deep water)
-function surface(sdf, [x0, x1, z0, z1], deep = Infinity) {
+export function surface(sdf, [x0, x1, z0, z1], deep = Infinity) {
   const nx = Math.ceil((x1 - x0) / STEP) + 3, nz = Math.ceil((z1 - z0) / STEP) + 3;
   const ox = x0 - STEP, oz = z0 - STEP;
   const val = new Float32Array(nx * nz);

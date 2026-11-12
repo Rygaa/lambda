@@ -34,10 +34,41 @@ export function addShape(tops, parts, x, y, z, rot) {
   }
 }
 
-// raise every cell whose centre is under the triangle to its height there (and the cells of its corners)
-function triangle(tops, a, b, c) {
-  const { ext, n, top } = tops;
-  const raise = (i, j, y) => { if (i >= 0 && j >= 0 && i < n && j < n && y > top[j * n + i]) top[j * n + i] = y; };
+// adds the parts of meshes ({ geometry, matrix }: to the world) a walker can reach: what is below ceiling(x, z). So
+// the roofs, arches and leaves of the FlyFF objects of a map are over its head (systems/objects.js), and their floors,
+// steps and bridges are under its feet. A wall (a steep triangle) raises the cells along it to its top, at most the
+// ceiling, so it stops a walker
+export function addReachable(tops, meshes, ceiling) {
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), up = new THREE.Vector3();
+  for (const { geometry, matrix } of meshes) {
+    const pos = geometry.attributes.position, idx = geometry.index;
+    const count = idx ? idx.count : pos.count, at = (k) => (idx ? idx.getX(k) : k);
+    for (let t = 0; t < count; t += 3) {
+      a.fromBufferAttribute(pos, at(t)).applyMatrix4(matrix);
+      b.fromBufferAttribute(pos, at(t + 1)).applyMatrix4(matrix);
+      c.fromBufferAttribute(pos, at(t + 2)).applyMatrix4(matrix);
+      const lo = Math.min(a.y, b.y, c.y), hi = Math.max(a.y, b.y, c.y);
+      if (lo > ceiling((a.x + b.x + c.x) / 3, (a.z + b.z + c.z) / 3)) continue;      // over the head
+      up.subVectors(b, a).cross(c.clone().sub(a));
+      if (Math.abs(up.y) > 0.3 * up.length()) { triangle(tops, a, b, c, ceiling); continue; }
+      for (const [p, q] of [[a, b], [b, c], [c, a]]) {
+        const steps = Math.ceil(Math.hypot(q.x - p.x, q.z - p.z) / (CELL / 2));
+        for (let s = 0; s <= steps; s++) {
+          const x = p.x + ((q.x - p.x) * s) / steps, z = p.z + ((q.z - p.z) * s) / steps;
+          raiseCell(tops, Math.floor((x + tops.ext) / CELL), Math.floor((z + tops.ext) / CELL), Math.min(hi, ceiling(x, z)));
+        }
+      }
+    }
+  }
+}
+
+const raiseCell = ({ n, top }, i, j, y) => { if (i >= 0 && j >= 0 && i < n && j < n && y > top[j * n + i]) top[j * n + i] = y; };
+
+// raise every cell whose centre is under the triangle to its height there (and the cells of its corners); with a
+// ceiling(x, z), not where the triangle is higher than it
+function triangle(tops, a, b, c, ceiling = null) {
+  const { ext } = tops;
+  const raise = (i, j, y) => { if (!ceiling || y <= ceiling((i + 0.5) * CELL - ext, (j + 0.5) * CELL - ext)) raiseCell(tops, i, j, y); };
   for (const p of [a, b, c]) raise(Math.floor((p.x + ext) / CELL), Math.floor((p.z + ext) / CELL), p.y);
   const d = (b.x - a.x) * (c.z - a.z) - (c.x - a.x) * (b.z - a.z);
   if (Math.abs(d) < 1e-9) return;      // a wall seen from above: its corners are enough

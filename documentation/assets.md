@@ -144,6 +144,10 @@ The types come from `pixel-scene` version-3 (commit `9da4216`, `web/gen/kinds/`)
 - `plant/oak`: the `tree` kind. `big` became `large`.
 - `plant/bush`: the `bush` preset of the `tree` kind. It has one size, `medium`.
 - `plant/palm`: the `palm` kind. `tall` became `large`, and `small` stayed `small`.
+- `plant/leafy`: new, not from `pixel-scene`: the 3 leafy plants of FlyFF (`obj_macoprgr04`, `05`, `06`), one per
+  variant. `assets/plant/leafy/import-leafy.mjs` reads their stems and the leaves of their pictures, and writes them
+  into `plant.json` (`models`). Its own builder, `leafy` (`web/gen/builders/leafy.js`), makes them in our style: stems
+  with outlines, each leaf a sheet with a raised rib, no leaf clumps.
 - `rock/slab`, `rock/stack`, `rock/cluster`, `rock/split`: new, not from `pixel-scene` (your request). They use the
   `rock-form` builder with its `form` value.
 - `plant/pine`, `plant/fir`, `plant/cypress`, `plant/birch`, `plant/willow`, `plant/fruit`: new, not from
@@ -169,7 +173,41 @@ Left out on purpose: the player and the slimes, the houses `kame` and `goku` (co
 needs its own code, the `pod` block), the painted textures, the Blender pieces (ruins, old layouts), the first and
 third person views, and the `dbz` world (a map of buildings).
 
-## 7. The plan
+## 7. FlyFF, ours, or archived
+
+Every asset is in one of these groups.
+
+**From FlyFF** (the game Fly For Fun): copied from the FlyFF data folder by a script, never changed by hand.
+
+| Path | What | Script |
+| --- | --- | --- |
+| `assets/character/player/` (but `ual/`) | the human (the FlyFF male), its parts, clips, clothes, weapons and shields | `import-items.mjs` |
+| `assets/monsters/` | the 569 monsters, their 127 models and clips, their stats and the levels | `import-monsters.mjs` |
+| `assets/objects/` (`objects.json`, `models/`) | the 1018 decor objects (chairs, fences, lamps, houses...), drawn in our style | `import-objects.mjs` |
+| `worlds/maps/flarine.json` | the centre of Flarine: its ground, water, ground textures (as our paints) and its objects | `worlds/maps/import-map.mjs` |
+
+**Ours**: made by our code (`web/gen/builders/`) from the numbers of a type file, in our style.
+
+| Path | What |
+| --- | --- |
+| `assets/rock/` | every rock type |
+| `assets/plant/` | every tree, the bush and the palm (`plant/leafy`: see below) |
+| `assets/water/`, `assets/terrain/` | water, cliffs and mountains |
+| `assets/building/` | the 3 building plans |
+| `assets/palettes.json`, `assets/render.json`, `assets/textures/` | the colours, the render settings, the sprites of grass, flowers and leaf clumps |
+
+Two cases in between:
+
+- `plant/leafy` is ours (our builder, our style), but its form is taken from the 3 leafy plants of FlyFF
+  (`import-leafy.mjs` reads them).
+- `assets/character/player/ual/` is neither: the sword hits of Quaternius (CC0, see its `License.txt`).
+
+**Archived**: FlyFF objects we keep for now and will delete later, each with why, in `assets/objects/archived.json`:
+2 objects that float in the air, the 3 leafy plants and the 46 trees. Their models are still in
+`assets/objects/models/`, but no map places them: our oaks and our `plant/leafy` take the place of the trees and the
+plants (recipe `trees` and `plants`, `worlds.md`).
+
+## 8. The plan
 
 Do each step on a `try/` branch, then move it to `attempt_1` (see `branches.md`).
 

@@ -6,7 +6,8 @@
 // 7 greens of their light ramp; not autumn, which would take the wood), so plants stay green. Then each texel takes
 // the row most of its neighbours have, twice, so the painted specks go and flat areas stay.
 // In the texture (and in the voxel palette, for the cubes: lib/voxels.js) the red byte is the row, the green byte 255
-// for a leaf row.
+// for a leaf row, the blue byte 255 where the FlyFF texture is transparent: there it is cut out (the leaves of a plant
+// painted on a flat card keep their shape).
 import * as THREE from 'three';
 import { paletteTables, paletteNames } from '../gen/palettes.js';
 
@@ -14,7 +15,7 @@ const made = new WeakMap();   // texture -> its texture of rows
 
 // the texture of rows of a FlyFF texture (a canvas: lib/bake.js solidTexture), made once
 export function styleTexture(texture) {
-  if (!made.has(texture)) made.set(texture, rowTexture(texture.image));
+  if (!made.has(texture)) made.set(texture, rowTexture(texture.image, texture.userData.alpha));
   return made.get(texture);
 }
 
@@ -46,7 +47,8 @@ function rowOf(r, g, b) {
   return best;
 }
 
-function rowTexture(image) {
+// alpha: the alpha byte of each texel of the FlyFF texture (lib/bake.js), or none: all opaque
+function rowTexture(image, alpha) {
   const { width, height } = image, cv = document.createElement('canvas');
   cv.width = width; cv.height = height;
   const cx = cv.getContext('2d', { willReadFrequently: true });
@@ -60,7 +62,7 @@ function rowTexture(image) {
     rows[i] = row;
   }
   for (let pass = 0; pass < 2; pass++) rows = majority(rows, width, height);
-  return codeTexture(rows, width, height);
+  return codeTexture(rows, width, height, alpha);
 }
 
 // each texel takes the row most of the 3 x 3 texels around it have (the texture repeats)
@@ -79,9 +81,9 @@ function majority(rows, w, h) {
   return out;
 }
 
-// a canvas texture: the red byte is the row, the green byte 255 for a leaf row (a canvas, so the voxel workers can
-// read it: lib/voxels.js)
-function codeTexture(rows, w, h) {
+// a canvas texture: the red byte is the row, the green byte 255 for a leaf row, the blue byte 255 where it is cut out
+// (a canvas, so the voxel workers can read it: lib/voxels.js)
+function codeTexture(rows, w, h, alpha) {
   const cv = document.createElement('canvas');
   cv.width = w; cv.height = h;
   const img = new ImageData(w, h);
@@ -89,6 +91,7 @@ function codeTexture(rows, w, h) {
     const leaf = rows[i] >= LEAF;
     img.data[i * 4] = leaf ? rows[i] - LEAF : rows[i];
     img.data[i * 4 + 1] = leaf ? 255 : 0;
+    img.data[i * 4 + 2] = alpha && alpha[i] < 128 ? 255 : 0;
     img.data[i * 4 + 3] = 255;
   }
   cv.getContext('2d').putImageData(img, 0, 0);

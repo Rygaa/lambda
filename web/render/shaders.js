@@ -206,6 +206,7 @@ void main() {
   if (!gl_FrontFacing) N = -N;
   float ndl = dot(N, uSunL);
   vec4 code = texture(uMap, vUv);
+  if (code.b > 0.5) discard;     // transparent in the FlyFF texture (lib/objectStyle.js)
   float row = floor(code.r * 255.0 + 0.5);
   if (code.g > 0.5) {
     float lv = ((ndl * 0.5 + 0.5) * (0.78 + 0.22 * cloudLight(vW)) - 0.10) * (0.6 + 0.4 * shadowHard(vW + N * 0.02));
@@ -220,8 +221,9 @@ void main() {
 `;
 
 // The ground: grass, or the paint of gen/ground.js there (palette row of the
-// ground family). Pavement has tile joints, fields have furrows.
-export function groundFrag() {
+// ground family). Pavement has tile joints (bricks: the recipe "pavement": "bricks", rows of bricks each half a brick
+// off the one before, like the streets of Flarine), fields have furrows.
+export function groundFrag(bricks = false) {
   const GROUND_ROW = Object.fromEntries(paletteNames('ground').map((name, i) => [name, i.toFixed(1)]));
   return COMMON + GBUF_OUT + /* glsl */ `
 uniform sampler2D uGround;   // one paint per channel (sand, dirt, pavement, field), 0.5 on its edge
@@ -237,9 +239,14 @@ void main() {
   if (g.a > most) { most = g.a; row = ${GROUND_ROW.field}; }
   // one pixel wide lines: tile joints every 1.5 units, furrows every half unit
   vec2 px = fwidth(P.xz) * 1.5;
-  if (row == ${GROUND_ROW.pavement}) {
+  if (row == ${GROUND_ROW.pavement}) {${bricks ? `
+    // bricks 0.6 by 0.3
+    row = ${GROUND_ROW.brick};
+    float course = floor(P.z / 0.3);
+    vec2 f = abs(fract(vec2(P.x / 0.6 + 0.5 * mod(course, 2.0), P.z / 0.3) + 0.5) - 0.5) * vec2(0.6, 0.3);
+    if (f.x < px.x || f.y < px.y) row = ${GROUND_ROW.mortar};` : `
     vec2 f = abs(fract(P.xz / 1.5 + 0.5) - 0.5) * 1.5;
-    if (f.x < px.x || f.y < px.y) row = ${GROUND_ROW.tile};
+    if (f.x < px.x || f.y < px.y) row = ${GROUND_ROW.tile};`}
   }
   if (row == ${GROUND_ROW.field} && fract(P.z / 0.5) < 0.4) row = ${GROUND_ROW.furrow};
   gData = vec4(cloudLight(P) * shadowSoft(P), 1.0, 1.0, row);

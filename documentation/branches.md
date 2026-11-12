@@ -11,7 +11,10 @@ This guide says how to work with `attempt_1`, the official branch of Projet Lamb
   Voxel) and the 1018 FlyFF decor objects in the style of our world (the recipe `objects` and the Objects part of the
   Admin menu). It came from `try/voxel-switch`, `try/flyff-objects` and `try/flyff-style`, without their variants:
   the objects are only in our style (not with their FlyFF textures). Then came `try/attack-move` and
-  `try/ual-attacks`: the human keeps walking while it hits, and its 4 sword hits come from Quaternius (CC0).
+  `try/ual-attacks`: the human keeps walking while it hits, and its 4 sword hits come from Quaternius (CC0). Then came
+  `try/flarine-city`: the centre of the FlyFF city Flarine as a world (`?world=flarine`, the recipe `map`), with our
+  oaks and our big-leaf plants in place of its FlyFF trees and plants (the archived FlyFF objects:
+  `assets/objects/archived.json`; which assets are FlyFF, ours or archived: `assets.md`, section 7).
 
 The official copy is on GitHub, in `Rygaa/lambda`.
 
@@ -117,3 +120,4 @@ These branches stay as they are. Read them and copy from them, but do not build 
 | `try/flyff-style` | (made from `try/flyff-objects`) the FlyFF objects in the style of our world: drawn with the world, their textures turned into our stone and green leaf palettes and smoothed ("flat palettes", picked over one palette per part and one per texel); the default, with FlyFF textures as a choice in the Look part of the Admin menu; their sizes brought to ours (big ones shrink most, at most 6 m) | try, moved to `attempt_2` |
 | `try/attack-move` | (made from `attempt_2`) the human keeps walking while it attacks: its legs walk or run and the rest of it hits (clips mixed by bones, `attack1Walk`, `attack1Run`...), the hit goes where it faces | try, moved to `attempt_2` |
 | `try/ual-attacks` | (made from `try/attack-move`) the 4 hits of the human are sword hits of the Universal Animation Library 1 and 2 of Quaternius (CC0, `assets/character/player/ual/`), moved onto the FlyFF skeleton (`web/lib/retarget.js`); its legs still walk or run while it hits; when no hit follows, the hit ends with its way back (`recover`) melting into idle, walk or run, instead of jumping to idle | try, moved to `attempt_2` |
+| `try/flarine-city` | (made from `attempt_2`) the centre of the FlyFF city Flarine (3 squares, bridges, river) as a world, as in FlyFF: the recipe `map` (`worlds/maps/flarine.json`, made by `worlds/maps/import-map.mjs` from the FlyFF land files and objects), with its ground heights, river, ground textures as our paints, and 2389 decor objects at FlyFF size; walkers follow the ground, the river stops them, they walk on bridges and floors (`addReachable`); its streets in brown bricks (`"pavement": "bricks"`); grass in squares around the camera (`web/systems/coverChunks.js`); the FlyFF objects turned the right way; the FlyFF trees, leafy plants and floating objects archived (`assets/objects/archived.json`), with our oaks and `plant/leafy` (the form of the 3 FlyFF plants, in our style) in place of the trees and plants | try, moved to `attempt_2` |

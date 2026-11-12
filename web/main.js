@@ -20,6 +20,7 @@ import { createPalette } from './lib/voxels.js';
 import { createPool } from './lib/voxelPool.js';
 import { footprintSystem } from './systems/footprints.js';
 import { groundCoverSystem } from './systems/groundCover.js';
+import { coverChunkSystem } from './systems/coverChunks.js';
 import { shadowSystem } from './systems/shadows.js';
 import { renderSystem } from './systems/render.js';
 import { viewSystem } from './systems/view.js';
@@ -73,6 +74,8 @@ function showErrors(fn) {
 const params = new URLSearchParams(location.search);
 // ?world=<name>: worlds/<name>.json (default meadow), ?seed=<n> changes its seed
 const recipe = await loadRecipe(params.get('world') || 'meadow');
+// "map": a part of a FlyFF map, worlds/maps/<name>.json (gen/map.js)
+const map = recipe.map ? await loadJson(`../worlds/maps/${encodeURIComponent(recipe.map)}.json`).catch(() => showErrors(() => { throw new Error(`no map worlds/maps/${recipe.map}.json`); })) : null;
 if (params.has('seed')) recipe.seed = Number(params.get('seed'));
 // ?theme=<name>: a theme of assets/palettes.json (else the recipe "theme")
 const theme = params.get('theme') ?? recipe.theme ?? null;
@@ -84,7 +87,9 @@ const sunL = new THREE.Vector3(...meta.render.sun_l).normalize();
 const typeNames = showErrors(() => assetsOf(recipe));
 await loadTypes(typeNames, '../assets/').catch((err) => showErrors(() => { throw err; }));
 const shapes = createShapes({ meta, sunL, mid: meta.mid, seed: recipe.seed ?? 11 });
-const land = showErrors(() => buildRecipe(shapes, recipe));
+const land = showErrors(() => buildRecipe(shapes, recipe, map));
+const BIG = 60;       // a world wider than this (half + 5 > BIG: a FlyFF map) has grass only COVER around the camera
+const COVER = 32;
 
 const world = createWorld();
 setResource(world, Res.Settings, {
@@ -94,7 +99,8 @@ setResource(world, Res.Settings, {
   theme,                            // colour theme (assets/palettes.json "themes"), or null
   land,                             // { props, glades, half, start } (gen/world.js)
   half: land.half,
-  grassHalf: land.half + 5,         // grass, flowers and dust cover this square
+  grassHalf: land.half + 5 > BIG ? COVER : land.half + 5,   // grass, flowers and dust cover this square (around the camera in a big world)
+  coverChunks: land.half + 5 > BIG,                          // a big world: its grass in squares around the camera (systems/coverChunks.js)
   walkLimit: land.half - 4,         // the camera stays inside this square
   ppu: meta.render.ppu,
   basis: {
@@ -125,7 +131,7 @@ for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem
 for (const s of [
   inputSystem, timeSystem,
   outfitSystem, playerSystem, monsterSystem, combatSystem, cameraControlSystem, viewportSystem, cloudSystem,
-  meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
+  coverChunkSystem, meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem,
 ]) addSystem(world, s);
 

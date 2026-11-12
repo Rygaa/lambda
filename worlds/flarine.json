@@ -1,0 +1,11 @@
+{
+ "name": "Flarine: the centre of the FlyFF city (its 3 squares, the bridges and the river), as in FlyFF: its ground, water, ground textures and decor objects (worlds/maps/flarine.json), with our oaks and big-leaf plants for its trees and leafy plants",
+ "seed": 7,
+ "map": "flarine",
+ "pavement": "bricks",
+ "trees": "plant/oak/large",
+ "plants": "plant/leafy/medium",
+ "start": [-58, 38],
+ "clouds": "few",
+ "clearings": { "count": 0 }
+}

@@ -35,7 +35,8 @@ function fixSecondBones(o) {
   }
 }
 
-// each transparent texel gets the colour of an opaque neighbour; alphaAt reads the first alpha
+// each transparent texel gets the colour of an opaque neighbour; alphaAt reads the first alpha, and the texture keeps
+// it (userData.alpha: the alpha byte of each texel), so the decor objects cut their leaves out (lib/objectStyle.js)
 function solidTexture(map) {
   const img = map.image, cv = document.createElement('canvas');
   cv.width = img.width; cv.height = img.height;
@@ -71,6 +72,7 @@ function solidTexture(map) {
   texture.magFilter = texture.minFilter = THREE.NearestFilter;
   texture.generateMipmaps = false;
   texture.colorSpace = THREE.NoColorSpace;
+  texture.userData.alpha = Uint8Array.from({ length: cv.width * cv.height }, (_, i) => px[i * 4 + 3]);
   const alphaAt = (u, w) => {
     const x = Math.min(cv.width - 1, Math.max(0, Math.floor((((u % 1) + 1) % 1) * cv.width)));
     const y = Math.min(cv.height - 1, Math.max(0, Math.floor((((w % 1) + 1) % 1) * cv.height)));

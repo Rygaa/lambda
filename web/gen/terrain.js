@@ -6,11 +6,13 @@
 // documentation/worlds.md). A mountain border (recipe "borders", gen/borders.js) is a
 // band of cliffs stacked along a side, with no stairs: it closes the world.
 // Their numbers are in the asset types terrain/cliff and terrain/mountain.
-//   heightAt, levelUnder, bareAt: what the movers, the placement rules and the grass ask
+//   heightAt, levelUnder, bareAt, wetAt: what the movers, the placement rules and the grass ask
+//   (a FlyFF map, gen/map.js, is a terrain too: kind 'map'; it answers for it)
 //   terrainGeometry: the tops, the walls and the stairs (made with math, like gen/builders)
 import * as THREE from 'three';
 import { nextRandom, hashSeed } from '../lib/random.js';
 import { fromSide, wavyLine } from './borders.js';
+import { mapHeightAt, mapDepthAt, mapWetAt, mapGeometry } from './map.js';
 
 export const CELL = 0.5;        // grid step (world units)
 export const STEP = 0.35;       // a mover goes up or down at most this much at once
@@ -50,6 +52,7 @@ const centre = (t, i) => -t.ext + (i + 0.5) * CELL;
 // height of the ground at (x, z): its plateau, or the slope of the stairs
 export function heightAt(t, x, z) {
   if (!t) return 0;
+  if (t.kind === 'map') return mapHeightAt(t, x, z);
   const i = cellOf(t, x), j = cellOf(t, z);
   const s = stairAt(t, i, j);
   if (s < 0) return heightOf(t, i, j);
@@ -58,9 +61,13 @@ export function heightAt(t, x, z) {
   return st.top - (st.top - st.base) * Math.min(1, Math.max(0, d / (st.len * CELL)));
 }
 
-// no grass here: stairs, and the top edge of a cliff (the lip)
+// does water stop a walker here? (the water of a FlyFF map; other water stops it by its circles, gen/collision.js)
+export const wetAt = (t, x, z) => t?.kind === 'map' && mapWetAt(t, x, z);
+
+// no grass here: stairs, and the top edge of a cliff (the lip); under the water of a map
 export function bareAt(t, x, z) {
   if (!t) return false;
+  if (t.kind === 'map') return mapDepthAt(t, x, z) > 0;
   const i = cellOf(t, x), j = cellOf(t, z);
   if (stairAt(t, i, j) >= 0) return true;
   const h = heightOf(t, i, j);
@@ -71,6 +78,7 @@ export function bareAt(t, x, z) {
 // (a cliff edge, stairs, the foot of stairs, which stays free, or a mountain border)
 export function levelUnder(t, x, z, r) {
   if (!t) return 0;
+  if (t.kind === 'map') return mapWetAt(t, x, z) ? -1 : 0;
   let level = null;
   for (let i = cellOf(t, x - r); i <= cellOf(t, x + r); i++)
     for (let j = cellOf(t, z - r); j <= cellOf(t, z + r); j++) {
@@ -304,10 +312,11 @@ function pieces(m, n) {
 }
 
 // ---------------------------------------------------------------- geometry
-// -> { tops, walls, stairs }: BufferGeometry (or null). The walls are rock
+// -> { tops, walls, stairs } (a map: { tops, water }): BufferGeometry (or null). The walls are rock
 // columns of random width (two faces each, so the outlines draw their edges),
 // under an uneven stone lip. Nothing small is stuck on them (documentation/style/rules.md).
 export function terrainGeometry(t) {
+  if (t.kind === 'map') return mapGeometry(t);
   const rng = { seed: t.seed };
   const rand = (lo, hi) => lo + (hi - lo) * nextRandom(rng);
   const n = t.n;

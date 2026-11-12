@@ -10,7 +10,7 @@
 import * as THREE from 'three';
 import { query, getComponent, addComponent, getResource } from '../ecs/world.js';
 import { Decor, Blocker, Footprint } from '../components.js';
-import { Objects, Gpu, Settings, Voxels, Assets } from '../resources.js';
+import { Objects, Gpu, Settings, Voxels, Assets, Tops } from '../resources.js';
 import { loadPart } from '../lib/bake.js';
 import { styleTexture } from '../lib/objectStyle.js';
 import * as S from '../render/shaders.js';
@@ -18,9 +18,13 @@ import { shaderMaterial } from '../render/materials.js';
 import { unitScale } from '../lib/character.js';
 import { lookOf, voxelStill } from '../lib/voxels.js';
 import { heightAt } from '../gen/terrain.js';
+import { mapHighAt } from '../gen/map.js';
+import { addReachable } from '../lib/tops.js';
 
 const BASE = '../assets/objects/models/';
 const LOW = 0.3;   // world units: a lower object (a flower bed) does not stop a walker
+const CLEAR = 2.2; // world units: the parts of a FlyFF map object higher than this over the ground around them (or the
+                   // water) are over the head of a walker
 // our sizes (documentation/style/rules.md): next to the human (1.05 tall) FlyFF objects are a little bigger even when
 // small (a bench 1.6 high) and much bigger when big (a house 17, giant trees up to 104), where our houses are 3 to 4
 // high and our trees 3 to 5. So a height h (world units, FlyFF size) becomes SHRINK h / (1 + SHRINK h / CEILING): a
@@ -87,16 +91,16 @@ async function loadModel(file) {
 }
 
 // an object whose model is loaded: its meshes in the world, at our sizes (objectScale), on the ground (lifted if a part
-// goes below its origin), and its circle (half its widest side, a little less)
+// goes below its origin), or at its own size and height (a FlyFF map); and its circle (half its widest side, a little less)
 function place(world, o, gpu, e, d) {
   const file = o.names[d.object]?.model;
   if (!file) { console.error(`object "${d.object}": not in assets/objects/objects.json`); d.group = false; return; }
   const model = modelOf(o, file);
   if (!model.value) return;
-  const k = objectScale(o, d.object), { meshes, box } = model.value;
+  const k = d.k || objectScale(o, d.object), { meshes, box } = model.value;
   const group = new THREE.Group();
   for (const { geometry, texture } of meshes) group.add(decorMesh(world, gpu, styleTexture(texture), geometry));
-  const y = heightAt(getResource(world, Settings).land.terrain, d.x, d.z) + Math.max(0, -box.min.y * k);
+  const y = d.y ?? heightAt(getResource(world, Settings).land.terrain, d.x, d.z) + Math.max(0, -box.min.y * k);
   group.position.set(d.x, y, d.z);
   group.rotation.y = d.rot;
   group.scale.setScalar(k);
@@ -107,7 +111,13 @@ function place(world, o, gpu, e, d) {
   d.box = box.clone().applyMatrix4(group.matrixWorld);
   const r = THREE.MathUtils.clamp(Math.max(box.max.x - box.min.x, box.max.z - box.min.z) / 2 * k, 0.15, 3);
   addComponent(world, e, Footprint, { x: d.x, z: d.z, r });
-  if (box.max.y * k > LOW) addComponent(world, e, Blocker, { x: d.x, z: d.z, r: r * 0.8, h: y + box.max.y * k });
+  if (d.k) {
+    // an object of a FlyFF map stops a walker by its real shape, up to the height of a head: it walks on its floors and
+    // bridges, and under its arches (lib/tops.js)
+    const terrain = getResource(world, Settings).land.terrain;
+    addReachable(getResource(world, Tops), group.children.map((m) => ({ geometry: m.geometry, matrix: m.matrixWorld })),
+      (x, z) => mapHighAt(terrain, x, z) + CLEAR);
+  } else if (box.max.y * k > LOW) addComponent(world, e, Blocker, { x: d.x, z: d.z, r: r * 0.8, h: y + box.max.y * k });
 }
 
 // a mesh drawn with the world (layer 0) that casts a shadow (layer 1), its palette rows in the texture `map`

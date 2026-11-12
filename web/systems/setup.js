@@ -120,12 +120,21 @@ export function setupUiSystem(world) {
 }
 
 // ---------------------------------------------------------------- grass + flowers
+// A small world has one square of grass and flowers over all of it; a big one (a FlyFF map: Settings coverChunks)
+// has squares around the human, made as it walks (systems/coverChunks.js)
 export function spawnGroundCoverSystem(world) {
   const settings = getResource(world, Settings);
+  if (settings.coverChunks) return;
+  const rng = getResource(world, Random), GR = settings.grassHalf;
+  spawnCover(world, [-GR, GR, -GR, GR], () => nextRandom(rng));
+}
+
+// the grass tufts and the flowers of the box [x0, x1, z0, z1]: one GroundCover each ('grass', 'decor'), with the name
+// of their square (chunk), if any. rand: random numbers in [0, 1)
+export function spawnCover(world, [x0, x1, z0, z1], rand, chunk = null) {
+  const settings = getResource(world, Settings);
   const meta = getResource(world, Assets).meta;
-  const rng = getResource(world, Random);
-  const rand = () => nextRandom(rng);
-  const MID = meta.mid, GR = settings.grassHalf;
+  const MID = meta.mid;
   const toward = settings.basis.F.clone().multiplyScalar(-0.25);   // decor sits a little in front
   // on the level of the ground (cliffs); none on stairs or on the lip of a cliff
   // (far below, like under a footprint). Grass tufts take the colour of the
@@ -137,17 +146,18 @@ export function spawnGroundCoverSystem(world) {
   const ROW = Object.fromEntries(['grass', ...PAINTS].map((name) => [name, paletteRows({ ground: name }).ground]));
 
   const grass = [];
-  for (let x = -GR; x < GR; x += 0.125)
-    for (let z = -GR; z < GR; z += 0.125) {
+  for (let x = x0; x < x1; x += 0.125)
+    for (let z = z0; z < z1; z += 0.125) {
       const px = x + rand() * 0.125, pz = z + rand() * 0.125;
       const paint = paintAt(px, pz);
       const y = paint === 'pavement' ? -1000 : groundY(px, pz);
-      grass.push({ pos: [px, y, pz], light: [px, y, pz], param: [Math.floor(rand() * 4), MID.grass, ROW[paint], 0] });
+      const cell = Math.floor(rand() * 4);
+      if (y > -1000) grass.push({ pos: [px, y, pz], light: [px, y, pz], param: [cell, MID.grass, ROW[paint], 0] });
     }
   const decor = [];
   const sp = meta.sprites.decor.sprouts, fl = meta.sprites.decor.flowers;
-  for (let x = -GR; x < GR; x += 0.75)
-    for (let z = -GR; z < GR; z += 0.75) {
+  for (let x = x0; x < x1; x += 0.75)
+    for (let z = z0; z < z1; z += 0.75) {
       if (rand() > 0.8) continue;
       const px = x + rand() * 0.75, pz = z + rand() * 0.75;
       const roll = rand();
@@ -158,7 +168,7 @@ export function spawnGroundCoverSystem(world) {
       else { cell = sp[Math.floor(rand() * 4)]; mid = MID.leafdeco; }
       const lift = mid === MID.leafdeco ? 0.02 : 0.1;
       const y = paintAt(px, pz) === 'grass' ? groundY(px, pz) : -1000;
-      decor.push({ pos: [px + toward.x, y + lift + toward.y, pz + toward.z], light: [px, y, pz], param: [cell, mid, 0, 0] });
+      if (y > -1000) decor.push({ pos: [px + toward.x, y + lift + toward.y, pz + toward.z], light: [px, y, pz], param: [cell, mid, 0, 0] });
     }
 
   for (const [kind, items] of [['grass', grass], ['decor', decor]]) {
@@ -173,7 +183,7 @@ export function spawnGroundCoverSystem(world) {
       if (!grid.has(k)) grid.set(k, []);
       grid.get(k).push(i);
     });
-    spawn(world, [GroundCover, { kind, pos, home: pos.slice(), light, params, grid }]);
+    spawn(world, [GroundCover, { kind, pos, home: pos.slice(), light, params, grid, chunk }]);
   }
 }
 
@@ -184,7 +194,7 @@ export function spawnWorldSystem(world) {
   const land = settings.land;
   spawn(world, [GroundPlane]);
   for (const p of land.props) spawnProp(world, p);
-  for (const { object, x, z, rot } of land.objects) spawn(world, [Decor, { object, x, z, rot }]);
+  for (const { object, x, z, rot, y = null, k = 0 } of land.objects) spawn(world, [Decor, { object, x, z, rot, y, k }]);
   for (const g of land.glades) spawn(world, [Glade, { x: g.x, z: g.z, r: g.r, k: g.k }]);
   const [lo, hi] = land.clouds ?? [];
   spawn(world, [CloudLayer, land.clouds ? { lo, hi } : {}]);

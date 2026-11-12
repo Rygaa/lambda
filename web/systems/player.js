@@ -15,6 +15,7 @@ import { Player, CameraRig, Health } from '../components.js';
 import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe } from '../resources.js';
 import { Swing } from '../events.js';
 import { free, groundAt as groundOf, LEDGE } from '../lib/walk.js';
+import { heightAt } from '../gen/terrain.js';
 
 // the speeds its walk and run clips were made for: at other speeds (the admin menu) the clip plays faster or slower
 const CLIP_SPEED = { walk: 2.4, run: 5.2 };
@@ -125,6 +126,7 @@ export function playerSystem(world) {
     // the camera follows it
     const rig = getComponent(world, query(world, [CameraRig])[0], CameraRig);
     rig.follow = false;
-    rig.target = [p.x, rig.target[1], p.z];
+    // on a FlyFF map the ground goes up and down: the camera follows its height (not the jumps)
+    rig.target = [p.x, terrain?.kind === 'map' ? heightAt(terrain, p.x, p.z) + 0.6 : rig.target[1], p.z];
   }
 }

@@ -52,12 +52,27 @@ export function meshSystem(world) {
 
   for (const e of added(world, GroundPlane)) {
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2),
-      shaderMaterial(gpu.shared, S.MESH_VERT, S.groundFrag(), groundUniforms(settings.land.ground)));
+      shaderMaterial(gpu.shared, S.MESH_VERT, S.groundFrag(settings.land.pavement === 'bricks'), groundUniforms(settings.land.ground)));
     gpu.scene.add(mesh);
     addComponent(world, e, SceneObject, { group: mesh, meshes: [] });
     // cliffs: the plateau tops look like the ground; the walls and the stairs are stone
     const terrain = settings.land.terrain;
-    if (terrain) {
+    if (terrain?.kind === 'map') {
+      // a FlyFF map (gen/map.js): its ground, which goes on past the map, over the plane; and its water
+      const g = terrainGeometry(terrain);
+      mesh.position.y = Math.min(...terrain.height) - 1;
+      const ground = new THREE.Mesh(g.tops, mesh.material);
+      ground.position.y = -mesh.position.y;
+      ground.layers.enable(1);     // casts shadows (the hills)
+      mesh.add(ground);
+      if (g.water) {
+        const water = new THREE.Mesh(g.water, gpu.materials.water[paletteRows({ water: 'clear' }).water]);
+        water.position.y = -mesh.position.y;
+        gpu.reflect.skip.add(water);
+        gpu.reflect.on = true;
+        mesh.add(water);
+      }
+    } else if (terrain) {
       const g = terrainGeometry(terrain);
       const stone = (name) => gpu.materials.stone[paletteRows({ stone: name }).stone];
       for (const [geometry, material] of [[g.tops, mesh.material], [g.walls, stone(terrain.palette)], [g.stairs, stone(terrain.stairsPalette)]]) {

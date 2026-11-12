@@ -3,6 +3,7 @@ import './sharp-rock.js';
 import './round-rock.js';
 import './tree.js';
 import './palm.js';
+import './leafy.js';
 import './water.js';
 import './building.js';
 import './rock-form.js';

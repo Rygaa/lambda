@@ -69,6 +69,8 @@ The worlds:
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
+- `flarine`: the centre of the FlyFF city Flarine (its 3 squares, the bridges and the river), as in FlyFF (recipe
+  `map`, section 2).
 - `meadow`: ponds and puddles.
 - `lakes`: a lake, a river, ponds, and puddles.
 - `rocky`: an autumn forest with many rocks.
@@ -102,6 +104,8 @@ The fields of a world:
 - `theme`: the colours of the whole world (section 6). `?theme=` in the address wins.
 - `start`: where the camera starts, `[x, z]`. Default: the first clearing.
 - `clouds`: how much of the ground the cloud shadows cover: `none`, `few`, or `some` (default).
+- `pavement`: how the `pavement` paint looks: `tiles` (grey slabs, default) or `bricks` (brown bricks, each row half
+  a brick off the one before, like the streets of Flarine).
 - `rays`: the strength of the light rays, 0 to 1 (default 1).
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).
@@ -109,6 +113,30 @@ The fields of a world:
 - `cliffs`: plateaus in levels, with rock walls and stairs (section 4). No `cliffs`: flat ground.
 - `clearings`: open places with light: `amount` or `count` (at most 4), `radius` [min, max], `light` [min, max].
 - `props`: one line per group of objects. Big objects are placed first.
+- `map`: a part of a FlyFF map, `worlds/maps/<name>.json`, as in FlyFF (`web/gen/map.js`). It gives the ground, so a
+  world with a map has no `size`, `cliffs`, `borders` or `ground`. `worlds/maps/import-map.mjs` makes the file from the
+  FlyFF land files (`.lnd`) and the objects (`objects.ron`) of a folder, for a square of the map:
+  `node worlds/maps/import-map.mjs /path/to/flarine_city flarine 6871 3109 7231 3469`. Everything keeps its FlyFF size
+  next to the human: 1 FlyFF unit is 0.645 world units (the FlyFF human is 1.63 tall, ours 1.05), so the Flarine centre
+  is 232 units wide (a house 9 high). What comes from FlyFF:
+  - the ground heights (one every 4 FlyFF units): the ground goes up and down, walkers follow it, and the camera follows
+    its height;
+  - the water (the river at height 96 in FlyFF, our y = 0): it stops a walker deeper than 0.15, except on a bridge;
+  - the ground textures as our paints: the FlyFF default ground is `sand`, the bricks of Flarine are `pavement` (with `"pavement": "bricks"`), the
+    rocky grounds are `dirt`, the lawn is grass;
+  - the decor objects at their place, turn, size, and height. They are not brought to our sizes. They stop a walker by
+    their real shape, up to 2.2 over the ground around them (`web/lib/tops.js` `addReachable`): it walks on their floors
+    and bridges, walls and fences stop it, and it goes under arches and leaves.
+  The archived FlyFF objects (`assets/objects/archived.json`: kept for now, to delete later) are left out: the ones that
+  float in the air and hide the human (the big roof and the propellers over the Flarine squares), and the FlyFF trees
+  and leafy plants, which become our trees and big-leaf plants (`trees` and `plants` below). The import names any other object that floats more than 5 FlyFF units over
+  the ground: archive it there, then import again.
+  A world this big has grass and flowers only 32 units around the camera, in squares of 16 made as it walks
+  (`web/systems/coverChunks.js`).
+- `trees`: with a `map`, our tree type that takes the place of its FlyFF trees, `"family/type/size"` (Flarine:
+  `"plant/oak/large"`). Each is scaled (in steps of 1/4) to about the height of the FlyFF tree. No `trees`: no trees.
+- `plants`: the same for the FlyFF leafy plants of a `map` (Flarine: `"plant/leafy/medium"`, made from them). The map
+  says which FlyFF plant was at each place, and `plant/leafy` has the same one there. No `plants`: none.
 - `objects`: FlyFF decor objects (the 1018 of `assets/objects`: chairs, boxes, fences, lamps, tents, houses, trees,
   rocks...), one line per object type: `{ "object": "bench", "at": [[x, z, turn], ...] }` (turn in radians, default
   0). The names are in `assets/objects/objects.json`: the FlyFF name without `obj_` (`rustiachair01`), and a short
@@ -151,6 +179,8 @@ The types today:
   same palettes, and a new form each time.
 - `plant/oak`: `small`, `medium`, `large`. Palettes `green`, `autumn`, `pine`.
 - `plant/bush`: `medium`. Palettes `green`, `autumn`, `pine`. You walk through it.
+- `plant/leafy`: the 3 leafy plants of FlyFF, with the same stems and leaves at the same places, in our style (one per
+  variant). `medium`. Palettes `green`, `autumn`, `pine`. You walk through it.
 - `plant/palm`: `small`, `large`. Palettes `green`, `autumn`, `pine` (the fronds; the trunk is always `palm`).
 - `plant/pine`: 3 cones stacked. `plant/fir`: taller and narrower, 5 cones. `plant/cypress`: tall and narrow, like a
   flame. All three: `small`, `medium`, `large`. Palettes `pine`, `green`.

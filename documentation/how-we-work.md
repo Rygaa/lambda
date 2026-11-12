@@ -42,6 +42,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | the look, Normal or Voxel (the switch in the Admin menu): the converter to cubes, the workers that make them and save them, and the swap of what is drawn | `web/lib/voxels.js`, `web/lib/voxelPool.js`, `web/lib/voxelWorker.js`, `web/systems/voxels.js` |
 | the 1018 FlyFF decor objects (chairs, boxes, fences, lamps, houses, trees...): models, list (`objects.json`: name, scale for the few made too big or too small, size), import script; in the worlds (recipe `objects`) and the Objects part of the Admin menu, at our sizes, in cubes with the look | `assets/objects/`, `import-objects.mjs`, `web/systems/objects.js`, `web/systems/adminObjects.js` |
 | the FlyFF objects in the style of our world: textures turned into our stone and green leaf palettes, drawn with the world | `web/lib/objectStyle.js`, `web/render/shaders.js` (DECOR_FRAG) |
+| a part of a FlyFF map as a world (recipe `map`): import script, map files, heights, water, paints, objects at FlyFF size, archived objects, our trees and big-leaf plants for its trees and leafy plants; grass in squares around the camera in a big world | `worlds/maps/`, `web/gen/map.js`, `assets/objects/archived.json`, `web/systems/coverChunks.js` |
 | saved settings and stats, changed monsters, loaded at start | `saves/admin.json`, `saves/monsters.json` |
 
 ## 4. The FlyFF data
@@ -58,7 +59,10 @@ All FlyFF models and data are in `/Users/mohamedaissabenfodda/Workspace/data_fly
 - `data/motions.ron`: the clips of each model (stand, walk, atk1, dmg1, die1, ...), with their hit frames.
 - `data/items.ron`: the items. Many names are in German.
 - `models/obj_*.glb`: 1018 decor objects (chairs, boxes, fences, lamps, tents, houses, trees, rocks of each region).
-  Their size is the one next to the FlyFF human, except a few (their maps scale them).
+  Their size is the one next to the FlyFF human, except a few (their maps scale them). The ones we will delete later
+  (the FlyFF trees and leafy plants, the objects that float in the air) are listed, with why, in `assets/objects/archived.json`.
+
+Which assets come from FlyFF, which are ours, and which are archived: `documentation/assets.md`, section 7.
 
 ## 5. Testing without a screen
 

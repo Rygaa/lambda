@@ -38,7 +38,9 @@ export const Monster = defineComponent('Monster', () => ({
 // group: its meshes (fine pass, with their textures), once its model is loaded; cubes: { key, mesh } its last look
 // made of cubes (lib/voxels.js lookOf key); busy: cubes are being made; box: its box in the world; placed: put by the
 // admin menu (systems/adminObjects.js), not by the world recipe
-export const Decor = defineComponent('Decor', () => ({ object: '', x: 0, z: 0, rot: 0, group: null, cubes: null, busy: false, box: null, placed: false }));
+// y, k: its height and its world units per FlyFF unit, when they are given (a FlyFF map, gen/map.js), else on the
+// ground at our sizes (systems/objects.js objectScale)
+export const Decor = defineComponent('Decor', () => ({ object: '', x: 0, z: 0, rot: 0, y: null, k: 0, group: null, cubes: null, busy: false, box: null, placed: false }));
 
 // position on the ground and turn around the up axis
 export const Transform = defineComponent('Transform', () => ({ x: 0, z: 0, rotY: 0 }));
@@ -63,9 +65,10 @@ export const GroundPlane = defineComponent('GroundPlane');
 
 // one instance layer of grass tufts or flowers
 //   home: draw positions, light: where each instance samples light,
-//   params: [atlas cell, material id, 0, 0], grid: cell key -> instance indices
+//   params: [atlas cell, material id, 0, 0], grid: cell key -> instance indices,
+//   chunk: the name of its square in a big world (systems/coverChunks.js), or null
 export const GroundCover = defineComponent('GroundCover', () => ({
-  kind: 'grass', home: null, pos: null, light: null, params: null, grid: null,
+  kind: 'grass', home: null, pos: null, light: null, params: null, grid: null, chunk: null,
 }));
 
 // floating dust motes, shown only inside light beams

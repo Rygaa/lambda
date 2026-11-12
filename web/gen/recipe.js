@@ -6,12 +6,13 @@ import { SIZES, getType, paramsOf } from './assets.js';
 import { buildCliffs, levelUnder, CLIFF_FIELDS } from './terrain.js';
 import { SIDES, fromSide, wavyLine } from './borders.js';
 import { createGround, paint, groundAt, pathShape, rectShape, circleShape, PAINTS, GROUND_FIELDS } from './ground.js';
+import { buildMap, FLYFF } from './map.js';
 
 // objects per 100 m² for each amount word
 export const AMOUNTS = { none: 0, few: 0.3, some: 1, many: 2.5, lots: 6 };
 const CLEARINGS = { none: 0, few: 2, some: 3, many: 4, lots: 4 };   // the shaders take at most 4
 
-const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'borders', 'islands', 'clearings', 'cliffs', 'ground', 'props', 'objects'];
+const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'pavement', 'map', 'trees', 'plants', 'borders', 'islands', 'clearings', 'cliffs', 'ground', 'props', 'objects'];
 // recipe "clouds": how much of the ground their shadows cover -> the CloudLayer edges (lo, hi)
 export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02] };
 const LINE_FIELDS = ['asset', 'params', 'amount', 'count', 'palette', 'spacing', 'gap', 'near', 'avoid', 'on', 'at'];
@@ -23,6 +24,7 @@ export function assetsOf(recipe) {
   const names = (recipe.props ?? []).map((line, i) => assetOf(line, `props[${i}]`).asset);
   for (const [side, value] of Object.entries(recipe.borders ?? {})) names.push(assetOf(borderLine(value), `borders.${side}`).asset);
   if (recipe.cliffs) names.push(assetOf(recipe.cliffs, 'cliffs').asset);
+  for (const kind of ['trees', 'plants']) if (recipe[kind]) names.push(assetOf({ asset: recipe[kind] }, kind).asset);
   return names;
 }
 
@@ -44,10 +46,11 @@ function assetOf(line, where) {
   return { asset: `${parts[0]}/${parts[1]}`, size: parts[2] };
 }
 
-// recipe: the parsed JSON
-export function buildRecipe(cache, recipe) {
+// recipe: the parsed JSON; map: the parsed worlds/maps/<recipe.map>.json, when it has one (gen/map.js)
+export function buildRecipe(cache, recipe, map = null) {
   check(recipe, WORLD_FIELDS, 'world');
-  const half = (recipe.size ?? 40) / 2;
+  if (map && (recipe.cliffs || recipe.borders || recipe.ground)) bad('world', 'a world with a "map" takes its ground from it: no "cliffs", "borders" or "ground"');
+  const half = map ? ((map.heights.length - 1) * map.step * FLYFF) / 2 : (recipe.size ?? 40) / 2;
   const b = createWorldBuilder(cache, recipe.seed ?? 1, half);
   const borders = planBorders(b, recipe.borders ?? {}, islandsOf(recipe.islands ?? []));
   const inBorder = (x, z, pad) => borders.some((bd) => bd.inside(x, z, pad));
@@ -66,6 +69,8 @@ export function buildRecipe(cache, recipe) {
   b.start = g0 ? [g0.x, 0.6, g0.z] : [0, 0.6, 0];
   if (recipe.start) b.start = [recipe.start[0], 0.6, recipe.start[1]];
   b.rays = recipe.rays ?? 1;     // strength of the god rays (0 = none)
+  b.pavement = recipe.pavement ?? 'tiles';    // how the pavement paint looks: tiles or bricks
+  if (!['tiles', 'bricks'].includes(b.pavement)) bad('world', `pavement "${b.pavement}" (use tiles or bricks)`);
   b.clouds = CLOUDS[recipe.clouds ?? 'some'] ?? bad('world', `clouds "${recipe.clouds}" (use ${Object.keys(CLOUDS).join(', ')})`);
 
   // cliffs: plateaus in levels, with stairs, and the mountain borders
@@ -81,12 +86,19 @@ export function buildRecipe(cache, recipe) {
   // the ocean borders: one water shape each, before anything else takes the room
   for (const bd of borders) if (bd.set) b.add(bd.set, 0, ...bd.set.shapes[0].origin, 0);
   if (recipe.ground) b.ground = buildGround(b, recipe.ground, borders);
+  const ours = {};      // our types for the trees and the leafy plants of the map
+  for (const kind of ['trees', 'plants']) {
+    if (!recipe[kind]) continue;
+    if (!map) bad('world', `"${kind}" takes the place of the ${kind} of a "map": this world has none`);
+    ours[kind] = assetOf({ asset: recipe[kind] }, kind);
+  }
+  if (map) buildMap(b, map, ours);
 
   // big things first; lines placed "near" something come after the others
   const lines = (recipe.props ?? []).map((line, i) => prepare(b, line, i));
   lines.sort((p, q) => (!!p.line.near - !!q.line.near) || q.size - p.size);
   for (const l of lines) place(b, l);
-  b.objects = objectsOf(recipe.objects ?? []);
+  b.objects = [...(b.objects ?? []), ...objectsOf(recipe.objects ?? [])];
   return finish(b);
 }
 
