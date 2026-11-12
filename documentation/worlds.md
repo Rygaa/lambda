@@ -27,9 +27,23 @@ gets 3.7) and its light (`like the shape` or `each face`). Only the picture chan
 and the fights stay the same (`web/lib/voxels.js`, `web/systems/voxels.js`). Leaves, water, grass and the ground stay
 as they are (the ground of a FlyFF map too). The cubes of a shape or a FlyFF model are made once and every copy uses
 them, turned with it. They are made by workers, one per core of the computer but one, for the world and the bodies
-alike (`web/lib/voxelPool.js`, `web/lib/voxelWorker.js`). Each result is saved in the browser (IndexedDB,
-`lambda-voxels`) under the hash of what made it, so the same world, outfit and cube size come back faster, even after
-a reload. To free that space, clear the site data of the browser.
+alike (`web/lib/voxelPool.js`, `web/lib/voxelWorker.js`).
+
+Since `try/voxel-perf`, the Voxel look loads much faster and with much less memory, with the same cubes:
+
+- Making the cubes (`web/lib/voxelCore.js`) reads only the rows of the box that hold cubes, not the millions of empty
+  cells around a shape: the inside fill and the merging of faces look only at the visible faces. The cubes made are
+  exactly the same as before (checked voxel by voxel).
+- Nothing is saved in the browser any more (IndexedDB took GBs): the cubes are made again at each load. Once a cube
+  mesh is on the GPU, the page drops its own copy (`web/lib/voxels.js` toGeometry).
+- The human and the monsters get their cubes once, not once per frame (the human has 907): the cubes of the first idle
+  frame, each one tied to its place on a triangle of the body; in every frame each cube follows that place and goes
+  back to the grid of the body (`web/lib/voxelBody.js`, drawn as instances of one cube). The places are taken 2 times
+  closer than the cubes, so no hole opens where the body stretches. `?bodies=free` leaves the cubes off the grid,
+  `?bodies=frames` makes the cubes of every frame as before (to compare).
+
+The shadows of the world are drawn once into their own map; when only the human or the monsters move, they are drawn
+alone on a copy of it (`web/systems/shadows.js`).
 
 A loading screen with a bar covers the page until the world is all there, in cubes (`web/systems/loading.js`). To
 make a world load fast even the first time, make its cubes beforehand: open it once with `&bake`
@@ -79,6 +93,8 @@ The worlds:
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
+- `voxel-bench`: a small world with a bit of everything (cliffs, rocks, trees, 3 FlyFF houses, tents, lamps, a fence
+  and a bench), to measure the cost of the cubes.
 - `flarine`: the centre of the FlyFF city Flarine (its 3 squares, the bridges and the river), as in FlyFF (recipe
   `map`, section 2).
 - `meadow`: ponds and puddles.

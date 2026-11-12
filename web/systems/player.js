@@ -15,6 +15,7 @@ import { Player, CameraRig, Health } from '../components.js';
 import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe } from '../resources.js';
 import { Swing } from '../events.js';
 import { free, groundAt as groundOf, LEDGE } from '../lib/walk.js';
+import { showFrame } from '../lib/bake.js';
 import { heightAt } from '../gen/terrain.js';
 
 // the speeds its walk and run clips were made for: at other speeds (the admin menu) the clip plays faster or slower
@@ -118,11 +119,11 @@ export function playerSystem(world) {
     // the frame of its clip: walk, run and idle loop; a part of the jump or a hit stops on its last frame
     const frames = p.clips[p.state], k = Math.floor(p.t * p.fps);
     const frame = frames[/^(jump|attack|hit|dead)/.test(p.state) ? Math.min(k, frames.length - 1) : k % frames.length];
-    p.meshes.forEach((mesh, m) => { mesh.geometry = frame[m]; });
+    showFrame(p.meshes, frame);
     p.group.position.set(p.x, p.y + p.foot, p.z);
     p.group.rotation.y = p.rot;
     // its shadow moves with it
-    if (moved || state !== 'idle') getResource(world, Gpu).shadowsDirty = true;
+    if (moved || state !== 'idle') getResource(world, Gpu).bodiesDirty = true;
     // the camera follows it
     const rig = getComponent(world, query(world, [CameraRig])[0], CameraRig);
     rig.follow = false;

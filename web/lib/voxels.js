@@ -91,8 +91,12 @@ export function toGeometry(arrays) {
   if (arrays.uv) g.setAttribute('uv', new THREE.BufferAttribute(arrays.uv, 2));
   g.setIndex(new THREE.BufferAttribute(arrays.index, 1));
   g.computeBoundingSphere();
+  // once on the GPU, the page does not keep its own copy of the cubes (they were most of its memory)
+  for (const attribute of [...Object.values(g.attributes), g.index]) attribute.onUpload(freeArray);
   return g;
 }
+
+function freeArray() { this.array = null; }
 
 // the triangles of a geometry, moved by a matrix (or none): positions p and normals nrm (9 numbers a triangle), uv (6)
 export function triangles(geometry, matrix = null) {

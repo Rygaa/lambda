@@ -51,6 +51,21 @@ export function setupGpuSystem(world) {
   shared.uShadowMatrix.value.multiplyMatrices(shadowCam.projectionMatrix, shadowCam.matrixWorldInverse);
   shared.uShadowTexel.value = 1 / SM;
   shared.uShadowMap.value = shadowRT.depthTexture;
+  // the shadows of the world alone (layer 1), drawn when the world changes; the bodies (layer 3) are drawn on a copy of
+  // it when only they move (systems/shadows.js)
+  const worldRT = new THREE.WebGLRenderTarget(SM, SM, { depthBuffer: true });
+  worldRT.depthTexture = new THREE.DepthTexture(SM, SM);
+  worldRT.depthTexture.minFilter = worldRT.depthTexture.magFilter = THREE.NearestFilter;
+  const bodyCam = shadowCam.clone();
+  bodyCam.layers.set(3);
+  const copyDepth = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+    glslVersion: THREE.GLSL3, uniforms: { tDepth: { value: worldRT.depthTexture } },
+    vertexShader: 'out vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: 'uniform sampler2D tDepth; in vec2 vUv; out vec4 o; void main() { gl_FragDepth = texture(tDepth, vUv).r; o = vec4(0.0); }',
+    depthFunc: THREE.AlwaysDepth, depthWrite: true, colorWrite: false }));
+  copyDepth.frustumCulled = false;
+  const copyScene = new THREE.Scene();
+  copyScene.add(copyDepth);
 
   const rtOpts = { type: floatOK ? THREE.FloatType : THREE.HalfFloatType, minFilter: THREE.NearestFilter,
     magFilter: THREE.NearestFilter, depthBuffer: true, count: 2 };   // data, normal + depth
@@ -82,7 +97,9 @@ export function setupGpuSystem(world) {
     materials: pieceMaterials(shared, assets, ppu),
     scene: new THREE.Scene(),
     dustScene: new THREE.Scene(),
-    shadow: { rt: shadowRT, cam: shadowCam, mat: new THREE.MeshBasicMaterial({ side: THREE.BackSide, colorWrite: false }) },
+    shadow: { rt: shadowRT, cam: shadowCam, mat: new THREE.MeshBasicMaterial({ side: THREE.BackSide, colorWrite: false }),
+      worldRT, bodyCam, copyScene },
+    bodiesDirty: true,
     shadowsDirty: true,
     gbuf: new THREE.WebGLRenderTarget(4, 4, rtOpts),
     gbufSS: new THREE.WebGLRenderTarget(12, 12, rtOpts),

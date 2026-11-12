@@ -13,6 +13,7 @@ import { Gpu, Settings, Wardrobe, Voxels } from '../resources.js';
 import { loadBody, bakeClips, measure, fineMeshes, fineMesh, loader } from './bake.js';
 import { retarget } from './retarget.js';
 import { lookOf, voxelClips } from './voxels.js';
+import { voxelBody, BODIES } from './voxelBody.js';
 import { maxHp } from './combat.js';
 
 const BASE = '../assets/character/player/', TEXTURES = BASE + 'parts/textures/';
@@ -72,6 +73,11 @@ export async function dress(world, outfit) {
   }
   const clips = bakeClips(body, names, config.bakeFps, ONCE);
   if (!look) return { clips, meshes: fineMeshes(gpu, body, clips.idle[0]), look: null };
+  if (BODIES !== 'frames') {
+    const t = performance.now(), cubes = voxelBody(world, body, clips, look.size / (await unitScale(world)).k, look.normals, BODIES === 'snap');
+    console.log(`[bench] human: ${cubes.count} cubes in ${Math.round(performance.now() - t)} ms`);
+    return { clips, meshes: [cubes.mesh()], look: look.key };
+  }
   const cubes = await voxelClips(world, body, clips, look.size / (await unitScale(world)).k, look.normals);
   for (const frames of Object.values(clips)) for (const frame of frames) for (const g of frame) g.dispose();
   return { clips: cubes, meshes: [fineMesh(gpu, getResource(world, Voxels).palette.texture, cubes.idle[0][0])], look: look.key };

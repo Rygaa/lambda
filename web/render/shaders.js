@@ -131,11 +131,24 @@ out vec3 vW;
 out vec3 vN;
 out vec2 vUv;
 out float vDepth;
+#ifdef USE_INSTANCING
+// a body made of cubes once (lib/voxelBody.js): one instance a cube, its colour (a texel of the voxel palette) and the
+// normal of its surface; uFaces 1: each face lit by its own normal instead
+in vec2 iUv;
+in vec3 iNrm;
+uniform float uFaces;
+#endif
 void main() {
+#ifdef USE_INSTANCING
+  vec4 w = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  vN = normalize(mat3(modelMatrix) * (uFaces > 0.5 ? normal : iNrm));
+  vUv = iUv;
+#else
   vec4 w = modelMatrix * vec4(position, 1.0);
-  vW = w.xyz;
   vN = normalize(mat3(modelMatrix) * normal);
   vUv = uv;
+#endif
+  vW = w.xyz;
   vec4 v = viewMatrix * w;
   vDepth = -v.z;
   vec4 c = projectionMatrix * v;

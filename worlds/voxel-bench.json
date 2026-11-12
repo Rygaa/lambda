@@ -1,0 +1,27 @@
+{
+  "name": "Voxel bench: a small world with a bit of everything (cliffs, rocks, trees, FlyFF houses and props), to measure the cubes",
+  "seed": 7,
+  "size": 36,
+  "start": [0, 2],
+  "clouds": "none",
+  "clearings": { "count": 1, "radius": [3, 3.4] },
+  "cliffs": { "asset": "terrain/cliff/medium", "count": 2 },
+  "props": [
+    { "asset": "plant/oak/medium", "count": 6, "spacing": 4.6, "avoid": "clearings" },
+    { "asset": "plant/pine/medium", "count": 4, "spacing": 3, "avoid": "clearings" },
+    { "asset": "plant/bush/medium", "count": 8, "gap": 0.2 },
+    { "asset": "rock/sharp/medium", "count": 10, "gap": 0.3, "palette": ["sand", "grey"] },
+    { "asset": "rock/sharp/small", "count": 20, "gap": 0.2, "palette": ["sand", "grey"] },
+    { "asset": "rock/round/large", "count": 4, "gap": 0.3 }
+  ],
+  "objects": [
+    { "object": "masapuhouse01", "at": [[-6, -6, 0]] },
+    { "object": "masapuhouse02", "at": [[6, -6, 0.4]] },
+    { "object": "masapuhouse03", "at": [[0, -9, 0]] },
+    { "object": "tent", "at": [[-4, 3, 0.5]] },
+    { "object": "big-tent", "at": [[5, 3, -0.3]] },
+    { "object": "lamp", "at": [[-2, 0, 0], [2, 0, 0]] },
+    { "object": "long-fence", "at": [[0, 6, 0]] },
+    { "object": "bench", "at": [[-1, 4, 0]] }
+  ]
+}

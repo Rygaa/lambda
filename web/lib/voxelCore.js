@@ -62,7 +62,9 @@ export function voxelize(sources, size, opts = {}) {
   }
   const [nx, ny, nz] = n, cells = nx * ny * nz;
   const data = new Uint32Array(cells), normals = opts.normals ? new Uint16Array(cells) : null;
-  const score = new Float32Array(cells).fill(-9);
+  // score: the rank of the face kept in each voxel (read only where a face is); first, last: the first and last voxel
+  // of each row (y, z) with a face, so the steps after look only between them
+  const score = new Float32Array(cells), rows = ny * nz, first = new Int32Array(rows).fill(nx), last = new Int32Array(rows).fill(-1);
 
   for (let s = 0; s < sources.length; s++) {
     const { p, nrm, uv } = tris[s], colorAt = sources[s].colorAt, color = sources[s].color ?? 0;
@@ -95,9 +97,13 @@ export function voxelize(sources, size, opts = {}) {
           const depth = (cx - ax) * Nx + (cy - ay) * Ny + (cz - az) * Nz;
           if (depth > 1e-6 || depth < -thin) continue;
           const k = vx + nx * (vy + ny * vz);
-          const rank = facing - (0.5 * depth) / size - (0.2 * Math.hypot(x - cx, y - cy, z - cz)) / size;
-          if (rank <= score[k]) continue;
+          const dx = x - cx, dy = y - cy, dz = z - cz;
+          const rank = facing - (0.5 * depth) / size - (0.2 * Math.sqrt(dx * dx + dy * dy + dz * dz)) / size;
+          if (data[k] && rank <= score[k]) continue;
           score[k] = rank;
+          const row = vy + ny * vz;
+          if (vx < first[row]) first[row] = vx;
+          if (vx > last[row]) last[row] = vx;
           const w = 1 - a - b;
           data[k] = (colorAt ? colorAt(uv[uvt] * w + uv[uvt + 2] * a + uv[uvt + 4] * b, uv[uvt + 1] * w + uv[uvt + 3] * a + uv[uvt + 5] * b) : color) + 1;
           if (normals) {
@@ -110,37 +116,62 @@ export function voxelize(sources, size, opts = {}) {
       }
     }
   }
-  const volume = { size, min, n, data, normals };
+  const volume = { size, min, n, data, normals, first, last };
   if (opts.fill) fillInside(volume);
   return volume;
 }
 
 // fills every empty voxel that cannot be reached from outside the box (6 neighbours); they take the colour of the
-// last solid voxel of their row (they are never seen)
-function fillInside({ n: [nx, ny, nz], data }) {
-  const outside = new Uint8Array(data.length), queue = new Int32Array(data.length);
-  let head = 0, tail = 0;
-  const seed = (k) => { if (!data[k] && !outside[k]) { outside[k] = 1; queue[tail++] = k; } };
-  for (let z = 0; z < nz; z++) for (let y = 0; y < ny; y++) { seed(nx * (y + ny * z)); seed(nx - 1 + nx * (y + ny * z)); }
-  for (let z = 0; z < nz; z++) for (let x = 0; x < nx; x++) { seed(x + nx * ny * z); seed(x + nx * (ny - 1 + ny * z)); }
-  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) { seed(x + nx * y); seed(x + nx * (y + ny * (nz - 1))); }
-  const sz = nx * ny;
-  while (head < tail) {
-    const k = queue[head++], x = k % nx, y = Math.floor(k / nx) % ny, z = Math.floor(k / sz);
-    if (x > 0) seed(k - 1);
-    if (x < nx - 1) seed(k + 1);
-    if (y > 0) seed(k - nx);
-    if (y < ny - 1) seed(k + nx);
-    if (z > 0) seed(k - sz);
-    if (z < nz - 1) seed(k + sz);
-  }
-  for (let z = 0; z < nz; z++) for (let y = 0; y < ny; y++) {
-    let last = 0;
-    for (let x = 0; x < nx; x++) {
-      const k = x + nx * (y + ny * z);
-      if (data[k]) last = data[k];
-      else if (!outside[k] && last) data[k] = last;
+// last solid voxel of their row (they are never seen). In a row, the voxels before its first solid one and after its
+// last one reach the outside along the row, so only the empty runs between two solid voxels (the middle runs) can be
+// inside: one is outside when it is on a side of the box or next to a voxel outside, found row by row (a scanline fill)
+function fillInside({ n: [nx, ny, nz], data, first, last }) {
+  const outside = new Uint8Array(data.length), sxy = nx * ny;
+  let stack = new Int32Array(1024), top = 0;
+  // the voxel x of the row (y, z) is outside: before the first solid voxel, after the last, or marked
+  const out = (row, r, x) => x < first[r] || x > last[r] || outside[row + x] === 1;
+  // a middle run found outside: marked, and its neighbours looked at later
+  const mark = (row, x0, x1) => {
+    outside.fill(1, row + x0, row + x1 + 1);
+    if (top + 2 > stack.length) { const bigger = new Int32Array(stack.length * 2); bigger.set(stack); stack = bigger; }
+    stack[top++] = row + x0; stack[top++] = x1;
+  };
+  // the middle runs of the row (y, z), between x0 and x1, that are not marked; each found one goes to `found`
+  const runs = (y, z, x0, x1, found) => {
+    const r = y + ny * z, row = nx * r;
+    for (let x = Math.max(x0, first[r] + 1), end = Math.min(x1, last[r] - 1); x <= end; x++) {
+      if (data[row + x] || outside[row + x]) continue;
+      // the whole run, also where it goes past x0 or x1
+      let b = x, e = x;
+      while (!data[row + b - 1]) b--;
+      while (!data[row + e + 1]) e++;
+      found(row, r, b, e);
+      x = e;
     }
+  };
+  // the seeds: every middle run on a side of the box, or next to a voxel outside
+  for (let z = 0; z < nz; z++) for (let y = 0; y < ny; y++) {
+    const border = y === 0 || z === 0 || y === ny - 1 || z === nz - 1;
+    runs(y, z, 0, nx - 1, (row, r, x0, x1) => {
+      let free = border;
+      for (let x = x0; x <= x1 && !free; x++)
+        free = out(row - nx, r - 1, x) || out(row + nx, r + 1, x) || out(row - sxy, r - ny, x) || out(row + sxy, r + ny, x);
+      if (free) mark(row, x0, x1);
+    });
+  }
+  // then the middle runs next to the ones found
+  const near = (row, r, x0, x1) => mark(row, x0, x1);
+  while (top) {
+    const x1 = stack[--top], at = stack[--top], r = at / nx | 0, x0 = at - r * nx, y = r % ny, z = (r - y) / ny;
+    if (y > 0) runs(y - 1, z, x0, x1, near);
+    if (y < ny - 1) runs(y + 1, z, x0, x1, near);
+    if (z > 0) runs(y, z - 1, x0, x1, near);
+    if (z < nz - 1) runs(y, z + 1, x0, x1, near);
+  }
+  // the middle runs not found take the colour of the solid voxel before them
+  for (let r = 0; r < ny * nz; r++) {
+    const row = nx * r;
+    for (let x = first[r] + 1; x < last[r]; x++) if (!data[row + x] && !outside[row + x]) data[row + x] = data[row + x - 1];
   }
 }
 
@@ -150,65 +181,102 @@ function fillInside({ n: [nx, ny, nz], data }) {
 // the faces next to them)
 export function meshArrays(volume, { colors: withColor = false, only = -1 } = {}) {
   const { size, min, n, data, normals } = volume;
-  const [nx, ny, nz] = n;
-  const positions = [], nrms = [], colors = [], indices = [];
-  const get = (x, y, z) => (x < 0 || y < 0 || z < 0 || x >= nx || y >= ny || z >= nz ? 0 : data[x + nx * (y + ny * z)]);
   // the faces merge where both the colour and the surface normal (if any) are the same
   const keyOf = (k) => (normals ? data[k] * 65536 + normals[k] : data[k]);
-  const decoded = [0, 0, 0], pos = [0, 0, 0], p = [0, 0, 0];
-  const corner = (d, u, v, plane, a, b) => {
+  const { first, counts, faces, cells } = (volume.faces ??= facesOf(volume));
+  // at most one rectangle a face: the arrays are made that big, then cut
+  let most = 0;
+  for (let i = 0; i < cells.length; i++) if (only < 0 || data[cells[i]] === only + 1) most++;
+  if (!most) return null;
+  const positions = new Float32Array(most * 12), nrms = new Float32Array(most * 12), colors = withColor ? new Uint32Array(most * 4) : null;
+  const indices = new Uint32Array(most * 6);
+  let quads = 0;
+  const decoded = [0, 0, 0], p = [0, 0, 0];
+  const corner = (d, u, v, plane, a, b, q) => {
     p[d] = plane; p[u] = a; p[v] = b;
-    positions.push((p[0] + min[0]) * size, (p[1] + min[1]) * size, (p[2] + min[2]) * size);
+    positions[q] = (p[0] + min[0]) * size; positions[q + 1] = (p[1] + min[1]) * size; positions[q + 2] = (p[2] + min[2]) * size;
   };
+  // the masks of the slices, one per axis, kept for the other colours (each slice leaves its mask empty)
+  volume.masks ??= [0, 1, 2].map((d) => new Float64Array(n[(d + 1) % 3] * n[(d + 2) % 3]));
   for (let d = 0; d < 3; d++) {
-    const u = (d + 1) % 3, v = (d + 2) % 3, du = n[u], dv = n[v];
-    const mask = new Float64Array(du * dv);
+    const u = (d + 1) % 3, v = (d + 2) % 3, du = n[u], mask = volume.masks[d];
     for (const sign of [1, -1]) {
-      const axis = [0, 0, 0];
+      const s = d * 2 + (sign < 0 ? 1 : 0), axis = [0, 0, 0];
       axis[d] = sign;
       for (let slice = 0; slice < n[d]; slice++) {
-        let any = false;
-        for (let b = 0; b < dv; b++) for (let a = 0; a < du; a++) {
-          pos[d] = slice; pos[u] = a; pos[v] = b;
-          let m = 0;
-          const here = get(pos[0], pos[1], pos[2]);
-          if (here && (only < 0 || here === only + 1)) {
-            const key = keyOf(pos[0] + nx * (pos[1] + ny * pos[2]));
-            pos[d] = slice + sign;
-            if (!get(pos[0], pos[1], pos[2])) m = key;
-          }
-          mask[a + du * b] = m;
-          if (m) any = true;
-        }
-        if (!any) continue;
+        const lo = counts[first[s] + slice], hi = counts[first[s] + slice + 1];
+        if (lo === hi) continue;
+        for (let i = lo; i < hi; i++) if (only < 0 || data[cells[i]] === only + 1) mask[faces[i]] = keyOf(cells[i]);
         const plane = slice + (sign > 0 ? 1 : 0);
-        for (let b = 0; b < dv; b++) for (let a = 0; a < du;) {
-          const c = mask[a + du * b];
-          if (!c) { a++; continue; }
+        for (let i = lo; i < hi; i++) {
+          const at = faces[i], c = mask[at];
+          if (!c) continue;
+          const a = at % du, b = (at - a) / du;
           let w = 1;
-          while (a + w < du && mask[a + w + du * b] === c) w++;
+          while (a + w < du && mask[at + w] === c) w++;
           let h = 1;
-          grow: while (b + h < dv) {
-            for (let k = 0; k < w; k++) if (mask[a + k + du * (b + h)] !== c) break grow;
+          grow: while (b + h < n[v]) {
+            for (let k = 0; k < w; k++) if (mask[at + k + du * h] !== c) break grow;
             h++;
           }
-          for (let hh = 0; hh < h; hh++) for (let k = 0; k < w; k++) mask[a + k + du * (b + hh)] = 0;
-          const base = positions.length / 3;
-          if (sign > 0) { corner(d, u, v, plane, a, b); corner(d, u, v, plane, a + w, b); corner(d, u, v, plane, a + w, b + h); corner(d, u, v, plane, a, b + h); } else { corner(d, u, v, plane, a, b); corner(d, u, v, plane, a, b + h); corner(d, u, v, plane, a + w, b + h); corner(d, u, v, plane, a + w, b); }
+          for (let hh = 0; hh < h; hh++) for (let k = 0; k < w; k++) mask[at + k + du * hh] = 0;
+          const base = quads * 4, q = quads * 12;
+          if (sign > 0) { corner(d, u, v, plane, a, b, q); corner(d, u, v, plane, a + w, b, q + 3); corner(d, u, v, plane, a + w, b + h, q + 6); corner(d, u, v, plane, a, b + h, q + 9); } else { corner(d, u, v, plane, a, b, q); corner(d, u, v, plane, a, b + h, q + 3); corner(d, u, v, plane, a + w, b + h, q + 6); corner(d, u, v, plane, a + w, b, q + 9); }
           const normal = normals ? decodeNormal(c % 65536, decoded) : axis;
           const color = (normals ? Math.floor(c / 65536) : c) - 1;
-          for (let q = 0; q < 4; q++) {
-            nrms.push(normal[0], normal[1], normal[2]);
-            if (withColor) colors.push(color);
+          for (let k = 0; k < 4; k++) {
+            nrms[q + k * 3] = normal[0]; nrms[q + k * 3 + 1] = normal[1]; nrms[q + k * 3 + 2] = normal[2];
+            if (withColor) colors[base + k] = color;
           }
-          indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
-          a += w;
+          indices.set([base, base + 1, base + 2, base, base + 2, base + 3], quads * 6);
+          quads++;
         }
       }
     }
   }
-  if (!indices.length) return null;
-  const n4 = positions.length / 3;
-  return { position: new Float32Array(positions), normal: new Float32Array(nrms), color: withColor ? new Uint32Array(colors) : null,
-    index: n4 > 65535 ? new Uint32Array(indices) : new Uint16Array(indices) };
+  const n4 = quads * 4;
+  return { position: positions.slice(0, quads * 12), normal: nrms.slice(0, quads * 12), color: withColor ? colors.slice(0, n4) : null,
+    index: n4 > 65535 ? indices.slice(0, quads * 6) : Uint16Array.from(indices.subarray(0, quads * 6)) };
+}
+
+// the visible faces of a volume (between a voxel and an empty one), of all colours, found in one pass over it and
+// sorted by side (d, sign), slice, then place a + du * b in the slice: so the merging (meshArrays) visits only them, in
+// the order a full scan of each slice would (b then a), and makes the same rectangles. Made once for all the colours.
+// 6 sides: d * 2 + (sign < 0); counts[first[side] + slice] is where the faces of that slice start in faces (their
+// place in the slice) and cells (their voxel)
+function facesOf({ n, data, first: from = null, last: to = null }) {
+  const [nx, ny, nz] = n, sxy = nx * ny;
+  // a volume not from voxelize: its rows from end to end
+  if (!from) { from = new Int32Array(ny * nz); to = new Int32Array(ny * nz).fill(nx - 1); }
+  const first = [0, 0, 0, 0, 0, 0, 0];
+  for (let s = 0; s < 6; s++) first[s + 1] = first[s] + n[s >> 1];
+  const counts = new Int32Array(first[6] + 1);
+  const pass = (put) => {
+    for (let z = 0, r = 0; z < nz; z++) for (let y = 0; y < ny; y++, r++) for (let x = from[r], k = nx * r + x; x <= to[r]; x++, k++) {
+      if (!data[k]) continue;
+      if (x === nx - 1 || !data[k + 1]) put(0, x, y, z, k);
+      if (x === 0 || !data[k - 1]) put(1, x, y, z, k);
+      if (y === ny - 1 || !data[k + nx]) put(2, y, z, x, k);
+      if (y === 0 || !data[k - nx]) put(3, y, z, x, k);
+      if (z === nz - 1 || !data[k + sxy]) put(4, z, x, y, k);
+      if (z === 0 || !data[k - sxy]) put(5, z, x, y, k);
+    }
+  };
+  pass((s, slice) => { counts[first[s] + slice + 1]++; });
+  for (let i = 1; i < counts.length; i++) counts[i] += counts[i - 1];
+  const faces = new Int32Array(counts[counts.length - 1]), cells = new Int32Array(faces.length), fill = counts.slice();
+  pass((s, slice, a, b, k) => {
+    const at = fill[first[s] + slice]++;
+    faces[at] = a + n[((s >> 1) + 1) % 3] * b;
+    cells[at] = k;
+  });
+  // the faces of y (d = 1) came a before b: sorted by their place
+  for (let slice = 0; slice < ny; slice++) for (const s of [2, 3]) {
+    const lo = counts[first[s] + slice], hi = counts[first[s] + slice + 1];
+    if (hi - lo < 2) continue;
+    const order = Array.from({ length: hi - lo }, (_, i) => lo + i).sort((i, j) => faces[i] - faces[j]);
+    const f = order.map((i) => faces[i]), c = order.map((i) => cells[i]);
+    faces.set(f, lo); cells.set(c, lo);
+  }
+  return { first, counts, faces, cells };
 }

@@ -262,6 +262,12 @@ export function measure(body, name) {
   return box;
 }
 
+// shows a frame (one geometry per part) on the meshes of a body: a body made of cubes once (lib/voxelBody.js) moves
+// its cubes, the others take the geometries
+export function showFrame(meshes, frame) {
+  meshes.forEach((mesh, m) => { if (mesh.userData.showFrame) mesh.userData.showFrame(frame); else mesh.geometry = frame[m]; });
+}
+
 // the meshes of a body for the fine pass, showing `frame`; uFade (0 to 1) fades them out (render/shaders.js FINE_FRAG)
 export const fineMeshes = (gpu, body, frame) => body.parts.map((part, m) => fineMesh(gpu, part.texture, frame[m]));
 
@@ -270,7 +276,7 @@ export function fineMesh(gpu, texture, geometry) {
   const mesh = new THREE.Mesh(geometry, shaderMaterial(gpu.shared, S.FINE_VERT, S.FINE_FRAG,
     { uMap: { value: texture }, uFade: { value: 1 }, ...gpu.fine.uniforms }, { side: THREE.DoubleSide }));
   mesh.frustumCulled = false;
-  mesh.layers.set(1);      // casts a shadow, not in the G-buffer
-  mesh.layers.enable(2);   // the fine pass
+  mesh.layers.set(2);      // the fine pass, not in the G-buffer
+  mesh.layers.enable(3);   // casts the shadow of a body (systems/shadows.js)
   return mesh;
 }

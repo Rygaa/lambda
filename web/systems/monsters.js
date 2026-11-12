@@ -12,6 +12,7 @@ import { Monster, Player, Health } from '../components.js';
 import { Settings, Time, Gpu, BlockGrid, Tops, Bestiary } from '../resources.js';
 import { MonsterBlow } from '../events.js';
 import { free, groundAt } from '../lib/walk.js';
+import { showFrame } from '../lib/bake.js';
 import { bakeModel, spawnMonster, monsterLook } from '../lib/monsters.js';
 import { lookOf } from '../lib/voxels.js';
 
@@ -122,11 +123,11 @@ export function monsterSystem(world) {
     // the frame of its clip: stand and walk loop, the others stop on their last frame
     const frames = m.clips[m.state], k = Math.floor(m.t * m.fps);
     const frame = frames[m.state === 'idle' || m.state === 'walk' ? k % frames.length : Math.min(k, frames.length - 1)];
-    m.meshes.forEach((mesh, i) => { mesh.geometry = frame[i]; });
+    showFrame(m.meshes, frame);
     m.y = groundAt(terrain, tops, m.x, m.z);
     m.group.position.set(m.x, m.y + m.foot, m.z);
     m.group.rotation.y = m.rot;
-    if (moved || m.state !== 'idle') gpu.shadowsDirty = true;
+    if (moved || m.state !== 'idle') gpu.bodiesDirty = true;
   }
 }
 
