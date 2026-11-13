@@ -43,7 +43,7 @@ export function loadingSystem(world) {
   // ?bake: every cube made or read goes to web/serve.py, which writes worlds/baked/<world>.bin (lib/voxelSaved.js)
   const kept = getResource(world, Voxels).pool.kept;
   if (kept) {
-    const name = new URLSearchParams(location.search).get('world') || 'meadow';
+    const name = new URLSearchParams(location.search).get('world') || 'kame-island';
     fetch(`../worlds/baked/${encodeURIComponent(name)}.bin`, { method: 'POST', body: toFile(kept) })
       .then((r) => console.log(r.ok ? `worlds/baked/${name}.bin: ${kept.size} jobs` : `bake not saved: ${r.status}`));
   }

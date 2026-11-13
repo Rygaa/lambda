@@ -93,7 +93,7 @@ const player = params.has('player');
 // a player who came through a portal (systems/portals.js): its stats, bag, outfit and quests
 const came = player ? carried() : null;
 // ?world=<name>: worlds/<name>.json (default meadow), ?seed=<n> changes its seed
-const recipe = await loadRecipe(params.get('world') || 'meadow');
+const recipe = await loadRecipe(params.get('world') || 'kame-island');
 // "map": a part of a FlyFF map, worlds/maps/<name>.json (gen/map.js)
 const map = recipe.map ? await loadJson(`../worlds/maps/${encodeURIComponent(recipe.map)}.json`).catch(() => showErrors(() => { throw new Error(`no map worlds/maps/${recipe.map}.json`); })) : null;
 if (params.has('seed')) recipe.seed = Number(params.get('seed'));
@@ -143,7 +143,7 @@ setResource(world, Res.Look, { ...Res.createLook(), ...saved.look, ...(params.ha
 const pool = createPool(), palette = createPalette();
 if (params.has('bake')) pool.keepAll();
 else {
-  const res = await fetch(`../worlds/baked/${encodeURIComponent(params.get('world') || 'meadow')}.bin` + NOCACHE).catch(() => null);
+  const res = await fetch(`../worlds/baked/${encodeURIComponent(params.get('world') || 'kame-island')}.bin` + NOCACHE).catch(() => null);
   if (res?.ok) pool.useBaked(fromFile(await res.arrayBuffer()), palette.index);
 }
 setResource(world, Res.Voxels, Res.createVoxels(palette, pool));
