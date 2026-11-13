@@ -146,17 +146,44 @@
   #skills .row small { display: block; opacity: 0.7; }
   #skills .row button { color: #0b2a20; background: #b8d86a; border: 0; }
   #skills .row button:disabled { opacity: 0.25; cursor: default; }
-  #inventory h3 { margin: 2px 0 0; font-size: 11px; color: #b8d86a; }
-  #inventory .worn { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-  #inventory .slot { display: grid; gap: 2px; }
-  #inventory .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  #inventory .cell { position: relative; display: grid; gap: 2px; justify-items: center; padding: 3px; font: 10px/1.2 ui-monospace, Menlo, monospace;
-    color: inherit; background: #ffffff0d; border: 1px solid #e6f3c422; border-radius: 3px; cursor: pointer; }
-  #inventory .cell:hover { border-color: #e6f3c488; }
-  #inventory .cell.empty { min-height: 60px; align-content: center; opacity: 0.5; cursor: default; }
-  #inventory .cell img { width: 52px; height: 52px; }
+  #inventory { right: 12px; top: 12px; bottom: auto; z-index: 5; width: 360px; max-height: calc(100vh - 24px); box-sizing: border-box; overflow: auto; gap: 8px; padding: 10px;
+    background: linear-gradient(180deg, #13392cf5, #071c15f7); border-color: #b8d86a66; box-shadow: 0 6px 24px #000a, inset 0 1px 0 #e6f3c422; }
+  #inventory header b { color: #fff4c0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+  #inventory header button { width: 22px; height: 22px; padding: 0; }
+  #inventory header span { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #inventory .paper { display: grid; grid-template-columns: 56px 1fr 56px; gap: 8px; }
+  #inventory .col { display: grid; gap: 6px; align-content: space-between; }
+  #inventory .slot { display: grid; gap: 1px; justify-items: center; }
+  #inventory .slot small { font-size: 9px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; }
+  #inventory .slot .cell { width: 52px; height: 52px; padding: 2px; }
+  #inventory .slot .cell span { display: none; }
+  #inventory .slot .cell img { width: 46px; height: 46px; }
+  #inventory .slot .cell:not(.empty) { border-color: #b8d86a77; background: radial-gradient(circle at 50% 40%, #b8d86a33, #ffffff08 70%); }
+  #inventory .slot .cell:not(.empty):hover { border-color: #ff9a8a; box-shadow: 0 0 8px #ff9a8a55; }
+  #inventory .slot .cell.empty { display: grid; place-items: center; min-height: 0; font-size: 22px; opacity: 0.22; }
+  #inventory .stage { position: relative; height: 264px; border: 1px solid #e6f3c422; border-radius: 4px; cursor: grab; overflow: hidden;
+    background: radial-gradient(ellipse 60% 8% at 50% 90%, #000a, transparent), radial-gradient(circle at 50% 38%, #3d6b4a, #12302499 55%, #06140f 100%); }
+  #inventory .stage:active { cursor: grabbing; }
+  #inventory .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  #inventory .stage .busy { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font-style: normal; color: #fff4c0; opacity: 0.8; }
+  #inventory .stage .busy[hidden] { display: none; }
+  #inventory footer { display: flex; justify-content: center; }
+  #inventory footer button { font: inherit; color: #0b2a20; background: #b8d86a; border: 0; border-radius: 3px; padding: 3px 12px; cursor: pointer; }
+  #inventory footer button:hover { background: #fff4c0; }
+  #inventory footer button:disabled { opacity: 0.3; cursor: default; }
+  #inventory h3 { display: flex; justify-content: space-between; margin: 0; padding-top: 6px; font-size: 11px; color: #b8d86a; border-top: 1px solid #e6f3c422;
+    text-transform: uppercase; letter-spacing: 1px; }
+  #inventory h3 small { color: #e6f3c4; opacity: 0.6; letter-spacing: 0; }
+  #inventory .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
+  #inventory .cell { position: relative; display: grid; gap: 2px; justify-items: center; align-content: center; padding: 3px; font: 9px/1.2 ui-monospace, Menlo, monospace;
+    color: inherit; background: #ffffff0a; border: 1px solid #e6f3c422; border-radius: 3px; cursor: pointer; box-sizing: border-box; }
+  #inventory .grid .cell { aspect-ratio: 1; }
+  #inventory .cell:hover { border-color: #fff4c0; background: #fff4c014; }
+  #inventory .cell.empty { cursor: default; background: #00000033; }
+  #inventory .cell.empty:hover { border-color: #e6f3c422; }
+  #inventory .cell img { width: 34px; height: 34px; }
   #inventory .cell img:not([src]) { visibility: hidden; }
-  #inventory .cell span { width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #inventory .cell span { width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center; }
   #inventory .cell em { position: absolute; right: 3px; top: 2px; font-style: normal; color: #fff4c0; }
 </style>
 <script type="importmap">

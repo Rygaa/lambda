@@ -98,8 +98,10 @@ The Vagabond (`?player`), fights like League of Legends:
 
 - It starts at level 1 in the vagrant clothes of FlyFF (`part_mvag01upper`, `hand`, `foot`), with a wooden sword
   (`item_weaswowooden`) and a wooden shield (`item_armshiwooden`) in its bag, not worn (`character.json` `vagrant`).
-- The bag: the `I` key or the `Bag` button. A click on a weapon or a shield wears it (what was worn goes to the bag), a
-  click on a worn one takes it off, a click on a potion drinks it (`web/systems/inventory.js`). With no weapon, a click
+- The bag: the `I` key or the `Bag` button. It shows the human as it is dressed (a drag turns it, `web/lib/doll.js`)
+  and all it wears around it: helmet, glasses or mask, clothes, gloves, cloak, boots, weapon, shield. A click on a worn
+  item takes it off (no clothes: the bare body), `Take all off` takes off all, a click on an item of the bag wears it
+  (what was worn goes to the bag), a click on a potion drinks it (`web/systems/inventory.js`). With no weapon, a click
   gives 2 punches (Quaternius `Punch_Jab`, `Punch_Cross`) that hit half as hard as the sword.
 - MP: 50 + 5 × level, 1 back each second; the skills cost it. A level fills HP and MP.
 - Skills (`assets/character/player/skills.json`, `web/lib/skills.js`, `web/systems/skills.js`): each level gives a
