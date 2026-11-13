@@ -109,6 +109,22 @@ The Vagabond (`?player`), fights like League of Legends:
   target, a short text says why. While a skill plays, the human does not walk, jump or attack.
 - To test: the `Level +1` button of the bar gives the experience of the next level (its points, a skill point, full
   HP and MP).
+- The transformation (`try/transformation`), like Super Saiyan in Dragon Ball (`skills.json` `transform`,
+  `web/lib/form.js`, `web/systems/transform.js`, `web/systems/aura.js`): it opens at level 15 (the slot `G Super` of
+  the bar says `level 15` before). The `G` key starts it for 30 MP: the human plays its power-up clip without moving
+  (`Power_Burst` of Mesh2Motion, CC0, moved onto its skeleton: it crouches, raises a fist, crouches, then opens its
+  arms and legs wide like a scream) while gold cubes rise around it. From the key, its FlyFF hair gives way to a
+  free anime hair (the hair of a VRoid sample model, CC0, `assets/character/player/vroid/`, fitted on the FlyFF head:
+  `web/lib/superHair.js`), which shakes, lifts a little and flickers gold. When its arms open: a white flash, a ring
+  of cubes, and its hair stands up in gold spikes in a blink: each strand bends where it leaves the scalp and its end
+  goes up, opened out by where it grows (the strands of the back bend lower, so the open back of the FlyFF head stays
+  covered). The hair is one mesh bent at rest and moved by the matrix of the head each frame; made of cubes, it has
+  cubes of its own that follow its strands (none on the clear parts of its texture). The clip plays on and melts into
+  idle, then it can move. Transformed, it hits 1.5 times harder, walks and
+  runs 1.25 times faster, gold cubes rise around it, and it loses 3 MP a second; `G` again, no MP left, or death ends
+  it, and it can start again 15 s later. Nothing is baked again for the gold form (the other frames are shared),
+  when it opens and after each new outfit or look; a cap that hides the hair leaves it as it is. The gold hair casts
+  no shadow in the Normal look (the shadow pass would draw its strands without their holes).
 
   | Key | Skill | Needs | MP, cooldown | What it does |
   | --- | --- | --- | --- | --- |

@@ -14,7 +14,7 @@
 // MP comes back by MP_REGEN a second. The `Level +1` button of the bar gives the experience of the next level, to test.
 import * as THREE from 'three';
 import { query, getComponent, getResource, sendEvent, spawn } from '../ecs/world.js';
-import { Player, Skills, Mana, Stats, Monster, Blast } from '../components.js';
+import { Player, Skills, Mana, Stats, Monster, Blast, Form } from '../components.js';
 import { Input, Time, Wardrobe, Skillbook, Inventory, BlockGrid, Tops, Settings, Gpu, Bestiary } from '../resources.js';
 import { Swing, Damage } from '../events.js';
 import { whyNot, powerOf, holds } from '../lib/skills.js';
@@ -89,8 +89,10 @@ export function skillSystem(world) {
   // a combo waits for its next press; when the time is over, its cooldown starts
   if (sk.combo && !sk.active && (sk.combo.left -= dt) <= 0) { sk.cooldowns[sk.combo.id] = byId(book, sk.combo.id).cooldown; sk.combo = null; }
 
+  // no skill while it charges its transformation (systems/transform.js)
+  const charging = !!getComponent(world, e, Form)?.act;
   if (p.dead > 0) { sk.active = null; sk.combo = null; }
-  else for (const skill of book.skills) {
+  else if (!charging) for (const skill of book.skills) {
     if (!pressed(skill.key)) continue;
     const a = sk.active;
     if (a) { if (a.skill === skill && a.step + 1 < skill.steps.length) a.queued = true; break; }

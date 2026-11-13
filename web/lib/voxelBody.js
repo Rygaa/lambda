@@ -8,10 +8,12 @@ import * as THREE from 'three';
 import { getResource } from '../ecs/world.js';
 import { Gpu, Voxels } from '../resources.js';
 import { paletteAdd } from './voxels.js';
+import { OWN } from './bake.js';
 import * as S from '../render/shaders.js';
 import { shaderMaterial } from '../render/materials.js';
 
-// (u, v) -> 0xRRGGBB of a texture (repeated, nearest texel, flipY false like lib/bake.js), read once per texture
+// (u, v) -> 0xRRGGBB of a texture (repeated, nearest texel, flipY false like lib/bake.js), read once per texture;
+// .alpha(u, v): its opacity, 0 to 255
 const readers = new WeakMap();
 function colorsOf(texture) {
   if (readers.has(texture)) return readers.get(texture);
@@ -20,10 +22,12 @@ function colorsOf(texture) {
   const cx = cv.getContext('2d', { willReadFrequently: true });
   cx.drawImage(img, 0, 0);
   const { width, height, data } = cx.getImageData(0, 0, cv.width, cv.height);
+  const texel = (u, v) => Math.min(height - 1, Math.floor((v - Math.floor(v)) * height)) * width + Math.min(width - 1, Math.floor((u - Math.floor(u)) * width));
   const at = (u, v) => {
-    const k = Math.min(height - 1, Math.floor((v - Math.floor(v)) * height)) * width + Math.min(width - 1, Math.floor((u - Math.floor(u)) * width));
+    const k = texel(u, v);
     return (data[k * 4] << 16) | (data[k * 4 + 1] << 8) | data[k * 4 + 2];
   };
+  at.alpha = (u, v) => data[texel(u, v) * 4 + 3];
   readers.set(texture, at);
   return at;
 }
@@ -41,9 +45,10 @@ function breather() {
 }
 
 // the outside cubes of one frame (one geometry per part), with where each comes from. size: the cube edge, in the
-// units of the body. -> { count, part, tri (3 vertex indices a cube), bary (2), local (3: the centre from its place,
-// along the triangle edge, across it, along its normal), rgb }
-async function shellOf(parts, frame, size) {
+// units of the body. A part with `cut` has holes where its texture is clear (no cube there); all: every cube, not
+// only those of the outside (the hair of the gold form opens: lib/form.js). -> { count, part, tri (3 vertex indices a
+// cube), bary (2), local (3: the centre from its place, along the triangle edge, across it, along its normal), rgb }
+async function shellOf(parts, frame, size, all = false) {
   const breathe = breather();
   const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
   for (const g of frame) {
@@ -55,7 +60,8 @@ async function shellOf(parts, frame, size) {
   const score = new Float32Array(cells).fill(-9), src = new Int32Array(cells).fill(-1);
   const triOf = new Int32Array(cells), ba = new Float32Array(cells), bb = new Float32Array(cells);
   for (const [m, g] of frame.entries()) {
-    const p = g.getAttribute('position').array, index = g.index.array;
+    const p = g.getAttribute('position').array, index = g.index.array, uvs = g.getAttribute('uv');
+    const clear = parts[m].cut && colorsOf(parts[m].texture).alpha;
     for (let t = 0; t < index.length; t += 3) {
       if (t % 300 === 0) await breathe();
       const i0 = index[t] * 3, i1 = index[t + 1] * 3, i2 = index[t + 2] * 3;
@@ -73,6 +79,10 @@ async function shellOf(parts, frame, size) {
       const steps = Math.max(1, Math.ceil(longest / (size * 0.5)));
       for (let i = 0; i <= steps; i++) for (let j = 0; i + j <= steps; j++) {
         const a = i / steps, b = j / steps;
+        if (clear) {
+          const i0 = index[t], i1 = index[t + 1], i2 = index[t + 2], c = 1 - a - b;
+          if (clear(uvs.getX(i0) * c + uvs.getX(i1) * a + uvs.getX(i2) * b, uvs.getY(i0) * c + uvs.getY(i1) * a + uvs.getY(i2) * b) < 128) continue;
+        }
         const x = ax + abx * a + acx * b, y = ay + aby * a + acy * b, z = az + abz * a + acz * b;
         const bx = Math.floor(x / size) - min[0], by = Math.floor(y / size) - min[1], bz = Math.floor(z / size) - min[2];
         for (let c = 0; c < 2; c++) {
@@ -111,7 +121,7 @@ async function shellOf(parts, frame, size) {
     if (k % 65536 === 0) await breathe();
     if (src[k] < 0) continue;
     const x = k % nx, y = Math.floor(k / nx) % ny, z = Math.floor(k / sxy);
-    if (x === 0 || y === 0 || z === 0 || x === nx - 1 || y === ny - 1 || z === nz - 1 ||
+    if (all || x === 0 || y === 0 || z === 0 || x === nx - 1 || y === ny - 1 || z === nz - 1 ||
       outside[k - 1] || outside[k + 1] || outside[k - nx] || outside[k + nx] || outside[k - sxy] || outside[k + sxy]) kept.push(k);
   }
   const count = kept.length, part = new Uint8Array(count), tri = new Uint32Array(count * 3), bary = new Float32Array(count * 2);
@@ -162,9 +172,9 @@ const DENSE = Number(new URLSearchParams(location.search).get('dense') ?? 2);
 // the cubes of a body: made once from the first idle frame of `clips` (lib/bake.js bakeClips). -> a promise of
 // { mesh(): a new mesh of them for one body (lib/bake.js showFrame shows a frame on it), count }. size: the cube edge
 // in the units of the body; normals: each cube lit like the surface it comes from (else each face by its own normal);
-// snap: on the grid
-export async function voxelBody(world, body, clips, size, normals, snap = true) {
-  const shell = await shellOf(body.parts, clips.idle[0], size / DENSE), v = getResource(world, Voxels), gpu = getResource(world, Gpu);
+// snap: on the grid; all: every cube, not only those of the outside (shellOf)
+export async function voxelBody(world, body, clips, size, normals, snap = true, all = false) {
+  const shell = await shellOf(body.parts, clips.idle[0], size / DENSE, all), v = getResource(world, Voxels), gpu = getResource(world, Gpu);
   const SIDE = 256, uv = new Float32Array(shell.count * 2);
   for (let q = 0; q < shell.count; q++) {
     const i = paletteAdd(v.palette, shell.rgb[q]);
@@ -180,7 +190,7 @@ export async function voxelBody(world, body, clips, size, normals, snap = true) 
     iNrm.setUsage(THREE.DynamicDrawUsage);
     geometry.setAttribute('iNrm', iNrm);
     const material = shaderMaterial(gpu.shared, S.FINE_VERT, S.FINE_FRAG,
-      { uMap: { value: v.palette.texture }, uFade: { value: 1 }, uFaces: { value: normals ? 0 : 1 }, ...gpu.fine.uniforms });
+      { uMap: { value: v.palette.texture }, uFade: { value: 1 }, uFaces: { value: normals ? 0 : 1 }, ...OWN(), ...gpu.fine.uniforms });
     const out = new THREE.InstancedMesh(geometry, material, shell.count);
     out.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     const M = out.instanceMatrix.array;

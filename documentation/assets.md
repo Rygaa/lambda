@@ -185,7 +185,7 @@ Every asset is in one of these groups.
 
 | Path | What | Script |
 | --- | --- | --- |
-| `assets/character/player/` (but `ual/`) | the human (the FlyFF male), its parts, clips, clothes, weapons and shields | `import-items.mjs` |
+| `assets/character/player/` (but `ual/`, `m2m/`, `vroid/`) | the human (the FlyFF male), its parts, clips, clothes, weapons and shields | `import-items.mjs` |
 | `assets/character/npc/` (but `npcs.json`) | the FlyFF female (`mvr_female.glb`), its heads, hair, bare body and the Chinese dresses; the textures of opaque clothes made opaque | `import-npcs.mjs` |
 | `assets/monsters/` | the 569 monsters, their 127 models and clips, their stats and the levels | `import-monsters.mjs` |
 | `assets/objects/` (`objects.json`, `models/`) | the 1018 decor objects (chairs, fences, lamps, houses...), drawn in our style | `import-objects.mjs` |
@@ -206,6 +206,9 @@ Two cases in between:
 - `plant/leafy` is ours (our builder, our style), but its form is taken from the 3 leafy plants of FlyFF
   (`import-leafy.mjs` reads them).
 - `assets/character/player/ual/` is neither: the sword hits of Quaternius (CC0, see its `License.txt`).
+- `assets/character/player/m2m/` is neither: the power-up of Mesh2Motion (CC0, see its `License.txt`).
+- `assets/character/player/vroid/` is neither: the hair of a VRoid sample model, for the transformation (CC0, see its
+  `License.txt`).
 
 **Archived**: FlyFF objects we keep for now and will delete later, each with why, in `assets/objects/archived.json`:
 2 objects that float in the air, the 3 leafy plants and the 46 trees. Their models are still in

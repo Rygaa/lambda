@@ -38,6 +38,8 @@ import { combatSystem } from './systems/combat.js';
 import { setupHudSystem, hudSystem } from './systems/hud.js';
 import { loadingSystem } from './systems/loading.js';
 import { setupSkillsSystem, skillSystem } from './systems/skills.js';
+import { setupTransformSystem, transformSystem } from './systems/transform.js';
+import { auraSystem } from './systems/aura.js';
 import { setupInventorySystem, inventorySystem } from './systems/inventory.js';
 import { dropSystem } from './systems/drops.js';
 import { portalSystem, carried } from './systems/portals.js';
@@ -165,11 +167,11 @@ setResource(world, Res.Craters, createCraters(land.half + 2));
 setResource(world, Res.Ki, Res.createKi());
 setResource(world, Res.Random, Res.createRandom(5));
 
-for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem, setupSkillsSystem, setupInventorySystem, setupQuestSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
+for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem, setupSkillsSystem, setupTransformSystem, setupInventorySystem, setupQuestSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
   addSystem(world, s, 'startup');
 for (const s of [
   inputSystem, timeSystem,
-  outfitSystem, skillSystem, blastSystem, craterSystem, playerSystem, portalSystem, monsterSystem, combatSystem, dropSystem, questSystem, npcSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem, lampSystem,
+  outfitSystem, transformSystem, skillSystem, blastSystem, craterSystem, playerSystem, auraSystem, portalSystem, monsterSystem, combatSystem, dropSystem, questSystem, npcSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem, lampSystem,
   coverChunkSystem, meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem, loadingSystem,
 ]) addSystem(world, s);

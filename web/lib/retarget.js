@@ -1,12 +1,13 @@
 // Clips of another skeleton moved onto the FlyFF male (assets/character/player/ual: the Universal Animation Library 1
-// and 2 of Quaternius, CC0). Each bone of ours that has a bone of theirs (RIGS) turns like it: first the two skeletons
+// and 2 of Quaternius, CC0; assets/character/player/m2m: the power-up of Mesh2Motion, CC0). Each bone of ours that has a bone of theirs (RIGS) turns like it: first the two skeletons
 // are put in the same pose (ours is turned bone by bone so each arm, leg and spine part points like theirs in their
 // rest pose, a T), then at each frame a bone of ours turns from that pose as theirs turns from their rest pose. The
 // hips also move up and down like theirs (scaled to our size), never forward: the game moves the human. The other
 // bones of ours (ponytail, cloak) stay as at rest.
 import * as THREE from 'three';
 
-// their bone -> our bone. ue: the Unreal names of UAL 2; rigify: the Blender names of UAL 1
+// their bone -> our bone. ue: the Unreal names of UAL 2; rigify: the Blender names of UAL 1; m2m: the names of
+// Mesh2Motion (assets/character/player/m2m), the Unreal names with a small head
 const RIGS = {
   ue: {
     pelvis: 'Bip02', spine_01: 'Bip02 Spine', spine_02: 'Bip02 Spine1', spine_03: 'Bip02 Spine2',
@@ -25,6 +26,7 @@ const RIGS = {
     'DEF-thigh.R': 'Bip02 R Thigh', 'DEF-shin.R': 'Bip02 R Calf', 'DEF-foot.R': 'Bip02 R Foot',
   },
 };
+RIGS.m2m = Object.fromEntries(Object.entries(RIGS.ue).map(([s, t]) => [s === 'Head' ? 'head' : s, t]));
 // the bone that points each bone of ours (bone -> its child in the chain), to put both skeletons in the same pose
 const CHILD = {
   'Bip02 Spine': 'Bip02 Spine1', 'Bip02 Spine1': 'Bip02 Spine2', 'Bip02 Spine2': 'Bip02 Neck', 'Bip02 Neck': 'Bip02 Head',

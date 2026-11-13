@@ -35,6 +35,17 @@ export const Blast = defineComponent('Blast', () => ({
   spec: null, power: 1, rate: 1, t: 0, phase: 'charge', x: 0, y: 0, z: 0, dx: 0, dz: 1, head: 0, dug: 0, fade: 0, hit: [],
 }));
 
+// the transformation of the human (lib/form.js, systems/transform.js, skills.json transform): phase null (as it is),
+// charge (its power-up clip plays, the aura grows, it does not move), burst (the flash: its hair stands up in gold
+// spikes) or on (transformed); t: seconds in this phase; act: { clip, t } the clip it plays while it charges
+// (systems/player.js); cooldown: seconds before it can start again; aura: how strong the aura is now (0 to 1.5,
+// systems/aura.js); flash: the white flash over the screen (1 to 0);
+// normal, gold: the human as it is and transformed ({ clips, meshes }, lib/form.js), the gold one made when it opens
+// (null: not yet; busy: being made); shown: the one on the human now; told: the text "open" was shown
+export const Form = defineComponent('Form', () => ({
+  phase: null, t: 0, act: null, cooldown: 0, aura: 0, flash: 0, normal: null, gold: null, busy: false, shown: null, told: false,
+}));
+
 // a potion on the ground (systems/drops.js): which one, where, its meshes, and the seconds it has been there
 // a person who does not fight (assets/character/npc/npcs.json, systems/npcs.js): who it is, its body (made like a monster:
 // lib/npc.js), where it stands and faces; near: the human is close enough to talk

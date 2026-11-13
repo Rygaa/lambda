@@ -1,13 +1,14 @@
 // The blows of a fight (the rules are in lib/combat.js):
 //   a Swing of the human (systems/player.js, systems/skills.js) hits every monster in front of it, within its range
-//   and arc (or all around it, or only its target), with its power (times the damage) and its stun. A hit monster
+//   and arc (or all around it, or only its target), with its power (times the damage, more when it is transformed:
+//   systems/transform.js) and its stun. A hit monster
 //   gets angry; at 0 HP it dies (a Kill event: systems/drops.js) and the human gets its experience (levels, points and
 //   a skill point, full HP and MP on a level);
 //   a MonsterBlow (systems/monsters.js) hits the human. At 0 HP the human dies for DEAD seconds (systems/player.js).
 // Each blow sends a Damage event for the numbers on screen (systems/hud.js).
 import { query, getComponent, getResource, readEvents, sendEvent } from '../ecs/world.js';
-import { Monster, Player, Health, Stats, Mana } from '../components.js';
-import { Bestiary } from '../resources.js';
+import { Monster, Player, Health, Stats, Mana, Form } from '../components.js';
+import { Bestiary, Skillbook } from '../resources.js';
 import { Swing, MonsterBlow, Damage, Kill } from '../events.js';
 import { blow, damageOf, defenseOf, gainXp, maxHp, maxMp } from '../lib/combat.js';
 
@@ -21,8 +22,10 @@ export function combatSystem(world) {
   const p = getComponent(world, human, Player), life = getComponent(world, human, Health), s = getComponent(world, human, Stats);
   const clipTime = (clips, state, fps) => (clips[state].length - 1) / fps;
 
+  // transformed (systems/transform.js), it hits harder
+  const boost = getComponent(world, human, Form)?.phase === 'on' ? getResource(world, Skillbook).transform.power : 1;
   for (const { x, z, rot, range, arc, power = 1, target = null, around = false, stun = 0 } of swings) {
-    const [min, max] = damageOf(s), damage = [Math.round(min * power), Math.round(max * power)];
+    const [min, max] = damageOf(s), damage = [Math.round(min * power * boost), Math.round(max * power * boost)];
     for (const e of query(world, [Monster, Health])) {
       const m = getComponent(world, e, Monster), health = getComponent(world, e, Health);
       if (m.mode === 'dead' || (target !== null && e !== target)) continue;

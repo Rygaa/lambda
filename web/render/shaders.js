@@ -367,6 +367,9 @@ uniform vec2 uOffset;
 uniform float uScale;
 uniform vec2 uMargin;
 uniform float uFade;       // 1: seen, 0: gone (a dead monster): fewer pixels, in a 4x4 dither
+uniform float uGlow;       // 0: its shade is cool like the world's; 1: warm, it glows (the gold hair, lib/form.js)
+uniform float uGold;       // 0: its colours; 1: gold, light where they are light (the hair of the gold form, lib/superHair.js)
+uniform float uCut;        // > 0: its texels less opaque than this are holes (the strands of that hair)
 in vec3 vW; in vec3 vN; in vec2 vUv; in float vDepth;
 out vec4 outColor;
 const float BAYER[16] = float[16](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
@@ -380,8 +383,11 @@ void main() {
   if (!gl_FrontFacing) N = -N;
   float ndl = dot(N, uSunL);
   float lv = ndl > 0.0 ? ndl * cloudLight(vW) * shadowHard(vW + N * 0.02) : 0.0;
-  vec3 a = pow(texture(uMap, vUv).rgb, vec3(2.2));
-  vec3 col = lv > 0.09 ? a : a * vec3(0.52, 0.56, 0.74);
+  vec4 t = texture(uMap, vUv);
+  if (t.a < uCut) discard;
+  float lum = dot(t.rgb, vec3(0.3, 0.59, 0.11));
+  vec3 a = pow(mix(t.rgb, vec3(1.0, 0.74, 0.16) * (0.55 + 0.95 * smoothstep(0.02, 0.35, lum)), uGold), vec3(2.2));
+  vec3 col = lv > 0.09 ? a : a * mix(vec3(0.52, 0.56, 0.74), vec3(0.98, 0.8, 0.58), uGlow);
   outColor = vec4(pow(col, vec3(1.0 / 2.2)), 1.0);
 }
 `;
@@ -404,6 +410,42 @@ void main() {
   vec3 N = normalize(vN);
   float face = N.y > 0.5 ? 1.0 : (abs(N.x) > 0.5 ? 0.92 : 0.86);
   outColor = vec4(texture(uMap, vUv).rgb * face, 1.0);
+}
+`;
+
+// the aura of the transformation (systems/aura.js): small cubes at screen pixels like the human (FINE_VERT), one
+// instance a cube with its colour (iCol.rgb; iCol.a: unused), not lit, behind the world where the world is in front
+export const AURA_VERT = /* glsl */ `
+uniform vec2 uLowSize;
+uniform vec2 uScreen;
+uniform vec2 uOffset;
+uniform float uScale;
+uniform vec2 uMargin;
+in vec4 iCol;
+out vec4 vCol;
+out float vDepth;
+void main() {
+  vec4 v = viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
+  vDepth = -v.z;
+  vec4 c = projectionMatrix * v;
+  vec2 low = (c.xy / c.w * 0.5 + 0.5) * uLowSize;
+  vec2 scr = (low - 1.0 - uOffset) * uScale + uMargin;
+  gl_Position = vec4(scr / uScreen * 2.0 - 1.0, c.z / c.w, 1.0);
+  vCol = iCol;
+}
+`;
+export const AURA_FRAG = /* glsl */ `
+uniform sampler2D tNorm;
+uniform vec2 uOffset;
+uniform float uScale;
+uniform vec2 uMargin;
+in vec4 vCol; in float vDepth;
+out vec4 outColor;
+void main() {
+  ivec2 q = ivec2(floor((gl_FragCoord.xy - uMargin) / uScale + 1.0 + uOffset));
+  float d = texelFetch(tNorm, q, 0).w;
+  if (d > 0.0 && d < vDepth - 0.05) discard;
+  outColor = vec4(vCol.rgb, 1.0);
 }
 `;
 

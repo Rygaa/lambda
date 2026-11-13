@@ -1,0 +1,9 @@
+power-burst.glb (clip Power_Burst): a human animation of Mesh2Motion, without its meshopt compression
+https://github.com/Mesh2Motion/mesh2motion-app (static/assets/human/animations/)
+
+-------------------------------------------------------
+License:
+CC0 1.0 Universal (CC0 1.0)
+Public Domain Dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+("All 3d models, blend files, rigs, animations": LICENSE-CC0.MD of that repository)

@@ -46,10 +46,11 @@ export const createVoxels = (palette, pool) => ({
 //   config: assets/character/player/character.json; slots: slot -> [{ name, file, hides, hold, bothHands }] (items.json);
 //   outfit: slot -> file (null: none, or the bare body); dirty: the outfit changed; busy: a bake runs;
 //   next: its result { clips, meshes }; cache: file -> its loaded parts; look: the look (lib/voxels.js lookOf key,
-//   null: as it is) of its last bake
+//   null: as it is) of its last bake; dressed: the last bake on the human ({ clips, meshes, body, outfit }, lib/character.js
+//   dress), the transformation changes its hair (lib/form.js)
 export const Wardrobe = 'Wardrobe';
 export const createWardrobe = (config, items) => ({
-  config, slots: items.slots, outfit: { ...config.outfit }, dirty: false, busy: false, next: null, cache: new Map(), look: null,
+  config, slots: items.slots, outfit: { ...config.outfit }, dirty: false, busy: false, next: null, cache: new Map(), look: null, dressed: null,
 });
 
 // the monsters (lib/monsters.js, systems/monsters.js, the Monsters part of systems/admin.js):

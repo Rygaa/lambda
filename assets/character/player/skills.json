@@ -40,5 +40,9 @@
    "id": "bash", "name": "Shield Bash", "key": "4", "needs": "shield", "mp": 12, "cooldown": 10,
    "steps": [{ "clip": "bash", "rate": 1.2, "rush": [0.1, 0.4], "distance": 2, "hits": [0.4], "power": 1, "range": 1.4, "arc": 120, "stun": 1.5 }]
   }
- ]
+ ],
+ "transform": {
+  "about": "The transformation (web/lib/form.js, web/systems/transform.js), like Super Saiyan in Dragon Ball: open at level `level`, the key starts it when the human has `mp` MP. It plays the clip `powerup` of character.json (`rate` times its speed) while a gold aura grows and its hair (web/lib/superHair.js, a free VRoid hair) shakes, lifts and flickers gold; `burst` seconds into the clip (when the arms open) comes a flash: its hair stands up in gold spikes (in `flicker` seconds it settles), and the clip plays on to its end. Transformed, it hits `power` times harder, walks and runs `speed` times faster, and loses `drain` MP a second; the key again, no MP left, or death ends it, and it can start again `cooldown` seconds later.",
+  "name": "Super", "key": "g", "level": 15, "mp": 30, "drain": 3, "power": 1.5, "speed": 1.25, "cooldown": 15, "rate": 1.15, "burst": 2.45, "flicker": 0.6
+ }
 }

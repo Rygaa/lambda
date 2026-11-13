@@ -124,8 +124,8 @@ export async function loadPart(url, textures) {
 export async function loadBody(cache, entries, animations, textures) {
   const get = (url) => { if (!cache.has(url)) cache.set(url, loadPart(url, textures)); return cache.get(url); };
   const [anim, ...files] = await Promise.all([get(animations), ...entries.map(({ url }) => get(url))]);
-  // a yoyo is one file held twice: each one gets its own bone
-  const parts = files.flatMap(({ parts: list }, k) => list.map((part) => (entries[k].bone ? { ...part, bone: entries[k].bone } : part)));
+  // a yoyo is one file held twice: each one gets its own bone. Each part knows its file (url)
+  const parts = files.flatMap(({ parts: list }, k) => list.map((part) => ({ ...part, url: entries[k].url, ...(entries[k].bone ? { bone: entries[k].bone } : {}) })));
   // seams: vertices of different skinned parts at the same rest place are welded after posing
   const key = (p) => p.map((c) => Math.round(c * 333)).join(',');
   const groups = new Map();
@@ -305,9 +305,13 @@ export function showFrame(meshes, frame) {
 export const fineMeshes = (gpu, body, frame) => body.parts.map((part, m) => fineMesh(gpu, part.texture, frame[m]));
 
 // one mesh for the fine pass, with its texture (a part, or the voxel palette: lib/voxels.js)
+// the uniforms of FINE_FRAG each material has its own value of: the meshes share one program, which would keep the
+// value of the last one drawn (the gold of the hair of the gold form, lib/form.js)
+export const OWN = () => ({ uGlow: { value: 0 }, uGold: { value: 0 }, uCut: { value: 0 } });
+
 export function fineMesh(gpu, texture, geometry) {
   const mesh = new THREE.Mesh(geometry, shaderMaterial(gpu.shared, S.FINE_VERT, S.FINE_FRAG,
-    { uMap: { value: texture }, uFade: { value: 1 }, ...gpu.fine.uniforms }, { side: THREE.DoubleSide }));
+    { uMap: { value: texture }, uFade: { value: 1 }, ...OWN(), ...gpu.fine.uniforms }, { side: THREE.DoubleSide }));
   mesh.frustumCulled = false;
   mesh.layers.set(2);      // the fine pass, not in the G-buffer
   mesh.layers.enable(3);   // casts the shadow of a body (systems/shadows.js)

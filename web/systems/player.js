@@ -7,14 +7,15 @@
 // (punch1, punch2) that hit half as hard. It keeps walking while it hits:
 // its legs walk or run and the rest of it hits (the clips attack1Walk, attack1Run..., lib/character.js), and the hit
 // goes where it faces. While a skill plays (systems/skills.js moves it), it does not walk, jump or attack, and shows
-// the clip of the skill. When no hit follows, it plays the end of the hit: its way back, melting into idle or walk.
+// the clip of the skill (or of the power-up of the transformation, systems/transform.js; transformed, it walks and runs
+// faster). When no hit follows, it plays the end of the hit: its way back, melting into idle or walk.
 // On the blow of each hit (character.json hits, from FlyFF data/motions.ron) it sends a Swing (systems/combat.js).
 // Hurt (systems/combat.js sets hurt), it plays its hurt clip when it stands still. Dead (dead > 0), it lies down,
 // and stands up again with full HP when dead is back to 0.
 import * as THREE from 'three';
 import { query, getComponent, getResource, sendEvent } from '../ecs/world.js';
-import { Player, CameraRig, Health, Skills } from '../components.js';
-import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe, Craters } from '../resources.js';
+import { Player, CameraRig, Health, Skills, Form } from '../components.js';
+import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe, Craters, Skillbook } from '../resources.js';
 import { Swing } from '../events.js';
 import { free, groundAt as groundOf, LEDGE } from '../lib/walk.js';
 import { slideRound } from '../lib/footprints.js';
@@ -41,7 +42,9 @@ export function playerSystem(world) {
   const craters = getResource(world, Craters), groundAt = (x, z) => groundOf(terrain, tops, x, z, craters);
   for (const e of query(world, [Player, Health])) {
     const p = getComponent(world, e, Player), health = getComponent(world, e, Health);
-    const j = p.jump, a = p.attack, dt = time.dt, skill = getComponent(world, e, Skills)?.active ?? null;
+    // a skill, or the power-up of the transformation (systems/transform.js), plays its clip instead
+    const form = getComponent(world, e, Form), j = p.jump, a = p.attack, dt = time.dt;
+    const skill = getComponent(world, e, Skills)?.active ?? form?.act ?? null;
     const clipTime = (state) => (p.clips[state].length - 1) / p.fps;
     p.y ??= groundAt(p.x, p.z);
 
@@ -79,7 +82,8 @@ export function playerSystem(world) {
     if (down('right')) mv.add(R);
     if (down('left')) mv.sub(R);
     const moving = alive && !skill && mv.lengthSq() > 0, running = input.keys.has('shift');
-    const speed = running ? tuning.runSpeed : tuning.walkSpeed;
+    // transformed, it goes faster (skills.json transform speed)
+    const speed = (running ? tuning.runSpeed : tuning.walkSpeed) * (form?.phase === 'on' ? getResource(world, Skillbook).transform.speed : 1);
 
     // a step on the ground or in the air: the whole step, else only along x, else only along z (it slides along what stops it),
     // else along the edge of the round collider it runs into (it goes round it instead of stopping in front of it)
