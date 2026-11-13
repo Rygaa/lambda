@@ -271,7 +271,9 @@ void main() {
 // The ground: grass, or the paint of gen/ground.js there (palette row of the
 // ground family). Pavement has tile joints (bricks: the recipe "pavement": "bricks", rows of bricks each half a brick
 // off the one before, like the streets of Flarine), fields have furrows.
-export function groundFrag(bricks = false) {
+// cave: the floor of a cave (gen/terrain.js buildCave): dim even where no light falls, with dark cracks and small
+// light pebbles, a pixel or two each
+export function groundFrag(bricks = false, cave = false) {
   const GROUND_ROW = Object.fromEntries(paletteNames('ground').map((name, i) => [name, i.toFixed(1)]));
   return COMMON + GBUF_OUT + /* glsl */ `
 uniform sampler2D uGround;   // one paint per channel (sand, dirt, pavement, field), 0.5 on its edge
@@ -300,7 +302,14 @@ void main() {
     if (f.x < px.x || f.y < px.y) row = ${GROUND_ROW.tile};`}
   }
   if (row == ${GROUND_ROW.field} && fract(P.z / 0.5) < 0.4) row = ${GROUND_ROW.furrow};
-  gData = vec4(cloudLight(P) * shadowSoft(P), 1.0, 1.0, row);
+  float lv = cloudLight(P) * shadowSoft(P);${cave ? `
+  lv = 0.32 + 0.6 * lv;
+  vec2 cellP = floor(P.xz * 10.0);
+  float crack = abs(gnoise(P.xz * 0.9 + 3.1) + 0.5 * gnoise(P.xz * 2.3));
+  if (crack < 0.035) lv -= 0.24;
+  else if (fract(sin(dot(cellP, vec2(12.9898, 78.233))) * 43758.5453) > 0.985) lv += 0.24;
+  else if (gnoise(P.xz * 0.35) > 0.25) lv += 0.1;` : ''}
+  gData = vec4(lv, 1.0, 1.0, row);
   gNorm = vec4(0.0, 0.0, 0.0, vDepth);
 }
 `;
@@ -531,8 +540,9 @@ void main() {
 }
 `;
 
+export const LAMPS = 24;       // the lamps the post pass takes (the nearest to the camera)
 export function postFrag(pal) {
-  return COMMON + paletteGlsl(pal) + /* glsl */ `
+  return COMMON + paletteGlsl(pal) + `const int LAMPS = ${LAMPS};\n` + /* glsl */ `
 uniform sampler2D tData;
 uniform sampler2D tNorm;
 uniform vec2 uRes;
@@ -546,6 +556,9 @@ uniform sampler2D tRefl;     // water: the G-buffer seen from the mirrored camer
 uniform sampler2D tReflN;    // ... and its normal + depth (0 = nothing, the sky)
 uniform mat4 uReflVP;        // water: view-projection of the mirrored camera
 uniform float uTime;
+uniform vec4 uLamps[LAMPS];    // lamps (systems/clouds.js lampSystem): x, y, z, radius (0: none)
+uniform vec4 uLampCol[LAMPS];  // ... their colour (linear) and strength
+uniform float uNoLamp;         // the stone row lamps do not light (the dark over a cave), or -1
 out vec4 outColor;
 
 const ivec2 O4[4] = ivec2[](ivec2(1, 0), ivec2(-1, 0), ivec2(0, 1), ivec2(0, -1));
@@ -686,6 +699,21 @@ void main() {
   const float SIGMA = 0.035;
   float acc = 0.0;
   vec3 P = uCamPos + uViewR * ndc.x * uHalf.x + uViewU * ndc.y * uHalf.y + uViewF * d;
+  // lamps: flat rings of their colour around them (3 bands, a 1px checker where two bands meet), the strongest
+  // lamp wins, so the rings stay flat like the palette bands
+  if (d > 0.0 && !(isMid(mid, 2.0) > 0.5 && abs(D.w - uNoLamp) < 0.5)) {
+    vec3 glow = vec3(0.0);
+    float chk = mod(float(p.x + p.y), 2.0) - 0.5;
+    for (int i = 0; i < LAMPS; i++) {
+      if (uLamps[i].w <= 0.0) continue;
+      float k = 1.0 - length(P - uLamps[i].xyz) / uLamps[i].w + chk * 0.05;
+      if (k <= 0.0) continue;
+      float band = k > 0.66 ? 0.34 : k > 0.36 ? 0.18 : 0.07;
+      vec3 c = uLampCol[i].rgb * band * uLampCol[i].a;
+      if (dot(c, vec3(1.0)) > dot(glow, vec3(1.0))) glow = c;
+    }
+    col += glow;
+  }
   float len = max(0.0, (uVolTop - P.y) / (-uViewF.y));
   for (int i = 0; i < 64; i++) {
     if (i >= uRaySteps) break;

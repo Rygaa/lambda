@@ -7,3 +7,7 @@ import './leafy.js';
 import './water.js';
 import './building.js';
 import './rock-form.js';
+import './kame-house.js';
+import './boat.js';
+import './crystal.js';
+import './mine.js';

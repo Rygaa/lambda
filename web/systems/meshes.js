@@ -54,7 +54,7 @@ export function meshSystem(world) {
 
   for (const e of added(world, GroundPlane)) {
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2),
-      shaderMaterial(gpu.shared, S.MESH_VERT, S.groundFrag(settings.land.pavement === 'bricks'), groundUniforms(settings.land.ground, getResource(world, Craters))));
+      shaderMaterial(gpu.shared, S.MESH_VERT, S.groundFrag(settings.land.pavement === 'bricks', !!settings.land.terrain?.cave), groundUniforms(settings.land.ground, getResource(world, Craters))));
     gpu.scene.add(mesh);
     addComponent(world, e, SceneObject, { group: mesh, meshes: [] });
     // cliffs: the plateau tops look like the ground; the walls and the stairs are stone
@@ -77,7 +77,9 @@ export function meshSystem(world) {
     } else if (terrain) {
       const g = terrainGeometry(terrain);
       const stone = (name) => gpu.materials.stone[paletteRows({ stone: name }).stone];
-      for (const [geometry, material] of [[g.tops, mesh.material], [g.walls, stone(terrain.palette)], [g.stairs, stone(terrain.stairsPalette)]]) {
+      // a cave (gen/terrain.js buildCave): the top of the rock is the dark over it, not ground
+      const top = terrain.cave ? stone(terrain.top) : mesh.material;
+      for (const [geometry, material] of [[g.tops, top], [g.walls, stone(terrain.palette)], [g.stairs, stone(terrain.stairsPalette)]]) {
         if (!geometry) continue;
         const m = new THREE.Mesh(geometry, material);
         m.layers.enable(1);     // casts shadows

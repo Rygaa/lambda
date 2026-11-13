@@ -17,6 +17,7 @@ import { Player, CameraRig, Health, Skills } from '../components.js';
 import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe, Craters } from '../resources.js';
 import { Swing } from '../events.js';
 import { free, groundAt as groundOf, LEDGE } from '../lib/walk.js';
+import { slideRound } from '../lib/footprints.js';
 import { showFrame } from '../lib/bake.js';
 import { heightAt } from '../gen/terrain.js';
 import { ONCE } from '../lib/character.js';
@@ -80,13 +81,15 @@ export function playerSystem(world) {
     const moving = alive && !skill && mv.lengthSq() > 0, running = input.keys.has('shift');
     const speed = running ? tuning.runSpeed : tuning.walkSpeed;
 
-    // a step on the ground or in the air: the whole step, else only along x, else only along z (it slides along what stops it)
+    // a step on the ground or in the air: the whole step, else only along x, else only along z (it slides along what stops it),
+    // else along the edge of the round collider it runs into (it goes round it instead of stopping in front of it)
     let moved = false;
     if (moving) {
       mv.normalize();
       p.rot = Math.atan2(mv.x, mv.z);
       const d = speed * dt, l = settings.walkLimit;
-      for (const [dx, dz] of [[mv.x * d, mv.z * d], [mv.x * d, 0], [0, mv.z * d]]) {
+      const round = slideRound(grid, p.x, p.z, mv.x * d, mv.z * d, RADIUS) ?? [0, 0];
+      for (const [dx, dz] of [[mv.x * d, mv.z * d], [mv.x * d, 0], [0, mv.z * d], round]) {
         const x = THREE.MathUtils.clamp(p.x + dx, -l, l), z = THREE.MathUtils.clamp(p.z + dz, -l, l);
         if ((x === p.x && z === p.z) || !free(grid, tops, terrain, p.x, p.z, x, z, p.y, RADIUS)) continue;
         p.x = x; p.z = z; moved = true;

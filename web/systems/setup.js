@@ -11,6 +11,7 @@ import { spawnProp } from '../lib/parts.js';
 import { paletteTables, paletteRows } from '../gen/palettes.js';
 import { heightAt, bareAt } from '../gen/terrain.js';
 import { groundAt, PAINTS } from '../gen/ground.js';
+import { getType } from '../gen/assets.js';
 
 // ---------------------------------------------------------------- GPU
 // Renderer, shared uniforms, materials, shadow map and the render targets.
@@ -36,6 +37,9 @@ export function setupGpuSystem(world) {
     uCamR: { value: basis.R.clone() },
     uCamU: { value: basis.U.clone() },
     uClipY: { value: -1e4 },
+    uLamps: { value: Array.from({ length: S.LAMPS }, () => new THREE.Vector4(0, 0, 0, 0)) },
+    uLampCol: { value: Array.from({ length: S.LAMPS }, () => new THREE.Vector4(0, 0, 0, 0)) },
+    uNoLamp: { value: -1 },
   };
 
   const SM = Math.min(4096, renderer.capabilities.maxTextureSize);
@@ -215,6 +219,16 @@ export function spawnWorldSystem(world) {
   for (const p of land.props) spawnProp(world, p);
   for (const { object, x, z, rot, y = null, k = 0 } of land.objects) spawn(world, [Decor, { object, x, z, rot, y, k }]);
   for (const g of land.glades) spawn(world, [Glade, { x: g.x, z: g.z, r: g.r, k: g.k }]);
+  // the lamps: every object whose type shines (gen/assets.js "light"); the dark over a cave takes no light
+  const gpu = getResource(world, Gpu);
+  gpu.lamps = land.props.flatMap((p) => {
+    const light = getType(p.asset).light, [, , size, palette] = p.name.split('/');
+    const at = light?.sizes?.[size];
+    if (!at) return [];
+    const color = new THREE.Color(typeof light.color === 'string' ? light.color : light.color[palette] ?? Object.values(light.color)[0]);
+    return [{ x: p.x, y: heightAt(land.terrain, p.x, p.z) + at[0], z: p.z, r: at[1], color, k: light.strength ?? 1, flicker: !!light.flicker, ph: p.x * 7.1 + p.z * 3.3 }];
+  });
+  if (land.terrain?.cave) gpu.shared.uNoLamp.value = paletteRows({ stone: land.terrain.top }).stone;
   const [lo, hi] = land.clouds ?? [];
   spawn(world, [CloudLayer, land.clouds ? { lo, hi } : {}]);
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.5, 200);
@@ -228,6 +242,7 @@ export function spawnWorldSystem(world) {
 export function spawnDustSystem(world) {
   const settings = getResource(world, Settings);
   const rng = getResource(world, Random);
+  if (settings.land.terrain?.cave) return;     // no motes over the dark of a cave
   const GR = settings.grassHalf;
   const n = 7000;
   const boxMin = [-GR, 0.15, -GR], boxSize = [GR * 2, 4.5, GR * 2];

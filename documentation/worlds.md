@@ -138,6 +138,20 @@ The Vagabond (`?player`), fights like League of Legends:
 
 The worlds:
 
+- `kame-island`: the start of the story. A sand island in the middle of the ocean, with the Kame House, palms in pairs
+  around it, and a small boat at the shore. Walk to the boat: it takes the human to `beach` (recipe `portals`, section 2).
+- `beach`: where the boat lands: the ocean on the south, a beach with one line of palms, then a dirt path north between
+  two rows of oaks, past 10 Aibatts (level 1), to Chichi's house at its end, under the mountains. Chichi stands in
+  front of it and gives the quest "Too many Aibatts" (recipe `npcs`, section "Quests" below). Behind her house, a
+  smaller path goes to a cave mouth in the mountain (`building/cave-mouth`): it opens `cave`. The human arrives on
+  the sand next to the boat; the boat takes it back to `kame-island`.
+- `cave`: the mine in the mountain, where the Aibatts come from (references: Pixel Mines Kit, Petixel Mines, Solaria
+  Cave, Mine Tileset Pack, on itch.io). Four rooms and the tunnels between them cut in dark rock (recipe `cave`,
+  section 4): the entrance hall, a crystal room on the west, the mine works on the east (rails, a minecart, crates)
+  and the Captain Aibatt chamber at the far north. Theme `cave`, all in shadow (`"clouds": "cave"`); the light comes
+  from torches, the lanterns of the mine frames and the glowing crystals (section 6, lamps), and daylight falls at
+  the entrance (one clearing). Small Aibatts and Aibatts in the rooms. Walk back south out of the tunnel to go out to
+  `beach`.
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
@@ -156,6 +170,17 @@ The worlds:
 - `coast`: mountains on the west, the ocean on the east.
 
 A mistake in a recipe shows its message at the bottom of the page.
+
+### Quests
+
+`assets/quests/quests.json` lists the quests (`web/systems/quests.js`). A person of `npcs.json` gives each one, and
+it goes through its steps in order: `talk` (lines, then a button to go on), `kill` (a number of monsters of one id:
+the human must kill them, then talk to the person again), `goal` (a text on the screen). While a quest runs, its
+title and its step are shown at the top left. A portal takes them along (`portals` above); a reload starts them again.
+
+- "Too many Aibatts" (Chichi, `beach`): Aibatts came out of the cave in the mountain; kill 10 of them, then come back.
+  Chichi then says that they all come from the cave behind her house, led by the Captain Aibatt: defeat it in `cave`,
+  then come back to her.
 
 ## 2. A recipe
 
@@ -181,7 +206,8 @@ The fields of a world:
 - `size`: the width of the square world, in world units (a person is about 1 unit tall).
 - `theme`: the colours of the whole world (section 6). `?theme=` in the address wins.
 - `start`: where the camera starts, `[x, z]`. Default: the first clearing.
-- `clouds`: how much of the ground the cloud shadows cover: `none`, `few`, or `some` (default).
+- `clouds`: how much of the ground the cloud shadows cover: `none`, `few`, `some` (default), or `cave` (all of it: only
+  the clearings are lit, like pools of light in a cave).
 - `pavement`: how the `pavement` paint looks: `tiles` (grey slabs, default) or `bricks` (brown bricks, each row half
   a brick off the one before, like the streets of Flarine).
 - `rays`: the strength of the light rays, 0 to 1 (default 1).
@@ -189,7 +215,9 @@ The fields of a world:
 - `islands`: islands cut out of the ocean (section 4).
 - `ground`: paints on the grass (section 5).
 - `cliffs`: plateaus in levels, with rock walls and stairs (section 4). No `cliffs`: flat ground.
-- `clearings`: open places with light: `amount` or `count` (at most 4), `radius` [min, max], `light` [min, max].
+- `cave`: the world is solid rock, with rooms and tunnels cut in it (section 4). Not with `cliffs`, `borders` or `map`.
+- `clearings`: open places with light: `amount` or `count` (at most 4), `radius` [min, max], `light` [min, max];
+  `at`: [[x, z], ...] places them instead of scattering them.
 - `props`: one line per group of objects. Big objects are placed first.
 - `map`: a part of a FlyFF map, `worlds/maps/<name>.json`, as in FlyFF (`web/gen/map.js`). It gives the ground, so a
   world with a map has no `size`, `cliffs`, `borders` or `ground`. `worlds/maps/import-map.mjs` makes the file from the
@@ -228,6 +256,17 @@ The fields of a world:
   gets bigger cubes, so the computer does not run out of memory. The cubes of a model are made once for each cube size
   and shared by its copies. Each one stops a walker by a circle, and no grass
   grows under it (`web/systems/objects.js`).
+- `portals`: circles on the ground that take the human to another world: `{ "at": [x, z], "radius": 1.2, "to": "beach",
+  "char": [x, z] }`. When the human walks into one, the page opens the world `to` (`worlds/<to>.json`) with the human at
+  `char`, and keeps the other options of the address (`?player`, `?look`...). A portal works only after the human has
+  been out of it, so arriving in one does not send it back (`web/systems/portals.js`). A player (`?player`) takes
+  itself along: its stats, HP, MP, skills, bag, outfit and quests are kept in the session (`sessionStorage`) and put
+  back in the next world; a reload without a portal starts a new Vagabond. The boat of `kame-island` is
+  one: put the portal where the object is, a little wider than it.
+- `npcs`: people who do not fight, one line each: `{ "id": "chichi", "at": [x, z, turn] }` (an id of
+  `assets/character/npc/npcs.json`). Each one is the FlyFF female in the parts it wears, plays its idle clip, has its
+  name over its head, stops walkers, and turns to the human when it comes near. Near it, `E` (or a click on its name)
+  opens the talk (`web/systems/npcs.js`, `web/lib/npc.js`).
 - `monsters`: FlyFF monsters placed in the world, one line per monster type: `{ "id": 21, "at": [[x, z], ...] }` (the
   `id` of `assets/monsters/monsters.json`). They spawn when the human is there, and each comes back at its place 15 s
   after its death (`web/systems/monsters.js`).
@@ -256,6 +295,9 @@ The types today:
 
 - `rock/sharp`: `small`, `medium`, `large`. Palettes `grey`, `sand`, `moss`, `dark`, `cliff`.
 - `rock/round`: `small`, `large`. The same palettes.
+- `rock/crystal`: a cluster of six-sided columns with pointed tips, on a small stone (`web/gen/builders/crystal.js`).
+  `small`, `medium`, `large`. Palettes `crystal-cyan`, `crystal-pink`, `crystal-gold` (bright: they shine in a dark
+  cave).
 - `rock/slab`: one flat, wide stone. `rock/stack`: 2 or 3 flat stones piled up. `rock/cluster`: one stone with 2 or 3
   smaller ones at its foot. `rock/split`: one stone split in two halves. All four: `small`, `medium`, `large`, the
   same palettes, and a new form each time.
@@ -272,6 +314,22 @@ The types today:
 - `water/ocean`: `medium`, only for `borders`.
 - `building/chichi-house`, `building/buu-house`, `building/capsule-ship`: `medium`. Palette `classic`. Their front
   always faces the camera.
+- `building/kame-house`: the Kame House of Dragon Ball Z (pink walls, red tile roof, KAME HOUSE on the gable), made by
+  code (`web/gen/builders/kame-house.js`). `medium`. Palette `classic`. Its front always faces the camera.
+- `building/cave-mouth`: a pile of rock blocks with a black arched hole, to put against a mountain, with a portal in
+  front of the hole. `medium`. Palette `classic`.
+- `building/mine-frame`: two wooden posts and a beam across a tunnel, with a lantern hanging from it (it shines).
+  `small`, `medium`, `large` (width between the posts 1.8, 2.4, 3.2). A walker goes under the beam.
+- `building/rails`: a piece of mine rails, steel on wooden sleepers. `small` (1.2 long), `medium` (2 long). Lay the
+  pieces end to end.
+- `building/minecart`: a wooden tub on wheels, full of ore and crystals. `medium`.
+- `building/crates`: wooden crates and a barrel. `small` (1 or 2 crates), `medium` (2 or 3).
+- `building/torch`: a torch on a pole (it shines). `medium`.
+  The five of them are made by `web/gen/builders/mine.js`, palette `classic`. They turn with `at`, and what runs
+  along a tunnel (a frame, the rails, a cart) runs along its local z: give it the turn atan2(dx, dz) of the tunnel.
+- `building/boat`: a small wooden row boat, pointed at its bow, open, with seats and two oars
+  (`web/gen/builders/boat.js`). `small`. Palette `classic`. It turns with `at`: a turn of
+  0 points its bow to the east, -1.57 to the camera.
 - `terrain/cliff`: `medium`, `large`, only for `cliffs`. Palettes `cliff`, `sand`, `grey`, `moss`, `dark`.
 - `terrain/mountain`: `medium`, only for `borders`. Palettes `cliff`, `sand`, `grey`, `moss`, `dark`.
 
@@ -301,6 +359,16 @@ the lowest level.
 All the walls of one world have one palette, so cliffs and mountains in the same world must ask for the same one.
 A world with two gives an error.
 
+A cave: `"cave": { "palette": "cliff", "top": "void", "height": 2.2, "rooms": [[x, z, r], ...], "tunnels": [{
+"path": [[x, z], ...], "width": 2.8 }], "pillars": [[x, z, r], ...] }` (`web/gen/terrain.js` buildCave). The whole
+world is rock `height` high, and the rooms (wavy circles) and the tunnels (a width that swells and narrows) are cut
+out of it down to the ground; a pillar is rock left standing in a room. The walls are drawn in `palette`, the top of
+the rock in `top` (`void`: near black, the dark over the cave, which takes no lamp light). Its floor has no grass:
+paint it (`dirt`), it gets cracks and pebbles. Lines with `"near": "cliffs"` go along the walls (rubble, crystals);
+with `"avoid": "paths"` they keep off the middle of the tunnels (a lane 2 wide stays free). The rock just south of the
+floor (3.5 units deep) is a low ledge, 0.5 high: the camera looks down at about 33°, so a high rock there would hide
+whoever walks behind it.
+
 `"islands": [{ "at": [36, 55], "radius": 5.6, "bar": [33.5, 43], "barWidth": 2.6 }]` cuts islands out of every
 ocean, with a sand bar out to the point `bar`.
 
@@ -324,6 +392,12 @@ A theme replaces palettes by name, so every world works with every theme:
 
 - `dbz`: Dragon Ball Z colours: yellow-green grass, tan rocks, a deep blue sea.
 - `namek`: planet Namek: blue grass, blue trees, and a blue sea.
+- `cave`: inside a cave: dark blue-grey ground, paths and flowers, dark blue-grey rocks and walls.
+
+Lamps: an asset type with `"light"` shines (`web/gen/assets.js`): `{ "sizes": { size: [height, radius] }, "color":
+"#rrggbb" or { palette: "#rrggbb" }, "flicker": true }`. Around it, the post pass draws flat rings of its colour
+(3 bands, `web/render/shaders.js`); a flame flickers. The 24 lamps nearest to the camera shine. Today: `rock/crystal`
+(`medium`, `large`, in the colour of their palette), `building/torch`, `building/mine-frame`.
 
 ## 7. What stops a walker
 
@@ -331,10 +405,14 @@ One rule for every object (`web/gen/collision.js`):
 
 - A rock or a building stops a walker by its real shape (`web/lib/tops.js`): a walker stands on its top, steps up at
   most 0.12 at once (so a slope steeper than about 30° stops it), and must jump to get higher.
-- Any other object lower than 25 % of a person does not stop a walker.
+- An object with simple colliders (`colliders` on its shape: circles under its solid parts, the mine things) stops a
+  walker by them instead of its real shape. A walker is a circle, tested whole against every circle (trees, water,
+  colliders): it slides along them and never sticks (`web/lib/footprints.js` bumps).
+- Any object lower than 25 % of a person does not stop a walker, rocks and crystals too (small crystals are that low).
 - A tree stops a walker only with its trunk. A bush never does.
 - Water stops a walker, except puddles.
-- A cliff stops a walker: only stairs go up or down.
+- A cliff stops a walker: only stairs go up or down. A walker keeps 0.3 away from the foot of a wall (walls lean out
+  at their foot), so it never sinks into one.
 
 ## 8. Add a new type
 

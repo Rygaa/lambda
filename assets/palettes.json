@@ -20,7 +20,14 @@
       "glass": {"lit": "#5f86c8", "up": "#5873ab", "shade": "#526a9c", "hi": "#a9c4e8"},
       "hole": {"lit": "#1b2148", "up": "#171c3e", "shade": "#141834", "hi": "#3a4478"},
       "wood-dark": {"lit": "#7e5a40", "up": "#5c4246", "shade": "#4c363e", "hi": "#a98262"},
-      "steel": {"lit": "#c9ccd3", "up": "#9d9fb5", "shade": "#8889a2", "hi": "#e9e6e0"}
+      "steel": {"lit": "#c9ccd3", "up": "#9d9fb5", "shade": "#8889a2", "hi": "#e9e6e0"},
+      "pink": {"lit": "#f6c8b0", "up": "#d29a9c", "shade": "#bc828c", "hi": "#fff2e0"},
+      "roof": {"lit": "#e0684c", "up": "#a0485a", "shade": "#86405a", "hi": "#ffb48e"},
+      "crystal-cyan": {"lit": "#8ff6ff", "up": "#4fc6e6", "shade": "#36a0cc", "hi": "#e8ffff"},
+      "crystal-pink": {"lit": "#ffa6f0", "up": "#d86ad6", "shade": "#b44cbc", "hi": "#ffe6fb"},
+      "crystal-gold": {"lit": "#ffe27a", "up": "#e0aa3c", "shade": "#c08a2c", "hi": "#fff6c8"},
+      "flame": {"lit": "#fff0a0", "up": "#ffd060", "shade": "#ffb040", "hi": "#fffbe0"},
+      "void": {"lit": "#161420", "up": "#100f18", "shade": "#0c0b12", "hi": "#1e1c2a"}
     },
     "trunk": {
       "brown": [[0, "#6f625e"], [0.1, "#a5897a"]],
@@ -107,6 +114,24 @@
       "cover": {
         "sprout": [[0, "#5a82a8"], [0.5, "#cce4f4"]],
         "leafdeco": [[0, "#2a4c7a"], [0.5, "#86b8e0"]]
+      }
+    },
+    "cave": {
+      "stone": {
+        "grey": {"lit": "#7a87a0", "up": "#4c566f", "shade": "#363e55", "hi": "#a9b4c8"},
+        "dark": {"lit": "#56607a", "up": "#363d52", "shade": "#262b3d", "hi": "#7f8aa2"},
+        "cliff": {"lit": "#626e88", "up": "#3c4459", "shade": "#2a3043", "hi": "#8c98b0"},
+        "moss": {"lit": "#5f7a78", "up": "#3c5054", "shade": "#2a3a40", "hi": "#88a8a0"}
+      },
+      "ground": {
+        "grass": [[0, "#1e2333"], [0.3, "#2a3043"], [0.52, "#363d53"], [0.76, "#454e66"]],
+        "dirt": [[0, "#25222c"], [0.3, "#322d37"], [0.52, "#3f3843"], [0.76, "#4d4550"]]
+      },
+      "cover": {
+        "flower_w": [[0, "#2a3043"], [0.5, "#3b4359"]],
+        "flower_l": [[0, "#2a3043"], [0.5, "#3b4359"]],
+        "sprout": [[0, "#2c3446"], [0.5, "#46506a"]],
+        "leafdeco": [[0, "#1e2333"], [0.5, "#3a4258"]]
       }
     }
   }

@@ -1,0 +1,9 @@
+{
+  "about": "A minecart: a wooden tub with iron bands on four wheels, full of ore and crystals (web/gen/builders/mine.js). It runs along its local z, so it sits on rails turned the same way.",
+  "builder": "mine",
+  "variants": 2,
+  "palettes": {"classic": {}},
+  "sizes": {
+    "medium": {"kind": "cart"}
+  }
+}

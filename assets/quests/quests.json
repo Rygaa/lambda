@@ -1,0 +1,55 @@
+{
+  "about": "The quests (web/systems/quests.js). A quest is given by a person of npcs.json (npc) and goes through its steps in order. A step is one of: talk (the lines the person says, then a button that goes to the next step), kill (a number of monsters of an id of assets/monsters/monsters.json; the person says waiting while it is not done), goal (a text on the screen; the person says waiting). title: shown on the screen while the quest runs.",
+  "quests": {
+    "aibatts": {
+      "npc": "chichi",
+      "title": "Too many Aibatts",
+      "steps": [
+        {
+          "talk": [
+            "Oh, a traveller! Please, help me!",
+            "Aibatts came out of the cave in the mountain. There are so many of them now.",
+            "They fly around my house all day. Kill 10 of them for me!"
+          ],
+          "button": "I will kill them"
+        },
+        {
+          "kill": {
+            "id": 21,
+            "count": 10
+          },
+          "goal": "Kill Aibatts",
+          "waiting": [
+            "There are still Aibatts everywhere. Please kill 10 of them!"
+          ]
+        },
+        {
+          "talk": [
+            "Thank you! But look... more of them keep coming.",
+            "They all come from the cave in the mountain, behind my house.",
+            "Their leader, the Captain Aibatt, lives deep in the cave. Defeat it, and the Aibatts will stop!"
+          ],
+          "button": "I will go to the cave"
+        },
+        {
+          "kill": {
+            "id": 22,
+            "count": 1
+          },
+          "goal": "Defeat the Captain Aibatt in the cave",
+          "waiting": [
+            "The cave is in the mountain, behind my house. The Captain Aibatt is at the far end. Be careful!"
+          ]
+        },
+        {
+          "talk": [
+            "You defeated the Captain Aibatt? Wonderful!",
+            "No more Aibatts will come out of the cave. My house is safe again.",
+            "Thank you, traveller. Come back and see me any time!"
+          ],
+          "button": "Goodbye, Chichi"
+        }
+      ]
+    }
+  }
+}

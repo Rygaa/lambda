@@ -1,0 +1,323 @@
+{
+  "name": "Beach: where the boat of Kame Island lands; a path goes north between rows of oaks, past Aibatts, to Chichi's house, where Chichi gives a quest; a cave in the mountain behind it",
+  "seed": 8,
+  "size": 64,
+  "start": [
+    1.6,
+    24.8
+  ],
+  "borders": {
+    "south": "water/ocean/medium",
+    "north": "terrain/mountain/medium"
+  },
+  "clearings": {
+    "count": 2,
+    "radius": [
+      3,
+      3.6
+    ]
+  },
+  "ground": [
+    {
+      "paint": "sand",
+      "beach": 7
+    },
+    {
+      "paint": "dirt",
+      "path": [
+        [
+          1.5,
+          25
+        ],
+        [
+          1,
+          15
+        ],
+        [
+          -2.5,
+          8
+        ],
+        [
+          -4,
+          0
+        ],
+        [
+          -1,
+          -7
+        ],
+        [
+          -1.5,
+          -12.5
+        ]
+      ],
+      "width": 2.2
+    },
+    {
+      "paint": "dirt",
+      "path": [
+        [
+          0.8,
+          -12.4
+        ],
+        [
+          4.4,
+          -14.5
+        ],
+        [
+          6.6,
+          -18
+        ],
+        [
+          8,
+          -22.4
+        ]
+      ],
+      "width": 1.6
+    }
+  ],
+  "props": [
+    {
+      "asset": "building/chichi-house/medium",
+      "at": [
+        [
+          -0.5,
+          -17.5,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "building/cave-mouth/medium",
+      "at": [
+        [
+          8,
+          -23.4,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "building/boat/small",
+      "at": [
+        [
+          0,
+          27.4,
+          -1.3
+        ]
+      ]
+    },
+    {
+      "asset": "plant/palm/large",
+      "at": [
+        [
+          -26,
+          21.5,
+          0
+        ],
+        [
+          -20,
+          21.5,
+          0
+        ],
+        [
+          -14,
+          21.5,
+          0
+        ],
+        [
+          -8,
+          21.5,
+          0
+        ],
+        [
+          10,
+          21.5,
+          0
+        ],
+        [
+          16,
+          21.5,
+          0
+        ],
+        [
+          22,
+          21.5,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/oak/medium",
+      "at": [
+        [
+          2.29,
+          9.98,
+          0
+        ],
+        [
+          -3.79,
+          13.02,
+          0
+        ],
+        [
+          0.09,
+          3.37,
+          0
+        ],
+        [
+          -6.59,
+          4.63,
+          0
+        ],
+        [
+          0.63,
+          -2.16,
+          0
+        ],
+        [
+          -5.63,
+          -4.84,
+          0
+        ],
+        [
+          2.14,
+          -10.06,
+          0
+        ],
+        [
+          -4.64,
+          -9.44,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/bush/medium",
+      "at": [
+        [
+          -4.6,
+          -15,
+          0
+        ],
+        [
+          -5.6,
+          -16.6,
+          0
+        ],
+        [
+          3.8,
+          -15,
+          0
+        ],
+        [
+          4.8,
+          -16.6,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "rock/round/small",
+      "count": 8,
+      "on": "sand",
+      "gap": 0.6,
+      "palette": [
+        "sand",
+        "grey"
+      ]
+    },
+    {
+      "asset": "rock/sharp/small",
+      "count": 14,
+      "on": "sand",
+      "gap": 0.4,
+      "palette": [
+        "sand",
+        "grey"
+      ]
+    }
+  ],
+  "monsters": [
+    {
+      "id": 21,
+      "at": [
+        [
+          5,
+          11
+        ],
+        [
+          7,
+          12.5
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          8,
+          10.5
+        ],
+        [
+          -8,
+          1
+        ],
+        [
+          -9.5,
+          -1
+        ],
+        [
+          -7.5,
+          -2.5
+        ],
+        [
+          4,
+          -6
+        ],
+        [
+          5.5,
+          -8
+        ],
+        [
+          6.5,
+          -5
+        ]
+      ]
+    }
+  ],
+  "portals": [
+    {
+      "at": [
+        0,
+        27.4
+      ],
+      "radius": 1.4,
+      "to": "kame-island",
+      "char": [
+        1.5,
+        4.6
+      ]
+    },
+    {
+      "at": [
+        8,
+        -22.2
+      ],
+      "radius": 1.0,
+      "to": "cave",
+      "char": [
+        -0.81,
+        18.9
+      ]
+    }
+  ],
+  "npcs": [
+    {
+      "id": "chichi",
+      "at": [
+        -0.4,
+        -11.4,
+        0
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "about": "Mine rails: two steel rails on wooden sleepers, along the local z (web/gen/builders/mine.js). Lay pieces end to end, each turned with atan2(dx, dz) of its piece of track. length: of one piece.",
+  "builder": "mine",
+  "palettes": {"classic": {}},
+  "sizes": {
+    "small": {"kind": "rails", "length": 1.2},
+    "medium": {"kind": "rails", "length": 2.0}
+  }
+}

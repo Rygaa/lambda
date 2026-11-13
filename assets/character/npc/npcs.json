@@ -1,0 +1,7 @@
+{
+  "about": "The people of the worlds who do not fight (recipe \"npcs\", web/systems/npcs.js). Each one is the FlyFF female (mvr_female.glb, its clips) in the parts of parts/ (import-npcs.mjs): parts: the files it wears; idle: the clip it plays; name: shown over it.",
+  "body": "mvr_female",
+  "people": {
+    "chichi": { "name": "Chichi", "parts": ["part_femalehead02", "part_femalehair04", "part_fclochina01suite", "part_fclochina01hand", "part_fclochina01boots"], "idle": "genstand" }
+  }
+}

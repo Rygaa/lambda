@@ -67,6 +67,7 @@ export const wetAt = (t, x, z) => t?.kind === 'map' && mapWetAt(t, x, z);
 // no grass here: stairs, and the top edge of a cliff (the lip); under the water of a map
 export function bareAt(t, x, z) {
   if (!t) return false;
+  if (t.cave) return true;
   if (t.kind === 'map') return mapDepthAt(t, x, z) > 0;
   const i = cellOf(t, x), j = cellOf(t, z);
   if (stairAt(t, i, j) >= 0) return true;
@@ -205,6 +206,61 @@ export function buildCliffs(b, spec, borders = []) {
       }
     }
   }
+  eachWall(t, (i, j, dx, dz) => t.edges.push({ x: centre(t, i) + dx * CELL / 2, z: centre(t, j) + dz * CELL / 2, nx: dx, nz: dz }));
+  return t;
+}
+
+// ---------------------------------------------------------------- a cave
+// recipe "cave": the world is solid rock, `height` high, and the rooms and the tunnels are cut out of it down to the
+// ground. Their edges are wavy (sine waves on a room, a width that changes along a tunnel), so the walls do not look
+// drawn with a compass. pillars: rock left standing in a room. The walls are the cliff walls (palette); the top of the
+// rock is drawn in `top` (a near black stone palette): the dark over the cave (systems/meshes.js)
+//   spec: { palette, top, height, rooms: [[x, z, r], ...], tunnels: [{ path: [[x, z], ...], width }], pillars: [[x, z, r], ...] }
+const LEDGE_CELLS = 7, LEDGE_H = 0.5;     // the low rock south of a cave floor: how deep (cells), how high
+export const CAVE_FIELDS = ['palette', 'top', 'height', 'rooms', 'tunnels', 'pillars'];
+export function buildCave(b, spec) {
+  const t = createTerrain(b.half + PAST, Math.floor(b.rand() * 2 ** 31), spec.palette, spec.palette);
+  Object.assign(t, { cave: true, top: spec.top });
+  const n = t.n, H = spec.height ?? 2.2;
+  const waves = () => [2, 3, 5, 7].map((h) => ({ h, amp: b.range(0.04, 0.12) / Math.sqrt(h - 1), ph: b.range(0, Math.PI * 2) }));
+  const wavy = (w, a) => 1 + w.reduce((s, v) => s + v.amp * Math.sin(v.h * a + v.ph), 0);
+  const rooms = (spec.rooms ?? []).map(([x, z, r]) => ({ x, z, r, w: waves() }));
+  const pillars = (spec.pillars ?? []).map(([x, z, r]) => ({ x, z, r, w: waves() }));
+  // a tunnel: its segments, and a width that swells and narrows along it (by the distance walked)
+  const tunnels = (spec.tunnels ?? []).map(({ path, width = 2.4 }) => ({ path, half: width / 2, ph: b.range(0, 9), f: b.range(0.5, 0.9) }));
+  const inRoom = (x, z, s) => Math.hypot(x - s.x, z - s.z) < s.r * wavy(s.w, Math.atan2(z - s.z, x - s.x));
+  const inTunnel = (x, z, tn) => {
+    let walked = 0;
+    for (let k = 0; k + 1 < tn.path.length; k++) {
+      const [ax, az] = tn.path[k], [bx, bz] = tn.path[k + 1], dx = bx - ax, dz = bz - az, len = Math.hypot(dx, dz);
+      const u = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (len * len)));
+      const along = walked + u * len, half = tn.half * (1 + 0.18 * Math.sin(along * tn.f + tn.ph) + 0.08 * Math.sin(along * 2.3 + tn.ph * 2));
+      if (Math.hypot(x - ax - u * dx, z - az - u * dz) < half) return true;
+      walked += len;
+    }
+    return false;
+  };
+  let open_ = new Uint8Array(n * n);
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) {
+      const x = centre(t, i), z = centre(t, j);
+      const cut = rooms.some((s) => inRoom(x, z, s)) || tunnels.some((tn) => inTunnel(x, z, tn));
+      open_[i * n + j] = cut && !pillars.some((s) => inRoom(x, z, s)) ? 1 : 0;
+    }
+  open_ = open(close(open_, n), n);
+  // the rock just south of the floor (between it and the camera) is low, a ledge, so it hides nobody who walks
+  // behind it (the camera looks down at about 33°: a high rock would hide a walker up to 3.4 units behind it)
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) {
+      const c = i * n + j;
+      if (open_[c]) continue;
+      let ledge = false;
+      for (let k = 1; k <= LEDGE_CELLS && !ledge; k++) ledge = j - k >= 0 && open_[i * n + j - k] === 1;
+      t.level[c] = 1;
+      t.height[c] = ledge ? LEDGE_H : H;
+      t.border[c] = 1;
+    }
+  t.paths = tunnels;     // for the recipe lines that keep off the tunnels (gen/recipe.js "avoid": "paths")
   eachWall(t, (i, j, dx, dz) => t.edges.push({ x: centre(t, i) + dx * CELL / 2, z: centre(t, j) + dz * CELL / 2, nx: dx, nz: dz }));
   return t;
 }

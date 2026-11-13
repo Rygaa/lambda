@@ -3,7 +3,7 @@
 import { createWorldBuilder, finish, discsOf } from './world.js';
 import { paletteNames } from './palettes.js';
 import { SIZES, getType, paramsOf } from './assets.js';
-import { buildCliffs, levelUnder, CLIFF_FIELDS } from './terrain.js';
+import { buildCliffs, buildCave, levelUnder, CLIFF_FIELDS, CAVE_FIELDS } from './terrain.js';
 import { SIDES, fromSide, wavyLine } from './borders.js';
 import { createGround, paint, groundAt, pathShape, rectShape, circleShape, PAINTS, GROUND_FIELDS } from './ground.js';
 import { buildMap, FLYFF } from './map.js';
@@ -12,9 +12,10 @@ import { buildMap, FLYFF } from './map.js';
 export const AMOUNTS = { none: 0, few: 0.3, some: 1, many: 2.5, lots: 6 };
 const CLEARINGS = { none: 0, few: 2, some: 3, many: 4, lots: 4 };   // the shaders take at most 4
 
-const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'pavement', 'map', 'trees', 'plants', 'borders', 'islands', 'clearings', 'cliffs', 'ground', 'props', 'objects', 'monsters'];
-// recipe "clouds": how much of the ground their shadows cover -> the CloudLayer edges (lo, hi)
-export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02] };
+const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'pavement', 'map', 'trees', 'plants', 'borders', 'islands', 'clearings', 'cliffs', 'cave', 'ground', 'props', 'objects', 'monsters', 'portals', 'npcs'];
+// recipe "clouds": how much of the ground their shadows cover -> the CloudLayer edges (lo, hi); cave: all of it, so
+// only the clearings are lit (pools of light)
+export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02], cave: [-0.6, -0.3] };
 const LINE_FIELDS = ['asset', 'params', 'amount', 'count', 'palette', 'spacing', 'gap', 'near', 'avoid', 'on', 'at'];
 const ISLAND_FIELDS = ['at', 'radius', 'bar', 'barWidth'];
 const BORDER_FIELDS = ['asset', 'palette', 'width'];
@@ -62,8 +63,10 @@ export function buildRecipe(cache, recipe, map = null) {
 
   // clearings: open ground where light falls through the canopy; the camera starts in the first
   const c = recipe.clearings ?? {};
-  check(c, ['amount', 'count', 'radius', 'light'], 'clearings');
-  const nClear = Math.min(4, c.count ?? CLEARINGS[c.amount ?? 'some'] ?? bad('clearings', `amount "${c.amount}"`));
+  check(c, ['amount', 'count', 'radius', 'light', 'at'], 'clearings');
+  // at: [[x, z], ...] places them (at most 4), else they are scattered
+  for (const [x, z] of (c.at ?? []).slice(0, 4)) b.glades.push({ x, z, r: b.range(...(c.radius ?? [3, 3.6])), k: b.range(...(c.light ?? [0.16, 0.2])) });
+  const nClear = c.at ? 0 : Math.min(4, c.count ?? CLEARINGS[c.amount ?? 'some'] ?? bad('clearings', `amount "${c.amount}"`));
   for (let tries = 0; b.glades.length < nClear && tries < 400; tries++) {
     const r = b.range(...(c.radius ?? [3, 3.6]));
     const x = b.range(-half * 0.7, half * 0.7), z = b.range(-half * 0.7, half * 0.7);
@@ -81,7 +84,13 @@ export function buildRecipe(cache, recipe, map = null) {
   // cliffs: plateaus in levels, with stairs, and the mountain borders
   // (gen/terrain.js); the start stays on the ground
   const mountains = borders.filter((bd) => bd.mountain);
-  if (recipe.cliffs || mountains.length) {
+  if (recipe.cave) {
+    if (recipe.cliffs || recipe.borders || map) bad('cave', 'a cave is its own ground: no "cliffs", "borders" or "map"');
+    const cv = recipe.cave;
+    check(cv, CAVE_FIELDS, 'cave');
+    for (const key of ['palette', 'top']) if (!paletteNames('stone').includes(cv[key])) bad('cave', `${key}: stone palette "${cv[key]}" (known: ${paletteNames('stone').join(', ')})`);
+    b.terrain = buildCave(b, cv);
+  } else if (recipe.cliffs || mountains.length) {
     const cl = recipe.cliffs ? cliffsOf(recipe.cliffs) : { count: 0 };
     // all the walls of a world are drawn with one material (gen/terrain.js)
     const walls = new Set([...(recipe.cliffs ? [cl.palette] : []), ...mountains.map((bd) => bd.palette)]);
@@ -104,6 +113,12 @@ export function buildRecipe(cache, recipe, map = null) {
   lines.sort((p, q) => (!!p.line.near - !!q.line.near) || q.size - p.size);
   for (const l of lines) place(b, l);
   b.objects = [...(b.objects ?? []), ...objectsOf(recipe.objects ?? [])];
+  b.portals = portalsOf(recipe.portals ?? []);
+  b.npcs = (recipe.npcs ?? []).map((line, i) => {
+    check(line, ['id', 'at'], `npcs[${i}]`);
+    if (typeof line.id !== 'string' || !Array.isArray(line.at)) bad(`npcs[${i}]`, 'give an "id" of assets/character/npc/npcs.json and "at": [x, z, turn]');
+    return { id: line.id, x: line.at[0], z: line.at[1], rot: line.at[2] ?? 0 };
+  });
   return finish(b);
 }
 
@@ -114,6 +129,18 @@ function objectsOf(lines) {
     check(line, ['object', 'at'], `objects[${i}]`);
     if (typeof line.object !== 'string') bad(`objects[${i}]`, 'object: a name of assets/objects/objects.json');
     return (line.at ?? []).map(([x, z, rot = 0]) => ({ object: line.object, x, z, rot }));
+  });
+}
+
+// recipe "portals": [{ at: [x, z], radius, to: a world of worlds/, char: [x, z] }]: the human who walks into the
+// circle goes to the world `to`, at `char` (systems/portals.js)
+function portalsOf(lines) {
+  return lines.map((line, i) => {
+    const where = `portals[${i}]`;
+    check(line, ['at', 'radius', 'to', 'char'], where);
+    if (!Array.isArray(line.at) || typeof line.to !== 'string') bad(where, 'give "at": [x, z] and "to": a world of worlds/');
+    if (line.char !== undefined && !Array.isArray(line.char)) bad(where, '"char": [x, z], where the human stands in the world "to"');
+    return { x: line.at[0], z: line.at[1], r: line.radius ?? 1.2, to: line.to, char: line.char ?? null };
   });
 }
 
@@ -252,6 +279,8 @@ function place(b, { line, set, count, palettes }) {
     // water (a shape of circles) is turned first, then each of its circles is tested
     const rot = shape.circles ? b.range(0, Math.PI * 2) : null;
     const discs = shape.circles ? discsOf(shape, { x, z, rot }) : [{ x, z, r: shape.radius }];
+    // avoid "paths": off the middle of the tunnels of a cave (a lane PATH_LANE wide stays free)
+    if (line.avoid === 'paths' && (b.terrain?.paths ?? []).some((tn) => nearPath(tn.path, x, z, PATH_LANE / 2 + shape.radius))) continue;
     if (line.avoid === 'clearings' && b.glades.some((g) => discs.some((c) => Math.hypot(g.x - c.x, g.z - c.z) < g.r * 0.95 + (shape.circles ? c.r : 0)))) continue;
     if (spacing && spaced.some((p) => Math.hypot(p.x - x, p.z - z) < spacing)) continue;
     // on: only on this ground (grass or a paint), all around it
@@ -267,6 +296,17 @@ function place(b, { line, set, count, palettes }) {
     if (spacing) { p.spaced = true; spaced.push(p); }
     made++;
   }
+}
+
+const PATH_LANE = 2;
+// is (x, z) less than d from the line through `path` ([[x, z], ...])?
+function nearPath(path, x, z, d) {
+  for (let k = 0; k + 1 < path.length; k++) {
+    const [ax, az] = path[k], [bx, bz] = path[k + 1], dx = bx - ax, dz = bz - az;
+    const u = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)));
+    if (Math.hypot(x - ax - u * dx, z - az - u * dz) < d) return true;
+  }
+  return false;
 }
 
 function check(obj, fields, where) {

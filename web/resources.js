@@ -118,3 +118,13 @@ export const createRandom = (seed) => ({ seed });
 
 export const ActiveView = 'ActiveView';
 // the camera drawn this frame: { camera }
+
+// the people who do not fight (assets/character/npc/npcs.json, lib/npc.js): their parts, and the bake of each one
+export const Npcs = 'Npcs';
+export const createNpcs = (json) => ({ ...json, bakes: new Map(), placed: false });
+
+// the quests (assets/quests/quests.json, systems/quests.js): quest id -> { step, count } while it runs or is done;
+// talk: the person the human talks to now (an id of npcs.json), or null
+export const Quests = 'Quests';
+export const createQuests = (json) => ({ quests: json.quests, state: {}, talk: null, version: 0 });
+

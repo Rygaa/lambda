@@ -36,6 +36,10 @@ export const Blast = defineComponent('Blast', () => ({
 }));
 
 // a potion on the ground (systems/drops.js): which one, where, its meshes, and the seconds it has been there
+// a person who does not fight (assets/character/npc/npcs.json, systems/npcs.js): who it is, its body (made like a monster:
+// lib/npc.js), where it stands and faces; near: the human is close enough to talk
+export const Npc = defineComponent('Npc', () => ({ id: '', name: '', group: null, meshes: [], clips: {}, look: null, fps: 15, foot: 0, height: 1, x: 0, z: 0, rot: 0, home: 0, t: 0, near: false, el: null }));
+
 export const Drop = defineComponent('Drop', () => ({ potion: 'hp', x: 0, z: 0, y: 0, group: null, t: 0 }));
 
 // the HP of the human or of a monster

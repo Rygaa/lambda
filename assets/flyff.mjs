@@ -14,10 +14,11 @@ export const ronBlocks = (text) => [...text.matchAll(/\n    \((\n.*?)\n    \),?/
 // one field of a block: its raw text (a number, a "string", Some(...)), or undefined
 export const ronField = (block, name) => block.match(new RegExp(`\\n\\s*${name}: ([^\\n]*?),?\\n`))?.[1];
 
-// the .png of the .ktx2 texture `name` of the FlyFF data folder, written once to `dir`
-export function copyTexture(src, name, dir) {
+// the .png of the .ktx2 texture `name` of the FlyFF data folder, written once to `dir`; opaque: its alpha is not a
+// cut-out (the material of the part is opaque), so every texel gets alpha 255
+export function copyTexture(src, name, dir, opaque = false) {
   const out = path.join(dir, name + '.png');
-  if (!fs.existsSync(out)) fs.writeFileSync(out, ktx2ToPng(fs.readFileSync(path.join(src, 'textures/model', name + '.ktx2'))));
+  if (!fs.existsSync(out)) fs.writeFileSync(out, ktx2ToPng(fs.readFileSync(path.join(src, 'textures/model', name + '.ktx2')), opaque));
   return out;
 }
 
@@ -58,8 +59,8 @@ export function boxOf(glb) {
   return lo[0] > hi[0] ? null : [...lo, ...hi];
 }
 
-// the first (largest) level of a .ktx2 file, as RGBA pixels, then as a .png
-export function ktx2ToPng(buf) {
+// the first (largest) level of a .ktx2 file, as RGBA pixels, then as a .png (opaque: every alpha 255)
+export function ktx2ToPng(buf, opaque = false) {
   const vk = buf.readUInt32LE(12), w = buf.readUInt32LE(20), h = buf.readUInt32LE(24), scheme = buf.readUInt32LE(44);
   const off = Number(buf.readBigUInt64LE(80)), len = Number(buf.readBigUInt64LE(88));
   let data = buf.subarray(off, off + len);
@@ -71,7 +72,9 @@ export function ktx2ToPng(buf) {
   else if (scheme !== 0) throw new Error('ktx2: supercompression ' + scheme);
   const kind = { 131: 1, 132: 1, 133: 1, 134: 1, 135: 2, 136: 2, 137: 3, 138: 3 }[vk];
   if (!kind) throw new Error('ktx2: format ' + vk);
-  return png(w, h, decodeBC(data, w, h, kind));
+  const rgba = decodeBC(data, w, h, kind);
+  if (opaque) for (let i = 3; i < rgba.length; i += 4) rgba[i] = 255;
+  return png(w, h, rgba);
 }
 
 function decodeBC(data, w, h, kind) {

@@ -16,6 +16,8 @@
 //            radius circle for grass, blocking and free spots; radius still holds it all
 //   blocker: { r, h } the part that stops movement (default { r: radius, h: height })
 //   blocks:  true / false to skip the height rule of gen/collision.js
+//   colliders: [[x, z, r]]: simple circles that stop a walker instead of its real shape (thin posts, a torch, crates:
+//            the walker slides along a circle, lib/footprints.js bumps), turned with the object
 //   turns:   false if it must not be turned around the up axis (trees: their leaves are lit in place)
 
 const builders = new Map();

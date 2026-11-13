@@ -1,0 +1,11 @@
+{
+  "about": "A mine frame: two wooden posts and a beam across a tunnel, with a lantern hanging from the beam (web/gen/builders/mine.js). It runs along its local z: turn it with atan2(dx, dz) of the tunnel. width: between the posts; height: under the beam.",
+  "builder": "mine",
+  "palettes": {"classic": {}},
+  "sizes": {
+    "small": {"kind": "frame", "width": 1.8, "height": 1.7},
+    "medium": {"kind": "frame", "width": 2.4, "height": 1.9},
+    "large": {"kind": "frame", "width": 3.2, "height": 2.0}
+  },
+  "light": {"sizes": {"small": [1.4, 2.8], "medium": [1.6, 3.2], "large": [1.7, 3.4]}, "color": "#ffa040", "flicker": true}
+}

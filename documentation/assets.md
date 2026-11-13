@@ -169,7 +169,11 @@ world seed and each world gets its own. Its name stops at the size: `terrain/mou
 
 A building is a plan, with one variant: nothing in it is random, so its name ends with `/classic/1`.
 
-Left out on purpose: the player and the slimes, the houses `kame` and `goku` (code, not plans), `raditz-pod` (its door
+- `building/kame-house`: the `kame` preset of the `house` kind (`web/gen/kinds/house.js`), brought back on
+  `try/island-start` as its own builder, `kame-house`, with the stone palettes `pink` and `roof` added.
+- `building/boat`: new, not from `pixel-scene` (your request): the builder `boat`. FlyFF has no boat, only flying boards.
+
+Left out on purpose: the player and the slimes, the house `goku` (code, not plans), `raditz-pod` (its door
 needs its own code, the `pod` block), the painted textures, the Blender pieces (ruins, old layouts), the first and
 third person views, and the `dbz` world (a map of buildings).
 
@@ -182,6 +186,7 @@ Every asset is in one of these groups.
 | Path | What | Script |
 | --- | --- | --- |
 | `assets/character/player/` (but `ual/`) | the human (the FlyFF male), its parts, clips, clothes, weapons and shields | `import-items.mjs` |
+| `assets/character/npc/` (but `npcs.json`) | the FlyFF female (`mvr_female.glb`), its heads, hair, bare body and the Chinese dresses; the textures of opaque clothes made opaque | `import-npcs.mjs` |
 | `assets/monsters/` | the 569 monsters, their 127 models and clips, their stats and the levels | `import-monsters.mjs` |
 | `assets/objects/` (`objects.json`, `models/`) | the 1018 decor objects (chairs, fences, lamps, houses...), drawn in our style | `import-objects.mjs` |
 | `worlds/maps/flarine.json` | the centre of Flarine: its ground, water, ground textures (as our paints) and its objects | `worlds/maps/import-map.mjs` |
@@ -190,10 +195,10 @@ Every asset is in one of these groups.
 
 | Path | What |
 | --- | --- |
-| `assets/rock/` | every rock type |
+| `assets/rock/` | every rock type (and the crystals, `rock/crystal`) |
 | `assets/plant/` | every tree, the bush and the palm (`plant/leafy`: see below) |
 | `assets/water/`, `assets/terrain/` | water, cliffs and mountains |
-| `assets/building/` | the 3 building plans |
+| `assets/building/` | the 3 building plans, the cave mouth, the Kame House (code of `pixel-scene` version-3), the boat, and the mine things (frame, rails, minecart, crates, torch: `web/gen/builders/mine.js`) |
 | `assets/palettes.json`, `assets/render.json`, `assets/textures/` | the colours, the render settings, the sprites of grass, flowers and leaf clumps |
 
 Two cases in between:

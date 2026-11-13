@@ -10,13 +10,16 @@
 //                 it has more than one family (a tree: trunk and canopy).
 //                 The first one is the default.
 //     "sizes":    { small | medium | large: the builder's values }
+//     "light":    optional, it shines (a lamp, a crystal: systems/clouds.js lampSystem):
+//                 { "sizes": { size: [height, radius] }, "color": "#rrggbb" or { palette: "#rrggbb" }, "flicker": true }
+//                 (a size it does not list does not shine)
 //   }
 //
 // One object in the world is named family/type/size/palette/variant, for
 // example rock/sharp/small/grey/2.
 
 export const SIZES = ['small', 'medium', 'large'];
-const FIELDS = ['about', 'builder', 'variants', 'palettes', 'sizes'];
+const FIELDS = ['about', 'builder', 'variants', 'palettes', 'sizes', 'light'];
 const types = new Map();   // 'family/type' -> { name, family, type, builder, variants, palettes, sizes }
 
 // names: 'family/type' of every type to load; root: the URL of assets/
