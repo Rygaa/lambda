@@ -120,27 +120,34 @@ export function setupAdminSystem(world) {
 }
 
 // the Look part: two buttons (Normal, Voxel), the size of a cube in pixels (from 0.5: smaller ones would not fit in
-// memory, the human has 270 frames of cubes), and its light. A new size or light applies
+// memory, the human has 270 frames of cubes), the size of a cube of the human the player plays only (the rest keeps its
+// size), and the light of the cubes. A new size or light applies
 // when the slider is let go. -> a function that shows the values again
 function setupLookPart(world, panel) {
   const look = getResource(world, Look), part = document.createElement('div');
   part.className = 'look';
   part.innerHTML = `<h3>Look</h3><div class="switch"><button id="admin-normal">Normal</button><button id="admin-voxel">Voxel</button></div>
     <label><span>Cube size (pixels)</span><output></output><input id="admin-cube" type="range" min="0.5" max="6" step="0.5"></label>
+    <label><span>Character cube size</span><output></output><input id="admin-player-cube" type="range" min="0.5" max="6" step="0.5"></label>
     <label><span>Cube light</span><select id="admin-light"><option value="surface">like the shape</option><option value="cube">each face</option></select></label>`;
   const normal = part.querySelector('#admin-normal'), voxel = part.querySelector('#admin-voxel');
-  const size = part.querySelector('#admin-cube'), light = part.querySelector('#admin-light'), out = part.querySelector('output');
+  const size = part.querySelector('#admin-cube'), light = part.querySelector('#admin-light'), [out, mine] = part.querySelectorAll('output');
+  const player = part.querySelector('#admin-player-cube');
   const show = () => {
     normal.classList.toggle('on', !look.voxel);
     voxel.classList.toggle('on', look.voxel);
     size.value = look.px;
     out.textContent = look.px;
+    player.value = look.playerPx;
+    mine.textContent = look.playerPx;
     light.value = look.light;
     for (const el of part.querySelectorAll('label')) el.classList.toggle('off', !look.voxel);
   };
   for (const [button, on] of [[normal, false], [voxel, true]]) button.addEventListener('click', () => { button.blur(); look.voxel = on; show(); });
   size.addEventListener('input', () => { out.textContent = size.value; });
   size.addEventListener('change', () => { look.px = Number(size.value); size.blur(); });
+  player.addEventListener('input', () => { mine.textContent = player.value; });
+  player.addEventListener('change', () => { look.playerPx = Number(player.value); player.blur(); });
   light.addEventListener('change', () => { look.light = light.value; light.blur(); });
   show();
   panel.append(part);

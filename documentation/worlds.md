@@ -25,8 +25,9 @@ Keys: the arrows (or W A S D, or Z Q S D) make the human walk, Shift makes it ru
 camera). The wheel zooms, `C` stops or starts the clouds. The `Admin` button at the top left opens a menu. Its `Look` part
 switches between `Normal` and `Voxel` (the default): rocks, plants, cliffs, FlyFF objects, the human and the monsters
 are drawn with small cubes, with the cube size in pixels (0.5 to 6, 1 by default; rocks, plants and cliffs stop at 1,
-because nothing smaller than a pixel shows on them; the human always has cubes of 0.5 px, whatever the cube size:
-`HUMAN_PX` in `web/lib/voxels.js`) and its light (`like the shape` or `each face`). Only the picture changes: the shapes, what stops the human,
+because nothing smaller than a pixel shows on them; the people always have cubes of 0.5 px, whatever the cube size:
+`HUMAN_PX` in `web/lib/voxels.js`), the `Character cube size` (0.5 to 6, 0.5 by default: the cubes of the human you
+play only, nothing else changes; `playerPx` of the Look) and its light (`like the shape` or `each face`). Only the picture changes: the shapes, what stops the human,
 and the fights stay the same (`web/lib/voxels.js`, `web/systems/voxels.js`). Leaves, water, grass and the ground stay
 as they are (the ground of a FlyFF map too). The cubes of a shape or a FlyFF model are made once and every copy uses
 them, turned with it. They are made by workers, one per core of the computer but one, for the world and the bodies

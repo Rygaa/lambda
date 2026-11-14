@@ -68,7 +68,7 @@ export async function goldForm(world, dressed) {
   if (look) {
     // made of cubes: the body without its hair, then the hair (all its cubes, each keeps its place on a strand, so the
     // strands can open; its clear texels make no cubes), moved by the matrix of the head into `moved`
-    const size = look.human.size / (await unitScale(world)).k, snap = BODIES === 'snap';
+    const size = look.player.size / (await unitScale(world)).k, snap = BODIES === 'snap';
     const cubes = await voxelBody(world, { ...body, parts: keep(body.parts) }, { idle: [clips.idle[0].slice(0, -1)] }, size, look.normals, snap);
     const moved = poseGeometry(hair), P = moved.getAttribute('position'), N = moved.getAttribute('normal');
     geometries.push(moved);

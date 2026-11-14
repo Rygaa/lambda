@@ -97,7 +97,7 @@ export function clipNames(config) {
 }
 
 // the clips and meshes of an outfit (slot -> file), in the look now: systems/outfit.js puts them on the human.
-// Made of cubes (lib/voxels.js, always HUMAN_PX pixels: lookOf human), with the colours of the voxel palette; the
+// Made of cubes (lib/voxels.js, its own cube size: lookOf player), with the colours of the voxel palette; the
 // cubes are on the grid of the human, so they turn and move with it. body: its body (lib/bake.js loadBody), so the
 // transformation can change its hair (lib/form.js); none with ?bodies=frames
 export async function dress(world, outfit) {
@@ -106,13 +106,13 @@ export async function dress(world, outfit) {
   const clips = await bakeClips(body, clipNames(config), config.bakeFps, ONCE);
   if (!look) return { clips, meshes: fineMeshes(gpu, body, clips.idle[0]), look: null, body, outfit };
   if (BODIES !== 'frames') {
-    const t = performance.now(), cubes = await voxelBody(world, body, clips, look.human.size / (await unitScale(world)).k, look.normals, BODIES === 'snap');
+    const t = performance.now(), cubes = await voxelBody(world, body, clips, look.player.size / (await unitScale(world)).k, look.normals, BODIES === 'snap');
     console.log(`[bench] human: ${cubes.count} cubes in ${Math.round(performance.now() - t)} ms`);
-    return { clips, meshes: [cubes.mesh()], look: look.human.key, body, outfit };
+    return { clips, meshes: [cubes.mesh()], look: look.player.key, body, outfit };
   }
-  const cubes = await voxelClips(world, body, clips, look.human.size / (await unitScale(world)).k, look.normals);
+  const cubes = await voxelClips(world, body, clips, look.player.size / (await unitScale(world)).k, look.normals);
   for (const frames of Object.values(clips)) for (const frame of frames) for (const g of frame) g.dispose();
-  return { clips: cubes, meshes: [fineMesh(gpu, getResource(world, Voxels).palette.texture, cubes.idle[0][0])], look: look.human.key, body: null, outfit };
+  return { clips: cubes, meshes: [fineMesh(gpu, getResource(world, Voxels).palette.texture, cubes.idle[0][0])], look: look.player.key, body: null, outfit };
 }
 
 // a clip made of parts one after the other (config.sequences: a skill that charges, holds, then shoots). A part:
@@ -175,7 +175,7 @@ export async function addCharacter(world, at, stats, levels = {}) {
   };
   gpu.fine.camera.layers.set(2);
   const wardrobe = getResource(world, Wardrobe), { config, outfit } = wardrobe;
-  wardrobe.look = lookOf(world)?.human.key ?? null;
+  wardrobe.look = lookOf(world)?.player.key ?? null;
   const dressed = await dress(world, outfit), { clips, meshes } = dressed;
   wardrobe.dressed = dressed;
   const group = new THREE.Group();
