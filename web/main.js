@@ -47,7 +47,7 @@ import { npcSystem } from './systems/npcs.js';
 import { setupQuestSystem, questSystem } from './systems/quests.js';
 import { setupNetSystem, netSystem, netSendSystem } from './systems/net.js';
 import { setupRoomSystem, roomSystem } from './systems/room.js';
-import { openRoom, accountInfo } from './lib/room.js';
+import { openRoom, accountInfo, HOME } from './lib/room.js';
 import { params, online } from './lib/address.js';
 import { START } from './lib/combat.js';
 
@@ -94,6 +94,8 @@ function showErrors(fn) {
 // ?room=<id>: a room (lib/room.js; it asks to log in), with the player of the account saved in it (null the first
 // time), or null
 const room = await openRoom(params);
+// online the game needs a room: without one, the home page (web/home.html) chooses it
+if (online && !room) { location.replace(HOME); await new Promise(() => {}); }
 // a player who starts as a Vagabond (level 1, its clothes, a wooden sword and shield in its bag, no admin menu, nothing
 // saved); else the admin, with what saves/admin.json has. Online: every account but the admins (web/serve.py); on this
 // computer: ?player

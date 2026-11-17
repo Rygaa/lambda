@@ -1,3 +1,6 @@
 worlds/baked/
 saves/rooms/
 saves/accounts.json
+
+.venv/
+__pycache__/

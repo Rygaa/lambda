@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projet Lambda</title>
+<!-- The home page (web/serve.py serves it at /): log in or make an account, then the worlds (rooms) of the account:
+     play one (the game: web/?room=<code>), make one, join a friend's with its code, leave one (its owner deletes it).
+     A link ?room=<code> (the Copy link of the game) logs in first, then opens that world. The links are relative to
+     this page, so it works under a path too (/game_02/). -->
+<style>
+  :root { --bg: #13392c; --panel: #0b2a20; --line: #e6f3c433; --text: #e6f3c4; --dim: #e6f3c499; --accent: #b8d86a; --bad: #ffb4a0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: radial-gradient(ellipse at 50% 0%, #1f5a43 0%, var(--bg) 55%, #0b2a20 100%); color: var(--text);
+    font: 13px/1.5 ui-monospace, Menlo, monospace; display: grid; justify-items: center; padding: 48px 16px; }
+  h1 { margin: 0 0 4px; font-size: 28px; letter-spacing: 4px; color: var(--accent); text-shadow: 0 2px 0 #0b2a20; }
+  .sub { margin: 0 0 28px; color: var(--dim); }
+  main { width: min(640px, 100%); }
+  .card { background: #0b2a20e6; border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; margin-bottom: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 14px; color: var(--accent); font-weight: normal; letter-spacing: 1px; }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
+  button { font: inherit; color: var(--text); background: var(--panel); border: 1px solid #e6f3c455; border-radius: 4px; padding: 5px 12px; cursor: pointer; }
+  button:hover { border-color: #e6f3c4aa; }
+  button.on, button.main { color: var(--panel); background: var(--accent); border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  label { display: grid; gap: 4px; margin-bottom: 10px; color: var(--dim); }
+  input { font: inherit; color: var(--text); background: #13392c; border: 1px solid #e6f3c455; border-radius: 4px; padding: 6px 8px; width: 100%; }
+  input:focus { outline: 1px solid var(--accent); }
+  .error { color: var(--bad); min-height: 1.5em; margin: 0 0 8px; }
+  .note { color: var(--dim); margin: 0 0 12px; }
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .bar b { color: var(--accent); font-weight: normal; }
+  .worlds { display: grid; gap: 8px; }
+  .world { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; padding: 10px 12px;
+    background: #ffffff08; border: 1px solid var(--line); border-radius: 4px; }
+  .world .name { font-size: 14px; }
+  .world .name small { color: var(--dim); margin-left: 6px; }
+  .world .meta { color: var(--dim); font-size: 12px; }
+  .world .meta i { font-style: normal; color: var(--accent); }
+  .world .act { grid-row: 1 / 3; grid-column: 2; display: flex; gap: 6px; }
+  .empty { color: var(--dim); padding: 8px 0; }
+  .row { display: flex; gap: 8px; }
+  .row input { flex: 1; }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) { .world { grid-template-columns: 1fr; } .world .act { grid-row: auto; grid-column: auto; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>PROJET LAMBDA</h1>
+  <p class="sub">An island, a boat, and the start of the story.</p>
+
+  <section class="card" id="login" hidden>
+    <div class="tabs"><button data-mode="login" class="on">Log in</button><button data-mode="new">Create account</button></div>
+    <p class="note" id="login-note" hidden></p>
+    <form>
+      <label>Username<input name="username" autocomplete="username" required maxlength="20"></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
+      <p class="error"></p>
+      <button class="main" type="submit">Log in</button>
+    </form>
+  </section>
+
+  <section id="home" hidden>
+    <div class="bar"><span>Logged in as <b id="me"></b></span><button id="logout">Log out</button></div>
+    <div class="card">
+      <h2>MY WORLDS</h2>
+      <div class="worlds" id="worlds"></div>
+    </div>
+    <div class="card">
+      <h2>NEW WORLD</h2>
+      <form class="row" id="create"><input name="title" placeholder="World name" maxlength="32" required><button class="main" type="submit">Create</button></form>
+      <p class="error" id="create-error"></p>
+    </div>
+    <div class="card">
+      <h2>JOIN A FRIEND</h2>
+      <form class="row" id="join"><input name="code" placeholder="World code (8 letters)" maxlength="8" required><button type="submit">Join</button></form>
+      <p class="error" id="join-error"></p>
+    </div>
+  </section>
+</main>
+<script type="module">
+const $ = (sel) => document.querySelector(sel);
+const getJson = (url) => fetch(url).then(async (r) => ({ ok: r.ok, status: r.status, data: await r.json().catch(() => null) }), () => ({ ok: false, status: 0, data: null }));
+const post = (url, body) => fetch(url, { method: 'POST', body: JSON.stringify(body ?? {}) })
+  .then(async (r) => ({ ok: r.ok, status: r.status, data: await r.json().catch(() => null) }), () => ({ ok: false, status: 0, data: { error: 'no server' } }));
+const play = (code) => { location.href = `web/?room=${code}`; };
+// a world code from a link (?room=<code>) waiting for the login
+const wanted = new URLSearchParams(location.search).get('room');
+
+// how long ago: "2 h ago"
+function ago(iso) {
+  const s = (Date.now() - new Date(iso)) / 1000;
+  if (s < 60) return 'just now';
+  for (const [n, unit] of [[86400 * 30, 'month'], [86400, 'day'], [3600, 'h'], [60, 'min']]) {
+    if (s >= n) { const k = Math.floor(s / n); return `${k} ${unit}${unit.length > 3 && k > 1 ? 's' : ''} ago`; }
+  }
+}
+
+async function start() {
+  const { data } = await getJson('account');
+  if (!data?.name) return showLogin();
+  if (wanted) return play(wanted);
+  showHome(data);
+}
+
+// the login form: Log in or Create account
+let mode = 'login';
+async function showLogin() {
+  $('#home').hidden = true;
+  $('#login').hidden = false;
+  if (wanted) {
+    const { data } = await getJson(`rooms/${wanted}`);
+    $('#login-note').hidden = false;
+    $('#login-note').textContent = data?.title ? `Log in to join the world "${data.title}".` : `No world with the code ${wanted}.`;
+  }
+  $('#login input[name=username]').focus();
+}
+for (const b of document.querySelectorAll('#login .tabs button')) {
+  b.addEventListener('click', () => {
+    mode = b.dataset.mode;
+    for (const t of document.querySelectorAll('#login .tabs button')) t.classList.toggle('on', t === b);
+    $('#login button[type=submit]').textContent = mode === 'login' ? 'Log in' : 'Create account';
+    $('#login input[name=password]').autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+    $('#login .error').textContent = '';
+  });
+}
+$('#login form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = new FormData(e.target), button = $('#login button[type=submit]');
+  button.disabled = true;
+  const res = await post(mode === 'login' ? 'account/login' : 'account/new', { username: form.get('username').trim(), password: form.get('password') });
+  button.disabled = false;
+  if (!res.ok) { $('#login .error').textContent = res.data?.error ?? 'no server'; return; }
+  if (wanted) return play(wanted);
+  showHome(res.data);
+});
+
+// the worlds of the account
+function showHome(me) {
+  $('#login').hidden = true;
+  $('#home').hidden = false;
+  $('#me').textContent = me.name + (me.admin ? ' (admin)' : '');
+  loadWorlds();
+}
+async function loadWorlds() {
+  const { ok, data } = await getJson('rooms');
+  const list = $('#worlds');
+  list.replaceChildren();
+  if (!ok) { list.innerHTML = '<p class="empty">The worlds cannot be read.</p>'; return; }
+  if (!data.length) { list.innerHTML = '<p class="empty">No world yet: create one, or join a friend with its code.</p>'; return; }
+  for (const w of data) {
+    const row = document.createElement('div');
+    row.className = 'world';
+    row.innerHTML = `<div class="name"></div><div class="meta"></div><div class="act"><button class="main">Play</button><button></button></div>`;
+    row.querySelector('.name').textContent = w.title;
+    const code = document.createElement('small');
+    code.textContent = w.id;
+    row.querySelector('.name').append(code);
+    const where = w.world ? `${w.world} · level ${w.level ?? 1}` : 'not played yet';
+    const who = w.mine ? 'yours' : `by ${w.owner ?? '?'}`;
+    const online = w.online ? ` · <i>${w.online} online</i>` : '';
+    row.querySelector('.meta').innerHTML = `${who} · ${w.members} player${w.members > 1 ? 's' : ''} · ${where} · ${ago(w.last_played)}${online}`;
+    row.querySelector('.main').addEventListener('click', () => play(w.id));
+    const leave = row.querySelectorAll('button')[1];
+    leave.textContent = w.mine ? 'Delete' : 'Leave';
+    leave.addEventListener('click', async () => {
+      const text = w.mine ? `Delete the world "${w.title}" for every player? This cannot be undone.` : `Leave the world "${w.title}"? Your player there is lost.`;
+      if (!confirm(text)) return;
+      await post(`rooms/${w.id}/leave`);
+      loadWorlds();
+    });
+    list.append(row);
+  }
+}
+$('#create').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const res = await post('rooms', { title: new FormData(e.target).get('title').trim() });
+  if (!res.ok) { $('#create-error').textContent = res.data?.error ?? 'not made'; return; }
+  play(res.data.id);
+});
+$('#join').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const code = new FormData(e.target).get('code').trim().toLowerCase();
+  const { ok, data } = await getJson(`rooms/${encodeURIComponent(code)}`);
+  if (!ok) { $('#join-error').textContent = data?.error ?? 'no such world'; return; }
+  play(code);
+});
+$('#logout').addEventListener('click', async () => { await post('account/logout'); location.href = location.pathname; });
+
+start();
+</script>
+</body>
+</html>

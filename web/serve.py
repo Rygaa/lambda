@@ -1,52 +1,59 @@
-# Static server for the repo, with caching off: web/ reads ../assets and ../worlds.
-# It writes two files, for the Save button of the admin menu (web/systems/admin.js): saves/admin.json (the settings and
-# the stats of the human) and saves/monsters.json (the monster types changed in the admin menu). And the cubes of a world
-# made beforehand: worlds/baked/<world>.bin, sent by the page opened with ?bake (web/lib/voxelSaved.js).
-# The network (web/systems/net.js): a WebSocket at /net?room=<world>&name=<name>. The players of one room (one world)
-# are together: the server gives each one a number, says who comes and who goes, and passes each message on to the
-# others of its room (or to one of them: "to"). The first player of a room is its host (it runs the monsters); when
-# the host goes, the player who came next is the host. A 'ping' (a page alone sends one every 20 s, so a tunnel does
-# not close the connection) goes to nobody. Each join and leave is printed.
-# Accounts (web/lib/room.js): a username and a password, in saves/accounts.json (the password as a salted PBKDF2
-# hash). POST /account/new or /account/login {username, password} logs the browser in: a cookie the page cannot read
-# (COOKIE), kept until POST /account/logout. GET /account: {name} (null: not logged in). A wrong password waits 1 s.
-# Rooms: a player logged in makes a room (POST /rooms {title}: its id) and sends its link (?room=<id>) to its friends.
-# The room keeps the player of each account: saves/rooms/<id>.json {title, players: {username: player}}. A page reads
-# its player (GET /rooms/<id>: {title, name, player}; name null: not logged in, player null the first time) and writes
-# it (POST /rooms/<id>, every 10 s and when it closes). saves/ (but the two admin files) is not served as files.
-# Logged in, a player has its username on the network too.
-# Admins: an account with "admin": true in saves/accounts.json. GET /account says it ({name, admin}); the page shows the
-# Admin menu only to them online. The admin saves (POST /saves/admin.json, /saves/monsters.json, /worlds/baked/...)
-# are refused to the others. An admin lists the accounts (GET /accounts: [{name, admin}]) and makes one admin or not
-# (POST /account/admin {username, admin}), but not itself (so there is always one). A request that did not come through
-# the Cloudflare tunnel (no Cf-Connecting-Ip header: this computer, the tests) counts as an admin.
-#   python3 web/serve.py [port] [--lan] [--prefix=/game_01]   then open http://127.0.0.1:8643/web/
-#   --lan: other computers of the network can open it too (http://<this computer>:8643/web/)
-#   --prefix=/game_01: also answers under /game_01/ (http://127.0.0.1:8701/game_01/web/), for a test branch online
+# The game server: the files of the game, the PostgreSQL database (server/db.py) and the network.
+# Set up once with ./setup.sh; then   python3 web/serve.py [port] [--lan] [--prefix=/test]   (it runs itself with
+# the Python of .venv). http://127.0.0.1:8643/ opens the home page (web/home.html): log in or make an account, then the
+# worlds (rooms) of the account: join one, make one, join a friend's with its code. The game is /web/?room=<code>.
+#   --lan: other computers of the network can open it too (http://<this computer>:8643/)
+#   --prefix=/test: also answers under /test/ (a tunnel rule sends game.aissabenfodda.ca/test/ here), for another
+#   test branch online; its login cookie has its own name
+# Files: only web/, assets/ and worlds/ are served (never a .py file or a name starting with a dot), with caching off.
+# Accounts: POST /account/new or /account/login {username, password} logs the browser in (a cookie the page cannot
+# read, a row of the table sessions), POST /account/logout logs it out, GET /account: {name, admin}. A wrong password
+# waits 1 s. The password is kept as a salted PBKDF2-SHA256 hash.
+# Rooms: GET /rooms: the rooms of the account (made or joined), with its player there and the players online; POST
+# /rooms {title}: a new room (its code); GET /rooms/<code>: joins it (it is then in the list) -> {title, owner, name,
+# player}; POST /rooms/<code> {player}: saves the player of the account there (the page: every 10 s, when it closes, at
+# a portal); POST /rooms/<code>/leave: takes it out of the list (its owner: deletes the room).
+# Admins: an account with admin true. They read and write the admin settings (GET/POST /saves/admin.json and
+# /saves/monsters.json, now in the table settings), the cubes of a world made beforehand (POST /worlds/baked/<w>.bin),
+# list the accounts (GET /accounts) and make one admin or not (POST /account/admin {username, admin}), not themselves.
+# A request that did not come through the Cloudflare tunnel (no Cf-Connecting-Ip header: this computer) counts as admin.
+# The network (web/systems/net.js): a WebSocket at /net?room=<room>/<world>&name=<name>. The players of one room and
+# world are together: the server gives each one a number, says who comes and who goes, and passes each message on to
+# the others (or to one of them: "to"). The first player is the host (it runs the monsters); when it goes, the player
+# who came next is the host. A 'ping' (a page alone sends one every 20 s, so a tunnel does not close the connection)
+# goes to nobody. Each join and leave is printed.
 import http.server, functools, json, os, re, shutil, sys, base64, hashlib, hmac, struct, threading, secrets, time
 from http.cookies import SimpleCookie
 from urllib.parse import urlparse, parse_qs, unquote
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SAVES = {'/saves/admin.json', '/saves/monsters.json'}
+sys.path.insert(0, ROOT)
+try:
+    import psycopg
+except ModuleNotFoundError:
+    # started with the Python of the computer: again with the one of .venv (./setup.sh made it)
+    VENV = os.path.join(ROOT, '.venv')
+    if os.path.exists(os.path.join(VENV, 'bin', 'python')) and os.path.realpath(sys.prefix) != os.path.realpath(VENV):
+        os.execv(os.path.join(VENV, 'bin', 'python'), [os.path.join(VENV, 'bin', 'python'), os.path.abspath(__file__), *sys.argv[1:]])
+    sys.exit('psycopg is missing: run ./setup.sh first')
+from server.db import Store, as_json, db_name
+
+SERVED = ('/web/', '/assets/', '/worlds/')      # the folders served as files
+SETTINGS = {'/saves/admin.json': 'admin', '/saves/monsters.json': 'monsters'}
 BAKED = re.compile(r'^/worlds/baked/[A-Za-z0-9_-]+\.bin$')
 GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
-ROOMS = os.path.join(ROOT, 'saves', 'rooms')
-ROOM = re.compile(r'^/rooms/([a-z0-9]{8})$')
-MAX_ROOMS = 1000           # rooms made, at most
+ROOM = re.compile(r'^/rooms/([a-z0-9]{8})(/leave)?$')
+USERNAME = re.compile(r'^[A-Za-z0-9_]{3,20}$')
+MAX_ROOMS = 20             # rooms one account makes, at most
+MAX_ACCOUNTS = 5000
 MAX_PLAYER = 256 * 1024    # bytes of one saved player, at most
 MAX_FRAME = 1 << 20        # bytes of one WebSocket message, at most: a bigger one closes the connection
-files_lock = threading.Lock()
-ACCOUNTS = os.path.join(ROOT, 'saves', 'accounts.json')
-USERNAME = re.compile(r'^[A-Za-z0-9_]{3,20}$')
-MAX_ACCOUNTS = 5000
-# --prefix=/game_01: the server answers under that path too (a tunnel rule sends game.aissabenfodda.ca/game_01/ here),
-# and its login cookie has its own name, so it does not mix with the one of the live game
 PREFIX = next((a.split('=', 1)[1].rstrip('/') for a in sys.argv[1:] if a.startswith('--prefix=')), '')
 COOKIE = 'lambda' + PREFIX.replace('/', '_')
 YEAR = 365 * 24 * 3600
 
-rooms = {}                 # room -> [Peer], the first one is the host
+store = Store()
+rooms = {}                 # network room (<code>/<world>) -> [Peer], the first one is the host
 rooms_lock = threading.Lock()
 next_id = [1]
 
@@ -68,42 +75,14 @@ class Peer:
             pass
 
 
-def room_file(room_id):
-    return os.path.join(ROOMS, room_id + '.json')
-
-
-def read_room(room_id):
-    try:
-        with open(room_file(room_id)) as f:
-            return json.load(f)
-    except (OSError, ValueError):
-        return None
-
-
-def write_room(room_id, room):
-    os.makedirs(ROOMS, exist_ok=True)
-    with open(room_file(room_id) + '.part', 'w') as f:
-        json.dump(room, f, separators=(',', ':'))
-    os.replace(room_file(room_id) + '.part', room_file(room_id))
-
-
-def read_accounts():
-    try:
-        with open(ACCOUNTS) as f:
-            return json.load(f)
-    except (OSError, ValueError):
-        return {'users': {}, 'sessions': {}}
-
-
-def write_accounts(accounts):
-    os.makedirs(os.path.dirname(ACCOUNTS), exist_ok=True)
-    with open(ACCOUNTS + '.part', 'w') as f:
-        json.dump(accounts, f, separators=(',', ':'))
-    os.replace(ACCOUNTS + '.part', ACCOUNTS)
-
-
 def hash_password(password, salt):
     return hashlib.pbkdf2_hmac('sha256', password.encode(), bytes.fromhex(salt), 200_000).hex()
+
+
+def online_in(code):
+    """the players on the network now in a room (any of its worlds)"""
+    with rooms_lock:
+        return sum(len(peers) for key, peers in rooms.items() if key.startswith(code + '/'))
 
 
 def read_frame(f):
@@ -132,61 +111,83 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store')
         super().end_headers()
 
-    # with --prefix, /game_01/web/... is read as /web/... (the address without it works too)
+    # with --prefix, /test/web/... is read as /web/... (the address without it works too)
     def parse_request(self):
         if not super().parse_request():
             return False
+        self.__dict__.pop('account', None)
+        self.bare_prefix = bool(PREFIX) and self.path.split('?')[0] == PREFIX
         if PREFIX and self.path.startswith(PREFIX) and self.path[len(PREFIX):len(PREFIX) + 1] in ('', '/', '?'):
             rest = self.path[len(PREFIX):]
             self.path = rest if rest.startswith('/') else '/' + rest
         return True
 
-    # the address alone opens the game; no folder is listed, and no file or folder whose name starts with a dot (.git)
-    # or of documentation/ is served
+    # a database error answers 503 (the database is missing or stopped: ./setup.sh)
+    def handle_one_request(self):
+        try:
+            super().handle_one_request()
+        except psycopg.Error as err:
+            print(f'[db] {type(err).__name__}: {err}'.strip(), flush=True)
+            try:
+                self.answer({'error': f'database {db_name()}: run ./setup.sh'}, 503)
+            except OSError:
+                pass
+
     def do_GET(self):
         url = urlparse(self.path)
         if url.path == '/net' and self.headers.get('Upgrade', '').lower() == 'websocket':
             return self.network(parse_qs(url.query))
         if url.path == '/':
-            self.send_response(302)
-            self.send_header('Location', PREFIX + '/web/' + ('?' + url.query if url.query else ''))
-            self.end_headers()
-            return
-        if url.path.startswith('/saves/') and url.path not in SAVES:
-            return self.send_error(404)
+            if self.bare_prefix:          # /test -> /test/, so the links of the page stay under it
+                return self.go(PREFIX + '/' + ('?' + url.query if url.query else ''))
+            self.path = '/web/home.html'
+            return super().do_GET()
+        if url.path in SETTINGS:
+            data = store.setting(SETTINGS[url.path])
+            return self.answer(data) if data is not None else self.send_error(404)
         if url.path == '/account':
-            return self.answer({'name': self.user(), 'admin': self.admin()})
+            me = self.me()
+            return self.answer({'name': me and me['username'], 'admin': self.admin()})
         if url.path == '/accounts':
-            if not self.admin():
-                return self.send_error(403)
-            with files_lock:
-                users = read_accounts()['users']
-            return self.answer(sorted(({'name': u['name'], 'admin': bool(u.get('admin'))} for u in users.values()), key=lambda u: u['name'].lower()))
+            return self.answer(store.accounts()) if self.admin() else self.send_error(403)
+        if url.path == '/rooms':
+            me = self.me()
+            if not me:
+                return self.answer({'error': 'log in first'}, 401)
+            mine = [{**as_json(r), 'online': online_in(r['id'])} for r in store.my_rooms(me['id'])]
+            return self.answer(mine)
         found = ROOM.match(url.path)
-        if found:
-            room, name = read_room(found[1]), self.user()
+        if found and not found[2]:
+            me, room = self.me(), store.room(found[1])
             if room is None:
-                return self.send_error(404, 'no room')
-            return self.answer({'title': room['title'], 'name': name, 'player': room['players'].get(name) if name else None})
+                return self.answer({'error': 'no such room'}, 404)
+            if not me:
+                return self.answer({'error': 'log in first', 'title': room['title']}, 401)
+            store.join(room['id'], me['id'])
+            return self.answer({'title': room['title'], 'owner': room['owner'], 'name': me['username'], 'player': store.player(room['id'], me['id']) or None})
         return super().do_GET()
 
-    # every file (GET and HEAD): none whose path has a part starting with a dot, none of documentation/
+    # the files (GET and HEAD): only web/, assets/ and worlds/, no .py file and no name starting with a dot
     def send_head(self):
         path = unquote(urlparse(self.path).path)
-        if any(part.startswith('.') for part in path.split('/')) or path.startswith('/documentation'):
+        if not path.startswith(SERVED) or path.endswith('.py') or any(part.startswith('.') for part in path.split('/')):
             self.send_error(404)
             return None
         if PREFIX and not path.endswith('/') and os.path.isdir(self.translate_path(self.path)):
-            self.send_response(301)       # a folder without its last /: the address keeps the prefix
-            self.send_header('Location', PREFIX + path + '/' + ('?' + urlparse(self.path).query if urlparse(self.path).query else ''))
-            self.send_header('Content-Length', '0')
-            self.end_headers()
+            query = urlparse(self.path).query      # a folder without its last /: the address keeps the prefix
+            self.go(PREFIX + path + '/' + ('?' + query if query else ''), 301)
             return None
         return super().send_head()
 
     def list_directory(self, path):
         self.send_error(404)
         return None
+
+    def go(self, location, status=302):
+        self.send_response(status)
+        self.send_header('Location', location)
+        self.send_header('Content-Length', '0')
+        self.end_headers()
 
     def answer(self, data, status=200, cookie=None):
         body = json.dumps(data).encode()
@@ -207,90 +208,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return None
         return jar[COOKIE].value if COOKIE in jar else None
 
-    # the username of the account this browser is logged in, or None
+    # the account this browser is logged in: {id, username, admin}, or None (read once per request)
+    def me(self):
+        if not hasattr(self, 'account'):
+            self.account = store.account_of(self.token())
+        return self.account
+
+    # the username, or None
     def user(self):
-        token = self.token()
-        if not token:
-            return None
-        with files_lock:
-            return read_accounts()['sessions'].get(token)
+        me = self.me()
+        return me['username'] if me else None
 
     # an admin account, or this computer (not through the tunnel)
     def admin(self):
-        if 'Cf-Connecting-Ip' not in self.headers:
-            return True
-        name = self.user()
-        if not name:
-            return False
-        with files_lock:
-            return bool(read_accounts()['users'].get(name.lower(), {}).get('admin'))
-
-    # POST /account/admin {username, admin}: only an admin, and not for itself
-    def make_admin(self):
-        if not self.admin():
-            return self.send_error(403)
-        data = self.body(1024)
-        if not isinstance(data, dict):
-            if data is not None:
-                self.send_error(400, 'not an object')
-            return
-        key, me = str(data.get('username', '')).strip().lower(), (self.user() or '').lower()
-        if key == me:
-            return self.answer({'error': 'you cannot change your own admin'}, 400)
-        with files_lock:
-            accounts = read_accounts()
-            user = accounts['users'].get(key)
-            if user is None:
-                return self.answer({'error': 'no such account'}, 404)
-            user['admin'] = bool(data.get('admin'))
-            write_accounts(accounts)
-        print(f'[account] {user["name"]} admin: {user["admin"]} (by {self.user() or "this computer"})', flush=True)
-        return self.answer({'name': user['name'], 'admin': user['admin']})
-
-    # POST /account/new, /account/login, /account/logout
-    def account(self, path):
-        if path == '/account/logout':
-            token = self.token()
-            with files_lock:
-                accounts = read_accounts()
-                if token and accounts['sessions'].pop(token, None):
-                    write_accounts(accounts)
-            return self.answer({'name': None}, cookie='')
-        data = self.body(1024)
-        if not isinstance(data, dict):
-            if data is not None:
-                self.send_error(400, 'not an object')
-            return
-        username, password = str(data.get('username', '')).strip(), str(data.get('password', ''))
-        if path == '/account/new':
-            if not USERNAME.match(username):
-                return self.answer({'error': 'username: 3 to 20 letters, digits or _'}, 400)
-            if not 6 <= len(password) <= 200:
-                return self.answer({'error': 'password: 6 characters or more'}, 400)
-        elif path != '/account/login':
-            return self.send_error(404)
-        key = username.lower()
-        with files_lock:
-            accounts = read_accounts()
-            users = accounts['users']
-            if path == '/account/new':
-                if key in users:
-                    return self.answer({'error': 'this username is taken'}, 409)
-                if len(users) >= MAX_ACCOUNTS:
-                    return self.answer({'error': 'too many accounts'}, 503)
-                salt = secrets.token_hex(16)
-                users[key] = {'name': username, 'salt': salt, 'hash': hash_password(password, salt), 'made': int(time.time())}
-                print(f'[account] {username} made', flush=True)
-            user = users.get(key)
-            good = user is not None and hmac.compare_digest(user['hash'], hash_password(password[:200], user['salt']))
-            if good:
-                token = secrets.token_urlsafe(32)
-                accounts['sessions'][token] = user['name']
-                write_accounts(accounts)
-        if not good:
-            time.sleep(1)
-            return self.answer({'error': 'wrong username or password'}, 401)
-        return self.answer({'name': user['name']}, cookie=token)
+        return 'Cf-Connecting-Ip' not in self.headers or bool(self.me() and self.me()['admin'])
 
     def body(self, most):
         n = int(self.headers.get('Content-Length', 0) or 0)
@@ -299,45 +230,94 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_error(413)
             return None
         try:
-            return json.loads(self.rfile.read(n))
+            data = json.loads(self.rfile.read(n))
         except ValueError:
             self.send_error(400, 'not JSON')
             return None
-
-    # a new room (POST /rooms {title}), or the player of this account in a room (POST /rooms/<id>)
-    def rooms(self, url):
-        name = self.user()
-        if not name:
-            return self.answer({'error': 'log in first'}, 401)
-        if url.path == '/rooms':
-            data = self.body(1024)
-            if not isinstance(data, dict):
-                if data is not None:
-                    self.send_error(400, 'not an object')
-                return
-            title = str(data.get('title', '')).strip()[:32] or 'Room'
-            with files_lock:
-                os.makedirs(ROOMS, exist_ok=True)
-                if sum(1 for f in os.listdir(ROOMS) if f.endswith('.json')) >= MAX_ROOMS:
-                    return self.send_error(503, 'too many rooms')
-                room_id = ''.join(secrets.choice('abcdefghijkmnpqrstuvwxyz23456789') for _ in range(8))
-                write_room(room_id, {'title': title, 'made': int(time.time()), 'players': {}})
-            print(f'[room] {title} ({room_id}) made by {name}', flush=True)
-            return self.answer({'id': room_id, 'title': title})
-        found = ROOM.match(url.path)
-        if not found:
-            return self.send_error(404)
-        data = self.body(MAX_PLAYER)
         if not isinstance(data, dict):
-            if data is not None:
-                self.send_error(400, 'not an object')
+            self.send_error(400, 'not an object')
+            return None
+        return data
+
+    # POST /account/new, /account/login, /account/logout
+    def account_post(self, path):
+        if path == '/account/logout':
+            if self.token():
+                store.log_out(self.token())
+            return self.answer({'name': None}, cookie='')
+        data = self.body(1024)
+        if data is None:
             return
-        with files_lock:
-            room = read_room(found[1])
-            if room is None:
-                return self.send_error(404, 'no room')
-            room['players'][name] = data
-            write_room(found[1], room)
+        username, password = str(data.get('username', '')).strip(), str(data.get('password', ''))[:200]
+        if path == '/account/new':
+            if not USERNAME.match(username):
+                return self.answer({'error': 'username: 3 to 20 letters, digits or _'}, 400)
+            if len(password) < 6:
+                return self.answer({'error': 'password: 6 characters or more'}, 400)
+            if store.count_accounts() >= MAX_ACCOUNTS:
+                return self.answer({'error': 'too many accounts'}, 503)
+            salt = secrets.token_hex(16)
+            user = store.add_account(username, salt, hash_password(password, salt))
+            if user is None:
+                return self.answer({'error': 'this username is taken'}, 409)
+            print(f'[account] {username} made', flush=True)
+        elif path == '/account/login':
+            row = store.account_named(username)
+            user = row if row and hmac.compare_digest(row['password_hash'], hash_password(password, row['salt'])) else None
+            if user is None:
+                time.sleep(1)
+                return self.answer({'error': 'wrong username or password'}, 401)
+        else:
+            return self.send_error(404)
+        return self.answer({'name': user['username'], 'admin': user['admin']}, cookie=store.log_in(user['id']))
+
+    # POST /account/admin {username, admin}: only an admin, and not for itself
+    def make_admin(self):
+        if not self.admin():
+            return self.send_error(403)
+        data = self.body(1024)
+        if data is None:
+            return
+        username = str(data.get('username', '')).strip()
+        if username.lower() == (self.user() or '').lower():
+            return self.answer({'error': 'you cannot change your own admin'}, 400)
+        user = store.set_admin(username, bool(data.get('admin')))
+        if user is None:
+            return self.answer({'error': 'no such account'}, 404)
+        print(f'[account] {user["name"]} admin: {user["admin"]} (by {self.user() or "this computer"})', flush=True)
+        return self.answer(user)
+
+    # POST /rooms {title}, /rooms/<code> {player}, /rooms/<code>/leave
+    def rooms_post(self, path):
+        me = self.me()
+        if not me:
+            return self.answer({'error': 'log in first'}, 401)
+        if path == '/rooms':
+            data = self.body(1024)
+            if data is None:
+                return
+            if store.count_rooms(me['id']) >= MAX_ROOMS:
+                return self.answer({'error': f'{MAX_ROOMS} worlds at most'}, 403)
+            title = str(data.get('title', '')).strip()[:32] or 'World'
+            code = store.add_room(me['id'], title)
+            print(f'[room] {title} ({code}) made by {me["username"]}', flush=True)
+            return self.answer({'id': code, 'title': title})
+        found = ROOM.match(path)
+        room = found and store.room(found[1])
+        if not room:
+            return self.answer({'error': 'no such room'}, 404)
+        if found[2]:
+            if room['owner'] == me['username']:
+                store.delete_room(room['id'])
+                print(f'[room] {room["title"]} ({room["id"]}) deleted by {me["username"]}', flush=True)
+            else:
+                store.leave(room['id'], me['id'])
+            return self.answer({'left': room['id']})
+        data = self.body(MAX_PLAYER)
+        if data is None:
+            return
+        store.join(room['id'], me['id'])
+        store.save_player(room['id'], me['id'], data)
         self.send_response(204)
         self.end_headers()
 
@@ -399,14 +379,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         path = self.path.split('?')[0]
-        if path == '/rooms' or path.startswith('/rooms/'):
-            return self.rooms(urlparse(self.path))
         if path == '/account/admin':
             return self.make_admin()
         if path.startswith('/account/'):
-            return self.account(path)
-        if (BAKED.match(path) or path in SAVES) and not self.admin():
+            return self.account_post(path)
+        if path == '/rooms' or path.startswith('/rooms/'):
+            return self.rooms_post(path)
+        if (BAKED.match(path) or path in SETTINGS) and not self.admin():
             return self.send_error(403, 'admins only')
+        if path in SETTINGS:
+            data = self.body(4 << 20)
+            if data is None:
+                return
+            store.set_setting(SETTINGS[path], data)
+            self.send_response(204)
+            self.end_headers()
+            return
         if BAKED.match(path):
             save = os.path.join(ROOT, path.lstrip('/'))
             os.makedirs(os.path.dirname(save), exist_ok=True)
@@ -425,23 +413,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_response(204)
             self.end_headers()
             return
-        if path not in SAVES:
-            return self.send_error(404)
-        try:
-            data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))))
-        except ValueError:
-            return self.send_error(400, 'not JSON')
-        save = os.path.join(ROOT, path.lstrip('/'))
-        os.makedirs(os.path.dirname(save), exist_ok=True)
-        with open(save, 'w') as f:
-            json.dump(data, f, indent=1)
-            f.write('\n')
-        self.send_response(204)
-        self.end_headers()
+        return self.send_error(404)
 
 
 args = [a for a in sys.argv[1:] if not a.startswith('--')]
 port = int(args[0]) if args else 8643
 host = '0.0.0.0' if '--lan' in sys.argv else '127.0.0.1'
-print(f'http://127.0.0.1:{port}{PREFIX}/web/', flush=True)
+print(f'http://127.0.0.1:{port}{PREFIX}/   (database {db_name()})', flush=True)
 http.server.ThreadingHTTPServer((host, port), functools.partial(Handler, directory=ROOT)).serve_forever()

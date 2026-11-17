@@ -1,56 +1,36 @@
-// The room (lib/room.js, web/serve.py): at the top right, under the network text, a button to make a room (no room
-// now) or the name of the room and a button that copies its link; logged in, the username and Log out. In a room, the
-// page writes the player of its account (portals.js playerData, with its world and where it stands) every SAVE ms and
-// when it closes, so it comes back there.
+// The room (lib/room.js, web/serve.py): at the top right, under the network text, the name of the room, a button that
+// copies its link for a friend, and Home (back to the home page, web/home.html). In a room, the page writes the player
+// of its account (portals.js playerData, with its world and where it stands) every SAVE ms, when it closes and before
+// Home, so it comes back there.
 import { query, getComponent, getResource } from '../ecs/world.js';
 import { Player } from '../components.js';
 import { Settings, Time } from '../resources.js';
 import { playerData } from './portals.js';
-import { makeRoom, roomLink, account, logOut, logInHere } from '../lib/room.js';
+import { roomLink, HOME } from '../lib/room.js';
 
 const SAVE = 10000;   // ms between two saves
 
 const state = { savedAt: 0 };
 
 export function setupRoomSystem(world) {
-  const settings = getResource(world, Settings), room = settings.room;
-  if (!/^https?:$/.test(location.protocol)) return;
+  const room = getResource(world, Settings).room;
+  if (!room || !/^https?:$/.test(location.protocol)) return;
   const el = document.createElement('div');
   el.id = 'room';
   document.body.append(el);
-  const button = document.createElement('button'), out = document.createElement('button');
-  out.textContent = 'Log out';
-  // the last save first: once logged out, the room no longer takes it
-  out.addEventListener('click', async () => { out.blur(); await save(world, false); logOut(); });
-  if (!room) {
-    button.textContent = 'Create room';
-    button.addEventListener('click', () => { button.blur(); makeRoom(); });
-    el.append(button);
-    account().then((name) => {
-      if (!name) {
-        const login = document.createElement('button');
-        login.textContent = 'Log in';
-        login.addEventListener('click', () => { login.blur(); logInHere(); });
-        el.append(login);
-        return;
-      }
-      const who = document.createElement('span');
-      who.textContent = name;
-      el.prepend(who);
-      el.append(out);
-    });
-    return;
-  }
-  const title = document.createElement('span');
-  title.textContent = `room ${room.title} · ${room.name}`;
-  button.textContent = 'Copy link';
-  button.addEventListener('click', async () => {
-    button.blur();
-    const link = roomLink(room.id);
-    try { await navigator.clipboard.writeText(link); button.textContent = 'Copied'; } catch { prompt('The link of the room:', link); }
-    setTimeout(() => { button.textContent = 'Copy link'; }, 1500);
+  const title = document.createElement('span'), link = document.createElement('button'), home = document.createElement('button');
+  title.textContent = `${room.title} · ${room.name}`;
+  link.textContent = 'Copy link';
+  link.addEventListener('click', async () => {
+    link.blur();
+    const url = roomLink(room.id);
+    try { await navigator.clipboard.writeText(url); link.textContent = 'Copied'; } catch { prompt('The link of the world:', url); }
+    setTimeout(() => { link.textContent = 'Copy link'; }, 1500);
   });
-  el.append(title, button, out);
+  home.textContent = 'Home';
+  // the last save first, then the home page
+  home.addEventListener('click', async () => { home.blur(); await save(world, false); location.href = HOME; });
+  el.append(title, link, home);
   // when the page closes (or a portal opens the next world): the last save, sent even as the page goes
   addEventListener('pagehide', () => save(world, true));
 }

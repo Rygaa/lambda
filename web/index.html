@@ -36,22 +36,11 @@
     color: #e6f3c4; font: 12px/1.4 ui-monospace, Menlo, monospace; text-shadow: 0 1px 0 #0b2a20;
   }
   #room span { opacity: .85; }
-  #room button, #ask button {
+  #room button {
     padding: 2px 8px; cursor: pointer; color: #e6f3c4; background: #0b2a20cc; border: 1px solid #e6f3c455; border-radius: 4px;
     font: 12px/1.4 ui-monospace, Menlo, monospace;
   }
-  #room button:hover, #ask button:hover { background: #134030; }
-  #ask {
-    position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; width: min(260px, calc(100vw - 32px));
-    display: grid; gap: 10px; padding: 14px 16px; color: #e6f3c4; background: #0b2a20; border: 1px solid #e6f3c455; border-radius: 4px;
-    font: 12px/1.4 ui-monospace, Menlo, monospace;
-  }
-  #ask label { display: grid; gap: 4px; }
-  #ask input { padding: 4px 6px; color: #e6f3c4; background: #13392c; border: 1px solid #e6f3c455; border-radius: 3px; font: inherit; }
-  #ask div { display: flex; gap: 6px; justify-content: flex-end; }
-  #ask em { color: #ffb4a0; font-style: normal; }
-  #ask em:empty { display: none; }
-  #ask button:disabled { opacity: .5; cursor: default; }
+  #room button:hover { background: #134030; }
   #admin-button {
     position: fixed; left: 12px; top: 10px; padding: 4px 10px; cursor: pointer;
     color: #e6f3c4; background: #0b2a20cc; border: 1px solid #e6f3c455; border-radius: 4px;

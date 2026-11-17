@@ -4,24 +4,19 @@ This guide says how to work with `main`, the official branch of Projet Lambda, a
 
 ## 0. Now: only `main`
 
-Since 2026-11-16, `main` is the only branch, with one commit: it was `attempt_4` (only the FlyFF characters and their
-clips, no Sidekick or Tripo bodies). The other branches and the old history were deleted. The rest of this guide tells
-that history with the old branch names, which no longer exist.
+Since 2026-11-16, `main` is the only branch: it was `attempt_4` (only the FlyFF characters and their clips, no Sidekick
+or Tripo bodies). The other branches and the old history were deleted. The rest of this guide tells that history with
+the old branch names, which no longer exist.
 
-`main` is the live game (`https://game.aissabenfodda.ca/web/`, folder `project-lambda`). New work goes on a test
-branch made from `main`: `game_01`, `game_02`..., each in its own folder (`project-lambda-game_01`, a git worktree)
-and online at `https://game.aissabenfodda.ca/game_01/web/` (`how-we-work.md`, section 6). When it works, its files
-are copied to `main` with `git checkout game_01 -- <files>`, never with `git merge`.
+`main` is the live game (`https://game.aissabenfodda.ca/`, folder `project-lambda`, database `lambda`). All work goes
+directly on `main`: no test branch (`how-we-work.md`, section 6).
 
-| Branch | Folder | Online | What it has |
-| --- | --- | --- | --- |
-| `main` | `project-lambda` | `/web/`, port 8643 | the live game |
+What came to `main` since:
 
-Test branches done (moved to `main`, then deleted):
-
-| Branch | What it brought to `main` | When |
-| --- | --- | --- |
-| `game_01` | the Admin menu in tabs; the pictures of the models saved as PNG files (`assets/make-pictures.mjs`); online the address holds only `?room=`, and only admin accounts have the Admin menu (`Admins` tab) | 2026-11-17 |
+| What | When |
+| --- | --- |
+| the Admin menu in tabs; the pictures of the models saved as PNG files (`assets/make-pictures.mjs`); online the address holds only `?room=`, and only admin accounts have the Admin menu (`Admins` tab) | 2026-11-17 |
+| PostgreSQL in place of the JSON saves; the home page (my worlds, new world, join a friend); `./setup.sh`: one command to set up a computer | 2026-11-17 |
 
 ## 1. The idea
 

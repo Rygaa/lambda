@@ -236,23 +236,29 @@ or with `?solo`, the page plays alone.
   `~/.cloudflared/config.yml` sending `game.aissabenfodda.ca` to `http://localhost:8643`; then
   `https://game.aissabenfodda.ca/web/?world=beach&player&name=<name>`. A test branch is online under its path
   (`/game_01/web/`, `python3 web/serve.py 8701 --prefix=/game_01`): `how-we-work.md`, section 6.
-- Accounts: a username (3 to 20 letters, digits or `_`) and a password (6 characters or more), no email. The form
-  (the `Log in` button at the top right, or `Create room`) has `Log in` and `Create account`; a cookie the page cannot read keeps the browser logged in until `Log out` (top
-  right). The server keeps them in `saves/accounts.json`, the password as a salted PBKDF2 hash; a wrong password waits
-  1 s. Logged in, the name of a player for the others is its username.
-- Admins: an account with `"admin": true` in `saves/accounts.json` (`Aissa` first). Online only an admin has the
+- The home page (`web/home.html`, at `/`), like the server list of Don't Starve Together: `Log in` or `Create
+  account`, then `MY WORLDS` (the rooms the account made or joined, the last played first: name, code, owner, players,
+  where its player is and its level, when, who is online now; `Play`, and `Leave`, or `Delete` for its owner),
+  `NEW WORLD` (a name: the room is made and the game opens) and `JOIN A FRIEND` (a code). Online the game opens only
+  from there: `/web/` without a room, or not logged in, goes back to the home page (a link with a room logs in first,
+  then opens it).
+- Accounts: a username (3 to 20 letters, digits or `_`) and a password (6 characters or more), no email. A cookie the
+  page cannot read keeps the browser logged in until `Log out` (home page). The server keeps them in PostgreSQL (tables
+  `accounts` and `sessions`, `server/db.py`), the password as a salted PBKDF2 hash; a wrong password waits 1 s. Logged
+  in, the name of a player for the others is its username.
+- Admins: an account with `admin` true in the table `accounts` (`Aissa` first). Online only an admin has the
   Admin menu (log in, the page opens again with it); the others are Vagabonds. The server refuses the admin saves
-  (`saves/admin.json`, `saves/monsters.json`, `worlds/baked/`) to the others. The `Admins` tab of the menu lists the
+  (the table `settings`, read and written at `/saves/admin.json` and `/saves/monsters.json`, and `worlds/baked/`) to the others. The `Admins` tab of the menu lists the
   accounts with a box each: ticked, the account is an admin. An admin cannot change its own box, so there is always
   one. A request that did not come through the Cloudflare tunnel (no `Cf-Connecting-Ip` header: this computer, the
   tests) counts as an admin (`web/serve.py`).
-- Rooms: the `Create room` button (top right) logs in first, asks a room name and opens `?room=<id>`; `Copy link`
-  copies that link (only `?room=<id>`; on this computer also `?player` and `?look` of the page) for the friends, who log in when they open it. Only the
-  pages of one room and one world are together. The room keeps the player of each account in `saves/rooms/<id>.json`
-  (`web/serve.py`, `web/lib/room.js`, `web/systems/room.js`): its world, where it stands, its stats, HP, MP, skills,
-  bag, outfit and quests. Each page writes its player every 10 s, when it closes and before `Log out`. Opened again
-  (even when everybody left, or from another browser), the link puts each account back in its world, where it was.
-  `saves/` is not served as files (but the two admin files): a page only reads its own player (`GET /rooms/<id>`).
+- Rooms (worlds): made on the home page; in the game, the bar at the top right shows its name, `Copy link` (the home
+  page with `?room=<code>`, for a friend) and `Home`. Only the pages of one room and one world are together. The room
+  keeps the player of each account (table `room_players`: its world, where it stands, its stats and level, HP, MP,
+  skills, bag, outfit and quests; `web/serve.py`, `web/lib/room.js`, `web/systems/room.js`). Each page writes its
+  player every 10 s, when it closes, at a portal and before `Home`. Played again (even when everybody left, or from
+  another browser), the room puts each account back in its world, where it was. Only `web/`, `assets/` and `worlds/`
+  are served as files: a page only reads its own player (`GET /rooms/<code>`).
 - A hidden tab gets no animation frames: with other players, a worker timer runs the game 20 times a second, so a
   hidden host still runs its monsters and the spawns of the guests.
 - The outfit of a player is sent only when it changes, or when a player comes.

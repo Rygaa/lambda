@@ -4,12 +4,11 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 
 ## 1. Rules
 
-- `main` (it was `attempt_4`) is the live game; the test branches are `game_01`, `game_02`..., each in its own folder.
+- `main` (it was `attempt_4`) is the only branch and the live game. All work goes directly on `main`: no test branch.
   The old branches and history were deleted. The text below still uses the old branch names
   (`documentation/branches.md`, section 0).
-- Branches, moving work, and pushing: `documentation/branches.md`. Short version: new work goes on a
-  test branch `game_NN` made from `main`; push only when the user asks. Never `git merge` into
-  `main`: copy the files with `git checkout <branch> -- <files>`. `attempt_2` is `attempt_1` plus the voxel
+- Branches and pushing: `documentation/branches.md`. Short version: work on `main`; push only when the user asks.
+  The old attempt branches are gone; to bring files from another branch, never `git merge`: copy the files with `git checkout <branch> -- <files>`. `attempt_2` is `attempt_1` plus the voxel
   look (the default, with a loading screen until all is in cubes), the FlyFF decor objects in our style, the sword hits
   of Quaternius, and the FlyFF city Flarine (`?world=flarine`). In Voxel the human always has cubes of 0.5 px. Two ki skills, the Kikoha (R) and the Kamehameha (T), dig holes in the ground. Which assets are FlyFF, ours or archived:
   `documentation/assets.md`, section 7. `attempt_3` is `attempt_2` plus play together: the pages open on the same
@@ -20,10 +19,8 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 - For visual choices, show options and let the user decide. Keep things simple.
 - Test scripts and pictures go in the scratchpad, never in the project.
 - Keep `documentation/worlds.md` and `documentation/branches.md` up to date.
-- `main` is the live game at `https://game.aissabenfodda.ca/web/` (section 6): the folder `project-lambda` runs it.
-  So new work never goes on `main` first: it goes on a test branch `game_01`, `game_02`... in its own folder, online at
-  `https://game.aissabenfodda.ca/game_01/web/` (section 6). Each time `main` changes, the site must run: do the checks
-  of section 6 before saying the work is done.
+- `main` is the live game at `https://game.aissabenfodda.ca/` (section 6): the folder `project-lambda` runs it. Each
+  time `main` changes, the site must run: do the checks of section 6 before saying the work is done.
 
 ## 2. The engine
 
@@ -31,10 +28,15 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 - ECS (`web/ecs/world.js`): components are plain data (`web/components.js`), resources are one of a kind
   (`web/resources.js`), and systems are functions `(world) => void` that run in the order set in `web/main.js`.
   New code follows this rule.
-- The server is `python3 web/serve.py` (port 8643). It serves the files, and it writes two files: `saves/admin.json`
-  and `saves/monsters.json`. It is also the network server: a WebSocket at `/net` that passes the messages of the
-  players of one world to each other (`web/systems/net.js`). `--lan`: other computers of the network can open it.
-- Open `http://localhost:8643/web/?world=rock-types&char=-2.5,-1`. Fights: `?world=combat&player&look=normal`. The worlds and the address options are in
+- Set up a computer with one command: `./setup.sh` (section 7). It makes `.venv` (Python packages:
+  `requirements.txt`), installs and starts PostgreSQL if it is missing, makes the database and its tables
+  (`db/migrations/`) and brings in the old JSON saves once (`db/setup.py`).
+- The server is `python3 web/serve.py` (port 8643; it runs itself with the Python of `.venv`). It serves the files of
+  `web/`, `assets/` and `worlds/`, and keeps the accounts, logins, rooms, players and admin settings in PostgreSQL
+  (`server/db.py`). It is also the network server: a WebSocket at `/net` that passes the messages of the players of one
+  world to each other (`web/systems/net.js`). `--lan`: other computers of the network can open it.
+- `http://localhost:8643/` is the home page (`web/home.html`): log in, then your worlds. On this computer the game also
+  opens without a room: `http://localhost:8643/web/?world=rock-types&char=-2.5,-1`. Fights: `?world=combat&player&look=normal`. The worlds and the address options are in
   `documentation/worlds.md`.
 
 ## 3. What exists
@@ -64,9 +66,11 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | (`try/island-start`) the people who do not fight (Chichi: the FlyFF female), the talk window, the quests and their line at the top left; the cave (`?world=cave`): crystals, theme and clouds `cave` | `assets/character/npc/`, `web/lib/npc.js`, `web/systems/npcs.js`, `assets/quests/quests.json`, `web/systems/quests.js`, `web/gen/builders/crystal.js`, `worlds/cave.json` |
 | (`try/transformation`) the transformation at level 15 (key G), like Super Saiyan: power-up clip (Mesh2Motion, CC0), gold aura of cubes, flash, a free VRoid hair (CC0) that bends into gold Super Saiyan spikes (moved by the head matrix), stronger and faster, MP each second | `web/lib/form.js`, `web/lib/superHair.js`, `web/systems/transform.js`, `web/systems/aura.js`, `skills.json` `transform`, `assets/character/player/m2m/`, `assets/character/player/vroid/` |
 | play together (`attempt_3`): the WebSocket of the server, the other players (Peer) and their ki blasts, the host that runs the monsters and the guests that send it their blows | `web/serve.py`, `web/systems/net.js` |
-| accounts and rooms (`attempt_3`): log in (username, password), make a room, its link, the player of each account saved in `saves/rooms/<id>.json` and put back; admin accounts (`"admin": true` in `saves/accounts.json`, the `Admins` tab) | `web/serve.py`, `web/lib/room.js`, `web/systems/room.js` |
+| the home page: log in or make an account, my worlds (Play, Leave or Delete), new world, join a friend with its code | `web/home.html` |
+| accounts and rooms in PostgreSQL: tables `accounts`, `sessions`, `rooms`, `room_players`, `settings`; the player of each account in each room saved and put back; admin accounts (`admin` column, the `Admins` tab) | `db/migrations/`, `server/db.py`, `web/serve.py`, `web/lib/room.js`, `web/systems/room.js` |
+| the setup of a computer: one command | `setup.sh`, `requirements.txt`, `db/setup.py` |
 | the address: online only `?room=<id>`, every other option only on this computer | `web/lib/address.js` |
-| saved settings and stats, changed monsters, loaded at start | `saves/admin.json`, `saves/monsters.json` |
+| saved settings and stats, changed monsters, loaded at start | table `settings` (`admin`, `monsters`); `saves/admin.json` is only the first value, brought in by `./setup.sh` |
 
 ## 4. The FlyFF data
 
@@ -109,46 +113,40 @@ with Chromium and `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swifts
 - Play together: open two pages (two `browser.newContext()`) on the same world with `&name=`; tick both. The first one
   is the host. A page with `?solo` plays alone.
 
-## 6. The live game and the test branches (game.aissabenfodda.ca)
+## 6. The live game (game.aissabenfodda.ca)
 
-| Address | Branch | Folder | Port |
-| --- | --- | --- | --- |
-| `https://game.aissabenfodda.ca/web/` | `main` (live) | `project-lambda` | 8643 |
+`main` is played online at `https://game.aissabenfodda.ca/` (the home page, then the game). It runs on this computer
+from the folder `project-lambda`, with the database `lambda`. Two programs run, each in its own terminal:
 
-No test branch runs now (`game_01` moved to `main` on 2026-11-17 and was deleted). A test branch `game_NN` is online at
-`/game_NN/` on port `87NN`. Online the address holds only `?room=<id>` (`documentation/worlds.md`, section 1). Each folder has its own `saves/` (accounts, rooms), so a test never touches the players of the live game.
-The programs run on this computer, each in its own terminal:
+- the game server: `cd /Users/mohamedaissabenfodda/Workspace/projects/project-lambda && python3 web/serve.py` (port 8643);
+- the Cloudflare tunnel: `cloudflared tunnel run lambda` (`~/.cloudflared/config.yml` sends `game.aissabenfodda.ca` to
+  `http://localhost:8643`).
 
-- the live game server: `cd /Users/mohamedaissabenfodda/Workspace/projects/project-lambda && python3 web/serve.py`
-  (port 8643);
-- the server of each test branch, with its path: `cd /Users/mohamedaissabenfodda/Workspace/projects/project-lambda-game_01 && python3 web/serve.py 8701 --prefix=/game_01`.
-  `--prefix` makes the server answer under `/game_01/` and gives its login cookie its own name; the page finds the
-  WebSocket next to itself (`../net`), so it works under any path;
-- the Cloudflare tunnel: `cloudflared tunnel run lambda`. `~/.cloudflared/config.yml` sends the paths of each test
-  branch to its port, and the rest of `game.aissabenfodda.ca` to `http://localhost:8643`. With a test branch `game_01`:
+The site serves the files of the folder as they are, so a change is online at once (the players reload their page).
+After each change of `main`:
 
-  ```yaml
-  ingress:
-    - hostname: game.aissabenfodda.ca
-      path: ^/game_01(/|$)
-      service: http://localhost:8701
-    - hostname: game.aissabenfodda.ca
-      service: http://localhost:8643
-    - service: http_status:404
-  ```
+1. If the tables changed (a new file in `db/migrations/`), run `./setup.sh`.
+2. If `web/serve.py` or `server/` changed, stop the game server and start it again (the players reconnect by themselves).
+3. Check that the site answers: `curl -s -o /dev/null -w "%{http_code}\n" https://game.aissabenfodda.ca/` must say
+   `200`. `502` (Bad Gateway): the game server is stopped (`lsof -iTCP:8643 -sTCP:LISTEN`), start it again. `530` or no
+   answer: the tunnel is stopped, start it again.
+4. Tests use another port (`LAMBDA_DB=lambda_test python3 web/serve.py 8651`, after `LAMBDA_DB=lambda_test ./setup.sh`),
+   never 8643 or the database `lambda`: the players are there.
 
-A new test branch `game_02`:
+## 7. Set up a new computer
 
-1. `git worktree add ../project-lambda-game_02 -b game_02 main` (from the folder `project-lambda`).
-2. Start its server: `python3 web/serve.py 8702 --prefix=/game_02`, from its folder.
-3. Add its rule to `~/.cloudflared/config.yml`, above the rule of port 8643, then stop the tunnel and start it again.
+```bash
+git clone git@github.com:Rygaa/lambda.git && cd lambda && ./setup.sh
+```
 
-The site serves the files of the folders as they are, so a change is online at once (the players reload their page).
-When a test branch is done, copy its files to `main` (`git checkout game_01 -- <files>`, from the folder
-`project-lambda`): they are live at once. After each change of `main` or of a test branch:
+`./setup.sh` (macOS with Homebrew, or Debian/Ubuntu) does all of it, and running it again only does what is missing:
 
-1. If `web/serve.py` changed, stop that server and start it again (the players reconnect by themselves).
-2. Check that the site answers: `curl -s -o /dev/null -w "%{http_code}\n" https://game.aissabenfodda.ca/web/` (and
-   `/game_01/web/`) must say `200`. `502` (Bad Gateway): the server of that port is stopped
-   (`lsof -iTCP:8643 -sTCP:LISTEN`), start it again. `530` or no answer: the tunnel is stopped, start it again.
-3. Tests without the site use another port (`python3 web/serve.py 8651`), never 8643 or 87NN: the players are there.
+1. Python 3.11 or newer, and the packages of `requirements.txt` in `.venv` (not in git);
+2. PostgreSQL: installed (`postgresql@18` with Homebrew, `postgresql` with apt) and started if it does not answer;
+3. the database: `lambda` (or the variable `LAMBDA_DB`),
+   made if missing; the migrations of `db/migrations/` not applied yet (table `schema_migrations`); the old JSON saves
+   of `saves/` brought in once, into a database with no account (`db/setup.py`).
+
+Then `python3 web/serve.py` and open `http://127.0.0.1:8643/`. A change of the tables is a new file
+`db/migrations/NNN_<what>.sql`: `./setup.sh` applies it.
+
