@@ -401,8 +401,9 @@ function step(f, dt) {
   let keep = 0;
   for (let i = 0; i < f.live; i++) {
     const c = f.active[i], t = (f.lit[c] += dt);
-    if (rain && f.state[c] === BURNING && Math.random() < out) f.out[c] = 1;
-    const s = (f.state[c] = stateAt(f, c, t));
+    let s = (f.state[c] = stateAt(f, c, t));
+    // the rain puts a burning voxel out (not one that already falls and breaks up)
+    if (rain && s === BURNING && !f.loose[c] && Math.random() < out) { f.out[c] = 1; s = f.state[c] = BURNT; }
     if (f.out[c]) continue;   // put out: black, it does not change any more
     if (s === BURNING && f.power[c] >= MIN_POWER) {
       const k = f.at[c];
@@ -456,20 +457,15 @@ function fall(f, dt) {
   for (let y = 1; y < ny - 1; y++) for (let z = 1; z < nz - 1; z++) for (let x = 1, k = x + nx * y + nxy * z; x < nx - 1; x++, k++) {
     const c = grid[k];
     if (c < 0 || f.state[c] === GONE || !mat(f, c).falls) continue;
-    // not joined to the wood or the ground (alone, or a piece of leaves that holds on nothing): it falls, onto what is
-    // under it
+    // not joined to the wood or the ground (alone, or a piece of leaves that holds on nothing): every voxel of it
+    // breaks up at once, and it falls onto what is under it
+    if (!f.joined[c]) loosen(f, c);
     const free = !f.joined[c] && !(y <= floor || held(k - nx));
     const hangs = !free && !f.was[k - nx] && !f.loose[c] && ((f.state[c] <= BURNING && !f.out[c]) ||
       anchor(k + 1) || anchor(k - 1) || anchor(k + nxy) || anchor(k - nxy) || anchor(k + nx));
     if (!free && (y <= floor || held(k - nx) || hangs ||
         (f.state[c] < BURNING && (held(k + 1) || held(k - 1) || held(k + nxy) || held(k - nxy))))) { f.vel[c] = f.off[c] = 0; continue; }
-    if (!f.loose[c]) {
-      // once it falls, it holds only on what is under it; it breaks up: grey ash in about a second, then gone (one that
-      // did not burn, or that the rain put out, goes back to the voxels that change)
-      f.loose[c] = 1;
-      if (f.state[c] < BURNING || f.out[c]) { f.out[c] = 0; f.lit[c] = 0; f.state[c] = ASH; f.active[f.live++] = c; }
-      f.lit[c] = Math.max(f.lit[c], total(f, c) - (0.5 + Math.random() * 0.9));
-    }
+    loosen(f, c);
     f.vel[c] += GRAVITY * dt;
     f.off[c] += f.vel[c] * dt;
     let at = k, cy = y;
@@ -492,14 +488,25 @@ function fall(f, dt) {
   }
 }
 
+// a voxel that falls, or holds on nothing: from now on it holds only on what is under it, and it breaks up: grey ash in
+// about a second, then gone (one that did not burn, or that the rain put out, goes back to the voxels that change)
+function loosen(f, c) {
+  if (f.loose[c]) return;
+  f.loose[c] = 1;
+  f.cut = true;
+  if (f.state[c] < BURNING || f.out[c]) { f.out[c] = 0; f.lit[c] = 0; f.state[c] = ASH; f.active[f.live++] = c; }
+  f.lit[c] = Math.max(f.lit[c], total(f, c) - (0.5 + Math.random() * 0.9));
+}
+
 // which voxels are joined, voxel by voxel (the 6 next to each), to a voxel of a material that does not fall (the wood,
-// stone) or to the ground
+// stone) or to the ground (a voxel that falls counts as on the ground only where it was at first: a piece that fell
+// and landed is not joined again)
 function join(f, floor) {
   const { grid, n } = f, offs = offsets(f), stack = new Int32Array(n);
   let top = 0;
   f.joined.fill(0);
   for (let c = 0; c < n; c++) {
-    if (f.state[c] === GONE || (mat(f, c).falls && f.xyz[c * 3 + 1] > floor)) continue;
+    if (f.state[c] === GONE || (mat(f, c).falls && (f.xyz[c * 3 + 1] > floor || f.loose[c]))) continue;
     f.joined[c] = 1;
     stack[top++] = c;
   }
@@ -507,7 +514,7 @@ function join(f, floor) {
     const k = f.at[stack[--top]];
     for (const o of offs) {
       const d = grid[k + o];
-      if (d < 0 || f.joined[d] || f.state[d] === GONE) continue;
+      if (d < 0 || f.joined[d] || f.state[d] === GONE || f.loose[d]) continue;
       f.joined[d] = 1;
       stack[top++] = d;
     }
