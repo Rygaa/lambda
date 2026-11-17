@@ -228,16 +228,6 @@ export function burnCube(world, x, y, z, size, hex, life, vx, vy, vz, rise) {
   getResource(world, Ki).sparks.push({ x, y, z, vx, vy, vz, size, color: colorOf(world)(hex), life, rise });
 }
 
-// a flake of ash of a tree that burns (systems/burn.js): light, so the air holds it: it falls slowly (it reaches its
-// own speed fall soon), sways from side to side and drifts, lands on the ground and lies there `rest` seconds, then fades
-export function ashCube(world, x, y, z, size, hex, rest) {
-  const rng = getResource(world, Random), rand = () => nextRandom(rng), a = rand() * 2 * Math.PI, fall = 0.9 + rand() * 0.7;
-  const life = Math.max(0, y - heightAt(getResource(world, Settings).land.terrain, x, z)) / fall + 0.3 + rest;
-  getResource(world, Ki).sparks.push({ x, y, z, vx: 0, vy: 0, vz: 0, size, color: colorOf(world)(hex), life, ash: true, t: 0,
-    fall, sway: 0.25 + rand() * 0.35, f: 2.5 + rand() * 3, ph: rand() * 6.3, dx: Math.cos(a), dz: Math.sin(a),
-    wind: 0.05 + rand() * 0.15 });
-}
-
 // a ball bursts: n cubes of its colours fly away from (x, y, z)
 function burst(ki, x, y, z, colors, n, speed, rand) {
   for (let i = 0; i < n; i++) {
@@ -251,18 +241,6 @@ function sparks(world, ki, dt, put) {
   const terrain = getResource(world, Settings).land.terrain;
   ki.sparks = ki.sparks.filter((s) => {
     s.life -= dt;
-    if (s.ash) {
-      if (!s.landed) {
-        s.t += dt;
-        s.vy += (-s.fall - s.vy) * Math.min(1, dt * 4);
-        const side = Math.sin(s.t * s.f + s.ph) * s.sway + s.wind;
-        s.x += s.dx * side * dt; s.z += s.dz * side * dt; s.y += s.vy * dt;
-        const ground = heightAt(terrain, s.x, s.z) + s.size * 0.5;
-        if (s.y <= ground) { s.y = ground; s.landed = true; }
-      }
-      put(s.x, s.y, s.z, s.life < 0.4 ? Math.max(0.02, s.size * (s.life / 0.4)) : s.size, s.color);
-      return s.life > 0;
-    }
     if (!s.rise) s.vy -= GRAVITY * dt;
     s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt;
     if (s.life <= 0 || s.y < heightAt(terrain, s.x, s.z) - 0.6) return false;
