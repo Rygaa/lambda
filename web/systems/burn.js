@@ -16,7 +16,7 @@ import * as S from '../render/shaders.js';
 import { shaderMaterial } from '../render/materials.js';
 import { voxelize, decodeNormal } from '../lib/voxelCore.js';
 import { lookOf, triangles, oneSided } from '../lib/voxels.js';
-import { burnCube } from './blasts.js';
+import { burnCube, ashCube } from './blasts.js';
 
 const PX = 2;            // a voxel of the fire: PX voxels of the look on each side
 const TREE = /^plant\//;
@@ -272,7 +272,7 @@ function step(f, dt) {
     }
     if (t >= total(f, c)) {
       f.gone[c] = 1;
-      if (f.slot[c] >= 0 && f.fell.length < 40 && Math.random() < 0.1) f.fell.push(c);   // falls as ash
+      if (f.slot[c] >= 0 && f.fell.length < 40 && Math.random() < 0.03) f.fell.push(c);   // falls as ash
       hide(f, c);
       for (const o of offs) { const d = f.grid[f.at[c] + o]; if (d >= 0) show(f, d); }
     } else if (!f.leaf[c] && t >= m.burn + m.ember * 1.4) {
@@ -335,8 +335,7 @@ function draw(world, f, gpu) {
   const g = f.so.group.matrixWorld, v = new THREE.Vector3(), mid = new THREE.Vector3();
   for (const c of f.fell.splice(0)) {
     cellPos(f, c, v).applyMatrix4(g);
-    burnCube(world, v.x, v.y, v.z, size, Math.random() < 0.7 ? '#4a4440' : '#2a2422', 0.6 + Math.random() * 0.8,
-      (Math.random() - 0.5) * 0.3, 0, (Math.random() - 0.5) * 0.3, false);
+    ashCube(world, v.x, v.y, v.z, size, Math.random() < 0.7 ? '#4a4440' : '#2a2422', 0.8 + Math.random() * 1.2);
   }
   let burning = 0;
   for (let i = 0; i < f.live; i++) {
@@ -362,8 +361,7 @@ function draw(world, f, gpu) {
     const c = f.active[Math.floor(Math.random() * f.live)];
     if (f.slot[c] >= 0) {
       cellPos(f, c, v).applyMatrix4(g);
-      burnCube(world, v.x, v.y, v.z, size, Math.random() < 0.5 ? '#3a3431' : '#ff7a20', 0.8 + Math.random() * 0.6,
-        (Math.random() - 0.5) * 0.4, 0.3, (Math.random() - 0.5) * 0.4, false);
+      ashCube(world, v.x, v.y, v.z, size, Math.random() < 0.5 ? '#3a3431' : '#ff7a20', 0.3 + Math.random() * 0.6);
     }
   }
 }
