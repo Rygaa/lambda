@@ -145,7 +145,8 @@ git clone git@github.com:Rygaa/lambda.git && cd lambda && ./setup.sh
 2. PostgreSQL: installed (`postgresql@18` with Homebrew, `postgresql` with apt) and started if it does not answer;
 3. the database: `lambda` (or the variable `LAMBDA_DB`),
    made if missing; the migrations of `db/migrations/` not applied yet (table `schema_migrations`); the old JSON saves
-   of `saves/` brought in once, into a database with no account (`db/setup.py`).
+   of `saves/` brought in once per database (marked `json-saves` in `schema_migrations`: deleted accounts never come
+   back; `db/setup.py`). The first account made in a database is an admin.
 
 Then `python3 web/serve.py` and open `http://127.0.0.1:8643/`. A change of the tables is a new file
 `db/migrations/NNN_<what>.sql`: `./setup.sh` applies it.

@@ -1,6 +1,7 @@
 # The database part of ./setup.sh: makes the database if it is missing, applies the migrations not applied yet
-# (db/migrations), then, once, brings in the old JSON saves of this folder (saves/accounts.json, saves/rooms/*.json,
-# saves/admin.json, saves/monsters.json) when the database has no account yet. Running it again changes nothing.
+# (db/migrations), then brings in the old JSON saves of this folder (saves/accounts.json, saves/rooms/*.json,
+# saves/admin.json, saves/monsters.json) once per database (marked 'json-saves' in schema_migrations, so accounts
+# deleted later never come back). Running it again changes nothing.
 #   .venv/bin/python db/setup.py            (LAMBDA_DB=<name> for another database: server/db.py)
 import datetime, glob, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -33,8 +34,8 @@ def when(seconds):
 
 
 def import_saves(conn):
-    """the old JSON saves, once (only into a database with no account) -> what was brought in"""
-    if conn.execute('select count(*) as n from accounts').fetchone()['n']:
+    """the old JSON saves, once per database -> what was brought in (None: done before)"""
+    if conn.execute("select 1 from schema_migrations where name = 'json-saves'").fetchone():
         return None
     users = (read(os.path.join(SAVES, 'accounts.json')) or {}).get('users', {})
     rooms = [(os.path.basename(p)[:-5], read(p)) for p in sorted(glob.glob(os.path.join(SAVES, 'rooms', '*.json')))]
@@ -63,6 +64,7 @@ def import_saves(conn):
             if data is not None:
                 conn.execute('insert into settings (name, data) values (%s, %s) on conflict do nothing', (name, Jsonb(data)))
                 count['settings'] += 1
+        conn.execute("insert into schema_migrations (name) values ('json-saves')")
     return count
 
 

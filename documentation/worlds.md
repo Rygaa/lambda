@@ -246,7 +246,7 @@ or with `?solo`, the page plays alone.
   page cannot read keeps the browser logged in until `Log out` (home page). The server keeps them in PostgreSQL (tables
   `accounts` and `sessions`, `server/db.py`), the password as a salted PBKDF2 hash; a wrong password waits 1 s. Logged
   in, the name of a player for the others is its username.
-- Admins: an account with `admin` true in the table `accounts` (`Aissa` first). Online only an admin has the
+- Admins: an account with `admin` true in the table `accounts`. The first account made in a database is an admin. Online only an admin has the
   Admin menu (log in, the page opens again with it); the others are Vagabonds. The server refuses the admin saves
   (the table `settings`, read and written at `/saves/admin.json` and `/saves/monsters.json`, and `worlds/baked/`) to the others. The `Admins` tab of the menu lists the
   accounts with a box each: ticked, the account is an admin. An admin cannot change its own box, so there is always

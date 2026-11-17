@@ -79,8 +79,9 @@ class Store:
         return self.one('select count(*) as n from accounts')['n']
 
     def add_account(self, username, salt, password_hash):
-        """-> the new account, or None when the name is taken"""
-        return self.one('insert into accounts (username, salt, password_hash) values (%s, %s, %s) on conflict do nothing returning id, username, admin',
+        """-> the new account, or None when the name is taken. The first account of the database is an admin."""
+        return self.one('''insert into accounts (username, salt, password_hash, admin)
+                           values (%s, %s, %s, not exists (select 1 from accounts)) on conflict do nothing returning id, username, admin''',
                         (username, salt, password_hash))
 
     def log_in(self, account_id):
