@@ -1,0 +1,13 @@
+{
+  "name": "Burn test: one tree on a small field, to try the voxel fire (systems/burn.js): stand near it and press B",
+  "seed": 5,
+  "size": 16,
+  "start": [1.5, -0.4],
+  "clouds": "none",
+  "rays": 0,
+  "burn": true,
+  "clearings": { "count": 1, "radius": [3, 3] },
+  "props": [
+    { "asset": "plant/oak/medium", "at": [[0, -1, 0]] }
+  ]
+}

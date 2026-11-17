@@ -199,6 +199,7 @@ The worlds:
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
+- `burn-test`: one oak on a small field, to try the voxel fire (`"burn": true`): stand next to the tree and press B.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),
@@ -345,6 +346,9 @@ The fields of a world:
 - `rays`: the strength of the light rays, 0 to 1 (default 1).
 - `night`: how dark, 0 (day, default) to 1: the world and the people are dark and blue, and only the rings of the
   lamps (and of the flashlights of a game mode) show their colours (`web/render/shaders.js` uNight).
+- `burn`: `true`: B next to a tree sets it on fire, voxel by voxel (`web/systems/burn.js`): the fire starts at the
+  trunk voxel in front of the human and spreads to the voxels next to it, most upward; each voxel turns red, burns
+  (red, yellow, orange), its embers go dark, it turns black, then grey ash, and it is gone. The tree is gone at the end.
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).

@@ -222,6 +222,12 @@ export function flames(world, x, y, z, r, h, n) {
   }
 }
 
+// one cube of a tree that burns voxel by voxel (systems/burn.js): fire that rises (rise), or ash and embers that fall.
+// hex: its colour '#rrggbb'
+export function burnCube(world, x, y, z, size, hex, life, vx, vy, vz, rise) {
+  getResource(world, Ki).sparks.push({ x, y, z, vx, vy, vz, size, color: colorOf(world)(hex), life, rise });
+}
+
 // a ball bursts: n cubes of its colours fly away from (x, y, z)
 function burst(ki, x, y, z, colors, n, speed, rand) {
   for (let i = 0; i < n; i++) {
