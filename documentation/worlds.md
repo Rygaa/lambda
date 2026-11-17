@@ -199,7 +199,8 @@ The worlds:
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
-- `burn-test`: one oak on a small field, to try the voxel fire (`"burn": true`): press the "Burn the tree" button at the top, or B.
+- `burn-test`: an oak, a bush, wooden crates with a barrel, and a rock on a small field, to try the voxel fire
+  (`"burn": true`): the button at the top, or B, sets fire to the nearest object that can burn. The rock does not burn.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),
@@ -346,10 +347,12 @@ The fields of a world:
 - `rays`: the strength of the light rays, 0 to 1 (default 1).
 - `night`: how dark, 0 (day, default) to 1: the world and the people are dark and blue, and only the rings of the
   lamps (and of the flashlights of a game mode) show their colours (`web/render/shaders.js` uNight).
-- `burn`: `true`: B next to a tree sets it on fire, voxel by voxel (`web/systems/burn.js`): the fire starts at the
-  trunk voxel in front of the human and spreads to the voxels next to it, most upward; each voxel turns red, burns
-  (red, yellow, orange), its embers go dark, it turns black. The leaves then turn to grey ash and are gone; the wood
-  stays black, so a black trunk and its branches are left (they still stop a walker).
+- `burn`: `true`: the button at the top (or B) sets fire to the nearest object that can burn, voxel by voxel
+  (`web/systems/burn.js`). Each voxel has a material (`assets/materials.json`, by the role of its part, or the palette of
+  a stone part: the wooden crates) and a state: normal, heating (red), burning, embers, burnt (black), ash, gone. A
+  material says if it burns, how easily it catches fire, how long it burns and glows, what is left (`char`: it stays
+  black, the wood; `gone`: it turns to ash and is gone, the leaves) and if it falls when nothing is under it. The fire
+  goes from voxel to voxel only where they touch.
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).

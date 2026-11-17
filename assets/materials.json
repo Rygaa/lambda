@@ -1,0 +1,11 @@
+{
+  "about": "What fire does to the voxels of an object (web/systems/burn.js). Each part of an object (its role: trunk, canopy, stone, water) has a material; a stone part whose palette is named in `palettes` has that material instead (the wooden crates and beams are stone parts with the wood palette). A material: burns (it can catch fire), catches (how much of the heat of the fire next to it it takes: more catches fire sooner), burnTime (seconds it burns and gives heat), emberTime (seconds its embers glow, about), after (what is left once it burned: char = it stays black; gone = it turns black, then grey ash, and is gone), charTime (after: gone: seconds it stays black and ash before it is gone), falls (once it caught fire, it falls when the voxel under it is gone).",
+  "materials": {
+    "leaves": { "burns": true, "catches": 0.75, "burnTime": 1.6, "emberTime": 1.6, "after": "gone", "charTime": 4.5, "falls": true },
+    "wood": { "burns": true, "catches": 0.55, "burnTime": 4, "emberTime": 3, "after": "char", "falls": false },
+    "stone": { "burns": false },
+    "water": { "burns": false }
+  },
+  "parts": { "trunk": "wood", "canopy": "leaves", "stone": "stone", "water": "water" },
+  "palettes": { "wood": "wood", "wood-dark": "wood", "palm": "wood" }
+}
