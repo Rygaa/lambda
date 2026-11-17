@@ -199,8 +199,9 @@ The worlds:
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
-- `burn-test`: an oak, a bush, wooden crates with a barrel, and a rock on a small field, to try the voxel fire
-  (`"burn": true`): the button at the top, or B, sets fire to the nearest object that can burn. The rock does not burn.
+- `burn-test`: a small forest (oaks, pines, a fir, a bush), wooden crates with a barrel, and a rock, to try the voxel
+  fire (`"burn": true`): the first button at the top, or B, sets fire to the nearest object that can burn; the fire
+  jumps from tree to tree and gets weaker; the second button turns the rain on or off. The rock does not burn.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),
@@ -352,7 +353,11 @@ The fields of a world:
   a stone part: the wooden crates) and a state: normal, heating (red), burning, embers, burnt (black), ash, gone. A
   material says if it burns, how easily it catches fire, how long it burns and glows, what is left (`char`: it stays
   black, the wood; `gone`: it turns to ash and is gone, the leaves) and if it falls when nothing is under it. The fire
-  goes from voxel to voxel only where they touch.
+  goes from voxel to voxel only where they touch. It can die out by itself: a voxel may resist (`resists`), each voxel
+  keeps only part of the strength of the fire that lit it (`keeps`), and a fire too weak gives no heat. A burning
+  object sets fire to an object less than 2 units away (more often when closer and stronger), and that fire is weaker:
+  a forest fire gets weaker from tree to tree, and a clearing, a path or water stops it. Rain (the second button) puts
+  the burning voxels out (they stay black) and slows the fire.
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).
