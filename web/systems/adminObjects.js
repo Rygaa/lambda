@@ -15,14 +15,12 @@ export function setupObjectsPart(world, panel, picker, preview) {
   // the FlyFF names (the short names of the first 30 are the same models again)
   const names = Object.keys(o.names).filter((n) => o.names[n].model.slice(4).trim() === n).sort();
   let name = names.includes('rustiachair01') ? 'rustiachair01' : names[0];
-  const title = document.createElement('h3');
-  title.textContent = 'Objects';
   const box = document.createElement('div');
   box.className = 'monsters';
   box.innerHTML = `<div class="slot"><span>Object</span><output>${names.length}</output><button id="admin-object"></button></div>
     <div class="slot"><span>Size</span><output id="admin-object-size"></output></div>
     <div class="save"><button id="admin-place">Place</button><button id="admin-objects-clear">Remove all</button></div>`;
-  panel.append(title, box);
+  panel.append(box);
   const $ = (sel) => box.querySelector(sel);
   // the name, and the size in world units (width x height x depth), once the unit is known
   const show = () => {

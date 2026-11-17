@@ -15,6 +15,11 @@
 # its player (GET /rooms/<id>: {title, name, player}; name null: not logged in, player null the first time) and writes
 # it (POST /rooms/<id>, every 10 s and when it closes). saves/ (but the two admin files) is not served as files.
 # Logged in, a player has its username on the network too.
+# Admins: an account with "admin": true in saves/accounts.json. GET /account says it ({name, admin}); the page shows the
+# Admin menu only to them online. The admin saves (POST /saves/admin.json, /saves/monsters.json, /worlds/baked/...)
+# are refused to the others. An admin lists the accounts (GET /accounts: [{name, admin}]) and makes one admin or not
+# (POST /account/admin {username, admin}), but not itself (so there is always one). A request that did not come through
+# the Cloudflare tunnel (no Cf-Connecting-Ip header: this computer, the tests) counts as an admin.
 #   python3 web/serve.py [port] [--lan] [--prefix=/game_01]   then open http://127.0.0.1:8643/web/
 #   --lan: other computers of the network can open it too (http://<this computer>:8643/web/)
 #   --prefix=/game_01: also answers under /game_01/ (http://127.0.0.1:8701/game_01/web/), for a test branch online
@@ -150,7 +155,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if url.path.startswith('/saves/') and url.path not in SAVES:
             return self.send_error(404)
         if url.path == '/account':
-            return self.answer({'name': self.user()})
+            return self.answer({'name': self.user(), 'admin': self.admin()})
+        if url.path == '/accounts':
+            if not self.admin():
+                return self.send_error(403)
+            with files_lock:
+                users = read_accounts()['users']
+            return self.answer(sorted(({'name': u['name'], 'admin': bool(u.get('admin'))} for u in users.values()), key=lambda u: u['name'].lower()))
         found = ROOM.match(url.path)
         if found:
             room, name = read_room(found[1]), self.user()
@@ -203,6 +214,38 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return None
         with files_lock:
             return read_accounts()['sessions'].get(token)
+
+    # an admin account, or this computer (not through the tunnel)
+    def admin(self):
+        if 'Cf-Connecting-Ip' not in self.headers:
+            return True
+        name = self.user()
+        if not name:
+            return False
+        with files_lock:
+            return bool(read_accounts()['users'].get(name.lower(), {}).get('admin'))
+
+    # POST /account/admin {username, admin}: only an admin, and not for itself
+    def make_admin(self):
+        if not self.admin():
+            return self.send_error(403)
+        data = self.body(1024)
+        if not isinstance(data, dict):
+            if data is not None:
+                self.send_error(400, 'not an object')
+            return
+        key, me = str(data.get('username', '')).strip().lower(), (self.user() or '').lower()
+        if key == me:
+            return self.answer({'error': 'you cannot change your own admin'}, 400)
+        with files_lock:
+            accounts = read_accounts()
+            user = accounts['users'].get(key)
+            if user is None:
+                return self.answer({'error': 'no such account'}, 404)
+            user['admin'] = bool(data.get('admin'))
+            write_accounts(accounts)
+        print(f'[account] {user["name"]} admin: {user["admin"]} (by {self.user() or "this computer"})', flush=True)
+        return self.answer({'name': user['name'], 'admin': user['admin']})
 
     # POST /account/new, /account/login, /account/logout
     def account(self, path):
@@ -358,8 +401,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         path = self.path.split('?')[0]
         if path == '/rooms' or path.startswith('/rooms/'):
             return self.rooms(urlparse(self.path))
+        if path == '/account/admin':
+            return self.make_admin()
         if path.startswith('/account/'):
             return self.account(path)
+        if (BAKED.match(path) or path in SAVES) and not self.admin():
+            return self.send_error(403, 'admins only')
         if BAKED.match(path):
             save = os.path.join(ROOT, path.lstrip('/'))
             os.makedirs(os.path.dirname(save), exist_ok=True)

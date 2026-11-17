@@ -1,4 +1,7 @@
-// Pictures of the items and the monsters for the admin menu (systems/admin.js): one small hidden renderer draws each
+// Pictures of the items, the monsters and the objects for the admin menu (systems/admin.js) and the bag: each model has
+// a saved PNG file (pictures/<name>.png next to it, made by assets/make-pictures.mjs), so the page loads no 3D model
+// for them. A model with no file yet is drawn here, and assets/make-pictures.mjs draws them all the same way: one
+// small hidden renderer draws each
 // model alone, turned three quarters, lit, and keeps the picture. Clothes are drawn in their rest pose, without the
 // body; a cap or a mask that is not skinned is drawn as it sits on the head (onHead); a monster at the start of its
 // stand clip (clip). One picture at a time, in the order they are asked for.
@@ -12,19 +15,32 @@ const PARTS = '../assets/character/player/parts/';
 // a .glb file and its clips; its textures are in the folder textures/ next to it
 const load = (url) => loader(url.replace(/[^/]*$/, 'textures/')).loadAsync(url);
 
-// a function (url, { onHead, clip }) -> Promise of the picture (a data URL)
-export function createPreview() {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-  renderer.setPixelRatio(1);
-  renderer.setSize(SIZE, SIZE);
+// the saved picture of a model: pictures/<name>.png next to its .glb (made by assets/make-pictures.mjs)
+export const pictureOf = (url) => url.replace(/([^/]*)\.glb$/, 'pictures/$1.png');
+
+// a function (url, { onHead, clip }) -> Promise of the picture: its saved PNG file, or, when there is none (a new
+// model), the model drawn here (a data URL). saved: false always draws (assets/make-pictures.mjs).
+export function createPreview({ saved = true } = {}) {
+  let renderer = null;   // made at the first drawing: with the saved pictures, often never
   const scene = new THREE.Scene(), camera = new THREE.OrthographicCamera();
   scene.add(new THREE.AmbientLight(0xffffff, 1.4));
   const sun = new THREE.DirectionalLight(0xffffff, 2.2);
   scene.add(sun);
   const pictures = new Map();
   let last = Promise.resolve(), head = null;
+  const fromFile = (url) => new Promise((ok, fail) => {
+    const img = new Image();
+    img.onload = () => ok(img.src);
+    img.onerror = fail;
+    img.src = pictureOf(url);
+  });
 
   async function draw(url, { onHead = false, clip = null } = {}) {
+    if (!renderer) {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1);
+      renderer.setSize(SIZE, SIZE);
+    }
     const gltf = await load(url), root = gltf.scene;
     const action = clip && gltf.animations.find((a) => a.name === clip);
     if (action) new THREE.AnimationMixer(root).clipAction(action).play().getMixer().setTime(0);
@@ -59,8 +75,10 @@ export function createPreview() {
     return picture;
   }
 
+  // the drawings one at a time, in the order they are asked for
+  const drawn = (url, opts) => (last = last.then(() => draw(url, opts), () => draw(url, opts)));
   return (url, opts) => {
-    if (!pictures.has(url)) pictures.set(url, (last = last.then(() => draw(url, opts), () => draw(url, opts))));
+    if (!pictures.has(url)) pictures.set(url, saved ? fromFile(url).catch(() => drawn(url, opts)) : drawn(url, opts));
     return pictures.get(url);
   };
 }

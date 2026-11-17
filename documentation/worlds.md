@@ -11,6 +11,12 @@ python3 web/serve.py
 
 Then open `http://127.0.0.1:8643/web/?world=all-types`.
 
+The options below work only on this computer (`localhost`, `127.0.0.1`: the tests). Online (`game.aissabenfodda.ca`)
+the address holds only the room, `?room=<id>` (`web/lib/address.js`): the page reads nothing else and takes the rest
+away from the address bar. The world comes from the game (the world saved in the room, the portals, else
+`kame-island`), the mode from the account (an admin account has the Admin menu, every other one is a Vagabond:
+"Accounts" below), the look is the default (Voxel), and the name is the username in a room (else `Player <number>`).
+
 - `?world=<name>`: a file of `worlds/`. The default is `kame-island` (the start of the story).
 - `?seed=<number>`: the same recipe with new shapes and new places.
 - `?theme=dbz` or `?theme=namek`: other colours (see section 6).
@@ -72,7 +78,12 @@ hundreds of MB, most for the frames of the human), so git leaves them out (`.git
 the walk speed, the run speed, the jump height, and the zoom while the game runs (`web/systems/admin.js`), and the
 clothes and weapons of the human: head, hair, clothes, gloves, shoes, cap, cloak, mask, weapon, and shield
 (`web/systems/outfit.js`). Each slot opens a grid of pictures of its items, so you see an item before you put it on
-(`web/lib/preview.js`). The items are the FlyFF male parts and the FlyFF weapons and shields of
+(`web/lib/preview.js`). The menu has tabs, one part at a time: `Look`, `Moves` (the sliders), `Outfit` (the slots, each
+with the picture of the item worn), `Monsters`, `Human` and `Objects`; `Save` and `Default` stay at the bottom, and the
+menu opens on the last tab. The pictures (items, monster models, objects, potions) are PNG files of 96 px saved in
+`pictures/` next to the models, so the page loads no 3D model for them; a model with no picture file is drawn in the
+page as before. After an import of new models, `node assets/make-pictures.mjs` makes the missing pictures (`--all`:
+all again, after a change of the drawing in `web/lib/preview.js`). The items are the FlyFF male parts and the FlyFF weapons and shields of
 `assets/character/player/parts/`, listed in `items.json`; `import-items.mjs` makes both from the FlyFF data folder.
 `Save` writes all these values (with the look) to `saves/admin.json` (through `web/serve.py`), and the game starts with them;
 `Default` puts back the values of the code, without saving them (not the monsters or the stats). Trees,
@@ -226,11 +237,17 @@ or with `?solo`, the page plays alone.
   `https://game.aissabenfodda.ca/web/?world=beach&player&name=<name>`. A test branch is online under its path
   (`/game_01/web/`, `python3 web/serve.py 8701 --prefix=/game_01`): `how-we-work.md`, section 6.
 - Accounts: a username (3 to 20 letters, digits or `_`) and a password (6 characters or more), no email. The form
-  has `Log in` and `Create account`; a cookie the page cannot read keeps the browser logged in until `Log out` (top
+  (the `Log in` button at the top right, or `Create room`) has `Log in` and `Create account`; a cookie the page cannot read keeps the browser logged in until `Log out` (top
   right). The server keeps them in `saves/accounts.json`, the password as a salted PBKDF2 hash; a wrong password waits
   1 s. Logged in, the name of a player for the others is its username.
+- Admins: an account with `"admin": true` in `saves/accounts.json` (`Aissa` first). Online only an admin has the
+  Admin menu (log in, the page opens again with it); the others are Vagabonds. The server refuses the admin saves
+  (`saves/admin.json`, `saves/monsters.json`, `worlds/baked/`) to the others. The `Admins` tab of the menu lists the
+  accounts with a box each: ticked, the account is an admin. An admin cannot change its own box, so there is always
+  one. A request that did not come through the Cloudflare tunnel (no `Cf-Connecting-Ip` header: this computer, the
+  tests) counts as an admin (`web/serve.py`).
 - Rooms: the `Create room` button (top right) logs in first, asks a room name and opens `?room=<id>`; `Copy link`
-  copies that link (with `?player` and `?look` of the page) for the friends, who log in when they open it. Only the
+  copies that link (only `?room=<id>`; on this computer also `?player` and `?look` of the page) for the friends, who log in when they open it. Only the
   pages of one room and one world are together. The room keeps the player of each account in `saves/rooms/<id>.json`
   (`web/serve.py`, `web/lib/room.js`, `web/systems/room.js`): its world, where it stands, its stats, HP, MP, skills,
   bag, outfit and quests. Each page writes its player every 10 s, when it closes and before `Log out`. Opened again
@@ -330,8 +347,8 @@ The fields of a world:
   grows under it (`web/systems/objects.js`).
 - `portals`: circles on the ground that take the human to another world: `{ "at": [x, z], "radius": 1.2, "to": "beach",
   "char": [x, z] }`. When the human walks into one, the page opens the world `to` (`worlds/<to>.json`) with the human at
-  `char`, and keeps the other options of the address (`?player`, `?look`...). A portal works only after the human has
-  been out of it, so arriving in one does not send it back (`web/systems/portals.js`). A player (`?player`) takes
+  `char`: both are kept in the session (`sessionStorage`) and the page reloads, so the address does not change. A portal works only after the human has
+  been out of it, so arriving in one does not send it back (`web/systems/portals.js`). A player (a Vagabond, or the player of a room) takes
   itself along: its stats, HP, MP, skills, bag, outfit and quests are kept in the session (`sessionStorage`) and put
   back in the next world; a reload without a portal starts a new Vagabond. The boat of `kame-island` is
   one: put the portal where the object is, a little wider than it.

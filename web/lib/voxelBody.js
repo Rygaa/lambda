@@ -6,6 +6,7 @@
 // With `snap`, each cube goes to the nearest cell of the grid of the body, so each frame looks made of cubes again.
 // The cubes are made in a worker (lib/shell.js, lib/shellWorker.js), which keeps the cubes of each part: a new
 // outfit makes again only the parts that changed (about 50 ms instead of 300), and the game does not wait meanwhile.
+import { params } from './address.js';
 import * as THREE from 'three';
 import { getResource } from '../ecs/world.js';
 import { Gpu, Voxels } from '../resources.js';
@@ -73,10 +74,10 @@ const CUBE = new THREE.BoxGeometry(1, 1, 1);
 
 // for the try: ?bodies=frames (the cubes of every frame, as before), free (the cubes follow the body, off the grid),
 // snap (the default: on the grid)
-export const BODIES = new URLSearchParams(location.search).get('bodies') ?? 'snap';
+export const BODIES = params.get('bodies') ?? 'snap';
 // the places are taken DENSE times closer than the cubes, so where the body stretches (a skirt that walks) no hole opens
 // between them; on the grid, the cubes that fall in one cell are drawn on top of each other
-const DENSE = Number(new URLSearchParams(location.search).get('dense') ?? 2);
+const DENSE = Number(params.get('dense') ?? 2);
 
 // the cubes of a body: made once from the first idle frame of `clips` (lib/bake.js bakeClips). -> a promise of
 // { mesh(): a new mesh of them for one body (lib/bake.js showFrame shows a frame on it), count }. size: the cube edge

@@ -46,7 +46,7 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | clothes, weapons, shields: models, list, import script | `assets/character/player/parts/`, `items.json`, `import-items.mjs` |
 | the outfit: the Wardrobe resource, a new outfit is baked again | `web/systems/outfit.js` |
 | baking any FlyFF model: load, fix, pose each frame, fine-pass meshes | `web/lib/bake.js` |
-| the Admin menu: sliders, item slots with a picture grid, Save and Default | `web/systems/admin.js`, `web/lib/preview.js` |
+| the Admin menu: tabs (Look, Moves, Outfit, Monsters, Human, Objects), sliders, item slots with a picture grid, Save and Default; the pictures of the models saved as PNG files (`pictures/` next to the models), made by `assets/make-pictures.mjs` | `web/systems/admin.js`, `web/lib/preview.js`, `assets/make-pictures.mjs` |
 | the monsters: models, list (`monsters.json`), clips per model (`models.json`), levels, import script | `assets/monsters/`, `import-monsters.mjs` |
 | the monsters in the game: bake, spawn, calm or angry, death | `web/lib/monsters.js`, `web/systems/monsters.js` |
 | fights: stats, damage, chance to hit, XP and levels; blows; the bars and numbers on screen | `web/lib/combat.js`, `web/systems/combat.js`, `web/systems/hud.js` |
@@ -64,7 +64,8 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 | (`try/island-start`) the people who do not fight (Chichi: the FlyFF female), the talk window, the quests and their line at the top left; the cave (`?world=cave`): crystals, theme and clouds `cave` | `assets/character/npc/`, `web/lib/npc.js`, `web/systems/npcs.js`, `assets/quests/quests.json`, `web/systems/quests.js`, `web/gen/builders/crystal.js`, `worlds/cave.json` |
 | (`try/transformation`) the transformation at level 15 (key G), like Super Saiyan: power-up clip (Mesh2Motion, CC0), gold aura of cubes, flash, a free VRoid hair (CC0) that bends into gold Super Saiyan spikes (moved by the head matrix), stronger and faster, MP each second | `web/lib/form.js`, `web/lib/superHair.js`, `web/systems/transform.js`, `web/systems/aura.js`, `skills.json` `transform`, `assets/character/player/m2m/`, `assets/character/player/vroid/` |
 | play together (`attempt_3`): the WebSocket of the server, the other players (Peer) and their ki blasts, the host that runs the monsters and the guests that send it their blows | `web/serve.py`, `web/systems/net.js` |
-| accounts and rooms (`attempt_3`): log in (username, password), make a room, its link, the player of each account saved in `saves/rooms/<id>.json` and put back | `web/serve.py`, `web/lib/room.js`, `web/systems/room.js` |
+| accounts and rooms (`attempt_3`): log in (username, password), make a room, its link, the player of each account saved in `saves/rooms/<id>.json` and put back; admin accounts (`"admin": true` in `saves/accounts.json`, the `Admins` tab) | `web/serve.py`, `web/lib/room.js`, `web/systems/room.js` |
+| the address: online only `?room=<id>`, every other option only on this computer | `web/lib/address.js` |
 | saved settings and stats, changed monsters, loaded at start | `saves/admin.json`, `saves/monsters.json` |
 
 ## 4. The FlyFF data
@@ -113,10 +114,9 @@ with Chromium and `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swifts
 | Address | Branch | Folder | Port |
 | --- | --- | --- | --- |
 | `https://game.aissabenfodda.ca/web/` | `main` (live) | `project-lambda` | 8643 |
-| `https://game.aissabenfodda.ca/game_01/web/` | `game_01` (test) | `project-lambda-game_01` | 8701 |
 
-A test branch `game_NN` is online at `/game_NN/` on port `87NN`. Add `?world=beach&player&name=<name>` to an address
-to play. Each folder has its own `saves/` (accounts, rooms), so a test never touches the players of the live game.
+No test branch runs now (`game_01` moved to `main` on 2026-11-17 and was deleted). A test branch `game_NN` is online at
+`/game_NN/` on port `87NN`. Online the address holds only `?room=<id>` (`documentation/worlds.md`, section 1). Each folder has its own `saves/` (accounts, rooms), so a test never touches the players of the live game.
 The programs run on this computer, each in its own terminal:
 
 - the live game server: `cd /Users/mohamedaissabenfodda/Workspace/projects/project-lambda && python3 web/serve.py`
@@ -125,7 +125,7 @@ The programs run on this computer, each in its own terminal:
   `--prefix` makes the server answer under `/game_01/` and gives its login cookie its own name; the page finds the
   WebSocket next to itself (`../net`), so it works under any path;
 - the Cloudflare tunnel: `cloudflared tunnel run lambda`. `~/.cloudflared/config.yml` sends the paths of each test
-  branch to its port, and the rest of `game.aissabenfodda.ca` to `http://localhost:8643`:
+  branch to its port, and the rest of `game.aissabenfodda.ca` to `http://localhost:8643`. With a test branch `game_01`:
 
   ```yaml
   ingress:

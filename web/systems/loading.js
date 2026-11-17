@@ -5,7 +5,7 @@
 // happens in the game, as before. With ?bake it then sends the cubes to be kept (worlds/baked/<world>.bin).
 import { query, getComponent, getResource } from '../ecs/world.js';
 import { Decor, Prop, SceneObject, Monster, Player } from '../components.js';
-import { Voxels, Wardrobe, Bestiary } from '../resources.js';
+import { Voxels, Wardrobe, Bestiary, Settings } from '../resources.js';
 import { lookOf } from '../lib/voxels.js';
 import { toFile } from '../lib/voxelSaved.js';
 
@@ -43,7 +43,7 @@ export function loadingSystem(world) {
   // ?bake: every cube made or read goes to web/serve.py, which writes worlds/baked/<world>.bin (lib/voxelSaved.js)
   const kept = getResource(world, Voxels).pool.kept;
   if (kept) {
-    const name = new URLSearchParams(location.search).get('world') || 'kame-island';
+    const name = getResource(world, Settings).worldName;
     fetch(`../worlds/baked/${encodeURIComponent(name)}.bin`, { method: 'POST', body: toFile(kept) })
       .then((r) => console.log(r.ok ? `worlds/baked/${name}.bin: ${kept.size} jobs` : `bake not saved: ${r.status}`));
   }

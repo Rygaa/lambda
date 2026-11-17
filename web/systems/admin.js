@@ -1,11 +1,14 @@
-// The admin menu: the button at the top left opens it. Its Look part switches how things are drawn: as they are
+// The admin menu: the button at the top left opens it. Its tabs show one part at a time (Look, Moves, Outfit, Monsters,
+// Human, Objects; the last one is kept in localStorage), with Save and Default always at the bottom. Its Look part switches how things are drawn: as they are
 // (Normal) or made of cubes (Voxel), with the size of a cube and its light (the Look resource, systems/voxels.js).
 // Its sliders change values while the game runs:
 // the walk and run speeds and the jump height of the human (the Tuning resource) and the zoom (the Viewport resource).
-// Its slots change the clothes and weapons of the human (the Wardrobe resource, systems/outfit.js): a slot opens a grid
-// with a picture of each item (lib/preview.js), and a click on a picture puts the item on.
+// Its slots (the Outfit tab) change the clothes and weapons of the human (the Wardrobe resource, systems/outfit.js): each
+// shows the picture of the item worn; a slot opens a grid with a picture of each item (lib/preview.js: saved PNG files),
+// and a click on a picture puts the item on.
 // The Monsters part edits and spawns the monsters, the Human part changes the stats of the human (systems/adminFight.js),
-// the Objects part places FlyFF decor objects (systems/adminObjects.js).
+// the Objects part places FlyFF decor objects (systems/adminObjects.js), the Admins part makes accounts admin or not
+// (web/serve.py: an admin cannot change itself). Online only an admin account has this menu (main.js).
 // Save writes all these values to saves/admin.json and the monster changes to saves/monsters.json (web/serve.py), which
 // the game loads at start (main.js); Default puts back the values of the code (resources.js createTuning,
 // character.json outfit), without saving them; it does not touch the monsters or the stats.
@@ -17,6 +20,7 @@ import { ZOOM_STEP } from './viewport.js';
 import { createPreview } from '../lib/preview.js';
 import { setupMonstersPart, setupHumanPart } from './adminFight.js';
 import { setupObjectsPart } from './adminObjects.js';
+import { accountInfo } from '../lib/room.js';
 
 let showHuman = () => {};   // shows the values of the Human part again (systems/adminFight.js)
 let showObject = () => {};  // shows the chosen object again (its size is known once the human is: systems/adminObjects.js)
@@ -28,6 +32,10 @@ const SLIDERS = [
   ['jump', 'Jump height (Space)', (w) => getResource(w, Tuning).jumpHeight, (w, v) => { getResource(w, Tuning).jumpHeight = v; }, 0.2, 4, 0.1, (v) => v.toFixed(1)],
   ['zoom', 'Zoom', (w) => getResource(w, Viewport).zoom, (w, v) => { const vp = getResource(w, Viewport); vp.zoom = v; vp.dirty = true; }, 0, 0, ZOOM_STEP, (v) => v.toFixed(2)],
 ];
+
+// the tabs: [id, label]
+const TABS = [['look', 'Look'], ['moves', 'Moves'], ['outfit', 'Outfit'], ['human', 'Human'], ['monsters', 'Monsters'], ['objects', 'Objects'], ['admins', 'Admins']];
+const TAB_KEY = 'lambda.adminTab';
 
 // one slot: [slot, label, its first choice ('': none or the bare body; null: no such choice)]
 const SLOTS = [
@@ -41,7 +49,8 @@ export function setupAdminSystem(world) {
   if (getResource(world, Settings).player) { document.getElementById('admin-button').style.display = 'none'; return; }
   const panel = document.getElementById('admin'), refresh = [];   // refresh: show the values again
   document.getElementById('admin-button').addEventListener('click', (e) => { panel.hidden = !panel.hidden; syncZoom(world); e.currentTarget.blur(); });
-  refresh.push(setupLookPart(world, panel));
+  const picker = document.getElementById('picker'), page = setupTabs(panel, picker);
+  refresh.push(setupLookPart(world, page.look));
   for (const [id, label, get, set, min, max, step, show] of SLIDERS) {
     const row = document.createElement('label');
     row.innerHTML = `<span>${label}</span><output></output><input type="range" min="${min}" max="${max}" step="${step}">`;
@@ -52,12 +61,9 @@ export function setupAdminSystem(world) {
     input.addEventListener('input', () => { set(world, Number(input.value)); out.textContent = show(Number(input.value)); });
     input.addEventListener('change', () => input.blur());   // the arrows go back to the human
     refresh.push(() => { input.value = get(world); out.textContent = show(get(world)); });
-    panel.append(row);
+    page.moves.append(row);
   }
-  const w = getResource(world, Wardrobe), picker = document.getElementById('picker'), preview = createPreview();
-  const title = document.createElement('h3');
-  title.textContent = 'Clothes and weapons';
-  panel.append(title);
+  const w = getResource(world, Wardrobe), preview = createPreview();
   for (const [slot, label, none] of SLOTS) {
     // the same name twice gets a number
     const seen = new Map(), items = (none === null ? [] : [{ name: none, file: '' }]).concat(w.slots[slot].map(({ name, file }) => {
@@ -66,31 +72,39 @@ export function setupAdminSystem(world) {
     }));
     const row = document.createElement('div');
     row.className = 'slot';
-    row.innerHTML = `<span>${label}</span><output>${w.slots[slot].length}</output><button></button>`;
-    const button = row.querySelector('button');
+    row.innerHTML = `<span>${label}</span><output>${w.slots[slot].length}</output><button><img alt=""><b></b></button>`;
+    const button = row.querySelector('button'), img = button.querySelector('img');
     button.id = 'admin-' + slot;
-    const wearing = () => { button.textContent = items.find((it) => it.file === (w.outfit[slot] ?? ''))?.name ?? w.outfit[slot]; };
+    const picture = (file) => preview(`../assets/character/player/parts/${file}.glb`, { onHead: slot === 'cap' || slot === 'mask' });
+    // the name and the picture of the item worn (no picture for none or the bare body)
+    const wearing = () => {
+      const file = w.outfit[slot] ?? '';
+      button.querySelector('b').textContent = items.find((it) => it.file === file)?.name ?? file;
+      img.removeAttribute('src');
+      if (file) picture(file).then((url) => { if ((w.outfit[slot] ?? '') === file) img.src = url; }, () => {});
+    };
     wearing();
     refresh.push(wearing);
     button.addEventListener('click', () => {
       button.blur();
       if (!picker.hidden && picker.dataset.slot === slot) { picker.hidden = true; return; }
-      const picture = (file) => preview(`../assets/character/player/parts/${file}.glb`, { onHead: slot === 'cap' || slot === 'mask' });
       openPicker(picker, slot, label, items, picture, () => w.outfit[slot] ?? '', (file) => {
         w.outfit[slot] = file || null;
         w.dirty = true;
         wearing();
       });
     });
-    panel.append(row);
+    page.outfit.append(row);
   }
   document.getElementById('admin-button').addEventListener('click', () => { if (panel.hidden) picker.hidden = true; });
-  setupMonstersPart(world, panel, picker, preview);
-  showHuman = setupHumanPart(world, panel);
-  showObject = setupObjectsPart(world, panel, picker, preview);
+  setupMonstersPart(world, page.monsters, picker, preview);
+  showHuman = setupHumanPart(world, page.human);
+  showObject = setupObjectsPart(world, page.objects, picker, preview);
+  const showAdmins = setupAdminsPart(page.admins);
+  document.getElementById('admin-tab-admins').addEventListener('click', showAdmins);
 
   const bar = document.createElement('div');
-  bar.className = 'save';
+  bar.className = 'save bottom';
   bar.innerHTML = `<button id="admin-save">Save</button><button id="admin-default">Default</button><span></span>`;
   const status = bar.querySelector('span');
   bar.querySelector('#admin-save').addEventListener('click', async (e) => {
@@ -119,6 +133,65 @@ export function setupAdminSystem(world) {
   panel.append(bar);
 }
 
+// the Admins part: each account with a box, ticked for an admin (GET /accounts, POST /account/admin); the box of the
+// account of this page cannot change. -> a function that reads the accounts again
+function setupAdminsPart(page) {
+  const list = document.createElement('div'), status = document.createElement('p');
+  list.className = 'accounts';
+  status.className = 'status';
+  page.append(list, status);
+  const show = async () => {
+    const [me, accounts] = await Promise.all([accountInfo(), fetch('../accounts').then((r) => (r.ok ? r.json() : null), () => null)]);
+    list.replaceChildren();
+    status.textContent = accounts ? `${accounts.filter((a) => a.admin).length} admin(s) of ${accounts.length} accounts` : 'the accounts cannot be read';
+    for (const { name, admin } of accounts ?? []) {
+      const row = document.createElement('label');
+      row.innerHTML = `<input type="checkbox"><span></span>`;
+      const box = row.querySelector('input');
+      row.querySelector('span').textContent = name + (name === me.name ? ' (you)' : '');
+      box.checked = admin;
+      box.disabled = name === me.name;
+      box.addEventListener('change', async () => {
+        box.blur();
+        const res = await fetch('../account/admin', { method: 'POST', body: JSON.stringify({ username: name, admin: box.checked }) }).catch(() => null);
+        const data = await res?.json().catch(() => null);
+        if (!res?.ok) { box.checked = !box.checked; status.textContent = data?.error ?? 'not changed'; return; }
+        status.textContent = `${data.name}: ${data.admin ? 'admin' : 'not admin'}`;
+      });
+      list.append(row);
+    }
+  };
+  show();
+  return show;
+}
+
+// the tab bar and one page per tab, in the panel -> { id: its page }; a click on a tab shows its page alone and closes
+// the grid of pictures
+function setupTabs(panel, picker) {
+  const bar = document.createElement('nav'), page = {};
+  bar.className = 'tabs';
+  panel.append(bar);
+  const open = (id) => {
+    for (const [key] of TABS) { page[key].hidden = key !== id; bar.querySelector(`[data-tab="${key}"]`).classList.toggle('on', key === id); }
+    try { localStorage.setItem(TAB_KEY, id); } catch { /* no storage: the first tab next time */ }
+  };
+  for (const [id, label] of TABS) {
+    const button = document.createElement('button');
+    button.dataset.tab = id;
+    button.id = 'admin-tab-' + id;
+    button.textContent = label;
+    button.addEventListener('click', () => { button.blur(); picker.hidden = true; open(id); });
+    bar.append(button);
+    page[id] = document.createElement('div');
+    page[id].className = 'page';
+    panel.append(page[id]);
+  }
+  let first = TABS[0][0];
+  try { first = TABS.find(([id]) => id === localStorage.getItem(TAB_KEY))?.[0] ?? first; } catch { /* no storage */ }
+  open(first);
+  return page;
+}
+
 // the Look part: two buttons (Normal, Voxel), the size of a cube in pixels (from 0.5: smaller ones would not fit in
 // memory, the human has 270 frames of cubes), the size of a cube of the human the player plays only (the rest keeps its
 // size), and the light of the cubes. A new size or light applies
@@ -126,7 +199,7 @@ export function setupAdminSystem(world) {
 function setupLookPart(world, panel) {
   const look = getResource(world, Look), part = document.createElement('div');
   part.className = 'look';
-  part.innerHTML = `<h3>Look</h3><div class="switch"><button id="admin-normal">Normal</button><button id="admin-voxel">Voxel</button></div>
+  part.innerHTML = `<div class="switch"><button id="admin-normal">Normal</button><button id="admin-voxel">Voxel</button></div>
     <label><span>Cube size (pixels)</span><output></output><input id="admin-cube" type="range" min="0.5" max="6" step="0.5"></label>
     <label><span>Character cube size</span><output></output><input id="admin-player-cube" type="range" min="0.5" max="6" step="0.5"></label>
     <label><span>Cube light</span><select id="admin-light"><option value="surface">like the shape</option><option value="cube">each face</option></select></label>`;

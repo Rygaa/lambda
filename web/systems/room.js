@@ -6,7 +6,7 @@ import { query, getComponent, getResource } from '../ecs/world.js';
 import { Player } from '../components.js';
 import { Settings, Time } from '../resources.js';
 import { playerData } from './portals.js';
-import { makeRoom, roomLink, account, logOut } from '../lib/room.js';
+import { makeRoom, roomLink, account, logOut, logInHere } from '../lib/room.js';
 
 const SAVE = 10000;   // ms between two saves
 
@@ -27,7 +27,13 @@ export function setupRoomSystem(world) {
     button.addEventListener('click', () => { button.blur(); makeRoom(); });
     el.append(button);
     account().then((name) => {
-      if (!name) return;
+      if (!name) {
+        const login = document.createElement('button');
+        login.textContent = 'Log in';
+        login.addEventListener('click', () => { login.blur(); logInHere(); });
+        el.append(login);
+        return;
+      }
       const who = document.createElement('span');
       who.textContent = name;
       el.prepend(who);

@@ -1,3 +1,5 @@
+import { params as addressParams } from './address.js';
+
 // Accounts and rooms (web/serve.py): a player logs in with a username and a password (a cookie keeps it logged in),
 // makes a room and sends its link (?room=<id>) to its friends. The room keeps the player of each account
 // (systems/room.js writes it): its world, where it stands, its stats, HP, MP, skills, bag, outfit and quests. Opened
@@ -30,13 +32,20 @@ const getJson = (url) => fetch(url).then((r) => (r.ok ? r.json() : null), () => 
 
 // the username of the account this browser is logged in, or null
 export const account = () => getJson('../account').then((a) => a?.name ?? null);
+// { name (null: not logged in), admin } of this browser (web/serve.py)
+export const accountInfo = () => getJson('../account').then((a) => ({ name: a?.name ?? null, admin: !!a?.admin }));
 
 export async function logOut() {
   await fetch('../account/logout', { method: 'POST' }).catch(() => {});
   location.reload();
 }
 
-// makes a room and opens it (the address keeps ?player and ?look); logs in first
+// logs in (outside a room) and opens the page again, so an admin gets its menu
+export async function logInHere() {
+  if (await logIn('Log in', true)) location.reload();
+}
+
+// makes a room and opens it (on this computer the address keeps ?player and ?look); logs in first
 export async function makeRoom() {
   if (!(await account()) && !(await logIn('Log in to make a room', true))) return;
   const values = await ask('New room', [['title', 'Room name']], ['Make', 'Cancel']);
@@ -46,12 +55,12 @@ export async function makeRoom() {
   location.search = '?' + linkParams((await res.json()).id);
 }
 
-// the link of a room: ?room, and ?player and ?look of this page
+// the link of a room: ?room (and on this computer ?player and ?look of this page)
 export function roomLink(id) {
   return `${location.origin}${location.pathname}?${linkParams(id)}`;
 }
 function linkParams(id) {
-  const now = new URLSearchParams(location.search), params = new URLSearchParams({ room: id });
+  const now = addressParams, params = new URLSearchParams({ room: id });
   for (const k of ['player', 'look']) if (now.has(k)) params.set(k, now.get(k));
   return params.toString().replace(/=(?=&|$)/g, '');
 }

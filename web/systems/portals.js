@@ -1,6 +1,6 @@
 // Portals (recipe "portals", gen/recipe.js): a circle on the ground that takes the human to another world. When the
-// human walks into it, the page opens the world `to` with the human at `char` (the address keeps its other options:
-// ?player, ?look...). A portal works only once the human has been out of it, so a human who arrives in a portal
+// human walks into it, the page opens the world `to` with the human at `char`: both are kept in the session (GO) and the
+// page reloads, so the address does not change (online it holds only the room: lib/address.js). A portal works only once the human has been out of it, so a human who arrives in a portal
 // (or starts in it) must step out and back in.
 // A player (?player) takes itself along: its stats, HP, MP, skills, bag, outfit and quests are kept in the session
 // (sessionStorage CARRY) and main.js puts them back in the next world (carried). The player of a room too (lib/room.js).
@@ -9,6 +9,7 @@ import { Player, Stats, Health, Mana, Skills } from '../components.js';
 import { Settings, Inventory, Wardrobe, Quests } from '../resources.js';
 
 export const CARRY = 'lambda-carry';
+const GO = 'lambda-go';
 
 const state = { armed: new Set(), gone: false };
 
@@ -24,11 +25,8 @@ export function portalSystem(world) {
     if (!state.armed.has(i)) continue;
     state.gone = true;
     if (getResource(world, Settings).player || getResource(world, Settings).room) carry(world, human);
-    const params = new URLSearchParams(location.search);
-    params.set('world', portal.to);
-    if (portal.char) params.set('char', portal.char.join(',')); else params.delete('char');
-    for (const k of ['seed', 'bake', 'nochar']) params.delete(k);
-    location.search = params.toString().replace(/=(?=&|$)/g, '');
+    try { sessionStorage.setItem(GO, JSON.stringify({ world: portal.to, char: portal.char ?? null })); } catch (err) { console.error('portal: no session', err); }
+    location.reload();
     return;
   }
 }
@@ -43,6 +41,15 @@ export function playerData(world, human) {
   const get = (C) => getComponent(world, human, C);
   return { stats: get(Stats), hp: get(Health).hp, mp: get(Mana).mp, skills: get(Skills).levels,
     bag: getResource(world, Inventory).bag, outfit: getResource(world, Wardrobe).outfit, quests: getResource(world, Quests).state };
+}
+
+// the world and the place of the portal that opened this page: { world, char } (once: it is then forgotten), or null
+export function goingTo() {
+  try {
+    const data = JSON.parse(sessionStorage.getItem(GO));
+    sessionStorage.removeItem(GO);
+    return data?.world ? data : null;
+  } catch { return null; }
 }
 
 // the player kept by the portal that opened this page (once: it is then forgotten), or null

@@ -25,8 +25,6 @@ const write = (type, key, v) => { const ks = key.split('.'); ks.slice(0, -1).red
 export function setupMonstersPart(world, panel, picker, preview) {
   const b = getResource(world, Bestiary);
   let type = b.types.find((t) => t.name === 'Aibatt') ?? b.types[0];
-  const title = document.createElement('h3');
-  title.textContent = 'Monsters';
   const box = document.createElement('div');
   box.className = 'monsters';
   box.innerHTML = `<div class="slot"><span>Monster</span><output></output><button id="admin-monster"></button></div>
@@ -34,7 +32,7 @@ export function setupMonstersPart(world, panel, picker, preview) {
     <div class="slot"><span>Model</span><output>${Object.keys(b.models).length}</output><button id="admin-monster-model"></button></div>
     <div class="fields"></div>
     <div class="save"><button id="admin-spawn">Spawn</button><button id="admin-copy">Copy</button><button id="admin-delete">Delete</button><button id="admin-clear">Remove all</button></div>`;
-  panel.append(title, box);
+  panel.append(box);
   const $ = (sel) => box.querySelector(sel);
   const fields = FIELDS.map(([key, label, step, min]) => {
     const row = document.createElement('label');
@@ -135,8 +133,6 @@ export function setupMonstersPart(world, panel, picker, preview) {
 
 // the Human part: returns a function that shows its values again (they change while it fights)
 export function setupHumanPart(world, panel) {
-  const title = document.createElement('h3');
-  title.textContent = 'Human';
   const box = document.createElement('div');
   box.className = 'fields';
   const stats = () => { const e = query(world, [Player, Stats, Health])[0]; return e === undefined ? null : [getComponent(world, e, Stats), getComponent(world, e, Health)]; };
@@ -167,7 +163,7 @@ export function setupHumanPart(world, panel) {
     const got = stats();
     if (got) got[1].hp = got[1].max;
   });
-  panel.append(title, box, heal);
+  panel.append(box, heal);
   return () => {
     const got = stats();
     if (got) for (const [key, input] of inputs) if (document.activeElement !== input) input.value = got[0][key];

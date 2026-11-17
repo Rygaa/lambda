@@ -22,6 +22,7 @@
 //   kill   the host: the monster m died of your blow       blow   the host: the monster m hits you
 //   spawn  a guest asks the host for a monster (its admin menu): type, x, z, rot
 //   welcome, join, leave: the server (who is here, who comes and goes, who is the host)
+import { params } from '../lib/address.js';
 import * as THREE from 'three';
 import { query, getComponent, getResource, sendEvent, spawn, destroyEntity, added } from '../ecs/world.js';
 import { Player, Peer, Monster, Health, Stats, Skills, Blast } from '../components.js';
@@ -42,7 +43,7 @@ const FOLLOW = 12;           // how fast a player goes to where its last message
 const JUMP = 3;              // farther than this, it is put there at once
 
 export function setupNetSystem(world) {
-  const net = getResource(world, Net), params = new URLSearchParams(location.search), settings = getResource(world, Settings);
+  const net = getResource(world, Net), settings = getResource(world, Settings);
   if (params.has('solo') || !/^https?:$/.test(location.protocol)) return;
   const room = (settings.room ? settings.room.id + '/' : '') + settings.worldName + (params.has('seed') ? '#' + params.get('seed') : '');
   // next to the page (../net), so a server under a path (game.aissabenfodda.ca/game_01/) gets it too

@@ -42,12 +42,13 @@ import { setupTransformSystem, transformSystem } from './systems/transform.js';
 import { auraSystem } from './systems/aura.js';
 import { setupInventorySystem, inventorySystem } from './systems/inventory.js';
 import { dropSystem } from './systems/drops.js';
-import { portalSystem, carried } from './systems/portals.js';
+import { portalSystem, carried, goingTo } from './systems/portals.js';
 import { npcSystem } from './systems/npcs.js';
 import { setupQuestSystem, questSystem } from './systems/quests.js';
 import { setupNetSystem, netSystem, netSendSystem } from './systems/net.js';
 import { setupRoomSystem, roomSystem } from './systems/room.js';
-import { openRoom } from './lib/room.js';
+import { openRoom, accountInfo } from './lib/room.js';
+import { params, online } from './lib/address.js';
 import { START } from './lib/combat.js';
 
 // ------------------------------------------------------------------ assets
@@ -89,22 +90,25 @@ function showErrors(fn) {
     throw err;
   }
 }
-const params = new URLSearchParams(location.search);
-// ?player: a player who starts as a Vagabond (level 1, its clothes, a wooden sword and shield in its bag, no admin
-// menu, nothing saved); else the admin, with what saves/admin.json has
-const player = params.has('player');
+// the options of the address (lib/address.js): online, only ?room
 // ?room=<id>: a room (lib/room.js; it asks to log in), with the player of the account saved in it (null the first
 // time), or null
 const room = await openRoom(params);
+// a player who starts as a Vagabond (level 1, its clothes, a wooden sword and shield in its bag, no admin menu, nothing
+// saved); else the admin, with what saves/admin.json has. Online: every account but the admins (web/serve.py); on this
+// computer: ?player
+const player = online ? !(await accountInfo()).admin : params.has('player');
 // a player who came through a portal (systems/portals.js): its stats, bag, outfit and quests
 const came = player || room ? carried() : null;
 // the player this page starts with: the one of the portal, else the one saved in the room, else none
 const me = came ?? room?.player ?? null;
-// ?world=<name>: worlds/<name>.json (else the world of the player saved in the room, else kame-island), ?seed=<n>
-// changes its seed
-const worldName = params.get('world') || room?.player?.world || 'kame-island';
-// where the human starts: where it was saved in this world (not after a portal: where the portal puts it), else ?char
-const kept = room?.player, startAt = kept && !came && kept.world === worldName && Number.isFinite(kept.x) && Number.isFinite(kept.z)
+// the world and the place a portal opened this page with (once), or null
+const going = goingTo();
+// the world: the one of the portal, else ?world=<name> (on this computer), else the world of the player saved in the
+// room, else kame-island; ?seed=<n> changes its seed
+const worldName = going?.world || params.get('world') || room?.player?.world || 'kame-island';
+// where the human starts: where the portal puts it, else where it was saved in this world, else ?char
+const kept = room?.player, startAt = going ? going.char ?? undefined : kept && kept.world === worldName && Number.isFinite(kept.x) && Number.isFinite(kept.z)
   ? [kept.x, kept.z] : params.get('char')?.split(',').map(Number);
 const recipe = await loadRecipe(worldName);
 // "map": a part of a FlyFF map, worlds/maps/<name>.json (gen/map.js)
@@ -127,7 +131,7 @@ const COVER = 32;
 const world = createWorld();
 setResource(world, Res.Settings, {
   canvas: document.getElementById('c'),
-  player,                           // ?player: a Vagabond, no admin menu
+  player,                           // a Vagabond, no admin menu (online: not an admin; here: ?player)
   room,                             // ?room: { id, title, name, player } (lib/room.js), or null
   worldName,                        // the world of this page (worlds/<worldName>.json)
   fixed: params.has('fixed'),       // exact 480x270 frame

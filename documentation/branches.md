@@ -16,7 +16,12 @@ are copied to `main` with `git checkout game_01 -- <files>`, never with `git mer
 | Branch | Folder | Online | What it has |
 | --- | --- | --- | --- |
 | `main` | `project-lambda` | `/web/`, port 8643 | the live game |
-| `game_01` | `project-lambda-game_01` | `/game_01/web/`, port 8701 | `main`, for the next tests |
+
+Test branches done (moved to `main`, then deleted):
+
+| Branch | What it brought to `main` | When |
+| --- | --- | --- |
+| `game_01` | the Admin menu in tabs; the pictures of the models saved as PNG files (`assets/make-pictures.mjs`); online the address holds only `?room=`, and only admin accounts have the Admin menu (`Admins` tab) | 2026-11-17 |
 
 ## 1. The idea
 
