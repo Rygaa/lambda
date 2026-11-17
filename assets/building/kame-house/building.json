@@ -1,0 +1,9 @@
+{
+  "about": "The Kame House of Dragon Ball Z: a pink two-floor house on a grey stone base, a red roof of tile rows, KAME HOUSE in red letters on the front gable, a small red roof over the door. Made by code (web/gen/builders/kame-house.js, from pixel-scene version-3). width (x), depth (z), walls: wall height, roof: roof height over the walls, overhang: how far the roof goes past the walls, text: the lines on the gable.",
+  "builder": "kame-house",
+  "variants": 1,
+  "palettes": {"classic": {}},
+  "sizes": {
+    "medium": {"width": 3.2, "depth": 3.4, "walls": 2.1, "roof": 1.45, "overhang": 0.28, "text": ["KAME", "HOUSE"]}
+  }
+}

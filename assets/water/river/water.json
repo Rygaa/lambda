@@ -1,0 +1,9 @@
+{
+  "about": "A river: a band of changing width along a winding line. length; width; bends: half waves of the bends; swing: how far the bends swing to the side; blocks: it stops a walker.",
+  "builder": "water",
+  "variants": 3,
+  "palettes": ["clear", "swamp", "glacier"],
+  "sizes": {
+    "medium": {"form": "stream", "length": [11, 15], "width": [1.7, 2.3], "bends": [2, 3], "swing": [1.0, 1.6], "blocks": true}
+  }
+}

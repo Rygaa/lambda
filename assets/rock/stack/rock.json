@@ -1,0 +1,11 @@
+{
+  "about": "2 or 3 flat stones piled up, each smaller. Built by web/gen/builders/rock-form.js. form: the form there; size: [width, height, depth] of the whole form; scale: [lo, hi] drawn per variant; sink: how far it goes into the ground.",
+  "builder": "rock-form",
+  "variants": 8,
+  "palettes": ["grey", "sand", "moss", "dark", "cliff"],
+  "sizes": {
+    "small": {"form": "stack", "size": [1.1, 1.0, 0.9], "scale": [0.55, 0.7], "sink": 0.06},
+    "medium": {"form": "stack", "size": [1.1, 1.0, 0.9], "scale": [0.85, 1.15], "sink": 0.06},
+    "large": {"form": "stack", "size": [1.1, 1.0, 0.9], "scale": [1.35, 1.6], "sink": 0.06}
+  }
+}

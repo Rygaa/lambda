@@ -1,0 +1,136 @@
+{
+  "name": "Rock types: 3 rocks of each rock type in a row (one row per type), to compare them",
+  "seed": 5,
+  "size": 52,
+  "start": [
+    0,
+    0
+  ],
+  "clouds": "none",
+  "rays": 0,
+  "clearings": {
+    "count": 0
+  },
+  "props": [
+    {
+      "asset": "rock/sharp/medium",
+      "at": [
+        [
+          -3.2,
+          -17,
+          0
+        ],
+        [
+          0,
+          -17,
+          0
+        ],
+        [
+          3.2,
+          -17,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "rock/round/small",
+      "at": [
+        [
+          -3.2,
+          -10,
+          0
+        ],
+        [
+          0,
+          -10,
+          0
+        ],
+        [
+          3.2,
+          -10,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "rock/slab/medium",
+      "at": [
+        [
+          -3.2,
+          -3,
+          0
+        ],
+        [
+          0,
+          -3,
+          0
+        ],
+        [
+          3.2,
+          -3,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "rock/stack/medium",
+      "at": [
+        [
+          -3.2,
+          4,
+          0
+        ],
+        [
+          0,
+          4,
+          0
+        ],
+        [
+          3.2,
+          4,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "rock/cluster/medium",
+      "at": [
+        [
+          -3.2,
+          11,
+          0
+        ],
+        [
+          0,
+          11,
+          0
+        ],
+        [
+          3.2,
+          11,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "rock/split/medium",
+      "at": [
+        [
+          -3.2,
+          18,
+          0
+        ],
+        [
+          0,
+          18,
+          0
+        ],
+        [
+          3.2,
+          18,
+          0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+ "description": "Raditz's space pod: a small round grey-blue pod, a sphere 2 m wide sitting on the ground, with a round pink porthole in a thick black frame on a door cut out of its front, which swings forward and down on a hinge and 2 metal arms.",
+ "layout": "Middle: the round grey-blue hull, a full sphere 2 wide (x -1 to 1, z -1 to 1, y 0 to 2), with no base and no legs: 2 domes with the same center 1 above the ground, the top half and the bottom half (tilt 180). Its lowest point touches the ground. Front: the door is a part of the sphere's own quads (the pod block): from the 3rd row under the top point, 3 quads wide and 6 quads high, from -54 to 54 degrees of elevation and 38.57 degrees each side of the front. It turns forward and down around a hinge line along x at y 0.19, z 0.52 (its bottom edge), by up to 62 degrees, where its top edge rests on the ground. A blue-grey hinge bar (0.3 long) lies inside the hull at the bottom of the opening, and 2 blue-grey arms, one on each side, go from inside the pod to inside the door; closed, all of them are inside the sphere. Colors (flat, no texture): the hull light grey-blue; on the door a round porthole 0.75 wide, pink glass in a thick black frame, its center 10 degrees above the widest line, which shows inside the door too; the inside of the pod and of the door white. The crater of the reference is not part of the building.",
+ "shapes": [
+  {"id": "hull-top", "type": "dome", "size": [2.0, 1.0, 2.0], "position": [0, 1.0, 0], "rotationY": 0, "tilt": 0, "role": null, "faces": [{"face": "side", "texture": "hull"}, {"face": "bottom", "texture": "hull"}]},
+  {"id": "hull-bottom", "type": "dome", "size": [2.0, 1.0, 2.0], "position": [0, 1.0, 0], "rotationY": 0, "tilt": 180, "role": null, "faces": [{"face": "side", "texture": "hull"}, {"face": "bottom", "texture": "hull"}]}
+ ],
+ "textures": [
+  {"name": "hull", "description": "Light grey-blue metal hull; on the door, a round porthole of pink-magenta glass in a thick black frame", "color": "#c4d9dd", "widthM": 3.14, "heightM": 1.0}
+ ],
+ "pod": {"open": 62, "openMax": 62, "hinge": [0.191, 0.52], "box": [-54.01, 54.01, 38.5814], "center": [0, 1.0, 0], "look": {"hull": "#c4d9dd", "inside": "#eceee8", "frame": "#15161c", "glass": "#d01a7c", "portElev": 10, "frameDeg": 22, "glassDeg": 14, "metal": "#7f9fbc", "hingeR": 0.045, "hingeW": 0.3, "hingeZ": 0.44, "armT": 0.11, "armR": 0.9, "armBodyElev": -46, "armBodyAz": 43, "armDoorElev": -30, "armDoorAz": 33}}
+}

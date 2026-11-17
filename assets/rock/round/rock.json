@@ -1,0 +1,10 @@
+{
+  "about": "A round boulder: a cube cut in pieces, pushed out towards a sphere, a little bumpy. width, depth, height: the whole ball before it sinks; cuts: pieces per side; bump: how bumpy; sink: how far it goes into the ground.",
+  "builder": "round-rock",
+  "variants": 4,
+  "palettes": ["grey", "sand", "moss", "dark", "cliff"],
+  "sizes": {
+    "small": {"width": [1.1, 1.5], "depth": [0.9, 1.3], "height": [0.8, 1.1], "cuts": 2, "bump": 0.08, "sink": 0.12},
+    "large": {"width": [2.0, 2.9], "depth": [1.7, 2.3], "height": [1.5, 1.9], "cuts": [2, 3], "bump": 0.06, "sink": 0.3}
+  }
+}

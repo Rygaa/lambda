@@ -1,0 +1,14 @@
+Paint one flat texture for a top-down 3D pixel art game.
+It covers 0.33 x 0.33 meters of "the Capsule Corp ship, a big round white and black spaceship".
+What to paint: One round porthole window: blue glass with a small light reflection in the top left, inside a thin pale grey-white metal rim. The corners outside the rim are black hull.
+Main color: #1f63d6.
+The reference image shows the object. Copy the material of this surface from it, but in plain white daylight: never copy the sunset, night, or colored light of the image.
+
+Rules:
+- A straight-on flat view of the surface that fills the whole image, edge to edge. No perspective, no background, no border, no frame, no text.
+- The image will be stretched to a 0.33:0.33 area, so place details for that shape.
+- Simple pixel art: big flat color areas, clear shapes, few colors.
+- Most of the image is the main color. Joints, lines, and marks are one or two steps lighter or darker in the same hue.
+- This is one object, painted once: it fills the whole image, edge to edge.
+- No painted light, no shadows, no outlines, no gradients. The game adds light and outlines.
+- The final texture is only 14 x 14 pixels, so only big details survive.

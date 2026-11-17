@@ -1,0 +1,16 @@
+{
+  "name": "Walk test: one of each object in a row, to walk into",
+  "seed": 1,
+  "size": 24,
+  "clearings": { "count": 1, "radius": [3, 3] },
+  "props": [
+    { "asset": "rock/sharp/small", "at": [[-6, -6, 0]] },
+    { "asset": "rock/sharp/medium", "at": [[-6, -3, 0]] },
+    { "asset": "rock/sharp/large", "at": [[-6, 0, 0]] },
+    { "asset": "rock/round/small", "at": [[-6, 3, 0]] },
+    { "asset": "plant/bush/medium", "at": [[-6, 6, 0]] },
+    { "asset": "plant/oak/medium", "at": [[-6, 9, 0]] },
+    { "asset": "water/puddle/medium", "at": [[-2, 6, 0]] },
+    { "asset": "water/pond/medium", "at": [[3, 5, 0]] }
+  ]
+}

@@ -1,0 +1,1402 @@
+{
+ "source": "FlyFF data/motions.ron and the clips of each .glb (import-monsters.mjs)",
+ "models": {
+  "mvr_abraxas": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.433
+  },
+  "mvr_aibatt": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.7
+  },
+  "mvr_antiquery": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.933
+  },
+  "mvr_asura": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.367
+  },
+  "mvr_atrox": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.633
+  },
+  "mvr_augoo01": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.533
+  },
+  "mvr_augoo02": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.533
+  },
+  "mvr_axkeakoon": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_bang": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.7
+  },
+  "mvr_basque": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.567
+  },
+  "mvr_berken": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.4
+  },
+  "mvr_bigcobra": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.7
+  },
+  "mvr_bigraccoon": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.733
+  },
+  "mvr_bigsoldierraccoon": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.767
+  },
+  "mvr_bigvarietycobra": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_boo": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.8
+  },
+  "mvr_bucrow": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_burudeng": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.733
+  },
+  "mvr_caitsith": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.233
+  },
+  "mvr_cardpuppet": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.867
+  },
+  "mvr_carrierbomb": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.3
+  },
+  "mvr_circusbear": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_cranemachinery": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.8
+  },
+  "mvr_creper": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.767
+  },
+  "mvr_cripescentipede": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.233
+  },
+  "mvr_crohell": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.3
+  },
+  "mvr_cyclopsx": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1.467
+  },
+  "mvr_dantalian": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.3
+  },
+  "mvr_demian": {
+   "clips": {
+    "idle": "stand",
+    "wander": "stand",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.267
+  },
+  "mvr_dorian": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.833
+  },
+  "mvr_doridoma": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.333
+  },
+  "mvr_driller": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.433
+  },
+  "mvr_dumbbull": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.967
+  },
+  "mvr_dump": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1.033
+  },
+  "mvr_elderguard": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.467
+  },
+  "mvr_fefern": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.733
+  },
+  "mvr_flbyrigen": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_flybat": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.6
+  },
+  "mvr_frinker": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.3
+  },
+  "mvr_ganesa": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_garbagepider": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_gigglebox": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1
+  },
+  "mvr_glaphan": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.533
+  },
+  "mvr_gongury": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.633
+  },
+  "mvr_greemong": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.933
+  },
+  "mvr_grrr": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_hag": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_harpy": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.733
+  },
+  "mvr_hatsalra": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.467
+  },
+  "mvr_hobo": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.633
+  },
+  "mvr_hoppre": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.933
+  },
+  "mvr_iren": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.9
+  },
+  "mvr_jackthehammer": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.867
+  },
+  "mvr_kern": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1
+  },
+  "mvr_khnemu": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.633
+  },
+  "mvr_kimeradon": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.267
+  },
+  "mvr_kingster": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_kraken": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.967
+  },
+  "mvr_lawolf": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.433
+  },
+  "mvr_leyena": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.567
+  },
+  "mvr_luia": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.633
+  },
+  "mvr_mammoth01": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1.2
+  },
+  "mvr_mammoth02": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1.2
+  },
+  "mvr_maulmouse": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.3
+  },
+  "mvr_merel": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.567
+  },
+  "mvr_meteonyker": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_mia": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.733
+  },
+  "mvr_minecatcher": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "stand",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1
+  },
+  "mvr_mothbee": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.967
+  },
+  "mvr_mrpumpkin": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.267
+  },
+  "mvr_muffrin": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.867
+  },
+  "mvr_mushpang": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.3
+  },
+  "mvr_mushpoie": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1.233
+  },
+  "mvr_naga": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_nautrepy": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.833
+  },
+  "mvr_nuctuvehicle": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.367
+  },
+  "mvr_nuttywheel": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.8
+  },
+  "mvr_nyangnyang": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_okean": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_peakyturtle": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.8
+  },
+  "mvr_polevik": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.933
+  },
+  "mvr_popcrank": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.4
+  },
+  "mvr_prankster": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.7
+  },
+  "mvr_prickant": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.467
+  },
+  "mvr_pukepuke": {
+   "clips": {
+    "idle": "stand",
+    "wander": "stand",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.467
+  },
+  "mvr_redmantis": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.8
+  },
+  "mvr_risem": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.433
+  },
+  "mvr_roachfl": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.633
+  },
+  "mvr_rockepeller": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1
+  },
+  "mvr_rockmuscle": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.9
+  },
+  "mvr_sadking01": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.9
+  },
+  "mvr_sadking02": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.9
+  },
+  "mvr_scopicon": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.267
+  },
+  "mvr_shamanwutangka": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.767
+  },
+  "mvr_shuhamma": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.567
+  },
+  "mvr_skelassassin": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.4
+  },
+  "mvr_skelfighter": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.467
+  },
+  "mvr_skelgeneral": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.933
+  },
+  "mvr_skelgriffin": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_skelleader": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.7
+  },
+  "mvr_skelmage": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.967
+  },
+  "mvr_skelrider": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.6
+  },
+  "mvr_skelshamen": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1.233
+  },
+  "mvr_skelspain": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_skelspear": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_skelsword": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.533
+  },
+  "mvr_skelwolf": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.7
+  },
+  "mvr_soldiertangz": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.8
+  },
+  "mvr_steamwalker": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.333
+  },
+  "mvr_steelknight": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.933
+  },
+  "mvr_swkeakoon": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_syliaca": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.867
+  },
+  "mvr_taiga": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.733
+  },
+  "mvr_thoth": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.633
+  },
+  "mvr_toadrin": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.3
+  },
+  "mvr_tombstonebearer": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.5
+  },
+  "mvr_totemia": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.467
+  },
+  "mvr_trangfoma": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.433
+  },
+  "mvr_trilipy": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.3
+  },
+  "mvr_volt": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.267
+  },
+  "mvr_wagsaac": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.4
+  },
+  "mvr_watangka": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 1.167
+  },
+  "mvr_wheelem": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.567
+  },
+  "mvr_wormveduque": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.867
+  },
+  "mvr_yeti01": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_yeti02": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.667
+  },
+  "mvr_zombiger": {
+   "clips": {
+    "idle": "stand",
+    "wander": "idle1",
+    "walk": "walk",
+    "attack": "atk1",
+    "hit": "dmg1",
+    "dead": "die1"
+   },
+   "hitAt": 0.833
+  }
+ }
+}

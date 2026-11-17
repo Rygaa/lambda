@@ -1,0 +1,318 @@
+// World recipes (worlds/*.json) -> a world: borders, clearings, cliffs, then
+// every recipe line scattered over the ground. See documentation/worlds.md for the fields.
+import { createWorldBuilder, finish, discsOf } from './world.js';
+import { paletteNames } from './palettes.js';
+import { SIZES, getType, paramsOf } from './assets.js';
+import { buildCliffs, buildCave, levelUnder, CLIFF_FIELDS, CAVE_FIELDS } from './terrain.js';
+import { SIDES, fromSide, wavyLine } from './borders.js';
+import { createGround, paint, groundAt, pathShape, rectShape, circleShape, PAINTS, GROUND_FIELDS } from './ground.js';
+import { buildMap, FLYFF } from './map.js';
+
+// objects per 100 m² for each amount word
+export const AMOUNTS = { none: 0, few: 0.3, some: 1, many: 2.5, lots: 6 };
+const CLEARINGS = { none: 0, few: 2, some: 3, many: 4, lots: 4 };   // the shaders take at most 4
+
+const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'pavement', 'map', 'trees', 'plants', 'borders', 'islands', 'clearings', 'cliffs', 'cave', 'ground', 'props', 'objects', 'monsters', 'portals', 'npcs'];
+// recipe "clouds": how much of the ground their shadows cover -> the CloudLayer edges (lo, hi); cave: all of it, so
+// only the clearings are lit (pools of light)
+export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02], cave: [-0.6, -0.3] };
+const LINE_FIELDS = ['asset', 'params', 'amount', 'count', 'palette', 'spacing', 'gap', 'near', 'avoid', 'on', 'at'];
+const ISLAND_FIELDS = ['at', 'radius', 'bar', 'barWidth'];
+const BORDER_FIELDS = ['asset', 'palette', 'width'];
+
+// the asset types ('family/type') a recipe uses: they are loaded before it is built (gen/assets.js)
+export function assetsOf(recipe) {
+  const names = (recipe.props ?? []).map((line, i) => assetOf(line, `props[${i}]`).asset);
+  for (const [side, value] of Object.entries(recipe.borders ?? {})) names.push(assetOf(borderLine(value), `borders.${side}`).asset);
+  if (recipe.cliffs) names.push(assetOf(recipe.cliffs, 'cliffs').asset);
+  for (const kind of ['trees', 'plants']) if (recipe[kind]) names.push(assetOf({ asset: recipe[kind] }, kind).asset);
+  return names;
+}
+
+// recipe "borders": a side is an asset, or { asset, palette, width }
+const borderLine = (value) => (typeof value === 'string' ? { asset: value } : value);
+
+// the palette of a terrain type (a list of stone palettes): `name`, else its first
+function terrainPalette(type, name, where) {
+  const palette = name ?? type.palettes[0];
+  if (!type.palettes.includes(palette) || !paletteNames('stone').includes(palette)) bad(where, `palette "${palette}" (known: ${type.palettes.join(', ')})`);
+  return palette;
+}
+
+// recipe line "asset": "family/type/size" -> { asset: 'family/type', size }
+function assetOf(line, where) {
+  if (typeof line.asset !== 'string') bad(where, 'no "asset": "family/type/size", for example "rock/sharp/small"');
+  const parts = line.asset.split('/');
+  if (parts.length !== 3 || !SIZES.includes(parts[2])) bad(where, `asset "${line.asset}": give family/type/size, with a size of ${SIZES.join(', ')}`);
+  return { asset: `${parts[0]}/${parts[1]}`, size: parts[2] };
+}
+
+// recipe: the parsed JSON; map: the parsed worlds/maps/<recipe.map>.json, when it has one (gen/map.js)
+export function buildRecipe(cache, recipe, map = null) {
+  check(recipe, WORLD_FIELDS, 'world');
+  // monsters: [{ id, at: [[x, z], ...] }], placed by main.js (systems/monsters.js)
+  (recipe.monsters ?? []).forEach((line, i) => {
+    check(line, ['id', 'at'], `monsters[${i}]`);
+    if (!Number.isInteger(line.id) || !Array.isArray(line.at)) bad(`monsters[${i}]`, 'give an "id" of assets/monsters/monsters.json and "at": [[x, z], ...]');
+  });
+  if (map && (recipe.cliffs || recipe.borders || recipe.ground)) bad('world', 'a world with a "map" takes its ground from it: no "cliffs", "borders" or "ground"');
+  const half = map ? ((map.heights.length - 1) * map.step * FLYFF) / 2 : (recipe.size ?? 40) / 2;
+  const b = createWorldBuilder(cache, recipe.seed ?? 1, half);
+  const borders = planBorders(b, recipe.borders ?? {}, islandsOf(recipe.islands ?? []));
+  const inBorder = (x, z, pad) => borders.some((bd) => bd.inside(x, z, pad));
+
+  // clearings: open ground where light falls through the canopy; the camera starts in the first
+  const c = recipe.clearings ?? {};
+  check(c, ['amount', 'count', 'radius', 'light', 'at'], 'clearings');
+  // at: [[x, z], ...] places them (at most 4), else they are scattered
+  for (const [x, z] of (c.at ?? []).slice(0, 4)) b.glades.push({ x, z, r: b.range(...(c.radius ?? [3, 3.6])), k: b.range(...(c.light ?? [0.16, 0.2])) });
+  const nClear = c.at ? 0 : Math.min(4, c.count ?? CLEARINGS[c.amount ?? 'some'] ?? bad('clearings', `amount "${c.amount}"`));
+  for (let tries = 0; b.glades.length < nClear && tries < 400; tries++) {
+    const r = b.range(...(c.radius ?? [3, 3.6]));
+    const x = b.range(-half * 0.7, half * 0.7), z = b.range(-half * 0.7, half * 0.7);
+    if (b.glades.some((g) => Math.hypot(g.x - x, g.z - z) < g.r + r + 2) || inBorder(x, z, r + 2)) continue;
+    b.glades.push({ x, z, r, k: b.range(...(c.light ?? [0.16, 0.2])) });
+  }
+  const g0 = b.glades[0];
+  b.start = g0 ? [g0.x, 0.6, g0.z] : [0, 0.6, 0];
+  if (recipe.start) b.start = [recipe.start[0], 0.6, recipe.start[1]];
+  b.rays = recipe.rays ?? 1;     // strength of the god rays (0 = none)
+  b.pavement = recipe.pavement ?? 'tiles';    // how the pavement paint looks: tiles or bricks
+  if (!['tiles', 'bricks'].includes(b.pavement)) bad('world', `pavement "${b.pavement}" (use tiles or bricks)`);
+  b.clouds = CLOUDS[recipe.clouds ?? 'some'] ?? bad('world', `clouds "${recipe.clouds}" (use ${Object.keys(CLOUDS).join(', ')})`);
+
+  // cliffs: plateaus in levels, with stairs, and the mountain borders
+  // (gen/terrain.js); the start stays on the ground
+  const mountains = borders.filter((bd) => bd.mountain);
+  if (recipe.cave) {
+    if (recipe.cliffs || recipe.borders || map) bad('cave', 'a cave is its own ground: no "cliffs", "borders" or "map"');
+    const cv = recipe.cave;
+    check(cv, CAVE_FIELDS, 'cave');
+    for (const key of ['palette', 'top']) if (!paletteNames('stone').includes(cv[key])) bad('cave', `${key}: stone palette "${cv[key]}" (known: ${paletteNames('stone').join(', ')})`);
+    b.terrain = buildCave(b, cv);
+  } else if (recipe.cliffs || mountains.length) {
+    const cl = recipe.cliffs ? cliffsOf(recipe.cliffs) : { count: 0 };
+    // all the walls of a world are drawn with one material (gen/terrain.js)
+    const walls = new Set([...(recipe.cliffs ? [cl.palette] : []), ...mountains.map((bd) => bd.palette)]);
+    if (walls.size > 1) bad('terrain', `one world takes one wall palette, this one asks for ${[...walls].join(', ')}`);
+    b.terrain = buildCliffs(b, { ...cl, palette: [...walls][0] }, borders);
+  }
+  // the ocean borders: one water shape each, before anything else takes the room
+  for (const bd of borders) if (bd.set) b.add(bd.set, 0, ...bd.set.shapes[0].origin, 0);
+  if (recipe.ground) b.ground = buildGround(b, recipe.ground, borders);
+  const ours = {};      // our types for the trees and the leafy plants of the map
+  for (const kind of ['trees', 'plants']) {
+    if (!recipe[kind]) continue;
+    if (!map) bad('world', `"${kind}" takes the place of the ${kind} of a "map": this world has none`);
+    ours[kind] = assetOf({ asset: recipe[kind] }, kind);
+  }
+  if (map) buildMap(b, map, ours);
+
+  // big things first; lines placed "near" something come after the others
+  const lines = (recipe.props ?? []).map((line, i) => prepare(b, line, i));
+  lines.sort((p, q) => (!!p.line.near - !!q.line.near) || q.size - p.size);
+  for (const l of lines) place(b, l);
+  b.objects = [...(b.objects ?? []), ...objectsOf(recipe.objects ?? [])];
+  b.portals = portalsOf(recipe.portals ?? []);
+  b.npcs = (recipe.npcs ?? []).map((line, i) => {
+    check(line, ['id', 'at'], `npcs[${i}]`);
+    if (typeof line.id !== 'string' || !Array.isArray(line.at)) bad(`npcs[${i}]`, 'give an "id" of assets/character/npc/npcs.json and "at": [x, z, turn]');
+    return { id: line.id, x: line.at[0], z: line.at[1], rot: line.at[2] ?? 0 };
+  });
+  return finish(b);
+}
+
+// recipe "objects": [{ object (a name of assets/objects/objects.json), at: [[x, z, rot], ...] }] -> one line each
+// { object, x, z, rot } (rot: radians, default 0). The names are checked when the world spawns (systems/objects.js)
+function objectsOf(lines) {
+  return lines.flatMap((line, i) => {
+    check(line, ['object', 'at'], `objects[${i}]`);
+    if (typeof line.object !== 'string') bad(`objects[${i}]`, 'object: a name of assets/objects/objects.json');
+    return (line.at ?? []).map(([x, z, rot = 0]) => ({ object: line.object, x, z, rot }));
+  });
+}
+
+// recipe "portals": [{ at: [x, z], radius, to: a world of worlds/, char: [x, z] }]: the human who walks into the
+// circle goes to the world `to`, at `char` (systems/portals.js)
+function portalsOf(lines) {
+  return lines.map((line, i) => {
+    const where = `portals[${i}]`;
+    check(line, ['at', 'radius', 'to', 'char'], where);
+    if (!Array.isArray(line.at) || typeof line.to !== 'string') bad(where, 'give "at": [x, z] and "to": a world of worlds/');
+    if (line.char !== undefined && !Array.isArray(line.char)) bad(where, '"char": [x, z], where the human stands in the world "to"');
+    return { x: line.at[0], z: line.at[1], r: line.radius ?? 1.2, to: line.to, char: line.char ?? null };
+  });
+}
+
+// recipe "cliffs": { asset, count, palette, stairs } -> the values buildCliffs takes
+function cliffsOf(spec) {
+  check(spec, CLIFF_FIELDS, 'cliffs');
+  const { asset, size } = assetOf(spec, 'cliffs');
+  const type = getType(asset);
+  if (type.builder !== 'cliff') bad('cliffs', `${asset} is not a cliff type`);
+  if (spec.stairs !== undefined && !paletteNames('stone').includes(spec.stairs)) bad('cliffs', `stairs: stone palette "${spec.stairs}" (known: ${paletteNames('stone').join(', ')})`);
+  return { ...paramsOf(type, size), count: spec.count ?? 3, palette: terrainPalette(type, spec.palette, 'cliffs'), stairs: spec.stairs };
+}
+
+// recipe "borders": { side: asset | { asset, palette, width } } -> [{ side, inside(x, z, pad), ... }]
+// inside: is (x, z) in the border, or less than pad from it? islands: cut out of every ocean
+function planBorders(b, spec, islands) {
+  if (typeof spec !== 'object' || Array.isArray(spec)) bad('borders', 'give { side: asset }, for example { "west": "terrain/mountain/medium" }');
+  check(spec, SIDES, 'borders');
+  return Object.entries(spec).map(([side, value]) => {
+    const where = `borders.${side}`, border = borderLine(value);
+    check(border, BORDER_FIELDS, where);
+    const { asset, size } = assetOf(border, where);
+    const type = getType(asset);
+    if (type.builder === 'water') {
+      if (border.palette !== undefined) bad(where, `${asset} takes no "palette" here`);
+      const set = b.set(asset, size, { side, half: b.half, islands, ...(border.width !== undefined && { width: border.width }) });
+      const shore = set.shapes[0].shore;
+      return { side, set, inside: (x, z, pad = 0) => shore(x, z) > -pad };
+    }
+    if (type.builder !== 'mountain') bad(where, `${asset} cannot close a side (use a terrain/mountain type or water/ocean)`);
+    if (border.width !== undefined) bad(where, 'only the ocean takes a "width"');
+    // mountains: in from the side as far as a wavy line
+    const mountain = paramsOf(type, size);
+    const line = wavyLine({ seed: Math.floor(b.rand() * 2 ** 31) }, mountain.reach, mountain.wobble);
+    return { side, name: border.asset, mountain, palette: terrainPalette(type, border.palette, where), line, inside(x, z, pad = 0) {
+      const [e, along] = fromSide(side, b.half, x, z);
+      return e < line(along) + pad;
+    } };
+  });
+}
+
+// recipe "islands": [{ at: [x, z], radius, bar: [x, z], barWidth }] -> the
+// ocean's islands; bar: a sand bar from the island out to that point
+function islandsOf(list) {
+  return list.map((s, i) => {
+    check(s, ISLAND_FIELDS, `islands[${i}]`);
+    if (!Array.isArray(s.at)) bad(`islands[${i}]`, 'no "at": [x, z]');
+    return { at: s.at, radius: s.radius ?? 6, bar: s.bar ?? null, barWidth: s.barWidth ?? 2.4 };
+  });
+}
+
+// recipe "ground": paints laid on the grass in order (gen/ground.js)
+//   { paint, beach: w }: along the ocean shores, w units in
+//   { paint, path: [[x, z], ...], width }, { paint, rect: [x0, z0, x1, z1] }, { paint, circle: [x, z, r] }
+function buildGround(b, lines, borders) {
+  const g = createGround(b.half);
+  lines.forEach((l, i) => {
+    const where = `ground[${i}]`;
+    check(l, GROUND_FIELDS, where);
+    if (!PAINTS.includes(l.paint)) bad(where, `paint "${l.paint}" (use ${PAINTS.join(', ')})`);
+    if (l.beach !== undefined) {
+      for (const bd of borders) if (bd.set) {
+        const shore = bd.set.shapes[0].shore;
+        paint(g, l.paint, (x, z) => l.beach + shore(x, z));
+      }
+      return;
+    }
+    const s = l.path ? pathShape(l.path, l.width ?? 2) : l.rect ? rectShape(l.rect) : l.circle ? circleShape(l.circle)
+      : bad(where, 'give "beach", "path", "rect" or "circle"');
+    paint(g, l.paint, s.sd, s.box);
+  });
+  return g;
+}
+
+function prepare(b, line, i) {
+  const where = `props[${i}] (${line.asset})`;
+  check(line, LINE_FIELDS, where);
+  const { asset, size } = assetOf(line, where);
+  if (line.on !== undefined && line.on !== 'grass' && !PAINTS.includes(line.on)) bad(where, `on "${line.on}" (use grass, ${PAINTS.join(', ')})`);
+  let set;
+  try { set = b.set(asset, size, line.params); } catch (err) { bad(where, err.message); }
+  const area = (2 * b.half) ** 2 / 100;
+  const count = line.at ? line.at.length
+    : line.count ?? Math.round(area * (AMOUNTS[line.amount ?? 'some'] ?? bad(where, `amount "${line.amount}" (use ${Object.keys(AMOUNTS).join(', ')})`)));
+  return { line, where, set, count, palettes: palettesOf(set, line.palette, where), size: Math.max(...set.shapes.map((s) => s.radius)) };
+}
+
+// recipe "palette": a name, or a list of names (one is picked per object),
+// of the asset type's palettes (gen/assets.js); none: its default
+function palettesOf(set, value, where) {
+  if (value === undefined) return null;
+  const names = [value].flat();
+  for (const name of names)
+    if (!set.palettes[name]) bad(where, `palette "${name}" (${set.asset} has ${Object.keys(set.palettes).join(', ')})`);
+  return names;
+}
+
+function place(b, { line, set, count, palettes }) {
+  const paletteFor = () => (palettes ? b.pick(palettes) : set.palette);
+  const variant = () => Math.floor(b.rand() * set.shapes.length);
+  if (line.at) {
+    for (const [x, z, rot = b.range(0, Math.PI * 2)] of line.at) b.add(set, variant(), x, z, rot, paletteFor());
+    return;
+  }
+  // spacing: keep this far from the other spaced objects of the same type (e.g. tree crowns)
+  const spaced = line.spacing ? b.props.filter((p) => p.asset === set.asset && p.spaced) : [];
+  // near "cliffs": at the foot of a wall; "cliff-tops": on top, just behind its edge;
+  // near a family ("water", "rock", "plant"): around the objects of that family
+  const edges = b.terrain?.edges ?? [];
+  const cliffs = { cliffs: 1, 'cliff-tops': -1 }[line.near];
+  const near = !line.near || cliffs ? null : b.props.filter((p) => p.family === line.near);
+  const spacing = line.spacing ?? 0, gap = line.gap ?? 0.3;
+  for (let made = 0, tries = 0; made < count && tries < count * 60; tries++) {
+    const v = variant();
+    const shape = set.shapes[v];
+    let x, z;
+    if (cliffs) {
+      if (!edges.length) return;
+      // out from the wall (cliffs) or back from its edge (cliff-tops), a little to the side
+      const e = b.pick(edges), d = cliffs * (shape.radius + b.range(0.35, 1.2)), side = b.range(-0.25, 0.25);
+      x = e.x + e.nx * d + e.nz * side;
+      z = e.z + e.nz * d - e.nx * side;
+    } else if (near) {
+      if (!near.length) return;
+      // around a round object; along the shore of water (one of its circles)
+      const t = b.pick(near), a = b.range(0, Math.PI * 2);
+      const c = t.discs.length > 1 ? b.pick(t.discs) : t;
+      const d = t.discs.length > 1 ? c.r + b.range(0.1, 0.9) : t.radius + b.range(1.2, 2.8);
+      x = c.x + Math.cos(a) * d;
+      z = c.z + Math.sin(a) * d;
+    } else {
+      x = b.range(-b.half, b.half);
+      z = b.range(-b.half, b.half);
+    }
+    if (Math.abs(x) > b.half || Math.abs(z) > b.half) continue;
+    // water (a shape of circles) is turned first, then each of its circles is tested
+    const rot = shape.circles ? b.range(0, Math.PI * 2) : null;
+    const discs = shape.circles ? discsOf(shape, { x, z, rot }) : [{ x, z, r: shape.radius }];
+    // avoid "paths": off the middle of the tunnels of a cave (a lane PATH_LANE wide stays free)
+    if (line.avoid === 'paths' && (b.terrain?.paths ?? []).some((tn) => nearPath(tn.path, x, z, PATH_LANE / 2 + shape.radius))) continue;
+    if (line.avoid === 'clearings' && b.glades.some((g) => discs.some((c) => Math.hypot(g.x - c.x, g.z - c.z) < g.r * 0.95 + (shape.circles ? c.r : 0)))) continue;
+    if (spacing && spaced.some((p) => Math.hypot(p.x - x, p.z - z) < spacing)) continue;
+    // on: only on this ground (grass or a paint), all around it
+    if (line.on && [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) => groundAt(b.ground, x + dx * shape.radius, z + dz * shape.radius, 0.4) !== line.on)) continue;
+    // on flat ground only (not over a cliff edge or on stairs); water only on the lowest level
+    if (b.terrain) {
+      const levels = discs.map((c) => levelUnder(b.terrain, c.x, c.z, c.r + 0.3));
+      if (levels.some((l) => l < 0 || l !== levels[0])) continue;
+      if (levels[0] > 0 && shape.parts.some((part) => part.role === 'water')) continue;
+    }
+    if (!discs.every((c) => b.free(c.x, c.z, c.r + gap))) continue;
+    const p = b.add(set, v, x, z, rot ?? b.range(0, Math.PI * 2), paletteFor());
+    if (spacing) { p.spaced = true; spaced.push(p); }
+    made++;
+  }
+}
+
+const PATH_LANE = 2;
+// is (x, z) less than d from the line through `path` ([[x, z], ...])?
+function nearPath(path, x, z, d) {
+  for (let k = 0; k + 1 < path.length; k++) {
+    const [ax, az] = path[k], [bx, bz] = path[k + 1], dx = bx - ax, dz = bz - az;
+    const u = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)));
+    if (Math.hypot(x - ax - u * dx, z - az - u * dz) < d) return true;
+  }
+  return false;
+}
+
+function check(obj, fields, where) {
+  for (const k of Object.keys(obj)) if (!fields.includes(k)) bad(where, `unknown field "${k}" (known: ${fields.join(', ')})`);
+}
+
+function bad(where, msg) {
+  throw new Error(`world recipe, ${where}: ${msg}`);
+}

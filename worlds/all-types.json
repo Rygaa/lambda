@@ -1,0 +1,68 @@
+{
+  "name": "All types: every asset type in every size, in rows (rocks, plants, water, buildings), with a mountain border, the ocean, a beach and a dirt path",
+  "seed": 1,
+  "size": 68,
+  "start": [0, 0],
+  "borders": { "west": "terrain/mountain/medium", "east": "water/ocean/medium" },
+  "clearings": { "count": 0 },
+  "ground": [
+    { "paint": "sand", "beach": 3 },
+    { "paint": "dirt", "path": [[-16, 16], [14, 16]], "width": 1.6 }
+  ],
+  "props": [
+    { "asset": "plant/birch/small", "at": [[-16, -30, 0]] },
+    { "asset": "plant/birch/medium", "at": [[-12, -30, 0]] },
+    { "asset": "plant/birch/large", "at": [[-8, -30, 0]] },
+    { "asset": "plant/willow/small", "at": [[-4, -30, 0]] },
+    { "asset": "plant/willow/medium", "at": [[0, -30, 0]] },
+    { "asset": "plant/willow/large", "at": [[4, -30, 0]] },
+    { "asset": "plant/fruit/small", "at": [[8, -30, 0]] },
+    { "asset": "plant/fruit/medium", "at": [[12, -30, 0]] },
+    { "asset": "plant/fruit/large", "at": [[16, -30, 0]] },
+
+    { "asset": "plant/pine/small", "at": [[-16, -22, 0]] },
+    { "asset": "plant/pine/medium", "at": [[-12, -22, 0]] },
+    { "asset": "plant/pine/large", "at": [[-8, -22, 0]] },
+    { "asset": "plant/fir/small", "at": [[-4, -22, 0]] },
+    { "asset": "plant/fir/medium", "at": [[0, -22, 0]] },
+    { "asset": "plant/fir/large", "at": [[4, -22, 0]] },
+    { "asset": "plant/cypress/small", "at": [[8, -22, 0]] },
+    { "asset": "plant/cypress/medium", "at": [[12, -22, 0]] },
+    { "asset": "plant/cypress/large", "at": [[16, -22, 0]] },
+
+    { "asset": "rock/slab/small", "at": [[-16, -18, 0]] },
+    { "asset": "rock/slab/medium", "at": [[-13, -18, 0]] },
+    { "asset": "rock/slab/large", "at": [[-10, -18, 0]] },
+    { "asset": "rock/stack/small", "at": [[-7, -18, 0]] },
+    { "asset": "rock/stack/medium", "at": [[-4, -18, 0]] },
+    { "asset": "rock/stack/large", "at": [[-1, -18, 0]] },
+    { "asset": "rock/cluster/small", "at": [[2, -18, 0]] },
+    { "asset": "rock/cluster/medium", "at": [[5, -18, 0]] },
+    { "asset": "rock/cluster/large", "at": [[8, -18, 0]] },
+    { "asset": "rock/split/small", "at": [[11, -18, 0]] },
+    { "asset": "rock/split/medium", "at": [[14, -18, 0]] },
+    { "asset": "rock/split/large", "at": [[17, -18, 0]] },
+
+    { "asset": "rock/sharp/small", "at": [[-14, -14, 0]] },
+    { "asset": "rock/sharp/medium", "at": [[-11, -14, 0]] },
+    { "asset": "rock/sharp/large", "at": [[-7, -14, 0]] },
+    { "asset": "rock/round/small", "at": [[-1, -14, 0]] },
+    { "asset": "rock/round/large", "at": [[5, -14, 0]] },
+
+    { "asset": "plant/bush/medium", "at": [[-14, -6, 0]] },
+    { "asset": "plant/oak/small", "at": [[-10, -6, 0]] },
+    { "asset": "plant/oak/medium", "at": [[-5, -6, 0]] },
+    { "asset": "plant/oak/large", "at": [[1, -6, 0]] },
+    { "asset": "plant/palm/small", "at": [[8, -6, 0]] },
+    { "asset": "plant/palm/large", "at": [[13, -6, 0]] },
+
+    { "asset": "water/puddle/medium", "at": [[-14, 4, 0]] },
+    { "asset": "water/pond/medium", "at": [[-9, 4, 0]] },
+    { "asset": "water/lake/medium", "at": [[0, 4, 0]] },
+    { "asset": "water/river/medium", "at": [[8, 9, 1.5708]] },
+
+    { "asset": "building/chichi-house/medium", "at": [[-11, 20, 0]] },
+    { "asset": "building/buu-house/medium", "at": [[1, 21, 0]] },
+    { "asset": "building/capsule-ship/medium", "at": [[11, 21, 0]] }
+  ]
+}

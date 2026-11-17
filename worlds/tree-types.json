@@ -1,0 +1,90 @@
+{
+  "name": "Tree types: one of each tree type in a row at z = 0, to compare them",
+  "seed": 11,
+  "size": 60,
+  "start": [
+    0,
+    0
+  ],
+  "clouds": "none",
+  "rays": 0,
+  "clearings": {
+    "count": 1,
+    "radius": [
+      3,
+      3
+    ]
+  },
+  "props": [
+    {
+      "asset": "plant/oak/medium",
+      "at": [
+        [
+          -18,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/pine/medium",
+      "at": [
+        [
+          -12,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/fir/medium",
+      "at": [
+        [
+          -6,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/cypress/medium",
+      "at": [
+        [
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/birch/medium",
+      "at": [
+        [
+          6,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/willow/medium",
+      "at": [
+        [
+          12,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/fruit/medium",
+      "at": [
+        [
+          18,
+          0,
+          0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+hair.glb: the hair of HairSample_Male.vrm, a sample model of the VRoid project (pixiv), its 114 strands only (one mesh
+each), fitted on the FlyFF head at rest (scaled, turned to face +z), with its texture. The gold form of the
+transformation bends it into a Super Saiyan hair (web/lib/superHair.js).
+https://opengameart.org/content/vroid-studio-cc0-models (hairsample_male.zip)
+
+-------------------------------------------------------
+License:
+CC0 1.0 Universal (CC0 1.0)
+Public Domain Dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+(the licence written in the model itself: "licenseName": "CC0")

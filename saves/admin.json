@@ -1,0 +1,20 @@
+{
+ "tuning": {
+  "walkSpeed": 2.4,
+  "runSpeed": 5.2,
+  "jumpHeight": 0.7
+ },
+ "outfit": {
+  "head": "part_malehead01",
+  "hair": "part_malehair07",
+  "upper": "part_mcloyukata05suit",
+  "hand": "part_mcloskull01hand",
+  "foot": null,
+  "cap": "part_mclopanda02cap",
+  "cloak": "part_mdarthvadercape",
+  "mask": "part_mmassunglass02",
+  "weapon": "item_weaaxeancient",
+  "shield": "item_armshiwooden"
+ },
+ "zoom": 0
+}

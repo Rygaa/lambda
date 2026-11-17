@@ -1,0 +1,9 @@
+{
+  "about": "A torch on a wooden pole, with an iron cup and a flame; it lights the ground around it (web/gen/builders/mine.js).",
+  "builder": "mine",
+  "palettes": {"classic": {}},
+  "sizes": {
+    "medium": {"kind": "torch"}
+  },
+  "light": {"sizes": {"medium": [1.15, 2.6]}, "color": "#ff9a3c", "flicker": true}
+}

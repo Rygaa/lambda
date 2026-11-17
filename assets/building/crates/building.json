@@ -1,0 +1,10 @@
+{
+  "about": "Mine supplies: wooden crates (one to three, the third on top) and a barrel (web/gen/builders/mine.js). count: how many crates.",
+  "builder": "mine",
+  "variants": 3,
+  "palettes": {"classic": {}},
+  "sizes": {
+    "small": {"kind": "crates", "count": [1, 2]},
+    "medium": {"kind": "crates", "count": [2, 3]}
+  }
+}

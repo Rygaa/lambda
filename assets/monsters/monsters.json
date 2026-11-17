@@ -1,0 +1,9678 @@
+{
+ "source": "FlyFF data/movers.ron, models.ron, motions.ron (import-monsters.mjs)",
+ "monsters": [
+  {
+   "id": 20,
+   "name": "Small Aibatt",
+   "model": "mvr_aibatt",
+   "level": 1,
+   "class": "small",
+   "size": 0.8,
+   "hp": 120,
+   "damage": [
+    15,
+    16
+   ],
+   "defense": 3,
+   "attackDelay": 6,
+   "walkSpeed": 1.8,
+   "xp": 2
+  },
+  {
+   "id": 21,
+   "name": "Aibatt",
+   "model": "mvr_aibatt",
+   "level": 1,
+   "class": "normal",
+   "size": 1,
+   "hp": 148,
+   "damage": [
+    15,
+    16
+   ],
+   "defense": 3,
+   "attackDelay": 6,
+   "walkSpeed": 1.8,
+   "xp": 2
+  },
+  {
+   "id": 111,
+   "name": "Flying Aibatt",
+   "model": "mvr_aibatt",
+   "level": 1,
+   "class": "small",
+   "size": 0.8,
+   "hp": 189,
+   "damage": [
+    1,
+    1
+   ],
+   "defense": 1,
+   "attackDelay": 6,
+   "walkSpeed": 4.8,
+   "xp": 21
+  },
+  {
+   "id": 134,
+   "name": "Small Froziest",
+   "model": "mvr_wagsaac",
+   "level": 1,
+   "class": "small",
+   "size": 0.8,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 21
+  },
+  {
+   "id": 135,
+   "name": "Froziest",
+   "model": "mvr_wagsaac",
+   "level": 1,
+   "class": "normal",
+   "size": 1,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 24
+  },
+  {
+   "id": 160,
+   "name": "Small Burn Bird",
+   "model": "mvr_wagsaac",
+   "level": 1,
+   "class": "small",
+   "size": 0.8,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 21
+  },
+  {
+   "id": 161,
+   "name": "Burn Bird",
+   "model": "mvr_wagsaac",
+   "level": 1,
+   "class": "normal",
+   "size": 1,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 24
+  },
+  {
+   "id": 190,
+   "name": "Small Buketfoot",
+   "model": "mvr_wagsaac",
+   "level": 1,
+   "class": "small",
+   "size": 0.8,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 21
+  },
+  {
+   "id": 191,
+   "name": "Buketfoot",
+   "model": "mvr_wagsaac",
+   "level": 1,
+   "class": "normal",
+   "size": 1,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 24
+  },
+  {
+   "id": 196,
+   "name": "Master Demian",
+   "model": "mvr_demian",
+   "level": 1,
+   "class": "giant",
+   "size": 2,
+   "hp": 3700000,
+   "damage": [
+    124,
+    130
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1
+  },
+  {
+   "id": 197,
+   "name": "Master Keakoon",
+   "model": "mvr_swkeakoon",
+   "level": 1,
+   "class": "giant",
+   "size": 2,
+   "hp": 3700000,
+   "damage": [
+    124,
+    130
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1
+  },
+  {
+   "id": 198,
+   "name": "Master Muffrin",
+   "model": "mvr_muffrin",
+   "level": 1,
+   "class": "giant",
+   "size": 2,
+   "hp": 3700000,
+   "damage": [
+    124,
+    130
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1
+  },
+  {
+   "id": 22,
+   "name": "Captain Aibatt",
+   "model": "mvr_aibatt",
+   "level": 2,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 190,
+   "damage": [
+    16,
+    17
+   ],
+   "defense": 5,
+   "attackDelay": 5.5,
+   "walkSpeed": 1.92,
+   "xp": 3
+  },
+  {
+   "id": 136,
+   "name": "Captain Froziest",
+   "model": "mvr_wagsaac",
+   "level": 2,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 33
+  },
+  {
+   "id": 162,
+   "name": "Captain Burn Bird",
+   "model": "mvr_wagsaac",
+   "level": 2,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 33
+  },
+  {
+   "id": 192,
+   "name": "Captain Buketfoot",
+   "model": "mvr_wagsaac",
+   "level": 2,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 550,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 33
+  },
+  {
+   "id": 96,
+   "name": "Small Mushpang",
+   "model": "mvr_mushpang",
+   "level": 3,
+   "class": "small",
+   "size": 0.8,
+   "hp": 305,
+   "damage": [
+    18,
+    19
+   ],
+   "defense": 6,
+   "attackDelay": 5.5,
+   "walkSpeed": 1.8,
+   "xp": 4
+  },
+  {
+   "id": 97,
+   "name": "Mushpang",
+   "model": "mvr_mushpang",
+   "level": 3,
+   "class": "normal",
+   "size": 1,
+   "hp": 348,
+   "damage": [
+    18,
+    19
+   ],
+   "defense": 6,
+   "attackDelay": 5.5,
+   "walkSpeed": 1.8,
+   "xp": 5
+  },
+  {
+   "id": 98,
+   "name": "Captain Mushpang",
+   "model": "mvr_mushpang",
+   "level": 4,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 373,
+   "damage": [
+    20,
+    21
+   ],
+   "defense": 7,
+   "attackDelay": 5.5,
+   "walkSpeed": 1.92,
+   "xp": 7
+  },
+  {
+   "id": 23,
+   "name": "Small Burudeng",
+   "model": "mvr_burudeng",
+   "level": 5,
+   "class": "small",
+   "size": 0.8,
+   "hp": 745,
+   "damage": [
+    26,
+    28
+   ],
+   "defense": 8,
+   "attackDelay": 5,
+   "walkSpeed": 1.8,
+   "xp": 9
+  },
+  {
+   "id": 24,
+   "name": "Burudeng",
+   "model": "mvr_burudeng",
+   "level": 5,
+   "class": "normal",
+   "size": 1,
+   "hp": 745,
+   "damage": [
+    27,
+    29
+   ],
+   "defense": 8,
+   "attackDelay": 5,
+   "walkSpeed": 1.8,
+   "xp": 9
+  },
+  {
+   "id": 71,
+   "name": "Giant Aibatt",
+   "model": "mvr_aibatt",
+   "level": 5,
+   "class": "giant",
+   "size": 2,
+   "hp": 14326,
+   "damage": [
+    101,
+    106
+   ],
+   "defense": 10,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 40
+  },
+  {
+   "id": 137,
+   "name": "Giant Froziest",
+   "model": "mvr_wagsaac",
+   "level": 5,
+   "class": "giant",
+   "size": 2,
+   "hp": 3300,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 510
+  },
+  {
+   "id": 163,
+   "name": "Giant Burn Bird",
+   "model": "mvr_wagsaac",
+   "level": 5,
+   "class": "giant",
+   "size": 2,
+   "hp": 3300,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 510
+  },
+  {
+   "id": 193,
+   "name": "Giant Buketfoot",
+   "model": "mvr_wagsaac",
+   "level": 5,
+   "class": "giant",
+   "size": 2,
+   "hp": 3300,
+   "damage": [
+    29,
+    31
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 510
+  },
+  {
+   "id": 25,
+   "name": "Captain Burudeng",
+   "model": "mvr_burudeng",
+   "level": 6,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 793,
+   "damage": [
+    28,
+    30
+   ],
+   "defense": 9,
+   "attackDelay": 5,
+   "walkSpeed": 1.92,
+   "xp": 11
+  },
+  {
+   "id": 99,
+   "name": "Giant Mushpang",
+   "model": "mvr_mushpang",
+   "level": 6,
+   "class": "giant",
+   "size": 2,
+   "hp": 19764,
+   "damage": [
+    136,
+    143
+   ],
+   "defense": 15,
+   "attackDelay": 5.5,
+   "walkSpeed": 1.8,
+   "xp": 56
+  },
+  {
+   "id": 26,
+   "name": "Small Pukepuke",
+   "model": "mvr_pukepuke",
+   "level": 7,
+   "class": "small",
+   "size": 0.8,
+   "hp": 1112,
+   "damage": [
+    36,
+    38
+   ],
+   "defense": 10,
+   "attackDelay": 4.5,
+   "walkSpeed": 1.8,
+   "xp": 12
+  },
+  {
+   "id": 27,
+   "name": "Pukepuke",
+   "model": "mvr_pukepuke",
+   "level": 7,
+   "class": "normal",
+   "size": 1,
+   "hp": 1112,
+   "damage": [
+    37,
+    39
+   ],
+   "defense": 10,
+   "attackDelay": 4.5,
+   "walkSpeed": 1.8,
+   "xp": 13
+  },
+  {
+   "id": 28,
+   "name": "Captain Pukepuke",
+   "model": "mvr_pukepuke",
+   "level": 8,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 1180,
+   "damage": [
+    39,
+    41
+   ],
+   "defense": 11,
+   "attackDelay": 4.5,
+   "walkSpeed": 1.92,
+   "xp": 13
+  },
+  {
+   "id": 524,
+   "name": "Small Peakyturtle",
+   "model": "mvr_peakyturtle",
+   "level": 8,
+   "class": "small",
+   "size": 0.8,
+   "hp": 1370,
+   "damage": [
+    43,
+    45
+   ],
+   "defense": 13,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 13
+  },
+  {
+   "id": 525,
+   "name": "Peakyturtle",
+   "model": "mvr_peakyturtle",
+   "level": 8,
+   "class": "normal",
+   "size": 1,
+   "hp": 1370,
+   "damage": [
+    43,
+    45
+   ],
+   "defense": 13,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 14
+  },
+  {
+   "id": 72,
+   "name": "Giant Burudeng",
+   "model": "mvr_burudeng",
+   "level": 9,
+   "class": "giant",
+   "size": 2,
+   "hp": 24323,
+   "damage": [
+    169,
+    178
+   ],
+   "defense": 20,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 66
+  },
+  {
+   "id": 88,
+   "name": "Urchin Demian",
+   "model": "mvr_demian",
+   "level": 9,
+   "class": "small",
+   "size": 0.8,
+   "hp": 1454,
+   "damage": [
+    48,
+    51
+   ],
+   "defense": 14,
+   "attackDelay": 4.5,
+   "walkSpeed": 1.8,
+   "xp": 14
+  },
+  {
+   "id": 89,
+   "name": "Demian",
+   "model": "mvr_demian",
+   "level": 9,
+   "class": "normal",
+   "size": 1,
+   "hp": 1454,
+   "damage": [
+    48,
+    51
+   ],
+   "defense": 14,
+   "attackDelay": 4.5,
+   "walkSpeed": 1.8,
+   "xp": 15
+  },
+  {
+   "id": 526,
+   "name": "Captain Peakyturtle",
+   "model": "mvr_peakyturtle",
+   "level": 9,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 1445,
+   "damage": [
+    45,
+    47
+   ],
+   "defense": 14,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 14
+  },
+  {
+   "id": 90,
+   "name": "Bad Demian",
+   "model": "mvr_demian",
+   "level": 10,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 1529,
+   "damage": [
+    50,
+    53
+   ],
+   "defense": 15,
+   "attackDelay": 4.5,
+   "walkSpeed": 1.92,
+   "xp": 15
+  },
+  {
+   "id": 29,
+   "name": "Small Doridoma",
+   "model": "mvr_doridoma",
+   "level": 11,
+   "class": "small",
+   "size": 0.8,
+   "hp": 1851,
+   "damage": [
+    66,
+    69
+   ],
+   "defense": 17,
+   "attackDelay": 4,
+   "walkSpeed": 1.8,
+   "xp": 18
+  },
+  {
+   "id": 30,
+   "name": "Doridoma",
+   "model": "mvr_doridoma",
+   "level": 11,
+   "class": "normal",
+   "size": 1,
+   "hp": 1851,
+   "damage": [
+    68,
+    72
+   ],
+   "defense": 17,
+   "attackDelay": 4,
+   "walkSpeed": 1.8,
+   "xp": 18
+  },
+  {
+   "id": 73,
+   "name": "Giant Pukepuke",
+   "model": "mvr_pukepuke",
+   "level": 11,
+   "class": "giant",
+   "size": 2,
+   "hp": 31556,
+   "damage": [
+    200,
+    210
+   ],
+   "defense": 25,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 81
+  },
+  {
+   "id": 31,
+   "name": "Captain Doridoma",
+   "model": "mvr_doridoma",
+   "level": 12,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 1939,
+   "damage": [
+    73,
+    76
+   ],
+   "defense": 18,
+   "attackDelay": 4,
+   "walkSpeed": 1.92,
+   "xp": 20
+  },
+  {
+   "id": 527,
+   "name": "Giant Peakyturtle",
+   "model": "mvr_peakyturtle",
+   "level": 12,
+   "class": "giant",
+   "size": 2,
+   "hp": 36132,
+   "damage": [
+    216,
+    227
+   ],
+   "defense": 30,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 91
+  },
+  {
+   "id": 32,
+   "name": "Young Lawolf",
+   "model": "mvr_lawolf",
+   "level": 13,
+   "class": "small",
+   "size": 0.8,
+   "hp": 2297,
+   "damage": [
+    84,
+    88
+   ],
+   "defense": 19,
+   "attackDelay": 4,
+   "walkSpeed": 1.8,
+   "xp": 22
+  },
+  {
+   "id": 33,
+   "name": "Lawolf",
+   "model": "mvr_lawolf",
+   "level": 13,
+   "class": "normal",
+   "size": 1,
+   "hp": 2297,
+   "damage": [
+    87,
+    91
+   ],
+   "defense": 19,
+   "attackDelay": 4,
+   "walkSpeed": 1.8,
+   "xp": 23
+  },
+  {
+   "id": 91,
+   "name": "Giant Demian",
+   "model": "mvr_demian",
+   "level": 13,
+   "class": "giant",
+   "size": 2,
+   "hp": 39177,
+   "damage": [
+    229,
+    241
+   ],
+   "defense": 35,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 102
+  },
+  {
+   "id": 34,
+   "name": "Grownup Lawolf",
+   "model": "mvr_lawolf",
+   "level": 14,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 2398,
+   "damage": [
+    91,
+    96
+   ],
+   "defense": 20,
+   "attackDelay": 4,
+   "walkSpeed": 1.92,
+   "xp": 25
+  },
+  {
+   "id": 50,
+   "name": "1st Class Fefern",
+   "model": "mvr_fefern",
+   "level": 15,
+   "class": "small",
+   "size": 0.8,
+   "hp": 2320,
+   "damage": [
+    104,
+    110
+   ],
+   "defense": 22,
+   "attackDelay": 3.5,
+   "walkSpeed": 1.8,
+   "xp": 29
+  },
+  {
+   "id": 51,
+   "name": "Fefern",
+   "model": "mvr_fefern",
+   "level": 15,
+   "class": "normal",
+   "size": 1,
+   "hp": 2320,
+   "damage": [
+    107,
+    113
+   ],
+   "defense": 22,
+   "attackDelay": 3.5,
+   "walkSpeed": 1.8,
+   "xp": 30
+  },
+  {
+   "id": 74,
+   "name": "Giant Doridoma",
+   "model": "mvr_doridoma",
+   "level": 15,
+   "class": "giant",
+   "size": 2,
+   "hp": 47784,
+   "damage": [
+    257,
+    271
+   ],
+   "defense": 35,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 132
+  },
+  {
+   "id": 100,
+   "name": "Brazenface Pukepuke",
+   "model": "mvr_pukepuke",
+   "level": 15,
+   "class": "small",
+   "size": 0.8,
+   "hp": 300,
+   "damage": [
+    1,
+    1
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 556,
+   "name": "Mine Catcher",
+   "model": "mvr_minecatcher",
+   "level": 15,
+   "class": "special",
+   "size": 1,
+   "hp": 100000,
+   "damage": [
+    54,
+    57
+   ],
+   "defense": 14,
+   "attackDelay": 3,
+   "walkSpeed": 1.2,
+   "xp": 0
+  },
+  {
+   "id": 687,
+   "name": "Shuraiture",
+   "model": "mvr_boo",
+   "level": 15,
+   "class": "normal",
+   "size": 1,
+   "hp": 2578,
+   "damage": [
+    140,
+    143
+   ],
+   "defense": 22,
+   "attackDelay": 3.5,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 719,
+   "name": "Criminal Fefern",
+   "model": "mvr_fefern",
+   "level": 15,
+   "class": "small",
+   "size": 0.8,
+   "hp": 2578,
+   "damage": [
+    137,
+    145
+   ],
+   "defense": 22,
+   "attackDelay": 3.5,
+   "walkSpeed": 1.8,
+   "xp": 29
+  },
+  {
+   "id": 750,
+   "name": "Chaner",
+   "model": "mvr_scopicon",
+   "level": 15,
+   "class": "normal",
+   "size": 1,
+   "hp": 2578,
+   "damage": [
+    140,
+    143
+   ],
+   "defense": 22,
+   "attackDelay": 3.5,
+   "walkSpeed": 2.04,
+   "xp": 0
+  },
+  {
+   "id": 751,
+   "name": "Babari",
+   "model": "mvr_flybat",
+   "level": 15,
+   "class": "normal",
+   "size": 1,
+   "hp": 2578,
+   "damage": [
+    145,
+    148
+   ],
+   "defense": 22,
+   "attackDelay": 3.5,
+   "walkSpeed": 2.04,
+   "xp": 0
+  },
+  {
+   "id": 752,
+   "name": "Seido",
+   "model": "mvr_hoppre",
+   "level": 15,
+   "class": "normal",
+   "size": 1,
+   "hp": 2578,
+   "damage": [
+    135,
+    138
+   ],
+   "defense": 22,
+   "attackDelay": 3.2,
+   "walkSpeed": 2.04,
+   "xp": 0
+  },
+  {
+   "id": 917,
+   "name": "GM Lysis",
+   "model": "mvr_bang",
+   "level": 15,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 450000,
+   "damage": [
+    244,
+    257
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 52,
+   "name": "2nd Class Fefern",
+   "model": "mvr_fefern",
+   "level": 16,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 2415,
+   "damage": [
+    113,
+    119
+   ],
+   "defense": 23,
+   "attackDelay": 3.5,
+   "walkSpeed": 1.92,
+   "xp": 32
+  },
+  {
+   "id": 35,
+   "name": "Cute Nyangnyang",
+   "model": "mvr_nyangnyang",
+   "level": 17,
+   "class": "small",
+   "size": 0.8,
+   "hp": 3080,
+   "damage": [
+    127,
+    134
+   ],
+   "defense": 25,
+   "attackDelay": 3.5,
+   "walkSpeed": 1.8,
+   "xp": 36
+  },
+  {
+   "id": 36,
+   "name": "Nyangnyang",
+   "model": "mvr_nyangnyang",
+   "level": 17,
+   "class": "normal",
+   "size": 1,
+   "hp": 3080,
+   "damage": [
+    130,
+    137
+   ],
+   "defense": 25,
+   "attackDelay": 3.5,
+   "walkSpeed": 1.8,
+   "xp": 38
+  },
+  {
+   "id": 75,
+   "name": "Giant Lawolf",
+   "model": "mvr_lawolf",
+   "level": 17,
+   "class": "giant",
+   "size": 2,
+   "hp": 52852,
+   "damage": [
+    285,
+    300
+   ],
+   "defense": 40,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 168
+  },
+  {
+   "id": 37,
+   "name": "Creep Nyangnyang",
+   "model": "mvr_nyangnyang",
+   "level": 18,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 3197,
+   "damage": [
+    136,
+    143
+   ],
+   "defense": 26,
+   "attackDelay": 3.5,
+   "walkSpeed": 1.92,
+   "xp": 41
+  },
+  {
+   "id": 38,
+   "name": "Bang",
+   "model": "mvr_bang",
+   "level": 19,
+   "class": "small",
+   "size": 0.8,
+   "hp": 2994,
+   "damage": [
+    152,
+    160
+   ],
+   "defense": 27,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 46
+  },
+  {
+   "id": 39,
+   "name": "Captain Bang",
+   "model": "mvr_bang",
+   "level": 19,
+   "class": "normal",
+   "size": 1,
+   "hp": 2994,
+   "damage": [
+    155,
+    163
+   ],
+   "defense": 27,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 48
+  },
+  {
+   "id": 81,
+   "name": "Giant Fefern",
+   "model": "mvr_fefern",
+   "level": 19,
+   "class": "giant",
+   "size": 2,
+   "hp": 52145,
+   "damage": [
+    311,
+    327
+   ],
+   "defense": 40,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 214
+  },
+  {
+   "id": 40,
+   "name": "Boss Bang",
+   "model": "mvr_bang",
+   "level": 20,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 3101,
+   "damage": [
+    162,
+    170
+   ],
+   "defense": 28,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 53
+  },
+  {
+   "id": 304,
+   "name": "Small Mothbee",
+   "model": "mvr_mothbee",
+   "level": 20,
+   "class": "small",
+   "size": 0.8,
+   "hp": 3404,
+   "damage": [
+    175,
+    184
+   ],
+   "defense": 28,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 53
+  },
+  {
+   "id": 305,
+   "name": "Mothbee",
+   "model": "mvr_mothbee",
+   "level": 20,
+   "class": "normal",
+   "size": 1,
+   "hp": 3404,
+   "damage": [
+    175,
+    184
+   ],
+   "defense": 29,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 55
+  },
+  {
+   "id": 820,
+   "name": "Ant Turtle",
+   "model": "mvr_peakyturtle",
+   "level": 20,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 3101,
+   "damage": [
+    169,
+    178
+   ],
+   "defense": 28,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 53
+  },
+  {
+   "id": 41,
+   "name": "Small Wagsaac",
+   "model": "mvr_wagsaac",
+   "level": 21,
+   "class": "small",
+   "size": 0.8,
+   "hp": 3802,
+   "damage": [
+    191,
+    201
+   ],
+   "defense": 31,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 61
+  },
+  {
+   "id": 42,
+   "name": "Wagsaac",
+   "model": "mvr_wagsaac",
+   "level": 21,
+   "class": "normal",
+   "size": 1,
+   "hp": 3802,
+   "damage": [
+    191,
+    201
+   ],
+   "defense": 31,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 63
+  },
+  {
+   "id": 76,
+   "name": "Giant Nyangnyang",
+   "model": "mvr_nyangnyang",
+   "level": 21,
+   "class": "giant",
+   "size": 2,
+   "hp": 65032,
+   "damage": [
+    340,
+    358
+   ],
+   "defense": 40,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 280
+  },
+  {
+   "id": 306,
+   "name": "Captain Mothbee",
+   "model": "mvr_mothbee",
+   "level": 21,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 3521,
+   "damage": [
+    179,
+    188
+   ],
+   "defense": 30,
+   "attackDelay": 3,
+   "walkSpeed": 4.32,
+   "xp": 61
+  },
+  {
+   "id": 577,
+   "name": "Small Flybat",
+   "model": "mvr_flybat",
+   "level": 21,
+   "class": "small",
+   "size": 0.8,
+   "hp": 9110,
+   "damage": [
+    209,
+    221
+   ],
+   "defense": 29,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 79
+  },
+  {
+   "id": 578,
+   "name": "Flybat",
+   "model": "mvr_flybat",
+   "level": 21,
+   "class": "normal",
+   "size": 1,
+   "hp": 9110,
+   "damage": [
+    209,
+    221
+   ],
+   "defense": 30,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 81
+  },
+  {
+   "id": 654,
+   "name": "Mutant Fefern",
+   "model": "mvr_fefern",
+   "level": 21,
+   "class": "normal",
+   "size": 1,
+   "hp": 3802,
+   "damage": [
+    200,
+    210
+   ],
+   "defense": 31,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 100
+  },
+  {
+   "id": 43,
+   "name": "Captain Wagsaac",
+   "model": "mvr_wagsaac",
+   "level": 22,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 3928,
+   "damage": [
+    195,
+    205
+   ],
+   "defense": 32,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 69
+  },
+  {
+   "id": 579,
+   "name": "Captain Flybat",
+   "model": "mvr_flybat",
+   "level": 22,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 9414,
+   "damage": [
+    213,
+    225
+   ],
+   "defense": 31,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 89
+  },
+  {
+   "id": 655,
+   "name": "Mutant Fefern King",
+   "model": "mvr_fefern",
+   "level": 22,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 3928,
+   "damage": [
+    209,
+    220
+   ],
+   "defense": 32,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 110
+  },
+  {
+   "id": 670,
+   "name": "Criminal Wagsaac",
+   "model": "mvr_wagsaac",
+   "level": 22,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 3928,
+   "damage": [
+    195,
+    205
+   ],
+   "defense": 32,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 811,
+   "name": "Member of the Violet Magician Troupe",
+   "model": "mvr_prankster",
+   "level": 22,
+   "class": "normal",
+   "size": 1,
+   "hp": 2972,
+   "damage": [
+    220,
+    260
+   ],
+   "defense": 30,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 77,
+   "name": "Giant Bang",
+   "model": "mvr_bang",
+   "level": 23,
+   "class": "giant",
+   "size": 2,
+   "hp": 63106,
+   "damage": [
+    367,
+    386
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 367
+  },
+  {
+   "id": 120,
+   "name": "Small Mia",
+   "model": "mvr_mia",
+   "level": 23,
+   "class": "small",
+   "size": 0.8,
+   "hp": 3921,
+   "damage": [
+    199,
+    209
+   ],
+   "defense": 33,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 79
+  },
+  {
+   "id": 121,
+   "name": "Mia",
+   "model": "mvr_mia",
+   "level": 23,
+   "class": "normal",
+   "size": 1,
+   "hp": 3921,
+   "damage": [
+    199,
+    209
+   ],
+   "defense": 33,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 83
+  },
+  {
+   "id": 657,
+   "name": "Mutant Nyangnyang",
+   "model": "mvr_nyangnyang",
+   "level": 23,
+   "class": "normal",
+   "size": 1,
+   "hp": 3921,
+   "damage": [
+    218,
+    229
+   ],
+   "defense": 33,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 130
+  },
+  {
+   "id": 122,
+   "name": "Captain Mia",
+   "model": "mvr_mia",
+   "level": 24,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 4044,
+   "damage": [
+    202,
+    213
+   ],
+   "defense": 34,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 90
+  },
+  {
+   "id": 658,
+   "name": "Mutant Nyangnyang Queen",
+   "model": "mvr_nyangnyang",
+   "level": 24,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 4044,
+   "damage": [
+    226,
+    238
+   ],
+   "defense": 34,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 140
+  },
+  {
+   "id": 53,
+   "name": "Stale Mr. Pumpkin",
+   "model": "mvr_mrpumpkin",
+   "level": 25,
+   "class": "small",
+   "size": 0.8,
+   "hp": 4454,
+   "damage": [
+    207,
+    217
+   ],
+   "defense": 36,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 103
+  },
+  {
+   "id": 54,
+   "name": "Mr. Pumpkin",
+   "model": "mvr_mrpumpkin",
+   "level": 25,
+   "class": "normal",
+   "size": 1,
+   "hp": 4454,
+   "damage": [
+    207,
+    217
+   ],
+   "defense": 36,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 108
+  },
+  {
+   "id": 78,
+   "name": "Giant Wagsaac",
+   "model": "mvr_wagsaac",
+   "level": 25,
+   "class": "giant",
+   "size": 2,
+   "hp": 75204,
+   "damage": [
+    395,
+    416
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 479
+  },
+  {
+   "id": 307,
+   "name": "Giant Mothbee",
+   "model": "mvr_mothbee",
+   "level": 25,
+   "class": "giant",
+   "size": 2,
+   "hp": 75204,
+   "damage": [
+    379,
+    399
+   ],
+   "defense": 81,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 479
+  },
+  {
+   "id": 580,
+   "name": "Giant Flybat",
+   "model": "mvr_flybat",
+   "level": 25,
+   "class": "giant",
+   "size": 2,
+   "hp": 90245,
+   "damage": [
+    475,
+    500
+   ],
+   "defense": 68,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 622
+  },
+  {
+   "id": 656,
+   "name": "Mutant Giant 2nd Class Fefern",
+   "model": "mvr_fefern",
+   "level": 25,
+   "class": "giant",
+   "size": 2,
+   "hp": 75204,
+   "damage": [
+    428,
+    450
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 750
+  },
+  {
+   "id": 660,
+   "name": "Mutant Bang",
+   "model": "mvr_bang",
+   "level": 25,
+   "class": "normal",
+   "size": 1,
+   "hp": 4454,
+   "damage": [
+    223,
+    235
+   ],
+   "defense": 35,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 170
+  },
+  {
+   "id": 813,
+   "name": "Organigor",
+   "model": "mvr_scopicon",
+   "level": 25,
+   "class": "normal",
+   "size": 1,
+   "hp": 2972,
+   "damage": [
+    250,
+    290
+   ],
+   "defense": 30,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 55,
+   "name": "Rotten Mr Pumpkin",
+   "model": "mvr_mrpumpkin",
+   "level": 26,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 4586,
+   "damage": [
+    210,
+    221
+   ],
+   "defense": 37,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 119
+  },
+  {
+   "id": 661,
+   "name": "Mutant Boss Bang",
+   "model": "mvr_bang",
+   "level": 26,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 4586,
+   "damage": [
+    236,
+    248
+   ],
+   "defense": 36,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 190
+  },
+  {
+   "id": 56,
+   "name": "Red Mantis C",
+   "model": "mvr_tombstonebearer",
+   "level": 27,
+   "class": "small",
+   "size": 0.8,
+   "hp": 4601,
+   "damage": [
+    232,
+    245
+   ],
+   "defense": 39,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 136
+  },
+  {
+   "id": 57,
+   "name": "Red Mantis B",
+   "model": "mvr_tombstonebearer",
+   "level": 27,
+   "class": "normal",
+   "size": 1,
+   "hp": 4601,
+   "damage": [
+    232,
+    245
+   ],
+   "defense": 39,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 143
+  },
+  {
+   "id": 123,
+   "name": "Giant Mia",
+   "model": "mvr_mia",
+   "level": 27,
+   "class": "giant",
+   "size": 2,
+   "hp": 82948,
+   "damage": [
+    425,
+    447
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 632
+  },
+  {
+   "id": 659,
+   "name": "Mutant Giant Nyangnyang",
+   "model": "mvr_nyangnyang",
+   "level": 27,
+   "class": "giant",
+   "size": 2,
+   "hp": 82948,
+   "damage": [
+    447,
+    470
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 960
+  },
+  {
+   "id": 671,
+   "name": "Criminal Mr. Pumpkin",
+   "model": "mvr_mrpumpkin",
+   "level": 27,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 4700,
+   "damage": [
+    216,
+    228
+   ],
+   "defense": 37,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 58,
+   "name": "Red Mantis A",
+   "model": "mvr_tombstonebearer",
+   "level": 28,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 4730,
+   "damage": [
+    236,
+    249
+   ],
+   "defense": 40,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 156
+  },
+  {
+   "id": 82,
+   "name": "Giant Mr. Pumpkin",
+   "model": "mvr_mrpumpkin",
+   "level": 29,
+   "class": "giant",
+   "size": 2,
+   "hp": 88035,
+   "damage": [
+    412,
+    434
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 821
+  },
+  {
+   "id": 199,
+   "name": "Beast Mr. Pumpkin",
+   "model": "mvr_mrpumpkin",
+   "level": 29,
+   "class": "giant",
+   "size": 2,
+   "hp": 88035,
+   "damage": [
+    453,
+    477
+   ],
+   "defense": 29,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1
+  },
+  {
+   "id": 552,
+   "name": "Small Jack the Hammer",
+   "model": "mvr_jackthehammer",
+   "level": 29,
+   "class": "small",
+   "size": 0.8,
+   "hp": 5003,
+   "damage": [
+    246,
+    259
+   ],
+   "defense": 41,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 177
+  },
+  {
+   "id": 553,
+   "name": "Jack the Hammer",
+   "model": "mvr_jackthehammer",
+   "level": 29,
+   "class": "normal",
+   "size": 1,
+   "hp": 5003,
+   "damage": [
+    246,
+    259
+   ],
+   "defense": 41,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 185
+  },
+  {
+   "id": 662,
+   "name": "Mutant Giant Bang King",
+   "model": "mvr_bang",
+   "level": 29,
+   "class": "giant",
+   "size": 2,
+   "hp": 88035,
+   "damage": [
+    466,
+    490
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1300
+  },
+  {
+   "id": 206,
+   "name": "Beast Zombiger",
+   "model": "mvr_zombiger",
+   "level": 30,
+   "class": "giant",
+   "size": 2,
+   "hp": 300000,
+   "damage": [
+    1123,
+    1159
+   ],
+   "defense": 61,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 327002
+  },
+  {
+   "id": 554,
+   "name": "Captain Jack the Hammer",
+   "model": "mvr_jackthehammer",
+   "level": 30,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 5137,
+   "damage": [
+    250,
+    263
+   ],
+   "defense": 42,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 201
+  },
+  {
+   "id": 666,
+   "name": "Vice Veduque",
+   "model": "mvr_wormveduque",
+   "level": 30,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 3000,
+   "damage": [
+    345,
+    363
+   ],
+   "defense": 50,
+   "attackDelay": 1,
+   "walkSpeed": 1.8,
+   "xp": 200
+  },
+  {
+   "id": 800,
+   "name": "Red Bang Troupe Member",
+   "model": "mvr_bang",
+   "level": 30,
+   "class": "normal",
+   "size": 1,
+   "hp": 5737,
+   "damage": [
+    300,
+    340
+   ],
+   "defense": 42,
+   "attackDelay": 2.9,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 812,
+   "name": "Member of the Violet Magician Troupe",
+   "model": "mvr_prankster",
+   "level": 30,
+   "class": "normal",
+   "size": 1,
+   "hp": 5780,
+   "damage": [
+    315,
+    355
+   ],
+   "defense": 42,
+   "attackDelay": 2.85,
+   "walkSpeed": 1.68,
+   "xp": 0
+  },
+  {
+   "id": 819,
+   "name": "Hammer Kick",
+   "model": "mvr_jackthehammer",
+   "level": 30,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 5137,
+   "damage": [
+    250,
+    263
+   ],
+   "defense": 42,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 201
+  },
+  {
+   "id": 918,
+   "name": "GM Demian",
+   "model": "mvr_aibatt",
+   "level": 30,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 5000000,
+   "damage": [
+    807,
+    849
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 83,
+   "name": "Giant Red Mantis",
+   "model": "mvr_redmantis",
+   "level": 31,
+   "class": "giant",
+   "size": 2,
+   "hp": 93121,
+   "damage": [
+    479,
+    504
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1060
+  },
+  {
+   "id": 400,
+   "name": "Small Giggle Box",
+   "model": "mvr_gigglebox",
+   "level": 31,
+   "class": "small",
+   "size": 0.8,
+   "hp": 5422,
+   "damage": [
+    260,
+    274
+   ],
+   "defense": 44,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 229
+  },
+  {
+   "id": 401,
+   "name": "Giggle Box",
+   "model": "mvr_gigglebox",
+   "level": 31,
+   "class": "normal",
+   "size": 1,
+   "hp": 5422,
+   "damage": [
+    260,
+    274
+   ],
+   "defense": 44,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 239
+  },
+  {
+   "id": 402,
+   "name": "Captain Giggle Box",
+   "model": "mvr_gigglebox",
+   "level": 32,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 5560,
+   "damage": [
+    264,
+    278
+   ],
+   "defense": 45,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 261
+  },
+  {
+   "id": 664,
+   "name": "Worm Veduque",
+   "model": "mvr_wormveduque",
+   "level": 32,
+   "class": "giant",
+   "size": 2,
+   "hp": 47000,
+   "damage": [
+    494,
+    520
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2000
+  },
+  {
+   "id": 672,
+   "name": "Criminal Gigglebox",
+   "model": "mvr_gigglebox",
+   "level": 32,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 5560,
+   "damage": [
+    264,
+    278
+   ],
+   "defense": 45,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 92,
+   "name": "Small Rock Muscle",
+   "model": "mvr_rockmuscle",
+   "level": 33,
+   "class": "small",
+   "size": 0.8,
+   "hp": 5857,
+   "damage": [
+    274,
+    288
+   ],
+   "defense": 46,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 297
+  },
+  {
+   "id": 93,
+   "name": "Rock Muscle",
+   "model": "mvr_rockmuscle",
+   "level": 33,
+   "class": "normal",
+   "size": 1,
+   "hp": 5857,
+   "damage": [
+    274,
+    288
+   ],
+   "defense": 46,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 311
+  },
+  {
+   "id": 101,
+   "name": "Heartless Bang",
+   "model": "mvr_bang",
+   "level": 33,
+   "class": "small",
+   "size": 0.8,
+   "hp": 400,
+   "damage": [
+    1,
+    1
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 555,
+   "name": "Giant Jack the Hammer",
+   "model": "mvr_jackthehammer",
+   "level": 33,
+   "class": "giant",
+   "size": 2,
+   "hp": 101552,
+   "damage": [
+    510,
+    537
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1377
+  },
+  {
+   "id": 581,
+   "name": "Small Bucrow",
+   "model": "mvr_bucrow",
+   "level": 33,
+   "class": "small",
+   "size": 0.8,
+   "hp": 13522,
+   "damage": [
+    342,
+    360
+   ],
+   "defense": 43,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 386
+  },
+  {
+   "id": 582,
+   "name": "Bucrow",
+   "model": "mvr_bucrow",
+   "level": 33,
+   "class": "normal",
+   "size": 1,
+   "hp": 13522,
+   "damage": [
+    342,
+    360
+   ],
+   "defense": 54,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 404
+  },
+  {
+   "id": 94,
+   "name": "Captain Rock Muscle",
+   "model": "mvr_rockmuscle",
+   "level": 34,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 6000,
+   "damage": [
+    277,
+    292
+   ],
+   "defense": 47,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 338
+  },
+  {
+   "id": 583,
+   "name": "Captain Bucrow",
+   "model": "mvr_bucrow",
+   "level": 34,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 13852,
+   "damage": [
+    345,
+    364
+   ],
+   "defense": 54,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 439
+  },
+  {
+   "id": 403,
+   "name": "Giant Giggle Box",
+   "model": "mvr_gigglebox",
+   "level": 35,
+   "class": "giant",
+   "size": 2,
+   "hp": 106638,
+   "damage": [
+    539,
+    567
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1779
+  },
+  {
+   "id": 528,
+   "name": "Small Hobo",
+   "model": "mvr_hobo",
+   "level": 35,
+   "class": "small",
+   "size": 0.8,
+   "hp": 6309,
+   "damage": [
+    287,
+    303
+   ],
+   "defense": 48,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 384
+  },
+  {
+   "id": 529,
+   "name": "Hobo",
+   "model": "mvr_hobo",
+   "level": 35,
+   "class": "normal",
+   "size": 1,
+   "hp": 6309,
+   "damage": [
+    287,
+    303
+   ],
+   "defense": 48,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 401
+  },
+  {
+   "id": 665,
+   "name": "Serus Uriel",
+   "model": "mvr_wormveduque",
+   "level": 35,
+   "class": "giant",
+   "size": 2,
+   "hp": 47000,
+   "damage": [
+    693,
+    729
+   ],
+   "defense": 50,
+   "attackDelay": 1.5,
+   "walkSpeed": 2.88,
+   "xp": 3500
+  },
+  {
+   "id": 814,
+   "name": "Gangard",
+   "model": "mvr_flybat",
+   "level": 35,
+   "class": "normal",
+   "size": 1,
+   "hp": 5880,
+   "damage": [
+    332,
+    372
+   ],
+   "defense": 46,
+   "attackDelay": 2.85,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 817,
+   "name": "Red Bang Troupe Leader",
+   "model": "mvr_bang",
+   "level": 35,
+   "class": "normal",
+   "size": 1,
+   "hp": 5880,
+   "damage": [
+    332,
+    372
+   ],
+   "defense": 46,
+   "attackDelay": 2.85,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 168,
+   "name": "Small Mushpoie",
+   "model": "mvr_mushpoie",
+   "level": 36,
+   "class": "normal",
+   "size": 1,
+   "hp": 6309,
+   "damage": [
+    287,
+    303
+   ],
+   "defense": 48,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 100
+  },
+  {
+   "id": 530,
+   "name": "Captain Hobo",
+   "model": "mvr_hobo",
+   "level": 36,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 6457,
+   "damage": [
+    291,
+    307
+   ],
+   "defense": 49,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 437
+  },
+  {
+   "id": 95,
+   "name": "Giant Rock Muscle",
+   "model": "mvr_rockmuscle",
+   "level": 37,
+   "class": "giant",
+   "size": 2,
+   "hp": 113713,
+   "damage": [
+    568,
+    598
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2305
+  },
+  {
+   "id": 544,
+   "name": "Small Dumb Bull",
+   "model": "mvr_dumbbull",
+   "level": 37,
+   "class": "small",
+   "size": 0.8,
+   "hp": 6605,
+   "damage": [
+    307,
+    324
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 497
+  },
+  {
+   "id": 545,
+   "name": "Dumb Bull",
+   "model": "mvr_dumbbull",
+   "level": 37,
+   "class": "normal",
+   "size": 1,
+   "hp": 6605,
+   "damage": [
+    307,
+    324
+   ],
+   "defense": 50,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 520
+  },
+  {
+   "id": 584,
+   "name": "Giant Bucrow",
+   "model": "mvr_bucrow",
+   "level": 37,
+   "class": "giant",
+   "size": 2,
+   "hp": 136456,
+   "damage": [
+    682,
+    718
+   ],
+   "defense": 77,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2996
+  },
+  {
+   "id": 673,
+   "name": "Criminal Hobo",
+   "model": "mvr_hobo",
+   "level": 37,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 6600,
+   "damage": [
+    291,
+    307
+   ],
+   "defense": 49,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 546,
+   "name": "Captain Dumb Bull",
+   "model": "mvr_dumbbull",
+   "level": 38,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 6753,
+   "damage": [
+    311,
+    328
+   ],
+   "defense": 51,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 567
+  },
+  {
+   "id": 47,
+   "name": "Small Totemia",
+   "model": "mvr_totemia",
+   "level": 39,
+   "class": "small",
+   "size": 0.8,
+   "hp": 6675,
+   "damage": [
+    321,
+    338
+   ],
+   "defense": 54,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 646
+  },
+  {
+   "id": 48,
+   "name": "Totemia",
+   "model": "mvr_totemia",
+   "level": 39,
+   "class": "normal",
+   "size": 1,
+   "hp": 6675,
+   "damage": [
+    321,
+    338
+   ],
+   "defense": 54,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 675
+  },
+  {
+   "id": 531,
+   "name": "Giant Hobo",
+   "model": "mvr_hobo",
+   "level": 39,
+   "class": "giant",
+   "size": 2,
+   "hp": 118131,
+   "damage": [
+    594,
+    625
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2993
+  },
+  {
+   "id": 49,
+   "name": "Captain Totemia",
+   "model": "mvr_totemia",
+   "level": 40,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 6819,
+   "damage": [
+    325,
+    342
+   ],
+   "defense": 55,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 723
+  },
+  {
+   "id": 816,
+   "name": "Arc Master of the Violet Magician Troupe",
+   "model": "mvr_prankster",
+   "level": 40,
+   "class": "giant",
+   "size": 2,
+   "hp": 141012,
+   "damage": [
+    642,
+    682
+   ],
+   "defense": 75,
+   "attackDelay": 2.45,
+   "walkSpeed": 1.44,
+   "xp": 0
+  },
+  {
+   "id": 818,
+   "name": "Lord Bang",
+   "model": "mvr_bang",
+   "level": 40,
+   "class": "giant",
+   "size": 2,
+   "hp": 147015,
+   "damage": [
+    642,
+    682
+   ],
+   "defense": 78,
+   "attackDelay": 2.55,
+   "walkSpeed": 1.44,
+   "xp": 0
+  },
+  {
+   "id": 62,
+   "name": "Maid Cardpuppet",
+   "model": "mvr_cardpuppet",
+   "level": 41,
+   "class": "small",
+   "size": 0.8,
+   "hp": 8950,
+   "damage": [
+    341,
+    359
+   ],
+   "defense": 56,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 809
+  },
+  {
+   "id": 63,
+   "name": "Cardpuppet",
+   "model": "mvr_cardpuppet",
+   "level": 41,
+   "class": "normal",
+   "size": 1,
+   "hp": 8950,
+   "damage": [
+    341,
+    359
+   ],
+   "defense": 56,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 845
+  },
+  {
+   "id": 547,
+   "name": "Giant Dumb Bull",
+   "model": "mvr_dumbbull",
+   "level": 41,
+   "class": "giant",
+   "size": 2,
+   "hp": 131912,
+   "damage": [
+    625,
+    658
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3748
+  },
+  {
+   "id": 64,
+   "name": "Manager Cardpuppet",
+   "model": "mvr_cardpuppet",
+   "level": 42,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 9135,
+   "damage": [
+    345,
+    363
+   ],
+   "defense": 57,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 905
+  },
+  {
+   "id": 300,
+   "name": "Small Flbyrigen",
+   "model": "mvr_flbyrigen",
+   "level": 42,
+   "class": "small",
+   "size": 0.8,
+   "hp": 7614,
+   "damage": [
+    339,
+    357
+   ],
+   "defense": 53,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 905
+  },
+  {
+   "id": 301,
+   "name": "Flbyrigen",
+   "model": "mvr_flbyrigen",
+   "level": 42,
+   "class": "normal",
+   "size": 1,
+   "hp": 7614,
+   "damage": [
+    339,
+    357
+   ],
+   "defense": 54,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 946
+  },
+  {
+   "id": 674,
+   "name": "Criminal Cardpuppet",
+   "model": "mvr_cardpuppet",
+   "level": 42,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 7632,
+   "damage": [
+    345,
+    363
+   ],
+   "defense": 57,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 56,
+   "name": "Small Tombstone Bearer",
+   "model": "mvr_tombstonebearer",
+   "level": 43,
+   "class": "small",
+   "size": 0.8,
+   "hp": 7769,
+   "damage": [
+    361,
+    380
+   ],
+   "defense": 59,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1013
+  },
+  {
+   "id": 57,
+   "name": "Tombstone Bearer",
+   "model": "mvr_tombstonebearer",
+   "level": 43,
+   "class": "normal",
+   "size": 1,
+   "hp": 7769,
+   "damage": [
+    361,
+    380
+   ],
+   "defense": 59,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1059
+  },
+  {
+   "id": 80,
+   "name": "Giant Totemia",
+   "model": "mvr_totemia",
+   "level": 43,
+   "class": "giant",
+   "size": 2,
+   "hp": 136998,
+   "damage": [
+    662,
+    697
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 4697
+  },
+  {
+   "id": 302,
+   "name": "Captain Flbyrigen",
+   "model": "mvr_flbyrigen",
+   "level": 43,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 7769,
+   "damage": [
+    342,
+    361
+   ],
+   "defense": 54,
+   "attackDelay": 3,
+   "walkSpeed": 4.32,
+   "xp": 1013
+  },
+  {
+   "id": 585,
+   "name": "Small Scorpicon",
+   "model": "mvr_scopicon",
+   "level": 43,
+   "class": "small",
+   "size": 0.8,
+   "hp": 19963,
+   "damage": [
+    509,
+    536
+   ],
+   "defense": 64,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1316
+  },
+  {
+   "id": 586,
+   "name": "Scorpicon",
+   "model": "mvr_scopicon",
+   "level": 43,
+   "class": "normal",
+   "size": 1,
+   "hp": 19963,
+   "damage": [
+    509,
+    536
+   ],
+   "defense": 64,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1376
+  },
+  {
+   "id": 993,
+   "name": "Small Kingster",
+   "model": "mvr_kingster",
+   "level": 43,
+   "class": "normal",
+   "size": 1,
+   "hp": 7769,
+   "damage": [
+    361,
+    380
+   ],
+   "defense": 59,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1824
+  },
+  {
+   "id": 58,
+   "name": "Captain Tombstone Bearer",
+   "model": "mvr_tombstonebearer",
+   "level": 44,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 7925,
+   "damage": [
+    365,
+    384
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1134
+  },
+  {
+   "id": 587,
+   "name": "Captain Scorpicon",
+   "model": "mvr_scopicon",
+   "level": 44,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 20362,
+   "damage": [
+    513,
+    540
+   ],
+   "defense": 65,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1474
+  },
+  {
+   "id": 994,
+   "name": "Kingster",
+   "model": "mvr_kingster",
+   "level": 44,
+   "class": "normal",
+   "size": 1,
+   "hp": 7925,
+   "damage": [
+    365,
+    384
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2042
+  },
+  {
+   "id": 59,
+   "name": "Phantom Basque",
+   "model": "mvr_basque",
+   "level": 45,
+   "class": "small",
+   "size": 0.8,
+   "hp": 8260,
+   "damage": [
+    369,
+    388
+   ],
+   "defense": 61,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1269
+  },
+  {
+   "id": 60,
+   "name": "Basque",
+   "model": "mvr_basque",
+   "level": 45,
+   "class": "normal",
+   "size": 1,
+   "hp": 8260,
+   "damage": [
+    369,
+    388
+   ],
+   "defense": 61,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1327
+  },
+  {
+   "id": 85,
+   "name": "Boss Cardpuppet",
+   "model": "mvr_cardpuppet",
+   "level": 45,
+   "class": "giant",
+   "size": 2,
+   "hp": 144760,
+   "damage": [
+    693,
+    729
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5885
+  },
+  {
+   "id": 815,
+   "name": "Hadeseor",
+   "model": "mvr_zombiger",
+   "level": 45,
+   "class": "normal",
+   "size": 1,
+   "hp": 2972,
+   "damage": [
+    380,
+    420
+   ],
+   "defense": 30,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 855,
+   "name": "Ivillis Crasher",
+   "model": "mvr_risem",
+   "level": 45,
+   "class": "normal",
+   "size": 1,
+   "hp": 15500,
+   "damage": [
+    405,
+    426
+   ],
+   "defense": 36,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 1692
+  },
+  {
+   "id": 861,
+   "name": "Ivillis Guardian",
+   "model": "mvr_luia",
+   "level": 45,
+   "class": "guardian",
+   "size": 1.5,
+   "hp": 100000,
+   "damage": [
+    900,
+    947
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 59050
+  },
+  {
+   "id": 995,
+   "name": "Captain Kingster",
+   "model": "mvr_kingster",
+   "level": 45,
+   "class": "normal",
+   "size": 1,
+   "hp": 8260,
+   "damage": [
+    369,
+    388
+   ],
+   "defense": 61,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2388
+  },
+  {
+   "id": 61,
+   "name": "Lumping Basque",
+   "model": "mvr_basque",
+   "level": 46,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 8419,
+   "damage": [
+    372,
+    392
+   ],
+   "defense": 62,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1421
+  },
+  {
+   "id": 303,
+   "name": "Giant Flbyrigen",
+   "model": "mvr_flbyrigen",
+   "level": 46,
+   "class": "giant",
+   "size": 2,
+   "hp": 147628,
+   "damage": [
+    682,
+    718
+   ],
+   "defense": 77,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 6589
+  },
+  {
+   "id": 996,
+   "name": "Small Kraken",
+   "model": "mvr_kraken",
+   "level": 46,
+   "class": "normal",
+   "size": 1,
+   "hp": 8419,
+   "damage": [
+    372,
+    392
+   ],
+   "defense": 62,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2558
+  },
+  {
+   "id": 59,
+   "name": "Giant Tombstone Bearer",
+   "model": "mvr_basque",
+   "level": 47,
+   "class": "giant",
+   "size": 2,
+   "hp": 149828,
+   "damage": [
+    720,
+    758
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7379
+  },
+  {
+   "id": 65,
+   "name": "Small Mage Prankster",
+   "model": "mvr_prankster",
+   "level": 47,
+   "class": "small",
+   "size": 0.8,
+   "hp": 8579,
+   "damage": [
+    382,
+    403
+   ],
+   "defense": 63,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1592
+  },
+  {
+   "id": 66,
+   "name": "Prankster",
+   "model": "mvr_prankster",
+   "level": 47,
+   "class": "normal",
+   "size": 1,
+   "hp": 8579,
+   "damage": [
+    382,
+    403
+   ],
+   "defense": 63,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1664
+  },
+  {
+   "id": 102,
+   "name": "Tough Rock Muscle",
+   "model": "mvr_rockmuscle",
+   "level": 47,
+   "class": "small",
+   "size": 0.8,
+   "hp": 500,
+   "damage": [
+    1,
+    1
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 116,
+   "name": "Small Circus Bear",
+   "model": "mvr_wagsaac",
+   "level": 47,
+   "class": "small",
+   "size": 0.8,
+   "hp": 9364,
+   "damage": [
+    494,
+    520
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 163152
+  },
+  {
+   "id": 117,
+   "name": "Circus Bear",
+   "model": "mvr_wagsaac",
+   "level": 47,
+   "class": "normal",
+   "size": 1,
+   "hp": 9364,
+   "damage": [
+    494,
+    520
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 189256
+  },
+  {
+   "id": 588,
+   "name": "Giant Scorpicon",
+   "model": "mvr_scopicon",
+   "level": 47,
+   "class": "giant",
+   "size": 2,
+   "hp": 179794,
+   "damage": [
+    864,
+    909
+   ],
+   "defense": 85,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 9592
+  },
+  {
+   "id": 675,
+   "name": "Criminal Basque",
+   "model": "mvr_basque",
+   "level": 47,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 8500,
+   "damage": [
+    372,
+    392
+   ],
+   "defense": 62,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 997,
+   "name": "Kraken",
+   "model": "mvr_kraken",
+   "level": 47,
+   "class": "normal",
+   "size": 1,
+   "hp": 8579,
+   "damage": [
+    382,
+    403
+   ],
+   "defense": 63,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2865
+  },
+  {
+   "id": 67,
+   "name": "Master Mage Prankster",
+   "model": "mvr_prankster",
+   "level": 48,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 8739,
+   "damage": [
+    386,
+    407
+   ],
+   "defense": 64,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1782
+  },
+  {
+   "id": 118,
+   "name": "Captain Circus Bear",
+   "model": "mvr_wagsaac",
+   "level": 48,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 9545,
+   "damage": [
+    504,
+    530
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 187624
+  },
+  {
+   "id": 998,
+   "name": "Captain Kraken",
+   "model": "mvr_kraken",
+   "level": 48,
+   "class": "normal",
+   "size": 1,
+   "hp": 8739,
+   "damage": [
+    386,
+    407
+   ],
+   "defense": 64,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3207
+  },
+  {
+   "id": 44,
+   "name": "Rough Wheelem",
+   "model": "mvr_wheelem",
+   "level": 49,
+   "class": "small",
+   "size": 0.8,
+   "hp": 8899,
+   "damage": [
+    402,
+    424
+   ],
+   "defense": 65,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1995
+  },
+  {
+   "id": 45,
+   "name": "Wheelem",
+   "model": "mvr_wheelem",
+   "level": 49,
+   "class": "normal",
+   "size": 1,
+   "hp": 8899,
+   "damage": [
+    402,
+    424
+   ],
+   "defense": 65,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2086
+  },
+  {
+   "id": 84,
+   "name": "Giant Basque",
+   "model": "mvr_basque",
+   "level": 49,
+   "class": "giant",
+   "size": 2,
+   "hp": 154915,
+   "damage": [
+    746,
+    785
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 9251
+  },
+  {
+   "id": 308,
+   "name": "Small Rockepeller",
+   "model": "mvr_rockepeller",
+   "level": 49,
+   "class": "small",
+   "size": 0.8,
+   "hp": 18947,
+   "damage": [
+    402,
+    424
+   ],
+   "defense": 58,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 1995
+  },
+  {
+   "id": 309,
+   "name": "Rockepeller",
+   "model": "mvr_rockepeller",
+   "level": 49,
+   "class": "normal",
+   "size": 1,
+   "hp": 18947,
+   "damage": [
+    402,
+    424
+   ],
+   "defense": 58,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 2086
+  },
+  {
+   "id": 999,
+   "name": "Small Creper",
+   "model": "mvr_creper",
+   "level": 49,
+   "class": "normal",
+   "size": 1,
+   "hp": 8899,
+   "damage": [
+    402,
+    424
+   ],
+   "defense": 65,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3591
+  },
+  {
+   "id": 46,
+   "name": "Bouncing Wheelem",
+   "model": "mvr_wheelem",
+   "level": 50,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 9059,
+   "damage": [
+    406,
+    428
+   ],
+   "defense": 66,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 2234
+  },
+  {
+   "id": 310,
+   "name": "Captain Rockepeller",
+   "model": "mvr_rockepeller",
+   "level": 50,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 19289,
+   "damage": [
+    406,
+    428
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 4.32,
+   "xp": 2234
+  },
+  {
+   "id": 856,
+   "name": "Ivillis Poisoner",
+   "model": "mvr_scopicon",
+   "level": 50,
+   "class": "normal",
+   "size": 1,
+   "hp": 18200,
+   "damage": [
+    451,
+    475
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 3101
+  },
+  {
+   "id": 1000,
+   "name": "Creper",
+   "model": "mvr_creper",
+   "level": 50,
+   "class": "normal",
+   "size": 1,
+   "hp": 9059,
+   "damage": [
+    406,
+    428
+   ],
+   "defense": 66,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 4022
+  },
+  {
+   "id": 86,
+   "name": "Giantmage Prankster",
+   "model": "mvr_prankster",
+   "level": 51,
+   "class": "giant",
+   "size": 2,
+   "hp": 163345,
+   "damage": [
+    778,
+    819
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 11597
+  },
+  {
+   "id": 119,
+   "name": "Giant Circus Bear",
+   "model": "mvr_wagsaac",
+   "level": 51,
+   "class": "giant",
+   "size": 2,
+   "hp": 163346,
+   "damage": [
+    960,
+    1011
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1426755
+  },
+  {
+   "id": 540,
+   "name": "Small Leyena",
+   "model": "mvr_leyena",
+   "level": 51,
+   "class": "small",
+   "size": 0.8,
+   "hp": 9620,
+   "damage": [
+    410,
+    432
+   ],
+   "defense": 68,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2501
+  },
+  {
+   "id": 541,
+   "name": "Leyena",
+   "model": "mvr_leyena",
+   "level": 51,
+   "class": "normal",
+   "size": 1,
+   "hp": 9620,
+   "damage": [
+    410,
+    432
+   ],
+   "defense": 68,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2615
+  },
+  {
+   "id": 589,
+   "name": "Small Trangfoma",
+   "model": "mvr_trangfoma",
+   "level": 51,
+   "class": "small",
+   "size": 0.8,
+   "hp": 22434,
+   "damage": [
+    614,
+    646
+   ],
+   "defense": 64,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3251
+  },
+  {
+   "id": 590,
+   "name": "Trangfoma",
+   "model": "mvr_trangfoma",
+   "level": 51,
+   "class": "normal",
+   "size": 1,
+   "hp": 22434,
+   "damage": [
+    614,
+    646
+   ],
+   "defense": 65,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3399
+  },
+  {
+   "id": 1001,
+   "name": "Captain Creper",
+   "model": "mvr_creper",
+   "level": 51,
+   "class": "normal",
+   "size": 1,
+   "hp": 9620,
+   "damage": [
+    410,
+    432
+   ],
+   "defense": 67,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 4502
+  },
+  {
+   "id": 542,
+   "name": "Captain Leyena",
+   "model": "mvr_leyena",
+   "level": 52,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 9788,
+   "damage": [
+    430,
+    452
+   ],
+   "defense": 69,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 2801
+  },
+  {
+   "id": 591,
+   "name": "Captain Trangfoma",
+   "model": "mvr_trangfoma",
+   "level": 52,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 22826,
+   "damage": [
+    618,
+    650
+   ],
+   "defense": 65,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 3641
+  },
+  {
+   "id": 676,
+   "name": "Criminal Leyena",
+   "model": "mvr_leyena",
+   "level": 52,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 9788,
+   "damage": [
+    430,
+    452
+   ],
+   "defense": 69,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 1002,
+   "name": "Small Naga",
+   "model": "mvr_naga",
+   "level": 52,
+   "class": "normal",
+   "size": 1,
+   "hp": 9788,
+   "damage": [
+    430,
+    452
+   ],
+   "defense": 68,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5042
+  },
+  {
+   "id": 79,
+   "name": "Giant Wheelem",
+   "model": "mvr_wheelem",
+   "level": 53,
+   "class": "giant",
+   "size": 2,
+   "hp": 168432,
+   "damage": [
+    807,
+    849
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 14540
+  },
+  {
+   "id": 107,
+   "name": "Small Steam Walker",
+   "model": "mvr_steamwalker",
+   "level": 53,
+   "class": "small",
+   "size": 0.8,
+   "hp": 9956,
+   "damage": [
+    440,
+    463
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3136
+  },
+  {
+   "id": 108,
+   "name": "Steam Walker",
+   "model": "mvr_steamwalker",
+   "level": 53,
+   "class": "normal",
+   "size": 1,
+   "hp": 9956,
+   "damage": [
+    440,
+    463
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3279
+  },
+  {
+   "id": 311,
+   "name": "Giant Rockepeller",
+   "model": "mvr_rockepeller",
+   "level": 53,
+   "class": "giant",
+   "size": 2,
+   "hp": 168432,
+   "damage": [
+    777,
+    818
+   ],
+   "defense": 85,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 14540
+  },
+  {
+   "id": 865,
+   "name": "Ivillis Red Otem",
+   "model": "mvr_totemia",
+   "level": 53,
+   "class": "normal",
+   "size": 1,
+   "hp": 10900,
+   "damage": [
+    352,
+    370
+   ],
+   "defense": 84,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 3706
+  },
+  {
+   "id": 1003,
+   "name": "Naga",
+   "model": "mvr_naga",
+   "level": 53,
+   "class": "normal",
+   "size": 1,
+   "hp": 9956,
+   "damage": [
+    440,
+    463
+   ],
+   "defense": 69,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5645
+  },
+  {
+   "id": 109,
+   "name": "Captain Steam Walker",
+   "model": "mvr_steamwalker",
+   "level": 54,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 10125,
+   "damage": [
+    460,
+    482
+   ],
+   "defense": 71,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 3512
+  },
+  {
+   "id": 1004,
+   "name": "Captain Naga",
+   "model": "mvr_naga",
+   "level": 54,
+   "class": "normal",
+   "size": 1,
+   "hp": 10125,
+   "damage": [
+    460,
+    482
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 6321
+  },
+  {
+   "id": 508,
+   "name": "Small Steel Knight",
+   "model": "mvr_steelknight",
+   "level": 55,
+   "class": "small",
+   "size": 0.8,
+   "hp": 10294,
+   "damage": [
+    475,
+    497
+   ],
+   "defense": 72,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3934
+  },
+  {
+   "id": 509,
+   "name": "Steel Knight",
+   "model": "mvr_steelknight",
+   "level": 55,
+   "class": "normal",
+   "size": 1,
+   "hp": 10294,
+   "damage": [
+    475,
+    497
+   ],
+   "defense": 72,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 4112
+  },
+  {
+   "id": 543,
+   "name": "Giant Leyena",
+   "model": "mvr_leyena",
+   "level": 55,
+   "class": "giant",
+   "size": 2,
+   "hp": 181405,
+   "damage": [
+    831,
+    875
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 18237
+  },
+  {
+   "id": 572,
+   "name": "Small Zombiger",
+   "model": "mvr_zombiger",
+   "level": 55,
+   "class": "small",
+   "size": 0.8,
+   "hp": 24984,
+   "damage": [
+    598,
+    630
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5115
+  },
+  {
+   "id": 573,
+   "name": "Zombiger",
+   "model": "mvr_zombiger",
+   "level": 55,
+   "class": "normal",
+   "size": 1,
+   "hp": 24984,
+   "damage": [
+    598,
+    630
+   ],
+   "defense": 61,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5346
+  },
+  {
+   "id": 592,
+   "name": "Giant Trangfoma",
+   "model": "mvr_trangfoma",
+   "level": 55,
+   "class": "giant",
+   "size": 2,
+   "hp": 217686,
+   "damage": [
+    998,
+    1050
+   ],
+   "defense": 89,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 13708
+  },
+  {
+   "id": 857,
+   "name": "Ivillis Wrecker",
+   "model": "mvr_rockmuscle",
+   "level": 55,
+   "class": "normal",
+   "size": 1,
+   "hp": 47900,
+   "damage": [
+    522,
+    546
+   ],
+   "defense": 43,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 5034
+  },
+  {
+   "id": 862,
+   "name": "Ivillis Quaker",
+   "model": "mvr_kern",
+   "level": 55,
+   "class": "guardian",
+   "size": 1.5,
+   "hp": 200000,
+   "damage": [
+    1080,
+    1137
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 182870
+  },
+  {
+   "id": 1005,
+   "name": "Small Atrox",
+   "model": "mvr_atrox",
+   "level": 55,
+   "class": "normal",
+   "size": 1,
+   "hp": 10294,
+   "damage": [
+    475,
+    497
+   ],
+   "defense": 71,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7082
+  },
+  {
+   "id": 510,
+   "name": "Captain Steel Knight",
+   "model": "mvr_steelknight",
+   "level": 56,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 10463,
+   "damage": [
+    495,
+    517
+   ],
+   "defense": 73,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 4406
+  },
+  {
+   "id": 575,
+   "name": "Captain Zombiger",
+   "model": "mvr_zombiger",
+   "level": 56,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 25395,
+   "damage": [
+    602,
+    634
+   ],
+   "defense": 62,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 5728
+  },
+  {
+   "id": 1006,
+   "name": "Atrox",
+   "model": "mvr_atrox",
+   "level": 56,
+   "class": "normal",
+   "size": 1,
+   "hp": 10463,
+   "damage": [
+    495,
+    517
+   ],
+   "defense": 72,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7931
+  },
+  {
+   "id": 110,
+   "name": "Giant Steam Walker",
+   "model": "mvr_steamwalker",
+   "level": 57,
+   "class": "giant",
+   "size": 2,
+   "hp": 190200,
+   "damage": [
+    832,
+    876
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 22873
+  },
+  {
+   "id": 548,
+   "name": "Small Nutty Wheel",
+   "model": "mvr_nuttywheel",
+   "level": 57,
+   "class": "small",
+   "size": 0.8,
+   "hp": 10632,
+   "damage": [
+    510,
+    532
+   ],
+   "defense": 74,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 4934
+  },
+  {
+   "id": 549,
+   "name": "Nutty Wheel",
+   "model": "mvr_nuttywheel",
+   "level": 57,
+   "class": "normal",
+   "size": 1,
+   "hp": 10632,
+   "damage": [
+    510,
+    532
+   ],
+   "defense": 74,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5158
+  },
+  {
+   "id": 560,
+   "name": "Small Nuctuvehicle",
+   "model": "mvr_nuctuvehicle",
+   "level": 57,
+   "class": "small",
+   "size": 0.8,
+   "hp": 25300,
+   "damage": [
+    587,
+    618
+   ],
+   "defense": 69,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5921
+  },
+  {
+   "id": 561,
+   "name": "Nuctuvehicle",
+   "model": "mvr_nuctuvehicle",
+   "level": 57,
+   "class": "normal",
+   "size": 1,
+   "hp": 25300,
+   "damage": [
+    587,
+    618
+   ],
+   "defense": 70,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 6190
+  },
+  {
+   "id": 677,
+   "name": "Criminal Steelknight",
+   "model": "mvr_steelknight",
+   "level": 57,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 11500,
+   "damage": [
+    495,
+    517
+   ],
+   "defense": 73,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 1007,
+   "name": "Captain Atrox",
+   "model": "mvr_atrox",
+   "level": 57,
+   "class": "normal",
+   "size": 1,
+   "hp": 10632,
+   "damage": [
+    510,
+    532
+   ],
+   "defense": 73,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 8882
+  },
+  {
+   "id": 550,
+   "name": "Captain Nutty Wheel",
+   "model": "mvr_nuttywheel",
+   "level": 58,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 10801,
+   "damage": [
+    530,
+    552
+   ],
+   "defense": 75,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 5525
+  },
+  {
+   "id": 562,
+   "name": "Captain Nuctuvehicle",
+   "model": "mvr_nuctuvehicle",
+   "level": 58,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 25703,
+   "damage": [
+    591,
+    622
+   ],
+   "defense": 71,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 6630
+  },
+  {
+   "id": 1008,
+   "name": "Small Okean",
+   "model": "mvr_okean",
+   "level": 58,
+   "class": "normal",
+   "size": 1,
+   "hp": 10801,
+   "damage": [
+    530,
+    552
+   ],
+   "defense": 74,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 9945
+  },
+  {
+   "id": 504,
+   "name": "Small Driller",
+   "model": "mvr_driller",
+   "level": 59,
+   "class": "small",
+   "size": 0.8,
+   "hp": 10971,
+   "damage": [
+    545,
+    567
+   ],
+   "defense": 76,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 6188
+  },
+  {
+   "id": 505,
+   "name": "Driller",
+   "model": "mvr_driller",
+   "level": 59,
+   "class": "normal",
+   "size": 1,
+   "hp": 10971,
+   "damage": [
+    545,
+    567
+   ],
+   "defense": 76,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 6469
+  },
+  {
+   "id": 511,
+   "name": "Giant Steel Knight",
+   "model": "mvr_steelknight",
+   "level": 59,
+   "class": "giant",
+   "size": 2,
+   "hp": 195518,
+   "damage": [
+    860,
+    905
+   ],
+   "defense": 90,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 28687
+  },
+  {
+   "id": 564,
+   "name": "Small Risem",
+   "model": "mvr_risem",
+   "level": 59,
+   "class": "small",
+   "size": 0.8,
+   "hp": 26629,
+   "damage": [
+    661,
+    696
+   ],
+   "defense": 74,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7425
+  },
+  {
+   "id": 565,
+   "name": "Risem",
+   "model": "mvr_risem",
+   "level": 59,
+   "class": "normal",
+   "size": 1,
+   "hp": 26629,
+   "damage": [
+    661,
+    696
+   ],
+   "defense": 75,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7762
+  },
+  {
+   "id": 576,
+   "name": "Giant Zombiger",
+   "model": "mvr_zombiger",
+   "level": 59,
+   "class": "giant",
+   "size": 2,
+   "hp": 234622,
+   "damage": [
+    1095,
+    1153
+   ],
+   "defense": 94,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 37294
+  },
+  {
+   "id": 1009,
+   "name": "Okean",
+   "model": "mvr_okean",
+   "level": 59,
+   "class": "normal",
+   "size": 1,
+   "hp": 10971,
+   "damage": [
+    545,
+    567
+   ],
+   "defense": 75,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 11139
+  },
+  {
+   "id": 506,
+   "name": "Captain Driller",
+   "model": "mvr_driller",
+   "level": 60,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 12255,
+   "damage": [
+    560,
+    582
+   ],
+   "defense": 75,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 6867
+  },
+  {
+   "id": 566,
+   "name": "Captain Risem",
+   "model": "mvr_risem",
+   "level": 60,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 27042,
+   "damage": [
+    665,
+    700
+   ],
+   "defense": 94,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 8240
+  },
+  {
+   "id": 663,
+   "name": "Venel Guardian",
+   "model": "mvr_bucrow",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 120000,
+   "damage": [
+    1045,
+    1100
+   ],
+   "defense": 100,
+   "attackDelay": 3,
+   "walkSpeed": 1.68,
+   "xp": 0
+  },
+  {
+   "id": 688,
+   "name": "Ren",
+   "model": "mvr_demian",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 12255,
+   "damage": [
+    670,
+    710
+   ],
+   "defense": 82,
+   "attackDelay": 2.9,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 689,
+   "name": "Sisif",
+   "model": "mvr_pukepuke",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 12255,
+   "damage": [
+    670,
+    710
+   ],
+   "defense": 82,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 690,
+   "name": "Rubo",
+   "model": "mvr_glaphan",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 12255,
+   "damage": [
+    670,
+    710
+   ],
+   "defense": 82,
+   "attackDelay": 2.9,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 841,
+   "name": "Kidler",
+   "model": "mvr_nautrepy",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 13255,
+   "damage": [
+    720,
+    760
+   ],
+   "defense": 82,
+   "attackDelay": 3,
+   "walkSpeed": 2.16,
+   "xp": 0
+  },
+  {
+   "id": 842,
+   "name": "Shacalpion",
+   "model": "mvr_scopicon",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 11255,
+   "damage": [
+    670,
+    710
+   ],
+   "defense": 82,
+   "attackDelay": 2.7,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 843,
+   "name": "Hoiren",
+   "model": "mvr_bang",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 12255,
+   "damage": [
+    670,
+    710
+   ],
+   "defense": 82,
+   "attackDelay": 2.9,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 844,
+   "name": "Hunter X",
+   "model": "mvr_trangfoma",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 11255,
+   "damage": [
+    620,
+    660
+   ],
+   "defense": 82,
+   "attackDelay": 2.7,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 845,
+   "name": "Kynsy",
+   "model": "mvr_mia",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 11255,
+   "damage": [
+    620,
+    660
+   ],
+   "defense": 82,
+   "attackDelay": 2.7,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 858,
+   "name": "Ivillis Destroyer",
+   "model": "mvr_nuctuvehicle",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 23500,
+   "damage": [
+    731,
+    770
+   ],
+   "defense": 49,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 7591
+  },
+  {
+   "id": 1010,
+   "name": "Captain Okean",
+   "model": "mvr_okean",
+   "level": 60,
+   "class": "normal",
+   "size": 1,
+   "hp": 12220,
+   "damage": [
+    560,
+    582
+   ],
+   "defense": 76,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 12360
+  },
+  {
+   "id": 112,
+   "name": "Small Volt",
+   "model": "mvr_volt",
+   "level": 61,
+   "class": "small",
+   "size": 0.8,
+   "hp": 12220,
+   "damage": [
+    581,
+    612
+   ],
+   "defense": 75,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7622
+  },
+  {
+   "id": 113,
+   "name": "Volt",
+   "model": "mvr_volt",
+   "level": 61,
+   "class": "normal",
+   "size": 1,
+   "hp": 12220,
+   "damage": [
+    581,
+    612
+   ],
+   "defense": 85,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7968
+  },
+  {
+   "id": 551,
+   "name": "Giant Nutty Wheel",
+   "model": "mvr_nuttywheel",
+   "level": 61,
+   "class": "giant",
+   "size": 2,
+   "hp": 200836,
+   "damage": [
+    885,
+    932
+   ],
+   "defense": 90,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 35337
+  },
+  {
+   "id": 563,
+   "name": "Giant Nuctuvehicle",
+   "model": "mvr_nuctuvehicle",
+   "level": 61,
+   "class": "giant",
+   "size": 2,
+   "hp": 241004,
+   "damage": [
+    1211,
+    1275
+   ],
+   "defense": 71,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 42405
+  },
+  {
+   "id": 1011,
+   "name": "Small Tigar",
+   "model": "mvr_taiga",
+   "level": 61,
+   "class": "normal",
+   "size": 1,
+   "hp": 12255,
+   "damage": [
+    581,
+    612
+   ],
+   "defense": 77,
+   "attackDelay": 3,
+   "walkSpeed": 2.4,
+   "xp": 13719
+  },
+  {
+   "id": 114,
+   "name": "Captain Volt",
+   "model": "mvr_volt",
+   "level": 62,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 12405,
+   "damage": [
+    585,
+    616
+   ],
+   "defense": 86,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 8460
+  },
+  {
+   "id": 678,
+   "name": "Criminal Volt",
+   "model": "mvr_volt",
+   "level": 62,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 12405,
+   "damage": [
+    585,
+    616
+   ],
+   "defense": 86,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 958,
+   "name": "Small Catsy",
+   "model": "mvr_caitsith",
+   "level": 62,
+   "class": "small",
+   "size": 0.8,
+   "hp": 12405,
+   "damage": [
+    856,
+    900
+   ],
+   "defense": 86,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 7691
+  },
+  {
+   "id": 1012,
+   "name": "Tigar",
+   "model": "mvr_taiga",
+   "level": 62,
+   "class": "normal",
+   "size": 1,
+   "hp": 12405,
+   "damage": [
+    585,
+    616
+   ],
+   "defense": 78,
+   "attackDelay": 3,
+   "walkSpeed": 2.4,
+   "xp": 15228
+  },
+  {
+   "id": 507,
+   "name": "Giant Driller",
+   "model": "mvr_driller",
+   "level": 63,
+   "class": "giant",
+   "size": 2,
+   "hp": 210053,
+   "damage": [
+    1001,
+    1054
+   ],
+   "defense": 94,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 43538
+  },
+  {
+   "id": 512,
+   "name": "Small Elderguard",
+   "model": "mvr_elderguard",
+   "level": 63,
+   "class": "small",
+   "size": 0.8,
+   "hp": 12589,
+   "damage": [
+    610,
+    642
+   ],
+   "defense": 77,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 9391
+  },
+  {
+   "id": 513,
+   "name": "Elderguard",
+   "model": "mvr_elderguard",
+   "level": 63,
+   "class": "normal",
+   "size": 1,
+   "hp": 12589,
+   "damage": [
+    610,
+    642
+   ],
+   "defense": 78,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 9818
+  },
+  {
+   "id": 567,
+   "name": "Giant Risem",
+   "model": "mvr_risem",
+   "level": 63,
+   "class": "giant",
+   "size": 2,
+   "hp": 247384,
+   "damage": [
+    1247,
+    1312
+   ],
+   "defense": 60,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 52245
+  },
+  {
+   "id": 866,
+   "name": "Ivillis Black Otem",
+   "model": "mvr_totemia",
+   "level": 63,
+   "class": "normal",
+   "size": 1,
+   "hp": 14100,
+   "damage": [
+    488,
+    513
+   ],
+   "defense": 92,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 11000
+  },
+  {
+   "id": 1013,
+   "name": "Captain Tigar",
+   "model": "mvr_taiga",
+   "level": 63,
+   "class": "normal",
+   "size": 1,
+   "hp": 12589,
+   "damage": [
+    610,
+    642
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 2.4,
+   "xp": 16904
+  },
+  {
+   "id": 514,
+   "name": "Captain Elderguard",
+   "model": "mvr_elderguard",
+   "level": 64,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 12773,
+   "damage": [
+    614,
+    646
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 10424
+  },
+  {
+   "id": 959,
+   "name": "Catsy",
+   "model": "mvr_caitsith",
+   "level": 64,
+   "class": "normal",
+   "size": 1,
+   "hp": 12773,
+   "damage": [
+    878,
+    924
+   ],
+   "defense": 77,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 9476
+  },
+  {
+   "id": 1014,
+   "name": "Small Dorian",
+   "model": "mvr_dorian",
+   "level": 64,
+   "class": "normal",
+   "size": 1,
+   "hp": 12773,
+   "damage": [
+    614,
+    646
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 18764
+  },
+  {
+   "id": 115,
+   "name": "Giant Volt",
+   "model": "mvr_volt",
+   "level": 65,
+   "class": "giant",
+   "size": 2,
+   "hp": 243386,
+   "damage": [
+    1046,
+    1101
+   ],
+   "defense": 94,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 53641
+  },
+  {
+   "id": 404,
+   "name": "Small Garbagepider",
+   "model": "mvr_garbagepider",
+   "level": 65,
+   "class": "small",
+   "size": 0.8,
+   "hp": 13429,
+   "damage": [
+    638,
+    672
+   ],
+   "defense": 77,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 11570
+  },
+  {
+   "id": 405,
+   "name": "Garbagepider",
+   "model": "mvr_garbagepider",
+   "level": 65,
+   "class": "normal",
+   "size": 1,
+   "hp": 13429,
+   "damage": [
+    638,
+    672
+   ],
+   "defense": 78,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 12096
+  },
+  {
+   "id": 821,
+   "name": "Emeraldmantis",
+   "model": "mvr_redmantis",
+   "level": 65,
+   "class": "normal",
+   "size": 1,
+   "hp": 14228,
+   "damage": [
+    809,
+    849
+   ],
+   "defense": 81,
+   "attackDelay": 2.7,
+   "walkSpeed": 1.92,
+   "xp": 0
+  },
+  {
+   "id": 827,
+   "name": "Lord Bang Hanoyan",
+   "model": "mvr_bang",
+   "level": 65,
+   "class": "normal",
+   "size": 1,
+   "hp": 270230,
+   "damage": [
+    819,
+    859
+   ],
+   "defense": 81,
+   "attackDelay": 2.75,
+   "walkSpeed": 2.04,
+   "xp": 0
+  },
+  {
+   "id": 859,
+   "name": "Ivillis Puppet",
+   "model": "mvr_cardpuppet",
+   "level": 65,
+   "class": "normal",
+   "size": 1,
+   "hp": 25800,
+   "damage": [
+    845,
+    889
+   ],
+   "defense": 46,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 12897
+  },
+  {
+   "id": 863,
+   "name": "Ivillis Mushellizer",
+   "model": "mvr_greemong",
+   "level": 65,
+   "class": "guardian",
+   "size": 1.5,
+   "hp": 300000,
+   "damage": [
+    1359,
+    1431
+   ],
+   "defense": 98,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 536810
+  },
+  {
+   "id": 867,
+   "name": "Ivillis Boxter",
+   "model": "mvr_gigglebox",
+   "level": 65,
+   "class": "normal",
+   "size": 1,
+   "hp": 12400,
+   "damage": [
+    700,
+    900
+   ],
+   "defense": 39,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 16000
+  },
+  {
+   "id": 1015,
+   "name": "Dorian",
+   "model": "mvr_dorian",
+   "level": 65,
+   "class": "normal",
+   "size": 1,
+   "hp": 13429,
+   "damage": [
+    638,
+    672
+   ],
+   "defense": 81,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 20826
+  },
+  {
+   "id": 406,
+   "name": "Captain Garbagepider",
+   "model": "mvr_garbagepider",
+   "level": 66,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 13621,
+   "damage": [
+    643,
+    677
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 12841
+  },
+  {
+   "id": 960,
+   "name": "Captain Catsy",
+   "model": "mvr_caitsith",
+   "level": 66,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 13621,
+   "damage": [
+    953,
+    1003
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 11674
+  },
+  {
+   "id": 1016,
+   "name": "Captain Dorian",
+   "model": "mvr_dorian",
+   "level": 66,
+   "class": "normal",
+   "size": 1,
+   "hp": 13621,
+   "damage": [
+    643,
+    677
+   ],
+   "defense": 82,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 23114
+  },
+  {
+   "id": 515,
+   "name": "Giant Elderguard",
+   "model": "mvr_elderguard",
+   "level": 67,
+   "class": "giant",
+   "size": 2,
+   "hp": 249215,
+   "damage": [
+    1075,
+    1132
+   ],
+   "defense": 94,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 66085
+  },
+  {
+   "id": 516,
+   "name": "Small Crane Machinery",
+   "model": "mvr_cranemachinery",
+   "level": 67,
+   "class": "small",
+   "size": 0.8,
+   "hp": 13813,
+   "damage": [
+    715,
+    752
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 14254
+  },
+  {
+   "id": 517,
+   "name": "Crane Machinery",
+   "model": "mvr_cranemachinery",
+   "level": 67,
+   "class": "normal",
+   "size": 1,
+   "hp": 13813,
+   "damage": [
+    715,
+    752
+   ],
+   "defense": 80,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 14902
+  },
+  {
+   "id": 679,
+   "name": "Criminal Garbagepider",
+   "model": "mvr_garbagepider",
+   "level": 67,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 14620,
+   "damage": [
+    643,
+    677
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 961,
+   "name": "Giant Catsy",
+   "model": "mvr_caitsith",
+   "level": 67,
+   "class": "giant",
+   "size": 2,
+   "hp": 249215,
+   "damage": [
+    1290,
+    1358
+   ],
+   "defense": 94,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 66085
+  },
+  {
+   "id": 971,
+   "name": "Great Catsy",
+   "model": "mvr_caitsith",
+   "level": 67,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 249215,
+   "damage": [
+    1290,
+    1358
+   ],
+   "defense": 94,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 1017,
+   "name": "Small Meral",
+   "model": "mvr_merel",
+   "level": 67,
+   "class": "normal",
+   "size": 1,
+   "hp": 13813,
+   "damage": [
+    715,
+    752
+   ],
+   "defense": 83,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 25658
+  },
+  {
+   "id": 518,
+   "name": "Captain Crane Machinery",
+   "model": "mvr_cranemachinery",
+   "level": 68,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 14005,
+   "damage": [
+    719,
+    757
+   ],
+   "defense": 81,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 15821
+  },
+  {
+   "id": 618,
+   "name": "Small Nautrepy",
+   "model": "mvr_nautrepy",
+   "level": 68,
+   "class": "small",
+   "size": 0.8,
+   "hp": 14005,
+   "damage": [
+    836,
+    880
+   ],
+   "defense": 78,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 14383
+  },
+  {
+   "id": 846,
+   "name": "Clocks",
+   "model": "mvr_shuhamma",
+   "level": 68,
+   "class": "normal",
+   "size": 1,
+   "hp": 320230,
+   "damage": [
+    880,
+    920
+   ],
+   "defense": 85,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 0
+  },
+  {
+   "id": 868,
+   "name": "Ivillis Dandysher",
+   "model": "mvr_prankster",
+   "level": 68,
+   "class": "normal",
+   "size": 1,
+   "hp": 13000,
+   "damage": [
+    418,
+    440
+   ],
+   "defense": 62,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 21774
+  },
+  {
+   "id": 922,
+   "name": "Small Harpy",
+   "model": "mvr_harpy",
+   "level": 68,
+   "class": "small",
+   "size": 0.8,
+   "hp": 14005,
+   "damage": [
+    1003,
+    1056
+   ],
+   "defense": 78,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 14383
+  },
+  {
+   "id": 1018,
+   "name": "Meral",
+   "model": "mvr_merel",
+   "level": 68,
+   "class": "normal",
+   "size": 1,
+   "hp": 14005,
+   "damage": [
+    915,
+    964
+   ],
+   "defense": 84,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 25890
+  },
+  {
+   "id": 407,
+   "name": "Giant Garbagepider",
+   "model": "mvr_garbagepider",
+   "level": 69,
+   "class": "giant",
+   "size": 2,
+   "hp": 254295,
+   "damage": [
+    1102,
+    1161
+   ],
+   "defense": 103,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 81421
+  },
+  {
+   "id": 568,
+   "name": "Young Syliaca",
+   "model": "mvr_syliaca",
+   "level": 69,
+   "class": "small",
+   "size": 0.8,
+   "hp": 25804,
+   "damage": [
+    934,
+    983
+   ],
+   "defense": 71,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 21074
+  },
+  {
+   "id": 569,
+   "name": "Syliaca",
+   "model": "mvr_syliaca",
+   "level": 69,
+   "class": "normal",
+   "size": 1,
+   "hp": 25804,
+   "damage": [
+    934,
+    983
+   ],
+   "defense": 72,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 22032
+  },
+  {
+   "id": 619,
+   "name": "Nautrepy",
+   "model": "mvr_nautrepy",
+   "level": 69,
+   "class": "normal",
+   "size": 1,
+   "hp": 14300,
+   "damage": [
+    915,
+    964
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 15965
+  },
+  {
+   "id": 1019,
+   "name": "Captain Meral",
+   "model": "mvr_merel",
+   "level": 69,
+   "class": "normal",
+   "size": 1,
+   "hp": 14300,
+   "damage": [
+    1003,
+    1056
+   ],
+   "defense": 85,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 28737
+  },
+  {
+   "id": 570,
+   "name": "Grownup Syliaca",
+   "model": "mvr_syliaca",
+   "level": 70,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 26154,
+   "damage": [
+    938,
+    987
+   ],
+   "defense": 73,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 23391
+  },
+  {
+   "id": 593,
+   "name": "Guru Catcher",
+   "model": "mvr_aibatt",
+   "level": 70,
+   "class": "special",
+   "size": 1,
+   "hp": 10000000,
+   "damage": [
+    1,
+    1
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.2,
+   "xp": 0
+  },
+  {
+   "id": 620,
+   "name": "Captain Nautrepy",
+   "model": "mvr_nautrepy",
+   "level": 70,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 28602,
+   "damage": [
+    941,
+    990
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 17721
+  },
+  {
+   "id": 860,
+   "name": "Ivillis Thief",
+   "model": "mvr_tombstonebearer",
+   "level": 70,
+   "class": "normal",
+   "size": 1,
+   "hp": 56200,
+   "damage": [
+    1058,
+    1114
+   ],
+   "defense": 45,
+   "attackDelay": 3,
+   "walkSpeed": 1.44,
+   "xp": 31456
+  },
+  {
+   "id": 864,
+   "name": "Ivillis Leanes",
+   "model": "mvr_prankster",
+   "level": 70,
+   "class": "guardian",
+   "size": 1.5,
+   "hp": 1140000,
+   "damage": [
+    1322,
+    1393
+   ],
+   "defense": 103,
+   "attackDelay": 3.75,
+   "walkSpeed": 1.44,
+   "xp": 2000000
+  },
+  {
+   "id": 919,
+   "name": "GM Redsun",
+   "model": "mvr_bang",
+   "level": 70,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 30000000,
+   "damage": [
+    1829,
+    1925
+   ],
+   "defense": 126,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 923,
+   "name": "Harpy",
+   "model": "mvr_harpy",
+   "level": 70,
+   "class": "normal",
+   "size": 1,
+   "hp": 28602,
+   "damage": [
+    1129,
+    1188
+   ],
+   "defense": 79,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 17721
+  },
+  {
+   "id": 1131,
+   "name": "Prismatic Cobra",
+   "model": "mvr_bigcobra",
+   "level": 70,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 114408,
+   "damage": [
+    3002,
+    3168
+   ],
+   "defense": 228,
+   "attackDelay": 3,
+   "walkSpeed": 2.4,
+   "xp": 108580
+  },
+  {
+   "id": 1138,
+   "name": "Mythic Prismatic Cobra",
+   "model": "mvr_bigcobra",
+   "level": 70,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 171612,
+   "damage": [
+    6492,
+    6834
+   ],
+   "defense": 304,
+   "attackDelay": 3,
+   "walkSpeed": 2.4,
+   "xp": 10858
+  },
+  {
+   "id": 500,
+   "name": "Small Greemong",
+   "model": "mvr_greemong",
+   "level": 71,
+   "class": "small",
+   "size": 0.8,
+   "hp": 28602,
+   "damage": [
+    962,
+    1013
+   ],
+   "defense": 75,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 25964
+  },
+  {
+   "id": 501,
+   "name": "Greemong",
+   "model": "mvr_greemong",
+   "level": 71,
+   "class": "normal",
+   "size": 1,
+   "hp": 28602,
+   "damage": [
+    962,
+    1013
+   ],
+   "defense": 76,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 27145
+  },
+  {
+   "id": 519,
+   "name": "Giant Crane Machinery",
+   "model": "mvr_cranemachinery",
+   "level": 71,
+   "class": "giant",
+   "size": 2,
+   "hp": 260913,
+   "damage": [
+    1132,
+    1191
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 100317
+  },
+  {
+   "id": 1132,
+   "name": "Twinstrike Cobra",
+   "model": "mvr_bigvarietycobra",
+   "level": 71,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 115924,
+   "damage": [
+    3002,
+    3168
+   ],
+   "defense": 231,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.56,
+   "xp": 127952
+  },
+  {
+   "id": 1139,
+   "name": "Mythic Twinstrike Cobra",
+   "model": "mvr_bigvarietycobra",
+   "level": 71,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 173886,
+   "damage": [
+    6492,
+    6834
+   ],
+   "defense": 308,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.56,
+   "xp": 12795
+  },
+  {
+   "id": 502,
+   "name": "Captain Greemong",
+   "model": "mvr_greemong",
+   "level": 72,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 28981,
+   "damage": [
+    967,
+    1018
+   ],
+   "defense": 77,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 28819
+  },
+  {
+   "id": 602,
+   "name": "Small Boo",
+   "model": "mvr_boo",
+   "level": 72,
+   "class": "small",
+   "size": 0.8,
+   "hp": 28981,
+   "damage": [
+    961,
+    1012
+   ],
+   "defense": 84,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 21833
+  },
+  {
+   "id": 680,
+   "name": "Criminal Greemong",
+   "model": "mvr_greemong",
+   "level": 72,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 28981,
+   "damage": [
+    967,
+    1018
+   ],
+   "defense": 77,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 924,
+   "name": "Captain Harpy",
+   "model": "mvr_harpy",
+   "level": 72,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 28981,
+   "damage": [
+    1153,
+    1214
+   ],
+   "defense": 84,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 21833
+  },
+  {
+   "id": 1133,
+   "name": "Tanuki Enforcer",
+   "model": "mvr_bigraccoon",
+   "level": 72,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 125140,
+   "damage": [
+    3002,
+    3168
+   ],
+   "defense": 249,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 133768
+  },
+  {
+   "id": 1140,
+   "name": "Elite Tanuki Enforcer",
+   "model": "mvr_bigraccoon",
+   "level": 72,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 187710,
+   "damage": [
+    6492,
+    6834
+   ],
+   "defense": 332,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 13376
+  },
+  {
+   "id": 536,
+   "name": "Small Carrierbomb",
+   "model": "mvr_carrierbomb",
+   "level": 73,
+   "class": "small",
+   "size": 0.8,
+   "hp": 31285,
+   "damage": [
+    991,
+    1043
+   ],
+   "defense": 84,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 31988
+  },
+  {
+   "id": 537,
+   "name": "Carrierbomb",
+   "model": "mvr_carrierbomb",
+   "level": 73,
+   "class": "normal",
+   "size": 1,
+   "hp": 31285,
+   "damage": [
+    991,
+    1043
+   ],
+   "defense": 85,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 33442
+  },
+  {
+   "id": 571,
+   "name": "Giant Syliaca",
+   "model": "mvr_syliaca",
+   "level": 73,
+   "class": "giant",
+   "size": 2,
+   "hp": 493414,
+   "damage": [
+    1485,
+    1563
+   ],
+   "defense": 102,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 148311
+  },
+  {
+   "id": 603,
+   "name": "Boo",
+   "model": "mvr_boo",
+   "level": 73,
+   "class": "normal",
+   "size": 1,
+   "hp": 31285,
+   "damage": [
+    982,
+    1034
+   ],
+   "defense": 85,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 24234
+  },
+  {
+   "id": 621,
+   "name": "Giant Nautrepy",
+   "model": "mvr_nautrepy",
+   "level": 73,
+   "class": "giant",
+   "size": 2,
+   "hp": 390112,
+   "damage": [
+    1411,
+    1485
+   ],
+   "defense": 98,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 182714
+  },
+  {
+   "id": 904,
+   "name": "Yetti",
+   "model": "mvr_yeti01",
+   "level": 73,
+   "class": "normal",
+   "size": 1,
+   "hp": 31285,
+   "damage": [
+    982,
+    1034
+   ],
+   "defense": 85,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 29081
+  },
+  {
+   "id": 925,
+   "name": "Giant Harpy",
+   "model": "mvr_harpy",
+   "level": 73,
+   "class": "giant",
+   "size": 2,
+   "hp": 254566,
+   "damage": [
+    1758,
+    1850
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 182714
+  },
+  {
+   "id": 972,
+   "name": "Great Harpy",
+   "model": "mvr_harpy",
+   "level": 73,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 254566,
+   "damage": [
+    1758,
+    1850
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 1134,
+   "name": "Tanuki Protector",
+   "model": "mvr_bigsoldierraccoon",
+   "level": 73,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 125140,
+   "damage": [
+    3002,
+    3168
+   ],
+   "defense": 252,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 148621
+  },
+  {
+   "id": 1141,
+   "name": "Elite Tanuki Protector",
+   "model": "mvr_bigsoldierraccoon",
+   "level": 73,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 187710,
+   "damage": [
+    6492,
+    6834
+   ],
+   "defense": 336,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 14862
+  },
+  {
+   "id": 538,
+   "name": "Captain Carrierbomb",
+   "model": "mvr_carrierbomb",
+   "level": 74,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 31690,
+   "damage": [
+    995,
+    1048
+   ],
+   "defense": 86,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 35506
+  },
+  {
+   "id": 604,
+   "name": "Captain Boo",
+   "model": "mvr_boo",
+   "level": 74,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 31690,
+   "damage": [
+    1003,
+    1056
+   ],
+   "defense": 86,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 26899
+  },
+  {
+   "id": 926,
+   "name": "Small Gullah",
+   "model": "mvr_polevik",
+   "level": 74,
+   "class": "small",
+   "size": 0.8,
+   "hp": 31690,
+   "damage": [
+    1204,
+    1267
+   ],
+   "defense": 86,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 26899
+  },
+  {
+   "id": 1135,
+   "name": "Wildwood Stalker",
+   "model": "mvr_soldiertangz",
+   "level": 74,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 126760,
+   "damage": [
+    3002,
+    3168
+   ],
+   "defense": 255,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 161215
+  },
+  {
+   "id": 1142,
+   "name": "Mythic Wildwood Stalker",
+   "model": "mvr_soldiertangz",
+   "level": 74,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 190140,
+   "damage": [
+    6492,
+    6834
+   ],
+   "defense": 340,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 16121
+  },
+  {
+   "id": 130,
+   "name": "Small Pire",
+   "model": "mvr_wagsaac",
+   "level": 75,
+   "class": "small",
+   "size": 0.8,
+   "hp": 15025,
+   "damage": [
+    772,
+    813
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 8168119
+  },
+  {
+   "id": 131,
+   "name": "Pire",
+   "model": "mvr_wagsaac",
+   "level": 75,
+   "class": "normal",
+   "size": 1,
+   "hp": 15025,
+   "damage": [
+    772,
+    813
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 9475018
+  },
+  {
+   "id": 503,
+   "name": "Giant Greemong",
+   "model": "mvr_greemong",
+   "level": 75,
+   "class": "giant",
+   "size": 2,
+   "hp": 552915,
+   "damage": [
+    1477,
+    1554
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 182714
+  },
+  {
+   "id": 638,
+   "name": "Small Hoppre",
+   "model": "mvr_hoppre",
+   "level": 75,
+   "class": "small",
+   "size": 0.8,
+   "hp": 31736,
+   "damage": [
+    1024,
+    1078
+   ],
+   "defense": 86,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 29857
+  },
+  {
+   "id": 1136,
+   "name": "Wildwood Shaman",
+   "model": "mvr_shamanwutangka",
+   "level": 75,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 126944,
+   "damage": [
+    3002,
+    3168
+   ],
+   "defense": 258,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 173809
+  },
+  {
+   "id": 1143,
+   "name": "Shadowy Wildwood Shaman",
+   "model": "mvr_shamanwutangka",
+   "level": 75,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 190416,
+   "damage": [
+    6492,
+    6834
+   ],
+   "defense": 344,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 17380
+  },
+  {
+   "id": 132,
+   "name": "Captain Pire",
+   "model": "mvr_wagsaac",
+   "level": 76,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 15204,
+   "damage": [
+    782,
+    823
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 9393336
+  },
+  {
+   "id": 639,
+   "name": "Hoppre",
+   "model": "mvr_hoppre",
+   "level": 76,
+   "class": "normal",
+   "size": 1,
+   "hp": 32138,
+   "damage": [
+    1035,
+    1089
+   ],
+   "defense": 87,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 33141
+  },
+  {
+   "id": 927,
+   "name": "Gullah",
+   "model": "mvr_polevik",
+   "level": 76,
+   "class": "normal",
+   "size": 1,
+   "hp": 32138,
+   "damage": [
+    1242,
+    1307
+   ],
+   "defense": 87,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 33141
+  },
+  {
+   "id": 539,
+   "name": "Giant Carrierbomb",
+   "model": "mvr_carrierbomb",
+   "level": 77,
+   "class": "giant",
+   "size": 2,
+   "hp": 564573,
+   "damage": [
+    1568,
+    1650
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 225129
+  },
+  {
+   "id": 605,
+   "name": "Giant Boo",
+   "model": "mvr_boo",
+   "level": 77,
+   "class": "giant",
+   "size": 2,
+   "hp": 564573,
+   "damage": [
+    1568,
+    1650
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 239109
+  },
+  {
+   "id": 640,
+   "name": "Captain Hoppre",
+   "model": "mvr_hoppre",
+   "level": 77,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 34242,
+   "damage": [
+    1049,
+    1104
+   ],
+   "defense": 89,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 36786
+  },
+  {
+   "id": 681,
+   "name": "Criminal Hoppre",
+   "model": "mvr_hoppre",
+   "level": 77,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 34242,
+   "damage": [
+    1049,
+    1104
+   ],
+   "defense": 89,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 630,
+   "name": "Small Mushpoie",
+   "model": "mvr_mushpoie",
+   "level": 78,
+   "class": "small",
+   "size": 0.8,
+   "hp": 35224,
+   "damage": [
+    1053,
+    1109
+   ],
+   "defense": 99,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 40832
+  },
+  {
+   "id": 928,
+   "name": "Captain Gullah",
+   "model": "mvr_polevik",
+   "level": 78,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 35224,
+   "damage": [
+    1264,
+    1331
+   ],
+   "defense": 99,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 40832
+  },
+  {
+   "id": 133,
+   "name": "Giant Pire",
+   "model": "mvr_wagsaac",
+   "level": 79,
+   "class": "giant",
+   "size": 2,
+   "hp": 254566,
+   "damage": [
+    1465,
+    1542
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 71430440
+  },
+  {
+   "id": 532,
+   "name": "Small Clawdoll",
+   "model": "mvr_wagsaac",
+   "level": 79,
+   "class": "small",
+   "size": 0.8,
+   "hp": 15910,
+   "damage": [
+    814,
+    857
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 14286088
+  },
+  {
+   "id": 533,
+   "name": "Clawdoll",
+   "model": "mvr_wagsaac",
+   "level": 79,
+   "class": "normal",
+   "size": 1,
+   "hp": 15910,
+   "damage": [
+    814,
+    857
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 16571862
+  },
+  {
+   "id": 631,
+   "name": "Mushpoie",
+   "model": "mvr_mushpoie",
+   "level": 79,
+   "class": "normal",
+   "size": 1,
+   "hp": 36220,
+   "damage": [
+    1058,
+    1113
+   ],
+   "defense": 101,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 45323
+  },
+  {
+   "id": 905,
+   "name": "Mutant Yetti",
+   "model": "mvr_yeti02",
+   "level": 79,
+   "class": "normal",
+   "size": 1,
+   "hp": 36220,
+   "damage": [
+    1058,
+    1113
+   ],
+   "defense": 101,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 54388
+  },
+  {
+   "id": 929,
+   "name": "Giant Gullah",
+   "model": "mvr_polevik",
+   "level": 79,
+   "class": "giant",
+   "size": 2,
+   "hp": 684834,
+   "damage": [
+    2132,
+    2244
+   ],
+   "defense": 120,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 327002
+  },
+  {
+   "id": 973,
+   "name": "Great Gullah",
+   "model": "mvr_polevik",
+   "level": 79,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 684834,
+   "damage": [
+    2132,
+    2244
+   ],
+   "defense": 120,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 534,
+   "name": "Captain Clawdoll",
+   "model": "mvr_wagsaac",
+   "level": 80,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 16049,
+   "damage": [
+    823,
+    866
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 16429001
+  },
+  {
+   "id": 632,
+   "name": "Captain Mushpoie",
+   "model": "mvr_mushpoie",
+   "level": 80,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 37231,
+   "damage": [
+    1081,
+    1137
+   ],
+   "defense": 103,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 50308
+  },
+  {
+   "id": 641,
+   "name": "Giant Hoppre",
+   "model": "mvr_hoppre",
+   "level": 80,
+   "class": "giant",
+   "size": 2,
+   "hp": 684834,
+   "damage": [
+    1777,
+    1870
+   ],
+   "defense": 120,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 327002
+  },
+  {
+   "id": 930,
+   "name": "Small Abraxas",
+   "model": "mvr_abraxas",
+   "level": 80,
+   "class": "small",
+   "size": 0.8,
+   "hp": 37231,
+   "damage": [
+    1297,
+    1364
+   ],
+   "defense": 103,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 50308
+  },
+  {
+   "id": 598,
+   "name": "Small Iren",
+   "model": "mvr_iren",
+   "level": 81,
+   "class": "small",
+   "size": 0.8,
+   "hp": 38256,
+   "damage": [
+    1085,
+    1142
+   ],
+   "defense": 105,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 55841
+  },
+  {
+   "id": 599,
+   "name": "Iren",
+   "model": "mvr_iren",
+   "level": 82,
+   "class": "normal",
+   "size": 1,
+   "hp": 39295,
+   "damage": [
+    1089,
+    1146
+   ],
+   "defense": 107,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 61983
+  },
+  {
+   "id": 931,
+   "name": "Abraxas",
+   "model": "mvr_abraxas",
+   "level": 82,
+   "class": "normal",
+   "size": 1,
+   "hp": 39295,
+   "damage": [
+    1307,
+    1375
+   ],
+   "defense": 107,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 61983
+  },
+  {
+   "id": 408,
+   "name": "Small Rampage Butcher",
+   "model": "mvr_wagsaac",
+   "level": 83,
+   "class": "small",
+   "size": 0.8,
+   "hp": 17048,
+   "damage": [
+    860,
+    905
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 24986455
+  },
+  {
+   "id": 409,
+   "name": "Small Rampage Butcher",
+   "model": "mvr_wagsaac",
+   "level": 83,
+   "class": "normal",
+   "size": 1,
+   "hp": 17048,
+   "damage": [
+    860,
+    905
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 28984287
+  },
+  {
+   "id": 535,
+   "name": "Giant Clawdoll",
+   "model": "mvr_wagsaac",
+   "level": 83,
+   "class": "giant",
+   "size": 2,
+   "hp": 272765,
+   "damage": [
+    1548,
+    1629
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 124932275
+  },
+  {
+   "id": 600,
+   "name": "Captain Iren",
+   "model": "mvr_iren",
+   "level": 83,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 40348,
+   "damage": [
+    1106,
+    1164
+   ],
+   "defense": 108,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 68801
+  },
+  {
+   "id": 633,
+   "name": "Giant Mushpoie",
+   "model": "mvr_mushpoie",
+   "level": 83,
+   "class": "giant",
+   "size": 2,
+   "hp": 744618,
+   "damage": [
+    1829,
+    1925
+   ],
+   "defense": 126,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 447207
+  },
+  {
+   "id": 682,
+   "name": "Criminal Iren",
+   "model": "mvr_iren",
+   "level": 83,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 40348,
+   "damage": [
+    1106,
+    1164
+   ],
+   "defense": 108,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 410,
+   "name": "Captain Rampage Butcher",
+   "model": "mvr_wagsaac",
+   "level": 84,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 17185,
+   "damage": [
+    868,
+    914
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 28734423
+  },
+  {
+   "id": 594,
+   "name": "Small Watangka",
+   "model": "mvr_watangka",
+   "level": 84,
+   "class": "small",
+   "size": 0.8,
+   "hp": 41415,
+   "damage": [
+    1110,
+    1168
+   ],
+   "defense": 110,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 76369
+  },
+  {
+   "id": 932,
+   "name": "Captain Abraxas",
+   "model": "mvr_abraxas",
+   "level": 84,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 41415,
+   "damage": [
+    1332,
+    1402
+   ],
+   "defense": 110,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 76369
+  },
+  {
+   "id": 595,
+   "name": "Watangka",
+   "model": "mvr_watangka",
+   "level": 85,
+   "class": "normal",
+   "size": 1,
+   "hp": 42497,
+   "damage": [
+    1114,
+    1173
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 84769
+  },
+  {
+   "id": 691,
+   "name": "Keakoon Worker",
+   "model": "mvr_axkeakoon",
+   "level": 85,
+   "class": "normal",
+   "size": 1,
+   "hp": 41415,
+   "damage": [
+    1137,
+    1197
+   ],
+   "defense": 110,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 80369
+  },
+  {
+   "id": 692,
+   "name": "Keakoon Guard",
+   "model": "mvr_swkeakoon",
+   "level": 85,
+   "class": "normal",
+   "size": 1,
+   "hp": 42497,
+   "damage": [
+    1141,
+    1201
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 2.04,
+   "xp": 86769
+  },
+  {
+   "id": 716,
+   "name": "Pink Roach Larva",
+   "model": "mvr_roachfl",
+   "level": 85,
+   "class": "small",
+   "size": 0.8,
+   "hp": 35415,
+   "damage": [
+    1114,
+    1173
+   ],
+   "defense": 108,
+   "attackDelay": 3,
+   "walkSpeed": 1.68,
+   "xp": 77369
+  },
+  {
+   "id": 717,
+   "name": "Blue Roach Larva",
+   "model": "mvr_roachfl",
+   "level": 85,
+   "class": "small",
+   "size": 0.8,
+   "hp": 35415,
+   "damage": [
+    1114,
+    1173
+   ],
+   "defense": 108,
+   "attackDelay": 3,
+   "walkSpeed": 1.68,
+   "xp": 75369
+  },
+  {
+   "id": 906,
+   "name": "Augu",
+   "model": "mvr_augoo01",
+   "level": 85,
+   "class": "normal",
+   "size": 1,
+   "hp": 42497,
+   "damage": [
+    1114,
+    1173
+   ],
+   "defense": 112,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 101723
+  },
+  {
+   "id": 933,
+   "name": "Giant Abraxas",
+   "model": "mvr_abraxas",
+   "level": 85,
+   "class": "giant",
+   "size": 2,
+   "hp": 806953,
+   "damage": [
+    2257,
+    2376
+   ],
+   "defense": 136,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 611605
+  },
+  {
+   "id": 974,
+   "name": "Great Abraxas",
+   "model": "mvr_abraxas",
+   "level": 85,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 806953,
+   "damage": [
+    2257,
+    2376
+   ],
+   "defense": 136,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 596,
+   "name": "Captain Watangka",
+   "model": "mvr_watangka",
+   "level": 86,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 43593,
+   "damage": [
+    1137,
+    1197
+   ],
+   "defense": 114,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 94093
+  },
+  {
+   "id": 601,
+   "name": "Giant Iren",
+   "model": "mvr_iren",
+   "level": 86,
+   "class": "giant",
+   "size": 2,
+   "hp": 806953,
+   "damage": [
+    1881,
+    1980
+   ],
+   "defense": 136,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 611605
+  },
+  {
+   "id": 695,
+   "name": "Elite Keakoon Worker",
+   "model": "mvr_axkeakoon",
+   "level": 86,
+   "class": "normal",
+   "size": 1,
+   "hp": 44703,
+   "damage": [
+    1141,
+    1201
+   ],
+   "defense": 116,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 114443
+  },
+  {
+   "id": 696,
+   "name": "Elite Keakoon Guard",
+   "model": "mvr_swkeakoon",
+   "level": 86,
+   "class": "normal",
+   "size": 1,
+   "hp": 45827,
+   "damage": [
+    1145,
+    1206
+   ],
+   "defense": 118,
+   "attackDelay": 3,
+   "walkSpeed": 2.04,
+   "xp": 175931
+  },
+  {
+   "id": 934,
+   "name": "Small Hague",
+   "model": "mvr_hag",
+   "level": 86,
+   "class": "small",
+   "size": 0.8,
+   "hp": 43593,
+   "damage": [
+    1364,
+    1436
+   ],
+   "defense": 114,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 94093
+  },
+  {
+   "id": 411,
+   "name": "Giant Rampage Butcher",
+   "model": "mvr_wagsaac",
+   "level": 87,
+   "class": "giant",
+   "size": 2,
+   "hp": 282251,
+   "damage": [
+    1612,
+    1697
+   ],
+   "defense": 0,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 218507315
+  },
+  {
+   "id": 622,
+   "name": "Small Grrr",
+   "model": "mvr_grrr",
+   "level": 87,
+   "class": "small",
+   "size": 0.8,
+   "hp": 44703,
+   "damage": [
+    1141,
+    1201
+   ],
+   "defense": 116,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 104443
+  },
+  {
+   "id": 626,
+   "name": "Small Antiquery",
+   "model": "mvr_antiquery",
+   "level": 87,
+   "class": "small",
+   "size": 0.8,
+   "hp": 44703,
+   "damage": [
+    1141,
+    1201
+   ],
+   "defense": 116,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 104443
+  },
+  {
+   "id": 683,
+   "name": "Criminal Watangka",
+   "model": "mvr_watangka",
+   "level": 87,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 43593,
+   "damage": [
+    1137,
+    1197
+   ],
+   "defense": 114,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 693,
+   "name": "Keakoon Worker Leader",
+   "model": "mvr_axkeakoon",
+   "level": 87,
+   "class": "giant",
+   "size": 2,
+   "hp": 471850,
+   "damage": [
+    1533,
+    1635
+   ],
+   "defense": 114,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 536440
+  },
+  {
+   "id": 694,
+   "name": "Keakoon Guard Leader",
+   "model": "mvr_swkeakoon",
+   "level": 87,
+   "class": "giant",
+   "size": 2,
+   "hp": 871850,
+   "damage": [
+    1933,
+    2035
+   ],
+   "defense": 116,
+   "attackDelay": 3,
+   "walkSpeed": 2.16,
+   "xp": 936440
+  },
+  {
+   "id": 703,
+   "name": "Pink Roach",
+   "model": "mvr_roachfl",
+   "level": 87,
+   "class": "normal",
+   "size": 1,
+   "hp": 49286,
+   "damage": [
+    1149,
+    1210
+   ],
+   "defense": 123,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 205706
+  },
+  {
+   "id": 704,
+   "name": "Blue Roach",
+   "model": "mvr_roachfl",
+   "level": 87,
+   "class": "normal",
+   "size": 1,
+   "hp": 48119,
+   "damage": [
+    1147,
+    1208
+   ],
+   "defense": 122,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 191551
+  },
+  {
+   "id": 623,
+   "name": "Grrr",
+   "model": "mvr_grrr",
+   "level": 88,
+   "class": "normal",
+   "size": 1,
+   "hp": 45827,
+   "damage": [
+    1145,
+    1206
+   ],
+   "defense": 118,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 115931
+  },
+  {
+   "id": 627,
+   "name": "Antiquery",
+   "model": "mvr_antiquery",
+   "level": 88,
+   "class": "normal",
+   "size": 1,
+   "hp": 45827,
+   "damage": [
+    1145,
+    1206
+   ],
+   "defense": 118,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 115931
+  },
+  {
+   "id": 697,
+   "name": "Elite Keakoon Worker Leader",
+   "model": "mvr_axkeakoon",
+   "level": 88,
+   "class": "giant",
+   "size": 2,
+   "hp": 531850,
+   "damage": [
+    1555,
+    1675
+   ],
+   "defense": 120,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 586440
+  },
+  {
+   "id": 707,
+   "name": "Green Trillipy",
+   "model": "mvr_trilipy",
+   "level": 88,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 51339,
+   "damage": [
+    1168,
+    1230
+   ],
+   "defense": 125,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 215706
+  },
+  {
+   "id": 935,
+   "name": "Hague",
+   "model": "mvr_hag",
+   "level": 88,
+   "class": "normal",
+   "size": 1,
+   "hp": 45827,
+   "damage": [
+    1374,
+    1447
+   ],
+   "defense": 118,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 115931
+  },
+  {
+   "id": 597,
+   "name": "Giant Watangka",
+   "model": "mvr_watangka",
+   "level": 89,
+   "class": "giant",
+   "size": 2,
+   "hp": 871850,
+   "damage": [
+    1933,
+    2035
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 836440
+  },
+  {
+   "id": 624,
+   "name": "Captain Grrr",
+   "model": "mvr_grrr",
+   "level": 89,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 46966,
+   "damage": [
+    1168,
+    1230
+   ],
+   "defense": 120,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 128683
+  },
+  {
+   "id": 628,
+   "name": "Captain Antiquery",
+   "model": "mvr_antiquery",
+   "level": 89,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 46966,
+   "damage": [
+    1168,
+    1230
+   ],
+   "defense": 120,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 128683
+  },
+  {
+   "id": 698,
+   "name": "Elite Keakoon Guard Leader",
+   "model": "mvr_swkeakoon",
+   "level": 89,
+   "class": "giant",
+   "size": 2,
+   "hp": 939316,
+   "damage": [
+    1953,
+    2055
+   ],
+   "defense": 145,
+   "attackDelay": 3,
+   "walkSpeed": 2.16,
+   "xp": 1036440
+  },
+  {
+   "id": 705,
+   "name": "Pink Roach Queen",
+   "model": "mvr_roachfl",
+   "level": 89,
+   "class": "giant",
+   "size": 2,
+   "hp": 1081995,
+   "damage": [
+    1992,
+    2100
+   ],
+   "defense": 166,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1301497
+  },
+  {
+   "id": 709,
+   "name": "Violet Trillipy",
+   "model": "mvr_trilipy",
+   "level": 89,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 52339,
+   "damage": [
+    1172,
+    1234
+   ],
+   "defense": 127,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 235706
+  },
+  {
+   "id": 718,
+   "name": "Blue Roach Queen",
+   "model": "mvr_roachfl",
+   "level": 89,
+   "class": "giant",
+   "size": 2,
+   "hp": 1081995,
+   "damage": [
+    1986,
+    2090
+   ],
+   "defense": 164,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1201497
+  },
+  {
+   "id": 606,
+   "name": "Small Luia",
+   "model": "mvr_luia",
+   "level": 90,
+   "class": "small",
+   "size": 0.8,
+   "hp": 48119,
+   "damage": [
+    1172,
+    1234
+   ],
+   "defense": 122,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 141551
+  },
+  {
+   "id": 646,
+   "name": "Small Dump",
+   "model": "mvr_dump",
+   "level": 90,
+   "class": "small",
+   "size": 0.8,
+   "hp": 48119,
+   "damage": [
+    1172,
+    1234
+   ],
+   "defense": 122,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 141551
+  },
+  {
+   "id": 708,
+   "name": "Hazardous Green Trillipy",
+   "model": "mvr_trilipy",
+   "level": 90,
+   "class": "giant",
+   "size": 2,
+   "hp": 1157225,
+   "damage": [
+    2038,
+    2145
+   ],
+   "defense": 169,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1401497
+  },
+  {
+   "id": 711,
+   "name": "Blood Trillipy",
+   "model": "mvr_trilipy",
+   "level": 90,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 53339,
+   "damage": [
+    1177,
+    1239
+   ],
+   "defense": 129,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 255706
+  },
+  {
+   "id": 936,
+   "name": "Captain Hague",
+   "model": "mvr_hag",
+   "level": 90,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 48119,
+   "damage": [
+    1406,
+    1481
+   ],
+   "defense": 122,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 141551
+  },
+  {
+   "id": 607,
+   "name": "Luia",
+   "model": "mvr_luia",
+   "level": 91,
+   "class": "normal",
+   "size": 1,
+   "hp": 49286,
+   "damage": [
+    1177,
+    1239
+   ],
+   "defense": 123,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 155706
+  },
+  {
+   "id": 647,
+   "name": "Dump",
+   "model": "mvr_dump",
+   "level": 91,
+   "class": "normal",
+   "size": 1,
+   "hp": 49286,
+   "damage": [
+    1177,
+    1239
+   ],
+   "defense": 123,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 155706
+  },
+  {
+   "id": 699,
+   "name": "Mutant Keakoon Worker",
+   "model": "mvr_axkeakoon",
+   "level": 91,
+   "class": "normal",
+   "size": 1,
+   "hp": 54339,
+   "damage": [
+    1200,
+    1263
+   ],
+   "defense": 129,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 265706
+  },
+  {
+   "id": 700,
+   "name": "Mutant Keakoon Guard",
+   "model": "mvr_swkeakoon",
+   "level": 91,
+   "class": "normal",
+   "size": 1,
+   "hp": 55339,
+   "damage": [
+    1205,
+    1268
+   ],
+   "defense": 131,
+   "attackDelay": 3,
+   "walkSpeed": 2.04,
+   "xp": 305706
+  },
+  {
+   "id": 710,
+   "name": "Hazardous Violet Trillipy",
+   "model": "mvr_trilipy",
+   "level": 91,
+   "class": "giant",
+   "size": 2,
+   "hp": 1257225,
+   "damage": [
+    2058,
+    2165
+   ],
+   "defense": 171,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1501497
+  },
+  {
+   "id": 907,
+   "name": "Mutant Augu",
+   "model": "mvr_augoo02",
+   "level": 91,
+   "class": "normal",
+   "size": 1,
+   "hp": 49286,
+   "damage": [
+    1177,
+    1239
+   ],
+   "defense": 123,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 186847
+  },
+  {
+   "id": 937,
+   "name": "Giant Hague",
+   "model": "mvr_hag",
+   "level": 91,
+   "class": "giant",
+   "size": 2,
+   "hp": 939316,
+   "damage": [
+    2383,
+    2508
+   ],
+   "defense": 145,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1113294
+  },
+  {
+   "id": 975,
+   "name": "Great Hague",
+   "model": "mvr_hag",
+   "level": 91,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 939316,
+   "damage": [
+    2383,
+    2508
+   ],
+   "defense": 145,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 608,
+   "name": "Captain Luia",
+   "model": "mvr_luia",
+   "level": 92,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 50468,
+   "damage": [
+    1200,
+    1263
+   ],
+   "defense": 125,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 171276
+  },
+  {
+   "id": 625,
+   "name": "Giant Grrr",
+   "model": "mvr_grrr",
+   "level": 92,
+   "class": "giant",
+   "size": 2,
+   "hp": 939316,
+   "damage": [
+    1986,
+    2090
+   ],
+   "defense": 145,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1113294
+  },
+  {
+   "id": 629,
+   "name": "Giant Antiquery",
+   "model": "mvr_antiquery",
+   "level": 92,
+   "class": "giant",
+   "size": 2,
+   "hp": 939316,
+   "damage": [
+    1986,
+    2090
+   ],
+   "defense": 145,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1113294
+  },
+  {
+   "id": 648,
+   "name": "Captain Dump",
+   "model": "mvr_dump",
+   "level": 92,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 50468,
+   "damage": [
+    1200,
+    1263
+   ],
+   "defense": 125,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 171276
+  },
+  {
+   "id": 684,
+   "name": "Criminal Luia",
+   "model": "mvr_luia",
+   "level": 92,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 50468,
+   "damage": [
+    1200,
+    1263
+   ],
+   "defense": 125,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 712,
+   "name": "Hazardous Blood Trillipy",
+   "model": "mvr_trilipy",
+   "level": 92,
+   "class": "giant",
+   "size": 2,
+   "hp": 1357225,
+   "damage": [
+    2078,
+    2205
+   ],
+   "defense": 173,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1601497
+  },
+  {
+   "id": 713,
+   "name": "Chimeradon",
+   "model": "mvr_kimeradon",
+   "level": 92,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 60339,
+   "damage": [
+    1231,
+    1296
+   ],
+   "defense": 129,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 325706
+  },
+  {
+   "id": 938,
+   "name": "Small Tengu",
+   "model": "mvr_thoth",
+   "level": 92,
+   "class": "small",
+   "size": 0.8,
+   "hp": 50468,
+   "damage": [
+    1440,
+    1516
+   ],
+   "defense": 125,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 171276
+  },
+  {
+   "id": 642,
+   "name": "Small Gongury",
+   "model": "mvr_gongury",
+   "level": 93,
+   "class": "small",
+   "size": 0.8,
+   "hp": 51664,
+   "damage": [
+    1204,
+    1267
+   ],
+   "defense": 127,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 188403
+  },
+  {
+   "id": 701,
+   "name": "Mutant Keakoon Worker Leader",
+   "model": "mvr_axkeakoon",
+   "level": 93,
+   "class": "giant",
+   "size": 2,
+   "hp": 1009362,
+   "damage": [
+    1800,
+    1950
+   ],
+   "defense": 150,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1036440
+  },
+  {
+   "id": 828,
+   "name": "Soldier Chimeradon",
+   "model": "mvr_kimeradon",
+   "level": 93,
+   "class": "small",
+   "size": 0.8,
+   "hp": 51664,
+   "damage": [
+    1204,
+    1267
+   ],
+   "defense": 127,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 188403
+  },
+  {
+   "id": 829,
+   "name": "Brigadier Chimeradon",
+   "model": "mvr_kimeradon",
+   "level": 93,
+   "class": "small",
+   "size": 0.8,
+   "hp": 52875,
+   "damage": [
+    1208,
+    1272
+   ],
+   "defense": 129,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 188403
+  },
+  {
+   "id": 643,
+   "name": "Gongury",
+   "model": "mvr_gongury",
+   "level": 94,
+   "class": "normal",
+   "size": 1,
+   "hp": 52875,
+   "damage": [
+    1208,
+    1272
+   ],
+   "defense": 129,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 207243
+  },
+  {
+   "id": 714,
+   "name": "Giant Chimeradon",
+   "model": "mvr_kimeradon",
+   "level": 94,
+   "class": "giant",
+   "size": 2,
+   "hp": 1557225,
+   "damage": [
+    2090,
+    2200
+   ],
+   "defense": 175,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1801497
+  },
+  {
+   "id": 830,
+   "name": "Major Chimeradon",
+   "model": "mvr_kimeradon",
+   "level": 94,
+   "class": "normal",
+   "size": 1,
+   "hp": 52875,
+   "damage": [
+    1208,
+    1272
+   ],
+   "defense": 129,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.56,
+   "xp": 207243
+  },
+  {
+   "id": 939,
+   "name": "Tengu",
+   "model": "mvr_thoth",
+   "level": 94,
+   "class": "normal",
+   "size": 1,
+   "hp": 52875,
+   "damage": [
+    1450,
+    1526
+   ],
+   "defense": 129,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 207243
+  },
+  {
+   "id": 609,
+   "name": "Giant Luia",
+   "model": "mvr_luia",
+   "level": 95,
+   "class": "giant",
+   "size": 2,
+   "hp": 1009362,
+   "damage": [
+    2038,
+    2145
+   ],
+   "defense": 164,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1468311
+  },
+  {
+   "id": 644,
+   "name": "Captain Gongury",
+   "model": "mvr_gongury",
+   "level": 95,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 54100,
+   "damage": [
+    1231,
+    1296
+   ],
+   "defense": 131,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 225894
+  },
+  {
+   "id": 649,
+   "name": "Giant Dump",
+   "model": "mvr_dump",
+   "level": 95,
+   "class": "giant",
+   "size": 2,
+   "hp": 1009362,
+   "damage": [
+    2038,
+    2145
+   ],
+   "defense": 164,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1468311
+  },
+  {
+   "id": 702,
+   "name": "Mutant Keakoon Guard Leader",
+   "model": "mvr_swkeakoon",
+   "level": 95,
+   "class": "giant",
+   "size": 2,
+   "hp": 3557225,
+   "damage": [
+    2404,
+    2530
+   ],
+   "defense": 180,
+   "attackDelay": 3,
+   "walkSpeed": 0.24,
+   "xp": 2001497
+  },
+  {
+   "id": 754,
+   "name": "Blue Meteonyker",
+   "model": "mvr_meteonyker",
+   "level": 95,
+   "class": "giant",
+   "size": 2,
+   "hp": 255000000,
+   "damage": [
+    3200,
+    4000
+   ],
+   "defense": 187,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5000000
+  },
+  {
+   "id": 755,
+   "name": "Green Meteonyker",
+   "model": "mvr_meteonyker",
+   "level": 95,
+   "class": "giant",
+   "size": 2,
+   "hp": 255000000,
+   "damage": [
+    3200,
+    4000
+   ],
+   "defense": 187,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5000000
+  },
+  {
+   "id": 823,
+   "name": "Brigadier General Crumple",
+   "model": "mvr_bang",
+   "level": 95,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 20000000,
+   "damage": [
+    2800,
+    3000
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 500
+  },
+  {
+   "id": 831,
+   "name": "Lieutenant Chimeradon",
+   "model": "mvr_kimeradon",
+   "level": 95,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 54100,
+   "damage": [
+    1231,
+    1296
+   ],
+   "defense": 131,
+   "attackDelay": 2.2,
+   "walkSpeed": 1.56,
+   "xp": 225894
+  },
+  {
+   "id": 614,
+   "name": "Small Shuhamma",
+   "model": "mvr_shuhamma",
+   "level": 96,
+   "class": "small",
+   "size": 0.8,
+   "hp": 55339,
+   "damage": [
+    1254,
+    1320
+   ],
+   "defense": 133,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 246224
+  },
+  {
+   "id": 833,
+   "name": "Private Bearnerky",
+   "model": "mvr_circusbear",
+   "level": 96,
+   "class": "small",
+   "size": 0.8,
+   "hp": 55339,
+   "damage": [
+    1254,
+    1320
+   ],
+   "defense": 133,
+   "attackDelay": 3.05,
+   "walkSpeed": 1.68,
+   "xp": 246224
+  },
+  {
+   "id": 834,
+   "name": "Specialist Bearnerky",
+   "model": "mvr_circusbear",
+   "level": 96,
+   "class": "small",
+   "size": 0.8,
+   "hp": 56593,
+   "damage": [
+    1258,
+    1324
+   ],
+   "defense": 135,
+   "attackDelay": 3.05,
+   "walkSpeed": 1.68,
+   "xp": 246224
+  },
+  {
+   "id": 940,
+   "name": "Captain Tengu",
+   "model": "mvr_thoth",
+   "level": 96,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 55339,
+   "damage": [
+    1505,
+    1584
+   ],
+   "defense": 133,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 246224
+  },
+  {
+   "id": 615,
+   "name": "Shuhamma",
+   "model": "mvr_shuhamma",
+   "level": 97,
+   "class": "normal",
+   "size": 1,
+   "hp": 56593,
+   "damage": [
+    1258,
+    1324
+   ],
+   "defense": 135,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 268384
+  },
+  {
+   "id": 685,
+   "name": "Criminal Shuhamma",
+   "model": "mvr_shuhamma",
+   "level": 97,
+   "class": "small",
+   "size": 0.8,
+   "hp": 55339,
+   "damage": [
+    1254,
+    1320
+   ],
+   "defense": 133,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 835,
+   "name": "Sergeant Bearnerky",
+   "model": "mvr_circusbear",
+   "level": 97,
+   "class": "normal",
+   "size": 1,
+   "hp": 56593,
+   "damage": [
+    1258,
+    1324
+   ],
+   "defense": 135,
+   "attackDelay": 3.05,
+   "walkSpeed": 1.56,
+   "xp": 268384
+  },
+  {
+   "id": 908,
+   "name": "Ghost of the Forgotten Prince",
+   "model": "mvr_sadking01",
+   "level": 97,
+   "class": "normal",
+   "size": 1,
+   "hp": 56593,
+   "damage": [
+    1258,
+    1324
+   ],
+   "defense": 135,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 322061
+  },
+  {
+   "id": 616,
+   "name": "Captain Shuhamma",
+   "model": "mvr_shuhamma",
+   "level": 98,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 57861,
+   "damage": [
+    1262,
+    1329
+   ],
+   "defense": 137,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 292538
+  },
+  {
+   "id": 645,
+   "name": "Giant Gongury",
+   "model": "mvr_gongury",
+   "level": 98,
+   "class": "giant",
+   "size": 2,
+   "hp": 1081995,
+   "damage": [
+    2090,
+    2200
+   ],
+   "defense": 173,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1901497
+  },
+  {
+   "id": 832,
+   "name": "General Chimeradon",
+   "model": "mvr_kimeradon",
+   "level": 98,
+   "class": "giant",
+   "size": 2,
+   "hp": 1081995,
+   "damage": [
+    2090,
+    2200
+   ],
+   "defense": 173,
+   "attackDelay": 2.8,
+   "walkSpeed": 1.92,
+   "xp": 1901497
+  },
+  {
+   "id": 836,
+   "name": "Captian Bearnerky",
+   "model": "mvr_circusbear",
+   "level": 98,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 57861,
+   "damage": [
+    1262,
+    1329
+   ],
+   "defense": 137,
+   "attackDelay": 3.1,
+   "walkSpeed": 1.56,
+   "xp": 292538
+  },
+  {
+   "id": 941,
+   "name": "Giant Tengu",
+   "model": "mvr_thoth",
+   "level": 98,
+   "class": "giant",
+   "size": 2,
+   "hp": 1081995,
+   "damage": [
+    2508,
+    2640
+   ],
+   "defense": 173,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 1901497
+  },
+  {
+   "id": 942,
+   "name": "Small Asterius",
+   "model": "mvr_khnemu",
+   "level": 98,
+   "class": "small",
+   "size": 0.8,
+   "hp": 57861,
+   "damage": [
+    1514,
+    1595
+   ],
+   "defense": 137,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 292538
+  },
+  {
+   "id": 976,
+   "name": "Great Tengu",
+   "model": "mvr_thoth",
+   "level": 98,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 1081995,
+   "damage": [
+    2508,
+    2640
+   ],
+   "defense": 173,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 634,
+   "name": "Trainee Chef Muffrin",
+   "model": "mvr_muffrin",
+   "level": 99,
+   "class": "small",
+   "size": 0.8,
+   "hp": 59144,
+   "damage": [
+    1285,
+    1353
+   ],
+   "defense": 138,
+   "attackDelay": 3,
+   "walkSpeed": 1.68,
+   "xp": 318866
+  },
+  {
+   "id": 635,
+   "name": "3rd Chef Muffrin",
+   "model": "mvr_muffrin",
+   "level": 99,
+   "class": "small",
+   "size": 0.8,
+   "hp": 60441,
+   "damage": [
+    1290,
+    1357
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 1.68,
+   "xp": 318866
+  },
+  {
+   "id": 650,
+   "name": "Small Kern",
+   "model": "mvr_kern",
+   "level": 99,
+   "class": "small",
+   "size": 0.8,
+   "hp": 59144,
+   "damage": [
+    1285,
+    1353
+   ],
+   "defense": 138,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 318866
+  },
+  {
+   "id": 636,
+   "name": "2nd Chef Muffrin",
+   "model": "mvr_muffrin",
+   "level": 100,
+   "class": "normal",
+   "size": 1,
+   "hp": 60441,
+   "damage": [
+    1290,
+    1357
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 1.56,
+   "xp": 347563
+  },
+  {
+   "id": 651,
+   "name": "Kern",
+   "model": "mvr_kern",
+   "level": 100,
+   "class": "normal",
+   "size": 1,
+   "hp": 60441,
+   "damage": [
+    1290,
+    1357
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 347563
+  },
+  {
+   "id": 824,
+   "name": "Lieutenant General Scythoid",
+   "model": "mvr_redmantis",
+   "level": 100,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 30000000,
+   "damage": [
+    3200,
+    3450
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 500
+  },
+  {
+   "id": 825,
+   "name": "Air Marshall Spiketail",
+   "model": "mvr_flbyrigen",
+   "level": 100,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 15000000,
+   "damage": [
+    3600,
+    3800
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 3.84,
+   "xp": 500
+  },
+  {
+   "id": 943,
+   "name": "Asterius",
+   "model": "mvr_khnemu",
+   "level": 100,
+   "class": "normal",
+   "size": 1,
+   "hp": 60441,
+   "damage": [
+    1548,
+    1628
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 347563
+  },
+  {
+   "id": 617,
+   "name": "Giant Shuhamma",
+   "model": "mvr_shuhamma",
+   "level": 101,
+   "class": "giant",
+   "size": 2,
+   "hp": 1157225,
+   "damage": [
+    2247,
+    2365
+   ],
+   "defense": 168,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 2439892
+  },
+  {
+   "id": 637,
+   "name": "1st Chef Muffrin",
+   "model": "mvr_muffrin",
+   "level": 101,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 61753,
+   "damage": [
+    1294,
+    1362
+   ],
+   "defense": 142,
+   "attackDelay": 3,
+   "walkSpeed": 1.56,
+   "xp": 375368
+  },
+  {
+   "id": 652,
+   "name": "Captain Kern",
+   "model": "mvr_kern",
+   "level": 101,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 61753,
+   "damage": [
+    1294,
+    1362
+   ],
+   "defense": 142,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 375368
+  },
+  {
+   "id": 837,
+   "name": "General Bearnerky",
+   "model": "mvr_circusbear",
+   "level": 101,
+   "class": "giant",
+   "size": 2,
+   "hp": 1157225,
+   "damage": [
+    2247,
+    2365
+   ],
+   "defense": 168,
+   "attackDelay": 3.2,
+   "walkSpeed": 1.92,
+   "xp": 2439892
+  },
+  {
+   "id": 520,
+   "name": "Pawn Popcrank",
+   "model": "mvr_popcrank",
+   "level": 102,
+   "class": "small",
+   "size": 0.8,
+   "hp": 63079,
+   "damage": [
+    1317,
+    1386
+   ],
+   "defense": 144,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 405397
+  },
+  {
+   "id": 521,
+   "name": "Knight Popcrank",
+   "model": "mvr_popcrank",
+   "level": 102,
+   "class": "small",
+   "size": 0.8,
+   "hp": 64420,
+   "damage": [
+    1321,
+    1390
+   ],
+   "defense": 146,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 405397
+  },
+  {
+   "id": 610,
+   "name": "Small Glaphan",
+   "model": "mvr_glaphan",
+   "level": 102,
+   "class": "small",
+   "size": 0.8,
+   "hp": 63079,
+   "damage": [
+    1317,
+    1386
+   ],
+   "defense": 144,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 405397
+  },
+  {
+   "id": 944,
+   "name": "Captain Asterius",
+   "model": "mvr_khnemu",
+   "level": 102,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 63079,
+   "damage": [
+    1580,
+    1663
+   ],
+   "defense": 144,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 405397
+  },
+  {
+   "id": 522,
+   "name": "Rook Popcrank",
+   "model": "mvr_popcrank",
+   "level": 103,
+   "class": "normal",
+   "size": 1,
+   "hp": 64420,
+   "damage": [
+    1321,
+    1390
+   ],
+   "defense": 146,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.56,
+   "xp": 437828
+  },
+  {
+   "id": 611,
+   "name": "Glaphan",
+   "model": "mvr_glaphan",
+   "level": 103,
+   "class": "normal",
+   "size": 1,
+   "hp": 64420,
+   "damage": [
+    1321,
+    1390
+   ],
+   "defense": 146,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 437828
+  },
+  {
+   "id": 909,
+   "name": "Ghost of the Forgotten King",
+   "model": "mvr_sadking02",
+   "level": 103,
+   "class": "normal",
+   "size": 1,
+   "hp": 64420,
+   "damage": [
+    1321,
+    1390
+   ],
+   "defense": 146,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 525394
+  },
+  {
+   "id": 523,
+   "name": "Bishop Popcrank",
+   "model": "mvr_popcrank",
+   "level": 104,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 65775,
+   "damage": [
+    1325,
+    1395
+   ],
+   "defense": 148,
+   "attackDelay": 2.2,
+   "walkSpeed": 1.56,
+   "xp": 472854
+  },
+  {
+   "id": 612,
+   "name": "Captain Glaphan",
+   "model": "mvr_glaphan",
+   "level": 104,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 65775,
+   "damage": [
+    1325,
+    1395
+   ],
+   "defense": 148,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 472854
+  },
+  {
+   "id": 653,
+   "name": "Giant Kern",
+   "model": "mvr_kern",
+   "level": 104,
+   "class": "giant",
+   "size": 2,
+   "hp": 1235058,
+   "damage": [
+    2299,
+    2420
+   ],
+   "defense": 178,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3073551
+  },
+  {
+   "id": 686,
+   "name": "Criminal Glaphan",
+   "model": "mvr_glaphan",
+   "level": 104,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 65775,
+   "damage": [
+    1325,
+    1395
+   ],
+   "defense": 148,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 1
+  },
+  {
+   "id": 838,
+   "name": "Great Chef Muffrin",
+   "model": "mvr_muffrin",
+   "level": 104,
+   "class": "giant",
+   "size": 2,
+   "hp": 1235058,
+   "damage": [
+    2299,
+    2420
+   ],
+   "defense": 178,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 3073551
+  },
+  {
+   "id": 945,
+   "name": "Giant Asterius",
+   "model": "mvr_khnemu",
+   "level": 104,
+   "class": "giant",
+   "size": 2,
+   "hp": 1235058,
+   "damage": [
+    2759,
+    2904
+   ],
+   "defense": 178,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3073551
+  },
+  {
+   "id": 946,
+   "name": "Small Dantalian",
+   "model": "mvr_dantalian",
+   "level": 104,
+   "class": "small",
+   "size": 0.8,
+   "hp": 65775,
+   "damage": [
+    1590,
+    1674
+   ],
+   "defense": 148,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 472854
+  },
+  {
+   "id": 977,
+   "name": "Great Asterius",
+   "model": "mvr_khnemu",
+   "level": 104,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 1235058,
+   "damage": [
+    2759,
+    2904
+   ],
+   "defense": 178,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 826,
+   "name": "General Glyphaxz",
+   "model": "mvr_kimeradon",
+   "level": 105,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 40000000,
+   "damage": [
+    4200,
+    4500
+   ],
+   "defense": 140,
+   "attackDelay": 3,
+   "walkSpeed": 1.92,
+   "xp": 500
+  },
+  {
+   "id": 839,
+   "name": "Queen Popcrank",
+   "model": "mvr_popcrank",
+   "level": 105,
+   "class": "giant",
+   "size": 2,
+   "hp": 1315502,
+   "damage": [
+    2404,
+    2530
+   ],
+   "defense": 187,
+   "attackDelay": 2.8,
+   "walkSpeed": 1.92,
+   "xp": 3871777
+  },
+  {
+   "id": 1050,
+   "name": "Small Battle Toadrin",
+   "model": "mvr_toadrin",
+   "level": 105,
+   "class": "small",
+   "size": 0.8,
+   "hp": 80417,
+   "damage": [
+    1345,
+    1415
+   ],
+   "defense": 150,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 496756
+  },
+  {
+   "id": 947,
+   "name": "Dantalian",
+   "model": "mvr_dantalian",
+   "level": 106,
+   "class": "normal",
+   "size": 1,
+   "hp": 82007,
+   "damage": [
+    1638,
+    1722
+   ],
+   "defense": 152,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.56,
+   "xp": 579415
+  },
+  {
+   "id": 1051,
+   "name": "Battle Toadrin",
+   "model": "mvr_toadrin",
+   "level": 106,
+   "class": "normal",
+   "size": 1,
+   "hp": 82007,
+   "damage": [
+    1365,
+    1435
+   ],
+   "defense": 152,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 579415
+  },
+  {
+   "id": 613,
+   "name": "Giant Glaphan",
+   "model": "mvr_glaphan",
+   "level": 107,
+   "class": "giant",
+   "size": 2,
+   "hp": 1315502,
+   "damage": [
+    2404,
+    2530
+   ],
+   "defense": 187,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 3871777
+  },
+  {
+   "id": 1052,
+   "name": "Creepy Battle Toadrin",
+   "model": "mvr_toadrin",
+   "level": 107,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 83756,
+   "damage": [
+    1375,
+    1445
+   ],
+   "defense": 154,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 625767
+  },
+  {
+   "id": 948,
+   "name": "Captain Dantalian",
+   "model": "mvr_dantalian",
+   "level": 108,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 85139,
+   "damage": [
+    1674,
+    1758
+   ],
+   "defense": 156,
+   "attackDelay": 3.05,
+   "walkSpeed": 1.68,
+   "xp": 639473
+  },
+  {
+   "id": 1058,
+   "name": "Troglodon Clansman",
+   "model": "mvr_berken",
+   "level": 108,
+   "class": "small",
+   "size": 0.8,
+   "hp": 85139,
+   "damage": [
+    1385,
+    1455
+   ],
+   "defense": 156,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 592105
+  },
+  {
+   "id": 911,
+   "name": "Mammoth ",
+   "model": "mvr_mammoth01",
+   "level": 109,
+   "class": "normal",
+   "size": 1,
+   "hp": 86854,
+   "damage": [
+    1405,
+    1475
+   ],
+   "defense": 158,
+   "attackDelay": 3.05,
+   "walkSpeed": 1.56,
+   "xp": 828756
+  },
+  {
+   "id": 1059,
+   "name": "Troglodon Warrior",
+   "model": "mvr_berken",
+   "level": 109,
+   "class": "normal",
+   "size": 1,
+   "hp": 86854,
+   "damage": [
+    1405,
+    1475
+   ],
+   "defense": 158,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 690630
+  },
+  {
+   "id": 949,
+   "name": "Giant Dantalian",
+   "model": "mvr_dantalian",
+   "level": 110,
+   "class": "giant",
+   "size": 2,
+   "hp": 1675135,
+   "damage": [
+    2970,
+    3090
+   ],
+   "defense": 196,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 5123851
+  },
+  {
+   "id": 950,
+   "name": "Small Gannessa",
+   "model": "mvr_ganesa",
+   "level": 110,
+   "class": "small",
+   "size": 0.8,
+   "hp": 88583,
+   "damage": [
+    1698,
+    1782
+   ],
+   "defense": 160,
+   "attackDelay": 3.1,
+   "walkSpeed": 1.56,
+   "xp": 756880
+  },
+  {
+   "id": 978,
+   "name": "Great Dantalian",
+   "model": "mvr_dantalian",
+   "level": 110,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 1675135,
+   "damage": [
+    2970,
+    3090
+   ],
+   "defense": 196,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 1053,
+   "name": "Giant Battle Toadrin",
+   "model": "mvr_toadrin",
+   "level": 110,
+   "class": "giant",
+   "size": 2,
+   "hp": 1675135,
+   "damage": [
+    2475,
+    2575
+   ],
+   "defense": 196,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 5123851
+  },
+  {
+   "id": 1060,
+   "name": "Troglodon Captain",
+   "model": "mvr_berken",
+   "level": 110,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 88583,
+   "damage": [
+    1415,
+    1485
+   ],
+   "defense": 160,
+   "attackDelay": 2.4,
+   "walkSpeed": 2.4,
+   "xp": 756880
+  },
+  {
+   "id": 1054,
+   "name": "Brown Bolo",
+   "model": "mvr_hatsalra",
+   "level": 111,
+   "class": "small",
+   "size": 0.8,
+   "hp": 89861,
+   "damage": [
+    1425,
+    1495
+   ],
+   "defense": 162,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 686512
+  },
+  {
+   "id": 951,
+   "name": "Gannessa",
+   "model": "mvr_ganesa",
+   "level": 112,
+   "class": "normal",
+   "size": 1,
+   "hp": 91628,
+   "damage": [
+    1734,
+    1818
+   ],
+   "defense": 164,
+   "attackDelay": 3.05,
+   "walkSpeed": 1.56,
+   "xp": 800746
+  },
+  {
+   "id": 1055,
+   "name": "Spotted Bolo",
+   "model": "mvr_hatsalra",
+   "level": 112,
+   "class": "normal",
+   "size": 1,
+   "hp": 91628,
+   "damage": [
+    1445,
+    1515
+   ],
+   "defense": 164,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 800746
+  },
+  {
+   "id": 1056,
+   "name": "Superior Spotted Bolo",
+   "model": "mvr_hatsalra",
+   "level": 113,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 93409,
+   "damage": [
+    1455,
+    1525
+   ],
+   "defense": 166,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 864805
+  },
+  {
+   "id": 1061,
+   "name": "Troglodon Warlord",
+   "model": "mvr_berken",
+   "level": 113,
+   "class": "giant",
+   "size": 2,
+   "hp": 1771668,
+   "damage": [
+    2515,
+    2615
+   ],
+   "defense": 205,
+   "attackDelay": 2.4,
+   "walkSpeed": 2.88,
+   "xp": 6107342
+  },
+  {
+   "id": 952,
+   "name": "Captain Gannessa",
+   "model": "mvr_ganesa",
+   "level": 114,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 94583,
+   "damage": [
+    1758,
+    1842
+   ],
+   "defense": 168,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 774266
+  },
+  {
+   "id": 1046,
+   "name": "Lazy Araknoid",
+   "model": "mvr_frinker",
+   "level": 114,
+   "class": "small",
+   "size": 0.8,
+   "hp": 94583,
+   "damage": [
+    1465,
+    1535
+   ],
+   "defense": 168,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 774266
+  },
+  {
+   "id": 912,
+   "name": "Cannibal Mammoth",
+   "model": "mvr_mammoth02",
+   "level": 115,
+   "class": "normal",
+   "size": 1,
+   "hp": 96403,
+   "damage": [
+    1485,
+    1555
+   ],
+   "defense": 170,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.56,
+   "xp": 1083722
+  },
+  {
+   "id": 1047,
+   "name": "Araknoid",
+   "model": "mvr_frinker",
+   "level": 115,
+   "class": "normal",
+   "size": 1,
+   "hp": 96403,
+   "damage": [
+    1485,
+    1555
+   ],
+   "defense": 170,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 903102
+  },
+  {
+   "id": 1062,
+   "name": "Blunt Axe-Jaw Ant",
+   "model": "mvr_prickant",
+   "level": 115,
+   "class": "small",
+   "size": 0.8,
+   "hp": 425695,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 83621
+  },
+  {
+   "id": 1063,
+   "name": "Axe-Jaw Ant",
+   "model": "mvr_prickant",
+   "level": 115,
+   "class": "normal",
+   "size": 1,
+   "hp": 434270,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 90311
+  },
+  {
+   "id": 1066,
+   "name": "Small Scorpede",
+   "model": "mvr_cripescentipede",
+   "level": 115,
+   "class": "small",
+   "size": 0.8,
+   "hp": 425695,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 83621
+  },
+  {
+   "id": 1067,
+   "name": "Scorpede",
+   "model": "mvr_cripescentipede",
+   "level": 115,
+   "class": "normal",
+   "size": 1,
+   "hp": 434270,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 90311
+  },
+  {
+   "id": 1070,
+   "name": "Small Maul Rat",
+   "model": "mvr_maulmouse",
+   "level": 115,
+   "class": "small",
+   "size": 0.8,
+   "hp": 425695,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 83621
+  },
+  {
+   "id": 1071,
+   "name": "Maul Rat",
+   "model": "mvr_maulmouse",
+   "level": 115,
+   "class": "normal",
+   "size": 1,
+   "hp": 434270,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 90311
+  },
+  {
+   "id": 1076,
+   "name": "Cursed Blunt Axe-Jaw Ant",
+   "model": "mvr_prickant",
+   "level": 115,
+   "class": "small",
+   "size": 0.8,
+   "hp": 851390,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 167242
+  },
+  {
+   "id": 1077,
+   "name": "Cursed Axe-Jaw Ant",
+   "model": "mvr_prickant",
+   "level": 115,
+   "class": "normal",
+   "size": 1,
+   "hp": 868540,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 180622
+  },
+  {
+   "id": 1080,
+   "name": "Cursed Small Scorpede",
+   "model": "mvr_cripescentipede",
+   "level": 115,
+   "class": "small",
+   "size": 0.8,
+   "hp": 851390,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 167242
+  },
+  {
+   "id": 1081,
+   "name": "Cursed Scorpede",
+   "model": "mvr_cripescentipede",
+   "level": 115,
+   "class": "normal",
+   "size": 1,
+   "hp": 868540,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 180622
+  },
+  {
+   "id": 1084,
+   "name": "Cursed Small Maul Rat",
+   "model": "mvr_maulmouse",
+   "level": 115,
+   "class": "small",
+   "size": 0.8,
+   "hp": 851390,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 167242
+  },
+  {
+   "id": 1085,
+   "name": "Cursed Maul Rat",
+   "model": "mvr_maulmouse",
+   "level": 115,
+   "class": "normal",
+   "size": 1,
+   "hp": 868540,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 180622
+  },
+  {
+   "id": 953,
+   "name": "Giant Gannessa",
+   "model": "mvr_ganesa",
+   "level": 116,
+   "class": "giant",
+   "size": 2,
+   "hp": 1868201,
+   "damage": [
+    3066,
+    3186
+   ],
+   "defense": 214,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7081113
+  },
+  {
+   "id": 954,
+   "name": "Small Asuras",
+   "model": "mvr_asura",
+   "level": 116,
+   "class": "small",
+   "size": 0.8,
+   "hp": 98236,
+   "damage": [
+    1794,
+    1878
+   ],
+   "defense": 172,
+   "attackDelay": 2.2,
+   "walkSpeed": 1.56,
+   "xp": 975349
+  },
+  {
+   "id": 979,
+   "name": "Great Gannessa",
+   "model": "mvr_ganesa",
+   "level": 116,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 1868201,
+   "damage": [
+    3066,
+    3186
+   ],
+   "defense": 214,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 1048,
+   "name": "Creepy Araknoid",
+   "model": "mvr_frinker",
+   "level": 116,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 98236,
+   "damage": [
+    1495,
+    1565
+   ],
+   "defense": 172,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 975349
+  },
+  {
+   "id": 1057,
+   "name": "Great White Bolo",
+   "model": "mvr_hatsalra",
+   "level": 116,
+   "class": "giant",
+   "size": 2,
+   "hp": 1868201,
+   "damage": [
+    2555,
+    2655
+   ],
+   "defense": 214,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 7081113
+  },
+  {
+   "id": 1064,
+   "name": "Sharp Axe-Jaw Ant",
+   "model": "mvr_prickant",
+   "level": 116,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 442915,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 97535
+  },
+  {
+   "id": 1068,
+   "name": "Creepy Scorpede",
+   "model": "mvr_cripescentipede",
+   "level": 116,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 442915,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 97535
+  },
+  {
+   "id": 1072,
+   "name": "Creepy Maul Rat",
+   "model": "mvr_maulmouse",
+   "level": 116,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 442915,
+   "damage": [
+    4425,
+    4635
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 97535
+  },
+  {
+   "id": 1078,
+   "name": "Cursed Sharp Axe-Jaw Ant",
+   "model": "mvr_prickant",
+   "level": 116,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 885830,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 195070
+  },
+  {
+   "id": 1082,
+   "name": "Cursed Creepy Scorpede",
+   "model": "mvr_cripescentipede",
+   "level": 116,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 885830,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 195070
+  },
+  {
+   "id": 1086,
+   "name": "Cursed Creepy Maul Rat",
+   "model": "mvr_maulmouse",
+   "level": 116,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 885830,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.68,
+   "xp": 195070
+  },
+  {
+   "id": 1042,
+   "name": "Small Club-tailed Reptilion ",
+   "model": "mvr_crohell",
+   "level": 117,
+   "class": "small",
+   "size": 0.8,
+   "hp": 98236,
+   "damage": [
+    1794,
+    1878
+   ],
+   "defense": 172,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 975349
+  },
+  {
+   "id": 715,
+   "name": "Meteonyker",
+   "model": "mvr_meteonyker",
+   "level": 118,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 120000,
+   "damage": [
+    1700,
+    1800
+   ],
+   "defense": 190,
+   "attackDelay": 4,
+   "walkSpeed": 3.36,
+   "xp": 1100000
+  },
+  {
+   "id": 955,
+   "name": "Asuras",
+   "model": "mvr_asura",
+   "level": 118,
+   "class": "normal",
+   "size": 1,
+   "hp": 120000,
+   "damage": [
+    2040,
+    2160
+   ],
+   "defense": 190,
+   "attackDelay": 4,
+   "walkSpeed": 3.36,
+   "xp": 1100000
+  },
+  {
+   "id": 1043,
+   "name": "Club-tailed Reptilion ",
+   "model": "mvr_crohell",
+   "level": 118,
+   "class": "normal",
+   "size": 1,
+   "hp": 120000,
+   "damage": [
+    2040,
+    2160
+   ],
+   "defense": 190,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1100000
+  },
+  {
+   "id": 957,
+   "name": "Giant Asuras",
+   "model": "mvr_asura",
+   "level": 119,
+   "class": "giant",
+   "size": 2,
+   "hp": 1964734,
+   "damage": [
+    3114,
+    3234
+   ],
+   "defense": 223,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 7986262
+  },
+  {
+   "id": 980,
+   "name": "Great Asuras",
+   "model": "mvr_asura",
+   "level": 119,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 1964734,
+   "damage": [
+    2595,
+    2695
+   ],
+   "defense": 223,
+   "attackDelay": 3,
+   "walkSpeed": 1.8,
+   "xp": 0
+  },
+  {
+   "id": 1044,
+   "name": "Captain Club-tailed Reptilion ",
+   "model": "mvr_crohell",
+   "level": 119,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 140000,
+   "damage": [
+    2160,
+    2520
+   ],
+   "defense": 205,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1250000
+  },
+  {
+   "id": 1049,
+   "name": "Giant Araknoid",
+   "model": "mvr_frinker",
+   "level": 119,
+   "class": "giant",
+   "size": 2,
+   "hp": 1964734,
+   "damage": [
+    2595,
+    2695
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 7986262
+  },
+  {
+   "id": 1065,
+   "name": "Razor Axe-Jaw Ant",
+   "model": "mvr_prickant",
+   "level": 119,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 8858340,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 464,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 798627
+  },
+  {
+   "id": 1069,
+   "name": "Giant Scorpede",
+   "model": "mvr_cripescentipede",
+   "level": 119,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 8858340,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 464,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 798627
+  },
+  {
+   "id": 1073,
+   "name": "Giant Maul Rat",
+   "model": "mvr_maulmouse",
+   "level": 119,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 8858340,
+   "damage": [
+    8850,
+    9270
+   ],
+   "defense": 464,
+   "attackDelay": 2.4,
+   "walkSpeed": 2.04,
+   "xp": 798627
+  },
+  {
+   "id": 1079,
+   "name": "Cursed Razor Axe-Jaw Ant",
+   "model": "mvr_prickant",
+   "level": 119,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 17716680,
+   "damage": [
+    17700,
+    18540
+   ],
+   "defense": 464,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1597254
+  },
+  {
+   "id": 1083,
+   "name": "Cursed Giant Scorpede",
+   "model": "mvr_cripescentipede",
+   "level": 119,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 17716680,
+   "damage": [
+    17700,
+    18540
+   ],
+   "defense": 464,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1597254
+  },
+  {
+   "id": 1087,
+   "name": "Cursed Giant Maul Rat",
+   "model": "mvr_maulmouse",
+   "level": 119,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 17716680,
+   "damage": [
+    17700,
+    18540
+   ],
+   "defense": 464,
+   "attackDelay": 2.4,
+   "walkSpeed": 2.04,
+   "xp": 1597254
+  },
+  {
+   "id": 874,
+   "name": "Cyclops X",
+   "model": "mvr_cyclopsx",
+   "level": 120,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 140000,
+   "damage": [
+    1800,
+    2100
+   ],
+   "defense": 205,
+   "attackDelay": 4,
+   "walkSpeed": 3.36,
+   "xp": 1250000
+  },
+  {
+   "id": 956,
+   "name": "Captain Asuras",
+   "model": "mvr_asura",
+   "level": 120,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 140000,
+   "damage": [
+    2160,
+    2520
+   ],
+   "defense": 205,
+   "attackDelay": 4,
+   "walkSpeed": 3.36,
+   "xp": 1250000
+  },
+  {
+   "id": 1045,
+   "name": "Colonel Club-tailed Reptilion ",
+   "model": "mvr_crohell",
+   "level": 120,
+   "class": "giant",
+   "size": 2,
+   "hp": 1964734,
+   "damage": [
+    3114,
+    3234
+   ],
+   "defense": 223,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 7986262
+  },
+  {
+   "id": 1106,
+   "name": "Hellhound",
+   "model": "mvr_skelwolf",
+   "level": 121,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 150000,
+   "damage": [
+    3875,
+    4103
+   ],
+   "defense": 220,
+   "attackDelay": 2.4,
+   "walkSpeed": 2.04,
+   "xp": 1356336
+  },
+  {
+   "id": 1107,
+   "name": "Risen Gladiator",
+   "model": "mvr_skelsword",
+   "level": 122,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 155000,
+   "damage": [
+    4104,
+    4345
+   ],
+   "defense": 225,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1412850
+  },
+  {
+   "id": 1108,
+   "name": "Risen Pikeman",
+   "model": "mvr_skelspear",
+   "level": 123,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 160000,
+   "damage": [
+    4346,
+    4601
+   ],
+   "defense": 230,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1471719
+  },
+  {
+   "id": 1109,
+   "name": "Risen Mage",
+   "model": "mvr_skelmage",
+   "level": 124,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 165000,
+   "damage": [
+    4603,
+    4873
+   ],
+   "defense": 235,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1533041
+  },
+  {
+   "id": 1110,
+   "name": "Risen Assassin",
+   "model": "mvr_skelassassin",
+   "level": 125,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 170000,
+   "damage": [
+    4876,
+    5162
+   ],
+   "defense": 240,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1596917
+  },
+  {
+   "id": 1113,
+   "name": "Blighted Gryphon ",
+   "model": "mvr_skelgriffin",
+   "level": 125,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 340000,
+   "damage": [
+    73134,
+    77424
+   ],
+   "defense": 240,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.56,
+   "xp": 319383
+  },
+  {
+   "id": 1111,
+   "name": "Risen Warrior",
+   "model": "mvr_skelfighter",
+   "level": 126,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 175000,
+   "damage": [
+    5164,
+    5467
+   ],
+   "defense": 245,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 1663456
+  },
+  {
+   "id": 1114,
+   "name": "Scythe Protector",
+   "model": "mvr_skelleader",
+   "level": 126,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 350000,
+   "damage": [
+    77465,
+    82007
+   ],
+   "defense": 245,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 332691
+  },
+  {
+   "id": 1115,
+   "name": "Vile Flayer",
+   "model": "mvr_skelspain",
+   "level": 127,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 360000,
+   "damage": [
+    82055,
+    86866
+   ],
+   "defense": 250,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 346553
+  },
+  {
+   "id": 1116,
+   "name": "Fallen Necromancer",
+   "model": "mvr_skelshamen",
+   "level": 128,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 370000,
+   "damage": [
+    86921,
+    92015
+   ],
+   "defense": 255,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 360993
+  },
+  {
+   "id": 1117,
+   "name": "Forsaken Banshee",
+   "model": "mvr_skelrider",
+   "level": 129,
+   "class": "captain",
+   "size": 1.2,
+   "hp": 380000,
+   "damage": [
+    92078,
+    97474
+   ],
+   "defense": 260,
+   "attackDelay": 2.4,
+   "walkSpeed": 1.8,
+   "xp": 376034
+  },
+  {
+   "id": 1112,
+   "name": "[General] Razgul",
+   "model": "mvr_skelgeneral",
+   "level": 133,
+   "class": "boss",
+   "size": 2.5,
+   "hp": 230927760,
+   "damage": [
+    9666,
+    10232
+   ],
+   "defense": 560,
+   "attackDelay": 3,
+   "walkSpeed": 2.4,
+   "xp": 11068346
+  }
+ ]
+}

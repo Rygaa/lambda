@@ -1,0 +1,8 @@
+{
+  "about": "A wall of mountains along one side of the world (recipe \"borders\"). It closes the side, with no stairs. It is part of the ground, so its shape comes from the world seed, and each world gets its own. tiers: how many cliffs are stacked; height: the height of each; ledge: the width of the ledge between two tiers; ledgeWobble: how much a ledge waves; reach: how far it comes in from the side; wobble: how much its foot waves.",
+  "builder": "mountain",
+  "palettes": ["cliff", "sand", "grey", "moss", "dark"],
+  "sizes": {
+    "medium": {"tiers": [3, 4], "height": [1.4, 1.9], "ledge": [1.3, 2.2], "ledgeWobble": [0.3, 0.6], "reach": [6, 10], "wobble": [0.8, 1.6]}
+  }
+}

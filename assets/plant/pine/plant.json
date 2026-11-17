@@ -1,0 +1,11 @@
+{
+  "about": "A pine: a short six-sided trunk and a canopy of 3 cones stacked, each narrower, covered in leaf clumps. The values are the ones of plant/oak, plus form (the canopy shape, see web/gen/builders/tree.js) and tiers (how many cones).",
+  "builder": "tree",
+  "variants": 3,
+  "palettes": {"pine": {"trunk": "brown", "canopy": "pine"}, "green": {"trunk": "brown", "canopy": "green"}},
+  "sizes": {
+    "small": {"trunk": 1.0, "r1": 0.2, "r2": 0.14, "trunkY": 0.5, "canopyY": 2.2, "radii": [1.2, 1.5, 1.2], "form": "cone", "tiers": 3, "scale": [0.76, 0.86]},
+    "medium": {"trunk": 1.0, "r1": 0.2, "r2": 0.14, "trunkY": 0.5, "canopyY": 2.2, "radii": [1.2, 1.5, 1.2], "form": "cone", "tiers": 3, "scale": [0.92, 1.08]},
+    "large": {"trunk": 1.0, "r1": 0.2, "r2": 0.14, "trunkY": 0.5, "canopyY": 2.2, "radii": [1.2, 1.5, 1.2], "form": "cone", "tiers": 3, "scale": [1.14, 1.26]}
+  }
+}

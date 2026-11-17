@@ -1,0 +1,18 @@
+{
+  "about": "The mouth of a cave: a pile of rock blocks against a mountain, with a black arched hole in its front. A plan of simple shapes (documentation/building/README.md). Put a portal (recipe \"portals\") just in front of the hole.",
+  "builder": "building",
+  "variants": 1,
+  "palettes": {"classic": {}},
+  "sizes": {
+    "medium": {"shapes": [
+      {"id": "back", "type": "box", "size": [3.2, 2.2, 1.2], "position": [0, 0, -0.2], "faces": {"all": "cliff"}},
+      {"id": "top", "type": "wedge", "size": [3.0, 0.6, 1.4], "position": [0, 2.2, -0.2], "faces": {"all": "cliff"}},
+      {"id": "left", "type": "box", "size": [1.0, 1.7, 1.0], "position": [-1.3, 0, 0.45], "rotationY": 12, "faces": {"all": "grey"}},
+      {"id": "right", "type": "box", "size": [1.1, 1.4, 1.0], "position": [1.35, 0, 0.4], "rotationY": -15, "faces": {"all": "grey"}},
+      {"id": "stone", "type": "box", "size": [0.55, 0.45, 0.55], "position": [2.0, 0, 0.95], "rotationY": 30, "faces": {"all": "grey"}}
+    ],
+    "details": [
+      {"form": "arch", "at": [0, 0.8, 0.4], "facing": [0, 0, 1], "size": [1.2, 1.6], "palette": "hole", "frame": {"palette": "dark", "width": 0.07}}
+    ]}
+  }
+}

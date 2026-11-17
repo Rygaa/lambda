@@ -1,0 +1,18 @@
+{
+  "name": "Combat: a small meadow with monsters, to try the fights and the skills",
+  "seed": 7,
+  "size": 32,
+  "start": [0, 0],
+  "clearings": { "count": 1, "radius": [4, 4] },
+  "props": [
+    { "asset": "plant/oak/medium", "at": [[-10, -9, 0], [9, -11, 0], [-11, 8, 0], [11, 10, 0]] },
+    { "asset": "plant/bush/medium", "at": [[-6, -11, 0], [12, -2, 0]] },
+    { "asset": "rock/sharp/medium", "at": [[-4, 6, 0]] },
+    { "asset": "rock/round/small", "at": [[5, -6, 0], [-8, 1, 0]] }
+  ],
+  "monsters": [
+    { "id": 21, "at": [[4, 3], [6, 2], [5, 5], [7, 4]] },
+    { "id": 97, "at": [[-5, -3], [-7, -4], [-6, -6]] },
+    { "id": 24, "at": [[2, -9], [5, -10]] }
+  ]
+}

@@ -1,0 +1,256 @@
+// Startup systems: run once, in this order (see main.js).
+import * as THREE from 'three';
+import { spawn, getResource, setResource } from '../ecs/world.js';
+import { GroundCover, GroundPlane, DustField, CameraRig, OrthoView, CloudLayer, Glade, Decor } from '../components.js';
+import { Assets, Gpu, Settings, Random, Input, ActiveView } from '../resources.js';
+import * as S from '../render/shaders.js';
+import { shaderMaterial, pieceMaterials } from '../render/materials.js';
+import { nextRandom } from '../lib/random.js';
+import { cellKey } from '../lib/cells.js';
+import { spawnProp } from '../lib/parts.js';
+import { paletteTables, paletteRows } from '../gen/palettes.js';
+import { heightAt, bareAt } from '../gen/terrain.js';
+import { groundAt, PAINTS } from '../gen/ground.js';
+import { getType } from '../gen/assets.js';
+
+// ---------------------------------------------------------------- GPU
+// Renderer, shared uniforms, materials, shadow map and the render targets.
+export function setupGpuSystem(world) {
+  const settings = getResource(world, Settings);
+  const assets = getResource(world, Assets);
+  const { basis, ppu } = settings;
+  const renderer = new THREE.WebGLRenderer({ canvas: settings.canvas, antialias: false, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(1);
+  renderer.autoClear = false;
+  const floatOK = renderer.extensions.has('EXT_color_buffer_float');
+
+  const shared = {
+    uSunL: { value: basis.L },
+    uShadowMap: { value: null },
+    uShadowMatrix: { value: new THREE.Matrix4() },
+    uShadowTexel: { value: 1 / 4096 },
+    uCloudOffset: { value: new THREE.Vector2(0, 0) },
+    uCloudScale: { value: 0.23 },
+    uCloudLo: { value: -0.05 },
+    uCloudHi: { value: 0.02 },
+    uGlades: { value: [0, 1, 2, 3].map(() => new THREE.Vector4(0, 0, 1, 0)) },
+    uCamR: { value: basis.R.clone() },
+    uCamU: { value: basis.U.clone() },
+    uClipY: { value: -1e4 },
+    uLamps: { value: Array.from({ length: S.LAMPS }, () => new THREE.Vector4(0, 0, 0, 0)) },
+    uLampCol: { value: Array.from({ length: S.LAMPS }, () => new THREE.Vector4(0, 0, 0, 0)) },
+    uNoLamp: { value: -1 },
+  };
+
+  const SM = Math.min(4096, renderer.capabilities.maxTextureSize);
+  const shadowRT = new THREE.WebGLRenderTarget(SM, SM, { depthBuffer: true });
+  shadowRT.depthTexture = new THREE.DepthTexture(SM, SM);
+  shadowRT.depthTexture.minFilter = shadowRT.depthTexture.magFilter = THREE.NearestFilter;
+  const SB = settings.half + 12;
+  const shadowCam = new THREE.OrthographicCamera(-SB, SB, SB, -SB, 1, 240);
+  shadowCam.position.copy(basis.L).multiplyScalar(120);
+  shadowCam.lookAt(0, 0, 0);
+  shadowCam.layers.set(1);
+  shadowCam.updateMatrixWorld();
+  shared.uShadowMatrix.value.multiplyMatrices(shadowCam.projectionMatrix, shadowCam.matrixWorldInverse);
+  shared.uShadowTexel.value = 1 / SM;
+  shared.uShadowMap.value = shadowRT.depthTexture;
+  // the shadows of the world alone (layer 1), drawn when the world changes; the bodies (layer 3) are drawn on a copy of
+  // it when only they move (systems/shadows.js)
+  const worldRT = new THREE.WebGLRenderTarget(SM, SM, { depthBuffer: true });
+  worldRT.depthTexture = new THREE.DepthTexture(SM, SM);
+  worldRT.depthTexture.minFilter = worldRT.depthTexture.magFilter = THREE.NearestFilter;
+  const bodyCam = shadowCam.clone();
+  bodyCam.layers.set(3);
+  const copyDepth = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+    glslVersion: THREE.GLSL3, uniforms: { tDepth: { value: worldRT.depthTexture } },
+    vertexShader: 'out vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: 'uniform sampler2D tDepth; in vec2 vUv; out vec4 o; void main() { gl_FragDepth = texture(tDepth, vUv).r; o = vec4(0.0); }',
+    depthFunc: THREE.AlwaysDepth, depthWrite: true, colorWrite: false }));
+  copyDepth.frustumCulled = false;
+  const copyScene = new THREE.Scene();
+  copyScene.add(copyDepth);
+
+  const rtOpts = { type: floatOK ? THREE.FloatType : THREE.HalfFloatType, minFilter: THREE.NearestFilter,
+    magFilter: THREE.NearestFilter, depthBuffer: true, count: 2 };   // data, normal + depth
+  const quad = new THREE.PlaneGeometry(2, 2);
+  const R = assets.meta.render;
+  const post = shaderMaterial(shared, S.FS_VERT, S.postFrag(paletteTables()), {
+    tData: { value: null }, tNorm: { value: null }, uRes: { value: new THREE.Vector2() },
+    uCamPos: { value: new THREE.Vector3() }, uHalf: { value: new THREE.Vector2() },
+    uViewR: { value: basis.R.clone() }, uViewU: { value: basis.U.clone() }, uViewF: { value: basis.F.clone() },
+    uVolTop: { value: R.volume_top }, uRayK: { value: 0.06 * (settings.land.rays ?? 1) }, uRayBias: { value: 3.56 }, uRaySteps: { value: 48 },
+    tRefl: { value: null }, tReflN: { value: null }, uReflVP: { value: new THREE.Matrix4() }, uTime: { value: 0 },
+  }, { depthTest: false, depthWrite: false });
+  // 3x3 samples per pixel, resolved to one sample per pixel
+  const resolve = shaderMaterial(shared, S.FS_VERT, S.RESOLVE_FRAG, {
+    tData: { value: null }, tNorm: { value: null },
+  }, { depthTest: false, depthWrite: false });
+  const blit = shaderMaterial(shared, S.FS_VERT, S.BLIT_FRAG, {
+    tFinal: { value: null }, uOffset: { value: new THREE.Vector2() }, uScale: { value: 1 },
+    uMargin: { value: new THREE.Vector2() }, uLow: { value: new THREE.Vector2() },
+  }, { depthTest: false, depthWrite: false });
+
+  const mirror = new THREE.OrthographicCamera();
+  mirror.matrixAutoUpdate = false;          // the render system sets its matrices by hand
+  mirror.matrixWorldAutoUpdate = false;
+
+  setResource(world, Gpu, {
+    renderer,
+    shared,
+    materials: pieceMaterials(shared, assets, ppu),
+    scene: new THREE.Scene(),
+    dustScene: new THREE.Scene(),
+    shadow: { rt: shadowRT, cam: shadowCam, mat: new THREE.MeshBasicMaterial({ side: THREE.BackSide, colorWrite: false }),
+      worldRT, bodyCam, copyScene },
+    bodiesDirty: true,
+    shadowsDirty: true,
+    gbuf: new THREE.WebGLRenderTarget(4, 4, rtOpts),
+    gbufSS: new THREE.WebGLRenderTarget(12, 12, rtOpts),
+    // water: the scene seen from the camera mirrored in the water plane
+    // (systems/render.js); skip: objects left out of it
+    reflect: { on: false, rt: new THREE.WebGLRenderTarget(4, 4, rtOpts), skip: new Set(), camera: mirror },
+    resolve,
+    resolveScene: new THREE.Scene().add(new THREE.Mesh(quad, resolve)),
+    finalRT: new THREE.WebGLRenderTarget(4, 4, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false }),
+    fsCam: new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1),
+    post,
+    postScene: new THREE.Scene().add(new THREE.Mesh(quad, post)),
+    blit,
+    blitScene: new THREE.Scene().add(new THREE.Mesh(quad, blit)),
+  });
+}
+
+// ---------------------------------------------------------------- DOM input
+// Listeners only push raw records into the Input resource.
+export function setupUiSystem(world) {
+  const { canvas } = getResource(world, Settings);
+  const input = getResource(world, Input);
+  const push = (r) => input.pending.push(r);
+  canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    push({ t: 'wheel', dy: e.deltaY || e.deltaX });
+  }, { passive: false });
+  // keys typed in a field of the admin menu are not game keys
+  addEventListener('keydown', (e) => { if (!['INPUT', 'SELECT'].includes(e.target.tagName)) push({ t: 'key', key: e.key }); });
+  addEventListener('keyup', (e) => push({ t: 'keyup', key: e.key }));
+  canvas.addEventListener('mousedown', (e) => { if (e.button === 0) push({ t: 'click' }); });
+  // where the mouse is on the canvas: the target of a skill (systems/skills.js)
+  canvas.addEventListener('mousemove', (e) => { const r = canvas.getBoundingClientRect(); push({ t: 'move', x: e.clientX - r.left, y: e.clientY - r.top }); });
+  addEventListener('blur', () => push({ t: 'blur' }));
+  addEventListener('resize', () => push({ t: 'resize' }));
+  setTimeout(() => (document.getElementById('hint').style.opacity = 0), 7000);
+}
+
+// ---------------------------------------------------------------- grass + flowers
+// A small world has one square of grass and flowers over all of it; a big one (a FlyFF map: Settings coverChunks)
+// has squares around the human, made as it walks (systems/coverChunks.js)
+export function spawnGroundCoverSystem(world) {
+  const settings = getResource(world, Settings);
+  if (settings.coverChunks) return;
+  const rng = getResource(world, Random), GR = settings.grassHalf;
+  spawnCover(world, [-GR, GR, -GR, GR], () => nextRandom(rng));
+}
+
+// the grass tufts and the flowers of the box [x0, x1, z0, z1]: one GroundCover each ('grass', 'decor'), with the name
+// of their square (chunk), if any. rand: random numbers in [0, 1)
+export function spawnCover(world, [x0, x1, z0, z1], rand, chunk = null) {
+  const settings = getResource(world, Settings);
+  const meta = getResource(world, Assets).meta;
+  const MID = meta.mid;
+  const toward = settings.basis.F.clone().multiplyScalar(-0.25);   // decor sits a little in front
+  // on the level of the ground (cliffs); none on stairs or on the lip of a cliff
+  // (far below, like under a footprint). Grass tufts take the colour of the
+  // ground paint under them (gen/ground.js), so the edges of sand and paths are
+  // tufts too; none on pavement. Flowers and sprouts grow on grass only.
+  const { terrain, ground } = settings.land;
+  const groundY = (x, z) => (bareAt(terrain, x, z) ? -1000 : heightAt(terrain, x, z));
+  const paintAt = (x, z) => groundAt(ground, x, z);
+  const ROW = Object.fromEntries(['grass', ...PAINTS].map((name) => [name, paletteRows({ ground: name }).ground]));
+
+  const grass = [];
+  for (let x = x0; x < x1; x += 0.125)
+    for (let z = z0; z < z1; z += 0.125) {
+      const px = x + rand() * 0.125, pz = z + rand() * 0.125;
+      const paint = paintAt(px, pz);
+      const y = paint === 'pavement' ? -1000 : groundY(px, pz);
+      const cell = Math.floor(rand() * 4);
+      if (y > -1000) grass.push({ pos: [px, y, pz], light: [px, y, pz], param: [cell, MID.grass, ROW[paint], 0] });
+    }
+  const decor = [];
+  const sp = meta.sprites.decor.sprouts, fl = meta.sprites.decor.flowers;
+  for (let x = x0; x < x1; x += 0.75)
+    for (let z = z0; z < z1; z += 0.75) {
+      if (rand() > 0.8) continue;
+      const px = x + rand() * 0.75, pz = z + rand() * 0.75;
+      const roll = rand();
+      let cell, mid;
+      if (roll < 0.32) { cell = sp[Math.floor(rand() * 4)]; mid = MID.sprout; }
+      else if (roll < 0.58) { cell = fl[Math.floor(rand() * 4)]; mid = MID.flower_w; }
+      else if (roll < 0.68) { cell = fl[Math.floor(rand() * 4)]; mid = MID.flower_l; }
+      else { cell = sp[Math.floor(rand() * 4)]; mid = MID.leafdeco; }
+      const lift = mid === MID.leafdeco ? 0.02 : 0.1;
+      const y = paintAt(px, pz) === 'grass' ? groundY(px, pz) : -1000;
+      if (y > -1000) decor.push({ pos: [px + toward.x, y + lift + toward.y, pz + toward.z], light: [px, y, pz], param: [cell, mid, 0, 0] });
+    }
+
+  for (const [kind, items] of [['grass', grass], ['decor', decor]]) {
+    const n = items.length;
+    const pos = new Float32Array(n * 3), light = new Float32Array(n * 3), params = new Float32Array(n * 4);
+    const grid = new Map();
+    items.forEach((it, i) => {
+      pos.set(it.pos, i * 3);
+      light.set(it.light, i * 3);
+      params.set(it.param, i * 4);
+      const k = cellKey(it.light[0], it.light[2]);
+      if (!grid.has(k)) grid.set(k, []);
+      grid.get(k).push(i);
+    });
+    spawn(world, [GroundCover, { kind, pos, home: pos.slice(), light, params, grid, chunk }]);
+  }
+}
+
+// ---------------------------------------------------------------- the world
+// Ground, generated objects, clearings, clouds and the camera.
+export function spawnWorldSystem(world) {
+  const settings = getResource(world, Settings);
+  const land = settings.land;
+  spawn(world, [GroundPlane]);
+  for (const p of land.props) spawnProp(world, p);
+  for (const { object, x, z, rot, y = null, k = 0 } of land.objects) spawn(world, [Decor, { object, x, z, rot, y, k }]);
+  for (const g of land.glades) spawn(world, [Glade, { x: g.x, z: g.z, r: g.r, k: g.k }]);
+  // the lamps: every object whose type shines (gen/assets.js "light"); the dark over a cave takes no light
+  const gpu = getResource(world, Gpu);
+  gpu.lamps = land.props.flatMap((p) => {
+    const light = getType(p.asset).light, [, , size, palette] = p.name.split('/');
+    const at = light?.sizes?.[size];
+    if (!at) return [];
+    const color = new THREE.Color(typeof light.color === 'string' ? light.color : light.color[palette] ?? Object.values(light.color)[0]);
+    return [{ x: p.x, y: heightAt(land.terrain, p.x, p.z) + at[0], z: p.z, r: at[1], color, k: light.strength ?? 1, flicker: !!light.flicker, ph: p.x * 7.1 + p.z * 3.3 }];
+  });
+  if (land.terrain?.cave) gpu.shared.uNoLamp.value = paletteRows({ stone: land.terrain.top }).stone;
+  const [lo, hi] = land.clouds ?? [];
+  spawn(world, [CloudLayer, land.clouds ? { lo, hi } : {}]);
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.5, 200);
+  const { R, U, F } = settings.basis;
+  camera.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(R, U, F.clone().negate()));
+  camera.layers.set(0);
+  spawn(world, [CameraRig, { target: [...land.start] }], [OrthoView, { camera }]);
+  setResource(world, ActiveView, { camera });
+}
+
+export function spawnDustSystem(world) {
+  const settings = getResource(world, Settings);
+  const rng = getResource(world, Random);
+  if (settings.land.terrain?.cave) return;     // no motes over the dark of a cave
+  const GR = settings.grassHalf;
+  const n = 7000;
+  const boxMin = [-GR, 0.15, -GR], boxSize = [GR * 2, 4.5, GR * 2];
+  const positions = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    positions[i * 3] = boxMin[0] + nextRandom(rng) * boxSize[0];
+    positions[i * 3 + 1] = boxMin[1] + nextRandom(rng) * boxSize[1];
+    positions[i * 3 + 2] = boxMin[2] + nextRandom(rng) * boxSize[2];
+  }
+  spawn(world, [DustField, { positions, boxMin, boxSize }]);
+}

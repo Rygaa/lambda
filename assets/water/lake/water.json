@@ -1,0 +1,9 @@
+{
+  "about": "Water in round blobs, their edge waved by sine harmonics. radius: of a blob; blobs: how many; waves: harmonics on the edge; wobble: how much they wave it (share of the radius); spread: how far extra blobs sit from the others; blocks: it stops a walker.",
+  "builder": "water",
+  "variants": 3,
+  "palettes": ["clear", "swamp", "glacier"],
+  "sizes": {
+    "medium": {"form": "blobs", "radius": [2.6, 3.3], "blobs": [3, 4], "waves": 5, "wobble": [0.08, 0.15], "spread": 1.15, "blocks": true}
+  }
+}

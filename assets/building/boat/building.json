@@ -1,0 +1,9 @@
+{
+  "about": "A small wooden boat: an open hull pointed at the bow (+x), a white band under its rim, seats and two oars. Made by code (web/gen/builders/boat.js). length (x), width (z), depth: rim height at the middle, sheer: how much the rim rises at the bow, seats: how many seats.",
+  "builder": "boat",
+  "variants": 1,
+  "palettes": {"classic": {}},
+  "sizes": {
+    "small": {"length": 2.0, "width": 0.84, "depth": 0.34, "sheer": 0.14, "seats": 2}
+  }
+}
