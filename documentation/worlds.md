@@ -348,7 +348,8 @@ The fields of a world:
   lamps (and of the flashlights of a game mode) show their colours (`web/render/shaders.js` uNight).
 - `burn`: `true`: B next to a tree sets it on fire, voxel by voxel (`web/systems/burn.js`): the fire starts at the
   trunk voxel in front of the human and spreads to the voxels next to it, most upward; each voxel turns red, burns
-  (red, yellow, orange), its embers go dark, it turns black, then grey ash, and it is gone. The tree is gone at the end.
+  (red, yellow, orange), its embers go dark, it turns black. The leaves then turn to grey ash and are gone; the wood
+  stays black, so a black trunk and its branches are left (they still stop a walker).
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).

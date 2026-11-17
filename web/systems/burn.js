@@ -3,13 +3,13 @@
 // the human and spreads: a burning voxel gives heat to the 6 voxels next to it, most to the one above (fire goes up),
 // least to the one under it; a voxel catches fire when it has enough heat (the leaves sooner than the wood). Each voxel:
 //   it heats: it turns red;  it burns: red, yellow, orange, it gives heat;  embers: the glow goes dark;
-//   char: black, then grey ash, it shrinks;  then it is gone, and the voxels it hid show.
+//   char: black. A leaf voxel then turns to grey ash, shrinks and is gone (the voxels it hid show); the wood stays black.
 // The voxels are one instanced mesh in the G-buffer (render/shaders.js BURN_VERT, BURN_FRAG); the post pass colours them
 // by their heat (burnColor). The leaves (sprites) go when the voxel under them catches fire. Cubes of fire rise from the
 // voxels that burn (systems/blasts.js burnCube), ash falls, and one lamp of the fire lights around it (systems/clouds.js
-// lampSystem). When every voxel is gone, so is the tree.
+// lampSystem). When the leaves are gone and nothing burns, the black trunk and branches stay (they still stop a walker).
 import * as THREE from 'three';
-import { query, getComponent, hasComponent, getResource, destroyEntity } from '../ecs/world.js';
+import { query, getComponent, hasComponent, getResource } from '../ecs/world.js';
 import { Prop, SceneObject, Player, Transform } from '../components.js';
 import { Gpu, Settings, Input, Time } from '../resources.js';
 import * as S from '../render/shaders.js';
@@ -27,7 +27,7 @@ const INNER = 0.25;      // a voxel hidden inside the shape at first takes this 
                          // the inside first and the whole outside catches fire at once)
 const FAR = 0.35;        // ... and the voxels 2 away get this much of it, so a voxel heats (turns red) before the fire reaches it
 // by material: take (how much of the heat it takes), then the seconds it burns, its embers glow, its char lasts
-const WOOD = { take: 0.55, burn: 4, ember: 3, char: 12 };    // the black trunk stands until the leaves are gone
+const WOOD = { take: 0.55, burn: 4, ember: 3, char: Infinity };   // the wood stays black: it is never gone
 const LEAF = { take: 0.75, burn: 1.6, ember: 1.6, char: 4.5 };   // the black leaves hold until the fire is over them
 const CRUMBLE = 0.06;     // seconds more of char for each voxel under the top of the leaves (and a random part): they
                          // crumble more from the top down (they caught fire from the bottom up, so without it the top
@@ -56,7 +56,7 @@ function showButton(world) {
     document.body.append(button);
   }
   const trees = query(world, [Prop, SceneObject]).filter((e) => TREE.test(getComponent(world, e, Prop).set));
-  const state = fires.size ? 'fire' : trees.length ? 'tree' : 'gone';
+  const state = [...fires.values()].some((f) => !f.done) ? 'fire' : trees.some((e) => !fires.has(e)) ? 'tree' : 'gone';
   if (button.dataset.state === state) return;
   button.dataset.state = state;
   button.textContent = { tree: 'Burn the tree (B)', fire: 'Burning…', gone: 'Grow the tree back' }[state];
@@ -74,18 +74,16 @@ export function burnSystem(world) {
   gpu.fireLamps = [];
   if (!fires.size) return;
   const dt = Math.min(0.05, getResource(world, Time).dt);
+  let burning = false;
   for (const [entity, fire] of fires) {
     if (!hasComponent(world, entity, SceneObject)) { drop(fire); fires.delete(entity); continue; }
+    if (fire.done) { for (const mesh of fire.hidden) mesh.visible = false; continue; }   // the black wood that is left
     step(fire, dt);
     draw(world, fire, gpu);
-    if (fire.left === 0) {
-      drop(fire);
-      fires.delete(entity);
-      destroyEntity(world, entity);
-      gpu.shadowsDirty = true;
-    }
+    burning = true;
+    if (!fire.live && !fire.unlit) { fire.done = true; gpu.shadowsDirty = true; }
   }
-  if ((shadowIn -= dt) <= 0) { shadowIn = SHADOW_EVERY; gpu.shadowsDirty = true; }
+  if (burning && (shadowIn -= dt) <= 0) { shadowIn = SHADOW_EVERY; gpu.shadowsDirty = true; }
 }
 
 // B or the button: the nearest tree (any distance) catches fire at the voxel nearest to the chest of the human
@@ -117,7 +115,7 @@ export function ignite(world, entity, at) {
   let n = 0;
   for (let k = 0; k < grid.length; k++) if (vol.data[k]) grid[k] = n++;
   const fire = {
-    entity, so, size, nx, ny, nz, grid, n, left: n,
+    entity, so, size, nx, ny, nz, grid, n, unlit: n, done: false,
     at: new Int32Array(n), xyz: new Int16Array(n * 3), leaf: new Uint8Array(n), inner: new Uint8Array(n), more: new Float32Array(n), heat: new Float32Array(n), need: new Float32Array(n),
     lit: new Float32Array(n).fill(-1), gone: new Uint8Array(n), slot: new Int32Array(n).fill(-1), cellAt: new Int32Array(n), count: 0,
     active: new Int32Array(n), live: 0, jitter: new Float32Array(n), mid: new Float32Array(n), row: new Float32Array(n),
@@ -196,6 +194,7 @@ function open(f, k) {
 function light(f, c) {
   if (f.lit[c] >= 0 || f.gone[c]) return;
   f.lit[c] = 0;
+  f.unlit--;
   f.heat[c] = f.need[c];
   f.active[f.live++] = c;
 }
@@ -247,16 +246,17 @@ function step(f, dt) {
     }
     if (t >= total(f, c)) {
       f.gone[c] = 1;
-      f.left--;
       if (f.slot[c] >= 0 && f.fell.length < 40 && Math.random() < 0.1) f.fell.push(c);   // falls as ash
       hide(f, c);
       for (const o of offs) { const d = f.grid[f.at[c] + o]; if (d >= 0) show(f, d); }
+    } else if (!f.leaf[c] && t >= m.burn + m.ember * 1.4) {
+      // black wood: it does not change any more
     } else f.active[keep++] = c;
   }
   f.live = keep;
   for (const c of born) light(f, c);
   // nothing burns but voxels are left (a part the fire cannot reach): the hottest one catches fire
-  if (!f.live && f.left > 0) {
+  if (!f.live && f.unlit > 0) {
     let best = -1;
     for (let c = 0; c < f.n; c++) if (!f.gone[c] && f.lit[c] < 0 && (best < 0 || f.heat[c] > f.heat[best])) best = c;
     if (best >= 0) light(f, best);
