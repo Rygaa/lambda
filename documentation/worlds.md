@@ -199,7 +199,7 @@ The worlds:
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
-- `burn-test`: one oak on a small field, to try the voxel fire (`"burn": true`): stand next to the tree and press B.
+- `burn-test`: one oak on a small field, to try the voxel fire (`"burn": true`): press the "Burn the tree" button at the top, or B.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),

@@ -1,5 +1,5 @@
 {
-  "name": "Burn test: one tree on a small field, to try the voxel fire (systems/burn.js): stand near it and press B",
+  "name": "Burn test: one tree on a small field, to try the voxel fire (systems/burn.js): the button Burn the tree at the top, or B",
   "seed": 5,
   "size": 16,
   "start": [1.5, -0.4],

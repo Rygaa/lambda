@@ -19,7 +19,6 @@ import { lookOf, triangles, oneSided } from '../lib/voxels.js';
 import { burnCube } from './blasts.js';
 
 const PX = 2;            // a voxel of the fire: PX voxels of the look on each side
-const NEAR = 2.5;        // B lights the nearest tree this close (world units)
 const TREE = /^plant\//;
 const HEAT = 4;          // heat a burning voxel gives a voxel next to it, a second (at 1 it catches fire, about)
 const UP = 2.5, SIDE = 1, DOWN = 0.7;   // ... times this, by where that voxel is
@@ -39,10 +38,39 @@ const LAMP = new THREE.Color(1, 0.42, 0.08);
 
 const fires = new Map();    // tree entity -> its fire
 let shadowIn = 0;
+let button = null, clicked = false;   // the button of a burn world (top of the screen): burn the tree, then grow it back
+
+// the button: "Burn the tree (B)"; while it burns, it waits; when no tree is left, "Grow the tree back" reloads the page
+function showButton(world) {
+  if (!button) {
+    button = document.createElement('button');
+    button.id = 'burn';
+    Object.assign(button.style, { position: 'fixed', top: '12px', left: '50%', transform: 'translateX(-50%)', zIndex: 20,
+      font: 'bold 15px monospace', padding: '8px 16px', color: '#fff4e0', background: '#b8401a', border: '2px solid #ffb060',
+      borderRadius: '6px', cursor: 'pointer' });
+    button.addEventListener('click', () => {
+      button.blur();
+      if (button.dataset.state === 'gone') location.reload();
+      else clicked = true;
+    });
+    document.body.append(button);
+  }
+  const trees = query(world, [Prop, SceneObject]).filter((e) => TREE.test(getComponent(world, e, Prop).set));
+  const state = fires.size ? 'fire' : trees.length ? 'tree' : 'gone';
+  if (button.dataset.state === state) return;
+  button.dataset.state = state;
+  button.textContent = { tree: 'Burn the tree (B)', fire: 'Burning…', gone: 'Grow the tree back' }[state];
+  button.disabled = state === 'fire';
+  button.style.opacity = state === 'fire' ? '0.6' : '1';
+}
 
 export function burnSystem(world) {
   const settings = getResource(world, Settings), gpu = getResource(world, Gpu), input = getResource(world, Input);
-  if (settings.land.burn && input.pressed.some(({ key }) => key.toLowerCase() === 'b')) lightNearest(world);
+  if (settings.land.burn) {
+    if (clicked || input.pressed.some(({ key }) => key.toLowerCase() === 'b')) lightNearest(world);
+    clicked = false;
+    showButton(world);
+  }
   gpu.fireLamps = [];
   if (!fires.size) return;
   const dt = Math.min(0.05, getResource(world, Time).dt);
@@ -60,12 +88,12 @@ export function burnSystem(world) {
   if ((shadowIn -= dt) <= 0) { shadowIn = SHADOW_EVERY; gpu.shadowsDirty = true; }
 }
 
-// B: the nearest tree catches fire at the voxel nearest to the chest of the human
+// B or the button: the nearest tree (any distance) catches fire at the voxel nearest to the chest of the human
 function lightNearest(world) {
   const human = query(world, [Player])[0];
   if (human === undefined) return;
   const p = getComponent(world, human, Player);
-  let best = -1, bestD = NEAR;
+  let best = -1, bestD = Infinity;
   for (const e of query(world, [Prop, Transform, SceneObject])) {
     if (!TREE.test(getComponent(world, e, Prop).set) || fires.has(e)) continue;
     const t = getComponent(world, e, Transform), d = Math.hypot(t.x - p.x, t.z - p.z);
