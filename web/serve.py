@@ -15,8 +15,9 @@
 # its player (GET /rooms/<id>: {title, name, player}; name null: not logged in, player null the first time) and writes
 # it (POST /rooms/<id>, every 10 s and when it closes). saves/ (but the two admin files) is not served as files.
 # Logged in, a player has its username on the network too.
-#   python3 web/serve.py [port] [--lan]   then open http://127.0.0.1:8643/web/
+#   python3 web/serve.py [port] [--lan] [--prefix=/game_01]   then open http://127.0.0.1:8643/web/
 #   --lan: other computers of the network can open it too (http://<this computer>:8643/web/)
+#   --prefix=/game_01: also answers under /game_01/ (http://127.0.0.1:8701/game_01/web/), for a test branch online
 import http.server, functools, json, os, re, shutil, sys, base64, hashlib, hmac, struct, threading, secrets, time
 from http.cookies import SimpleCookie
 from urllib.parse import urlparse, parse_qs, unquote
@@ -34,7 +35,10 @@ files_lock = threading.Lock()
 ACCOUNTS = os.path.join(ROOT, 'saves', 'accounts.json')
 USERNAME = re.compile(r'^[A-Za-z0-9_]{3,20}$')
 MAX_ACCOUNTS = 5000
-COOKIE = 'lambda'
+# --prefix=/game_01: the server answers under that path too (a tunnel rule sends game.aissabenfodda.ca/game_01/ here),
+# and its login cookie has its own name, so it does not mix with the one of the live game
+PREFIX = next((a.split('=', 1)[1].rstrip('/') for a in sys.argv[1:] if a.startswith('--prefix=')), '')
+COOKIE = 'lambda' + PREFIX.replace('/', '_')
 YEAR = 365 * 24 * 3600
 
 rooms = {}                 # room -> [Peer], the first one is the host
@@ -123,6 +127,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store')
         super().end_headers()
 
+    # with --prefix, /game_01/web/... is read as /web/... (the address without it works too)
+    def parse_request(self):
+        if not super().parse_request():
+            return False
+        if PREFIX and self.path.startswith(PREFIX) and self.path[len(PREFIX):len(PREFIX) + 1] in ('', '/', '?'):
+            rest = self.path[len(PREFIX):]
+            self.path = rest if rest.startswith('/') else '/' + rest
+        return True
+
     # the address alone opens the game; no folder is listed, and no file or folder whose name starts with a dot (.git)
     # or of documentation/ is served
     def do_GET(self):
@@ -131,7 +144,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.network(parse_qs(url.query))
         if url.path == '/':
             self.send_response(302)
-            self.send_header('Location', '/web/' + ('?' + url.query if url.query else ''))
+            self.send_header('Location', PREFIX + '/web/' + ('?' + url.query if url.query else ''))
             self.end_headers()
             return
         if url.path.startswith('/saves/') and url.path not in SAVES:
@@ -152,6 +165,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if any(part.startswith('.') for part in path.split('/')) or path.startswith('/documentation'):
             self.send_error(404)
             return None
+        if PREFIX and not path.endswith('/') and os.path.isdir(self.translate_path(self.path)):
+            self.send_response(301)       # a folder without its last /: the address keeps the prefix
+            self.send_header('Location', PREFIX + path + '/' + ('?' + urlparse(self.path).query if urlparse(self.path).query else ''))
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            return None
         return super().send_head()
 
     def list_directory(self, path):
@@ -166,7 +185,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if cookie is not None:
             secure = '; Secure' if self.headers.get('X-Forwarded-Proto') == 'https' else ''
             age = YEAR if cookie else 0
-            self.send_header('Set-Cookie', f'{COOKIE}={cookie}; Path=/; Max-Age={age}; HttpOnly; SameSite=Lax{secure}')
+            self.send_header('Set-Cookie', f'{COOKIE}={cookie}; Path={PREFIX or "/"}; Max-Age={age}; HttpOnly; SameSite=Lax{secure}')
         self.end_headers()
         self.wfile.write(body)
 
@@ -377,5 +396,5 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 args = [a for a in sys.argv[1:] if not a.startswith('--')]
 port = int(args[0]) if args else 8643
 host = '0.0.0.0' if '--lan' in sys.argv else '127.0.0.1'
-print(f'http://127.0.0.1:{port}/web/', flush=True)
+print(f'http://127.0.0.1:{port}{PREFIX}/web/', flush=True)
 http.server.ThreadingHTTPServer((host, port), functools.partial(Handler, directory=ROOT)).serve_forever()

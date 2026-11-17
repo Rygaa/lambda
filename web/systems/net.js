@@ -45,7 +45,9 @@ export function setupNetSystem(world) {
   const net = getResource(world, Net), params = new URLSearchParams(location.search), settings = getResource(world, Settings);
   if (params.has('solo') || !/^https?:$/.test(location.protocol)) return;
   const room = (settings.room ? settings.room.id + '/' : '') + settings.worldName + (params.has('seed') ? '#' + params.get('seed') : '');
-  net.url = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/net?room=${encodeURIComponent(room)}`
+  // next to the page (../net), so a server under a path (game.aissabenfodda.ca/game_01/) gets it too
+  const path = new URL('../net', location.href).pathname;
+  net.url = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}${path}?room=${encodeURIComponent(room)}`
     + `&name=${encodeURIComponent(settings.room?.name ?? params.get('name') ?? '')}`;
   net.el = document.createElement('div');
   net.el.id = 'net';

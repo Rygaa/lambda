@@ -6,7 +6,17 @@ This guide says how to work with `main`, the official branch of Projet Lambda, a
 
 Since 2026-11-16, `main` is the only branch, with one commit: it was `attempt_4` (only the FlyFF characters and their
 clips, no Sidekick or Tripo bodies). The other branches and the old history were deleted. The rest of this guide tells
-that history with the old branch names, which no longer exist. `main` is not online: test it on port 8651.
+that history with the old branch names, which no longer exist.
+
+`main` is the live game (`https://game.aissabenfodda.ca/web/`, folder `project-lambda`). New work goes on a test
+branch made from `main`: `game_01`, `game_02`..., each in its own folder (`project-lambda-game_01`, a git worktree)
+and online at `https://game.aissabenfodda.ca/game_01/web/` (`how-we-work.md`, section 6). When it works, its files
+are copied to `main` with `git checkout game_01 -- <files>`, never with `git merge`.
+
+| Branch | Folder | Online | What it has |
+| --- | --- | --- | --- |
+| `main` | `project-lambda` | `/web/`, port 8643 | the live game |
+| `game_01` | `project-lambda-game_01` | `/game_01/web/`, port 8701 | `main`, for the next tests |
 
 ## 1. The idea
 

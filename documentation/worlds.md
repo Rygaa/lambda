@@ -223,7 +223,8 @@ or with `?solo`, the page plays alone.
   (`[net] Krilin (#2) joins beach: 2 player(s)`).
 - A fixed link with a Cloudflare tunnel: `cloudflared tunnel run lambda` next to `python3 web/serve.py`, with
   `~/.cloudflared/config.yml` sending `game.aissabenfodda.ca` to `http://localhost:8643`; then
-  `https://game.aissabenfodda.ca/web/?world=beach&player&name=<name>`.
+  `https://game.aissabenfodda.ca/web/?world=beach&player&name=<name>`. A test branch is online under its path
+  (`/game_01/web/`, `python3 web/serve.py 8701 --prefix=/game_01`): `how-we-work.md`, section 6.
 - Accounts: a username (3 to 20 letters, digits or `_`) and a password (6 characters or more), no email. The form
   has `Log in` and `Create account`; a cookie the page cannot read keeps the browser logged in until `Log out` (top
   right). The server keeps them in `saves/accounts.json`, the password as a salted PBKDF2 hash; a wrong password waits

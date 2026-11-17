@@ -4,11 +4,12 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 
 ## 1. Rules
 
-- `main` is the only branch (it was `attempt_4`); the other branches and the old history were deleted. The text below
-  still uses the old branch names (`documentation/branches.md`, section 0).
+- `main` (it was `attempt_4`) is the live game; the test branches are `game_01`, `game_02`..., each in its own folder.
+  The old branches and history were deleted. The text below still uses the old branch names
+  (`documentation/branches.md`, section 0).
 - Branches, moving work, and pushing: `documentation/branches.md`. Short version: new work goes on a
-  new `try/<name>` branch made from `main`; push only when the user asks. Never `git merge` into
-  an attempt branch: copy the files with `git checkout <branch> -- <files>`. `attempt_2` is `attempt_1` plus the voxel
+  test branch `game_NN` made from `main`; push only when the user asks. Never `git merge` into
+  `main`: copy the files with `git checkout <branch> -- <files>`. `attempt_2` is `attempt_1` plus the voxel
   look (the default, with a loading screen until all is in cubes), the FlyFF decor objects in our style, the sword hits
   of Quaternius, and the FlyFF city Flarine (`?world=flarine`). In Voxel the human always has cubes of 0.5 px. Two ki skills, the Kikoha (R) and the Kamehameha (T), dig holes in the ground. Which assets are FlyFF, ours or archived:
   `documentation/assets.md`, section 7. `attempt_3` is `attempt_2` plus play together: the pages open on the same
@@ -19,8 +20,10 @@ Read this first in a new chat. It says how to work on Projet Lambda, where the c
 - For visual choices, show options and let the user decide. Keep things simple.
 - Test scripts and pictures go in the scratchpad, never in the project.
 - Keep `documentation/worlds.md` and `documentation/branches.md` up to date.
-- `attempt_3` (deleted, with its folder) was the live game at `https://game.aissabenfodda.ca/web/` (section 6). Each time `attempt_3` changes, the
-  site must have the change and must run: do the steps of section 6 before saying the work is done.
+- `main` is the live game at `https://game.aissabenfodda.ca/web/` (section 6): the folder `project-lambda` runs it.
+  So new work never goes on `main` first: it goes on a test branch `game_01`, `game_02`... in its own folder, online at
+  `https://game.aissabenfodda.ca/game_01/web/` (section 6). Each time `main` changes, the site must run: do the checks
+  of section 6 before saying the work is done.
 
 ## 2. The engine
 
@@ -105,23 +108,47 @@ with Chromium and `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swifts
 - Play together: open two pages (two `browser.newContext()`) on the same world with `&name=`; tick both. The first one
   is the host. A page with `?solo` plays alone.
 
-## 6. The live game (game.aissabenfodda.ca)
+## 6. The live game and the test branches (game.aissabenfodda.ca)
 
-`attempt_3` is played online at `https://game.aissabenfodda.ca/web/?world=beach&player&name=<name>`. Two programs
-must run on this computer, each in its own terminal:
+| Address | Branch | Folder | Port |
+| --- | --- | --- | --- |
+| `https://game.aissabenfodda.ca/web/` | `main` (live) | `project-lambda` | 8643 |
+| `https://game.aissabenfodda.ca/game_01/web/` | `game_01` (test) | `project-lambda-game_01` | 8701 |
 
-- the game server, from the folder of `attempt_3`: `cd /Users/mohamedaissabenfodda/Workspace/projects/project-lambda-attempt_3 && python3 web/serve.py`
+A test branch `game_NN` is online at `/game_NN/` on port `87NN`. Add `?world=beach&player&name=<name>` to an address
+to play. Each folder has its own `saves/` (accounts, rooms), so a test never touches the players of the live game.
+The programs run on this computer, each in its own terminal:
+
+- the live game server: `cd /Users/mohamedaissabenfodda/Workspace/projects/project-lambda && python3 web/serve.py`
   (port 8643);
-- the Cloudflare tunnel: `cloudflared tunnel run lambda` (`~/.cloudflared/config.yml` sends `game.aissabenfodda.ca` to
-  `http://localhost:8643`).
+- the server of each test branch, with its path: `cd /Users/mohamedaissabenfodda/Workspace/projects/project-lambda-game_01 && python3 web/serve.py 8701 --prefix=/game_01`.
+  `--prefix` makes the server answer under `/game_01/` and gives its login cookie its own name; the page finds the
+  WebSocket next to itself (`../net`), so it works under any path;
+- the Cloudflare tunnel: `cloudflared tunnel run lambda`. `~/.cloudflared/config.yml` sends the paths of each test
+  branch to its port, and the rest of `game.aissabenfodda.ca` to `http://localhost:8643`:
 
-The site serves the files of that folder as they are, so a change committed there is on the site at once (the players
-reload their page). After each change of `attempt_3`:
+  ```yaml
+  ingress:
+    - hostname: game.aissabenfodda.ca
+      path: ^/game_01(/|$)
+      service: http://localhost:8701
+    - hostname: game.aissabenfodda.ca
+      service: http://localhost:8643
+    - service: http_status:404
+  ```
 
-1. Make the change in the folder `project-lambda-attempt_3` (on the branch `attempt_3`). A change on another branch
-   or folder is on the site only once it is copied there.
-2. If `web/serve.py` changed, stop the game server and start it again (the players reconnect by themselves).
-3. Check that both run and that the site answers: `curl -s -o /dev/null -w "%{http_code}\n" https://game.aissabenfodda.ca/web/`
-   must say `200`. `502` (Bad Gateway): the game server is stopped (nothing on port 8643: `lsof -iTCP:8643 -sTCP:LISTEN`),
-   start it again. `530` or no answer: the tunnel is stopped, start it again.
-4. Tests use another port (`python3 web/serve.py 8651`), never 8643: the players are there.
+A new test branch `game_02`:
+
+1. `git worktree add ../project-lambda-game_02 -b game_02 main` (from the folder `project-lambda`).
+2. Start its server: `python3 web/serve.py 8702 --prefix=/game_02`, from its folder.
+3. Add its rule to `~/.cloudflared/config.yml`, above the rule of port 8643, then stop the tunnel and start it again.
+
+The site serves the files of the folders as they are, so a change is online at once (the players reload their page).
+When a test branch is done, copy its files to `main` (`git checkout game_01 -- <files>`, from the folder
+`project-lambda`): they are live at once. After each change of `main` or of a test branch:
+
+1. If `web/serve.py` changed, stop that server and start it again (the players reconnect by themselves).
+2. Check that the site answers: `curl -s -o /dev/null -w "%{http_code}\n" https://game.aissabenfodda.ca/web/` (and
+   `/game_01/web/`) must say `200`. `502` (Bad Gateway): the server of that port is stopped
+   (`lsof -iTCP:8643 -sTCP:LISTEN`), start it again. `530` or no answer: the tunnel is stopped, start it again.
+3. Tests without the site use another port (`python3 web/serve.py 8651`), never 8643 or 87NN: the players are there.
