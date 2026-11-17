@@ -108,8 +108,7 @@ export function ignite(world, entity, at) {
   const so = getComponent(world, entity, SceneObject), settings = getResource(world, Settings), gpu = getResource(world, Gpu);
   const size = (lookOf(world)?.world.size ?? 1 / settings.ppu) * PX;
   const parts = so.meshes.filter(({ role }) => role !== 'leaves' && role !== 'water');
-  const vol = voxelize(parts.map(({ mesh }, c) => ({ tris: oneSided(triangles(mesh.userData.shape ?? mesh.geometry, mesh.matrix)), color: c })),
-    size, { normals: true, fill: true, view: [0, 1, 0] });
+  const vol = partsVolume(parts, size);
   if (!vol) return;
   const [nx, ny, nz] = vol.n, grid = new Int32Array(nx * ny * nz).fill(-1);
   let n = 0;
@@ -174,6 +173,33 @@ export function ignite(world, entity, at) {
   for (const c of [first, ...neighbours(fire, first)]) if (c >= 0) light(fire, c);
   fires.set(entity, fire);
   window.__burn = fires;   // for the tests
+}
+
+// the voxels of the parts of a tree, filled: each part alone (filled as one shape, so its inside takes its own colour:
+// in one volume the inside of the leaves next to the trunk took the colour of the trunk, a branch that is not there),
+// then all in one grid (the grid starts at 0 in the units of the tree for every part); the wood wins where they meet
+// (the trunk goes on inside the leaves). -> { min, n, data (part + 1, 0: empty), normals } like voxelize, or null
+function partsVolume(parts, size) {
+  const vols = parts.map(({ mesh }) => voxelize([{ tris: oneSided(triangles(mesh.userData.shape ?? mesh.geometry, mesh.matrix)), color: 0 }],
+    size, { normals: true, fill: true, view: [0, 1, 0] }));
+  if (!vols.some(Boolean)) return null;
+  const min = [0, 1, 2].map((a) => Math.min(...vols.filter(Boolean).map((v) => v.min[a])));
+  const n = [0, 1, 2].map((a) => Math.max(...vols.filter(Boolean).map((v) => v.min[a] + v.n[a])) - min[a]);
+  const data = new Uint32Array(n[0] * n[1] * n[2]), normals = new Uint16Array(data.length);
+  const order = parts.map((_, c) => c).sort((a, b) => (parts[a].role === 'trunk') - (parts[b].role === 'trunk'));
+  for (const c of order) {
+    const v = vols[c];
+    if (!v) continue;
+    const [vx, vy, vz] = v.n, [ox, oy, oz] = [0, 1, 2].map((a) => v.min[a] - min[a]);
+    for (let z = 0; z < vz; z++) for (let y = 0; y < vy; y++) for (let x = 0; x < vx; x++) {
+      const k = x + vx * (y + vy * z);
+      if (!v.data[k]) continue;
+      const K = x + ox + n[0] * (y + oy + n[1] * (z + oz));
+      data[K] = c + 1;
+      normals[K] = v.normals[k];
+    }
+  }
+  return { min, n, data, normals };
 }
 
 // ------------------------------------------------------------------ the voxels
