@@ -46,6 +46,7 @@ const INNER = 0.25;      // a voxel hidden inside the shape at first takes this 
 const FAR = 0.35;        // ... and the voxels 2 away get this much of it, so a voxel heats (turns red) before the fire reaches it
 const CRUMBLE = 0.06;    // (after "gone") seconds more black for each voxel under the top of its material (and a random
                          // part): it crumbles more from the top down (it caught fire from the bottom up)
+const JOIN_EVERY = 0.15;  // seconds: which voxels are still joined to the wood or the ground is looked at again (when one went)
 const GRAVITY = 9;       // world units a second, a second: a voxel that falls
 const MIN_POWER = 0.2;    // a burning voxel weaker than this gives no heat
 const JUMP_MAX = 2;      // world units: a burning object sets fire to an object at most this far (from a burning voxel to
@@ -239,6 +240,7 @@ export function ignite(world, entity, at, power = 1, near = false) {
     at: new Int32Array(n), xyz: new Int16Array(n * 3), mat: new Uint8Array(n), state: new Uint8Array(n), inner: new Uint8Array(n),
     more: new Float32Array(n), heat: new Float32Array(n), need: new Float32Array(n), lit: new Float32Array(n).fill(-1),
     slot: new Int32Array(n).fill(-1), cellAt: new Int32Array(n), count: 0, active: new Int32Array(n), live: 0,
+    joined: new Uint8Array(n).fill(1), cut: true, joinIn: 0,
     power: new Float32Array(n), src: new Float32Array(n), out: new Uint8Array(n),
     vel: new Float32Array(n), loose: new Uint8Array(n), off: new Float32Array(n), jitter: new Float32Array(n),
     mid: new Float32Array(n), row: new Float32Array(n), hidden: parts.map(({ mesh }) => mesh), sprites: [], fell: [],
@@ -421,6 +423,7 @@ function step(f, dt) {
       }
     }
     if (s === GONE) {
+      f.cut = true;
       if (f.slot[c] >= 0 && f.fell.length < 40 && Math.random() < 0.1) f.fell.push(c);   // falls as ash
       hide(f, c);
       for (const o of offs) { const d = f.grid[f.at[c] + o]; if (d >= 0) show(f, d); }
@@ -437,7 +440,8 @@ function step(f, dt) {
 // the leaves over the air holds, but a burnt one there (done burning, or put out) only if it hangs from green leaves or
 // wood beside or over it); one that did not burn (green) also holds on a voxel beside it. It falls on (faster
 // and faster) until it lands on a voxel or the ground: so the burnt leaves sink as the ones under them go and never
-// float over nothing, and the green ones of a fire that died stay; a voxel that falls breaks up. The rows are seen from the
+// float over nothing, and the green ones of a fire that died stay; a voxel (or a piece of voxels) not joined to the
+// wood or the ground falls too; a voxel that falls breaks up. The rows are seen from the
 // bottom up, so a voxel lands on the ones that already fell. off: how far it fell since its cell (drawn lower by that
 // much), it moves down a cell each time it passes one
 function fall(f, dt) {
@@ -446,13 +450,19 @@ function fall(f, dt) {
   // green leaves or wood: what burnt leaves can hang from
   const anchor = (k) => { const d = grid[k]; return d >= 0 && f.state[d] !== GONE && (f.state[d] < BURNING || !mat(f, d).falls); };
   f.was ??= Uint8Array.from(grid, (d) => (d >= 0 ? 1 : 0));   // where a voxel was at first
+  if (f.cut && ((f.joinIn -= dt) <= 0 || !f.live)) {   // (at once when nothing else changes, so the fire does not end first)
+   join(f, floor); f.cut = false; f.joinIn = JOIN_EVERY;
+  }
   for (let y = 1; y < ny - 1; y++) for (let z = 1; z < nz - 1; z++) for (let x = 1, k = x + nx * y + nxy * z; x < nx - 1; x++, k++) {
     const c = grid[k];
     if (c < 0 || f.state[c] === GONE || !mat(f, c).falls) continue;
-    const hangs = !f.was[k - nx] && !f.loose[c] && ((f.state[c] <= BURNING && !f.out[c]) ||
+    // not joined to the wood or the ground (alone, or a piece of leaves that holds on nothing): it falls, onto what is
+    // under it
+    const free = !f.joined[c] && !(y <= floor || held(k - nx));
+    const hangs = !free && !f.was[k - nx] && !f.loose[c] && ((f.state[c] <= BURNING && !f.out[c]) ||
       anchor(k + 1) || anchor(k - 1) || anchor(k + nxy) || anchor(k - nxy) || anchor(k + nx));
-    if (y <= floor || held(k - nx) || hangs ||
-        (f.state[c] < BURNING && (held(k + 1) || held(k - 1) || held(k + nxy) || held(k - nxy)))) { f.vel[c] = f.off[c] = 0; continue; }
+    if (!free && (y <= floor || held(k - nx) || hangs ||
+        (f.state[c] < BURNING && (held(k + 1) || held(k - 1) || held(k + nxy) || held(k - nxy))))) { f.vel[c] = f.off[c] = 0; continue; }
     if (!f.loose[c]) {
       // once it falls, it holds only on what is under it; it breaks up: grey ash in about a second, then gone (one that
       // did not burn, or that the rain put out, goes back to the voxels that change)
@@ -474,9 +484,32 @@ function fall(f, dt) {
       cy--;
     }
     if (at !== k) {
+      f.cut = true;
       f.at[c] = at;
       f.xyz[c * 3 + 1] = cy;
       show(f, c);
+    }
+  }
+}
+
+// which voxels are joined, voxel by voxel (the 6 next to each), to a voxel of a material that does not fall (the wood,
+// stone) or to the ground
+function join(f, floor) {
+  const { grid, n } = f, offs = offsets(f), stack = new Int32Array(n);
+  let top = 0;
+  f.joined.fill(0);
+  for (let c = 0; c < n; c++) {
+    if (f.state[c] === GONE || (mat(f, c).falls && f.xyz[c * 3 + 1] > floor)) continue;
+    f.joined[c] = 1;
+    stack[top++] = c;
+  }
+  while (top) {
+    const k = f.at[stack[--top]];
+    for (const o of offs) {
+      const d = grid[k + o];
+      if (d < 0 || f.joined[d] || f.state[d] === GONE) continue;
+      f.joined[d] = 1;
+      stack[top++] = d;
     }
   }
 }

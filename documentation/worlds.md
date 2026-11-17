@@ -358,6 +358,8 @@ The fields of a world:
   object sets fire to an object less than 2 units away (more often when closer and stronger), and that fire is weaker:
   a forest fire gets weaker from tree to tree, and a clearing, a path or water stops it. Rain (the second button) puts
   the burning voxels out (they stay black) and slows the fire.
+  A voxel that falls (the leaves) that is not joined, voxel by voxel, to the wood or the ground falls and crumbles, so
+  nothing floats.
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).
