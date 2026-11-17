@@ -3,13 +3,15 @@
 # Day Night ("daynight"): in the world night-forest, one player of the room (picked at random) is the monster, with a
 # sword; the others have a flashlight and check the crates of the world. The players win when every crate is checked,
 # the monster when every player is dead. A trap stops whoever walks on it for TRAP_STUCK seconds; it works again
-# TRAP_READY seconds after.
+# TRAP_READY seconds after. The monster burns a tree every BURN_EVERY seconds at most: it burns, then it is gone for the
+# round (burns: tree -> seconds since it caught fire).
 # A player is known by its "who": its account (online), else a name its tab keeps (web/systems/net.js). A player gone
 # from the room for longer than GONE seconds is dead; the monster gone that long: the players win.
 # Messages of a page (not passed on to the others):
 #   g-start {mode}   the owner of the room starts a round (on this computer, any page)
 #   g-check {i}      a player checked the crate i            g-trap {i}   this player walked on the trap i
 #   g-dead           this player is dead
+#   g-burn {i}       the monster burns the tree i (the i-th prop of the world: the same on every page)
 # The server sends to every page of the room (any of its worlds) {t: 'game', ...} (game_state), and g-error {text} to
 # the page whose g-start is refused.
 import json, os, random, threading, time
@@ -18,6 +20,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODES = {'daynight': 'night-forest'}   # mode -> its world (worlds/<world>.json, field "game")
 TRAP_STUCK = 5      # seconds
 TRAP_READY = 20     # seconds from the moment it caught someone until it works again
+BURN_EVERY = 10     # seconds between two trees the monster burns
 GONE = 45           # seconds (a page that changes world reloads and loads the new world meanwhile)
 
 games = {}          # room group (the room code; '' without a room) -> the round
@@ -35,7 +38,8 @@ def game_state(g):
             'monster': g['monster'], 'checks': g['checks'], 'checked': sorted(g['checked']),
             'players': [{'who': who, 'name': p['name'], 'dead': p['dead'], 'spot': p['spot']} for who, p in g['players'].items()],
             'traps': {str(i): {'who': t['who'], 'stuck': max(0, t['until'] - now), 'ready': max(0, t['ready'] - now)}
-                      for i, t in g['traps'].items() if t['ready'] > now}}
+                      for i, t in g['traps'].items() if t['ready'] > now},
+            'burns': {str(i): now - at for i, at in g['burns'].items()}}
 
 
 class Games:
@@ -82,6 +86,12 @@ class Games:
                 if not isinstance(i, int) or not 0 <= i < g['trap_count'] or g['traps'].get(i, {'ready': 0})['ready'] > now:
                     return
                 g['traps'][i] = {'who': peer.who, 'until': now + TRAP_STUCK, 'ready': now + TRAP_READY}
+            elif kind == 'g-burn':
+                i, now = msg.get('i'), time.time()
+                if peer.who != g['monster'] or not isinstance(i, int) or not 0 <= i < 100000 or i in g['burns'] \
+                        or now - max(g['burns'].values(), default=0) < BURN_EVERY - 0.5:
+                    return
+                g['burns'][i] = now
             elif kind == 'g-dead':
                 if peer.who == g['monster']:
                     return
@@ -115,7 +125,7 @@ class Games:
         now = time.time()
         games[peer.group] = {
             'id': f'{int(now)}-{random.randrange(1 << 30)}', 'mode': mode, 'world': world, 'phase': 'play', 'winner': None,
-            'monster': monster, 'checks': len(rec['checks']), 'checked': set(), 'trap_count': len(rec['traps']), 'traps': {},
+            'monster': monster, 'checks': len(rec['checks']), 'checked': set(), 'trap_count': len(rec['traps']), 'traps': {}, 'burns': {},
             'players': {w: {'name': players[w], 'dead': False, 'spot': i, 'seen': now} for i, w in enumerate(who)},
         }
         print(f'[game] {mode} starts in room {peer.group or "-"}: {len(who)} players, monster {players[monster]}', flush=True)

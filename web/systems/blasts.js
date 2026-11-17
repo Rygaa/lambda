@@ -210,6 +210,18 @@ function flyDirt(world, ki, rand, centre, way = null) {
   }
 }
 
+// fire (a tree that burns, systems/game.js): n cubes of flame that rise from a disc of radius r at the height y to about
+// h over it, and fade
+const FIRE = ['#fff2a0', '#ffc040', '#ff8a20', '#e04a10', '#7a2a10'];
+export function flames(world, x, y, z, r, h, n) {
+  const ki = getResource(world, Ki), color = colorOf(world), rng = getResource(world, Random), rand = () => nextRandom(rng);
+  for (let i = 0; i < n; i++) {
+    const a = rand() * 2 * Math.PI, d = Math.sqrt(rand()) * r, life = 0.4 + rand() * 0.6, up = rand() * h * 0.6;
+    ki.sparks.push({ x: x + Math.cos(a) * d, y: y + up, z: z + Math.sin(a) * d, vx: (rand() - 0.5) * 0.4, vy: (h - up) / life * (0.5 + rand() * 0.5),
+      vz: (rand() - 0.5) * 0.4, size: 0.08 + rand() * 0.08, color: color(FIRE[Math.min(FIRE.length - 1, Math.floor(rand() * 2.2 + (up / h) * 3))]), life, rise: true });
+  }
+}
+
 // a ball bursts: n cubes of its colours fly away from (x, y, z)
 function burst(ki, x, y, z, colors, n, speed, rand) {
   for (let i = 0; i < n; i++) {
@@ -223,7 +235,7 @@ function sparks(world, ki, dt, put) {
   const terrain = getResource(world, Settings).land.terrain;
   ki.sparks = ki.sparks.filter((s) => {
     s.life -= dt;
-    s.vy -= GRAVITY * dt;
+    if (!s.rise) s.vy -= GRAVITY * dt;
     s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt;
     if (s.life <= 0 || s.y < heightAt(terrain, s.x, s.z) - 0.6) return false;
     put(s.x, s.y, s.z, s.life < 0.25 ? Math.max(0.02, s.size * (s.life / 0.25)) : s.size, s.color);

@@ -299,6 +299,11 @@ Day Night (`night-forest`):
   dot at the side of the screen for each flashlight that is on out of sight.
 - A player cannot attack. F turns its flashlight on and off: a ring of light in front of it, which everyone sees.
   Near a crate, it holds E for 3 s to check it.
+- The monster burns a tree: B near it, one every 10 s. It burns for 5 s (flames and an orange light every page shows),
+  then it is gone until the end of the round: no tree to hide behind (the props keep their entity: `land.props[i].entity`;
+  the server sends which ones burn).
+- Each player the monster kills gives it one disguise (R): for 20 s it wears the clothes of that player, with no sword
+  and no circle of its own. A blow or a burn ends it.
 - A trap (a red ring) stops anyone who walks on it, the monster or a player, for 5 s; it works again 20 s after.
 - No skills, transformation or potions, and no names over the other players (they would show where they hide).
 - The players win when the 5 crates are checked; the monster wins when every player is dead. A dead player lies there
