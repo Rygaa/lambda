@@ -32,6 +32,7 @@ const LEAF = { take: 0.75, burn: 1.6, ember: 1.6, char: 4.5 };   // the black le
 const CRUMBLE = 0.06;     // seconds more of char for each voxel under the top of the leaves (and a random part): they
                          // crumble more from the top down (they caught fire from the bottom up, so without it the top
                          // floats over nothing)
+const GRAVITY = 9;        // world units a second, a second: a leaf voxel that caught fire with nothing under it falls
 const SHADOW_EVERY = 0.3;   // seconds: the shadow of the burning tree is drawn again
 const FIRE = ['#fff2a0', '#ffc040', '#ff8a20', '#e04a10'];
 const LAMP = new THREE.Color(1, 0.42, 0.08);
@@ -117,7 +118,7 @@ export function ignite(world, entity, at) {
     entity, so, size, nx, ny, nz, grid, n, unlit: n, done: false,
     at: new Int32Array(n), xyz: new Int16Array(n * 3), leaf: new Uint8Array(n), inner: new Uint8Array(n), more: new Float32Array(n), heat: new Float32Array(n), need: new Float32Array(n),
     lit: new Float32Array(n).fill(-1), gone: new Uint8Array(n), slot: new Int32Array(n).fill(-1), cellAt: new Int32Array(n), count: 0,
-    active: new Int32Array(n), live: 0, jitter: new Float32Array(n), mid: new Float32Array(n), row: new Float32Array(n),
+    active: new Int32Array(n), live: 0, vel: new Float32Array(n), loose: new Uint8Array(n), off: new Float32Array(n), jitter: new Float32Array(n), mid: new Float32Array(n), row: new Float32Array(n),
     hidden: parts.map(({ mesh }) => mesh), sprites: [], fell: [],
   };
   const nrm = new Float32Array(n * 3), dec = [0, 0, 0];
@@ -287,6 +288,46 @@ function step(f, dt) {
     for (let c = 0; c < f.n; c++) if (!f.gone[c] && f.lit[c] < 0 && (best < 0 || f.heat[c] > f.heat[best])) best = c;
     if (best >= 0) light(f, best);
   }
+  fall(f, dt);
+}
+
+// a leaf voxel that caught fire falls when the voxel under it is gone (the leaves hang as one piece: the bottom of the
+// leaves over the air holds), and falls on (faster and faster) until it lands on a voxel or the ground: so the burnt
+// leaves sink as the ones under them go, and never float over nothing. The
+// rows are seen from the bottom up, so a voxel lands on the ones that already fell. off: how far it fell since its
+// cell (drawn lower by that much), it moves down a cell each time it passes one
+function fall(f, dt) {
+  const { nx, ny, nz, grid } = f, nxy = nx * ny, floor = Math.max(1, Math.ceil(-f.min[1] - 0.5)), offs = offsets(f);
+  const held = (k) => { const d = grid[k]; return d >= 0 && !f.gone[d]; };
+  f.was ??= Uint8Array.from(grid, (d) => (d >= 0 ? 1 : 0));   // where a voxel was at first
+  for (let y = 1; y < ny - 1; y++) for (let z = 1; z < nz - 1; z++) for (let x = 1, k = x + nx * y + nxy * z; x < nx - 1; x++, k++) {
+    const c = grid[k];
+    if (c < 0 || f.gone[c] || !f.leaf[c] || f.lit[c] < 0) continue;
+    if (y <= floor || held(k - nx) || (!f.was[k - nx] && !f.loose[c])) { f.vel[c] = f.off[c] = 0; continue; }
+    if (!f.loose[c]) {
+      // once it falls, it holds only on what is under it; it breaks up: grey ash in about a second, then gone
+      f.loose[c] = 1;
+      f.lit[c] = Math.max(f.lit[c], total(f, c) - (0.5 + Math.random() * 0.9));
+    }
+    f.vel[c] += GRAVITY * dt;
+    f.off[c] += f.vel[c] * dt;
+    let at = k, cy = y;
+    while (f.off[c] >= f.size) {
+      if (cy <= floor || held(at - nx)) { f.vel[c] = f.off[c] = 0; break; }
+      f.off[c] -= f.size;
+      grid[at] = -1;
+      grid[at - nx] = c;
+      // the voxels next to the cell it left show
+      for (const o of offs) { const d = grid[at + o]; if (d >= 0) show(f, d); }
+      at -= nx;
+      cy--;
+    }
+    if (at !== k) {
+      f.at[c] = at;
+      f.xyz[c * 3 + 1] = cy;
+      show(f, c);
+    }
+  }
 }
 
 // the heat of a voxel for the post pass (render/shaders.js burnColor), and its size (it shrinks as ash)
@@ -315,7 +356,7 @@ function draw(world, f, gpu) {
     const x = k % f.nx, y = Math.floor(k / f.nx) % f.ny, z = Math.floor(k / nxy), e = size * scale, o = s * 16;
     M[o] = e; M[o + 1] = M[o + 2] = M[o + 3] = M[o + 4] = 0; M[o + 5] = e; M[o + 6] = M[o + 7] = M[o + 8] = M[o + 9] = 0;
     M[o + 10] = e; M[o + 11] = 0;
-    M[o + 12] = (x + mx + 0.5) * size; M[o + 13] = (y + my + 0.5) * size - (size - e) * 0.5; M[o + 14] = (z + mz + 0.5) * size; M[o + 15] = 1;
+    M[o + 12] = (x + mx + 0.5) * size; M[o + 13] = (y + my + 0.5) * size - (size - e) * 0.5 - f.off[c]; M[o + 14] = (z + mz + 0.5) * size; M[o + 15] = 1;
     A[s * 3] = f.mid[c]; A[s * 3 + 1] = f.row[c]; A[s * 3 + 2] = h;
   }
   f.mesh.count = f.count;
