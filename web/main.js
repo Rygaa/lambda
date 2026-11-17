@@ -47,6 +47,7 @@ import { npcSystem } from './systems/npcs.js';
 import { setupQuestSystem, questSystem } from './systems/quests.js';
 import { setupNetSystem, netSystem, netSendSystem } from './systems/net.js';
 import { setupRoomSystem, roomSystem } from './systems/room.js';
+import { setupGameSystem, gameSystem, gameHitSystem } from './systems/game.js';
 import { openRoom, accountInfo, HOME } from './lib/room.js';
 import { params, online } from './lib/address.js';
 import { START } from './lib/combat.js';
@@ -189,12 +190,14 @@ setResource(world, Res.Ki, Res.createKi());
 setResource(world, Res.Random, Res.createRandom(5));
 // play together (systems/net.js): ?name=<name> is the name the others see; ?solo: alone
 setResource(world, Res.Net, Res.createNet());
+// the game modes (systems/game.js, server/games.py)
+setResource(world, Res.Game, Res.createGame());
 
-for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem, setupSkillsSystem, setupTransformSystem, setupInventorySystem, setupQuestSystem, setupNetSystem, setupRoomSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
+for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem, setupSkillsSystem, setupTransformSystem, setupInventorySystem, setupQuestSystem, setupNetSystem, setupRoomSystem, setupGameSystem, spawnGroundCoverSystem, spawnWorldSystem, spawnDustSystem])
   addSystem(world, s, 'startup');
 for (const s of [
-  inputSystem, timeSystem, netSystem,
-  outfitSystem, transformSystem, skillSystem, blastSystem, craterSystem, playerSystem, auraSystem, portalSystem, monsterSystem, combatSystem, netSendSystem, roomSystem, dropSystem, questSystem, npcSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem, lampSystem,
+  inputSystem, timeSystem, netSystem, gameSystem,
+  outfitSystem, transformSystem, skillSystem, blastSystem, craterSystem, playerSystem, auraSystem, portalSystem, monsterSystem, combatSystem, gameHitSystem, netSendSystem, roomSystem, dropSystem, questSystem, npcSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem, lampSystem,
   coverChunkSystem, meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem, loadingSystem,
 ]) addSystem(world, s);

@@ -31,6 +31,16 @@ export function portalSystem(world) {
   }
 }
 
+// opens the world `to` with the human at `char` (null: the start of the world) and, when given, the player `data`
+// (playerData) put back there: a game mode (systems/game.js) sends the players of a room to its world and back
+export function goTo(to, char, data = null) {
+  try {
+    if (data) sessionStorage.setItem(CARRY, JSON.stringify(data));
+    sessionStorage.setItem(GO, JSON.stringify({ world: to, char }));
+  } catch (err) { console.error('goTo: no session', err); }
+  location.reload();
+}
+
 // keeps the player for the next world
 function carry(world, human) {
   try { sessionStorage.setItem(CARRY, JSON.stringify(playerData(world, human))); } catch (err) { console.error('portal: the player is not kept', err); }

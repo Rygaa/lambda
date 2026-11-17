@@ -21,7 +21,8 @@
 # world are together: the server gives each one a number, says who comes and who goes, and passes each message on to
 # the others (or to one of them: "to"). The first player is the host (it runs the monsters); when it goes, the player
 # who came next is the host. A 'ping' (a page alone sends one every 20 s, so a tunnel does not close the connection)
-# goes to nobody. Each join and leave is printed.
+# goes to nobody. Each join and leave is printed. The game modes (server/games.py): the g-... messages go to the server,
+# which keeps the round of the room and sends it to every page of the room.
 import http.server, functools, json, os, re, shutil, sys, base64, hashlib, hmac, struct, threading, secrets, time
 from http.cookies import SimpleCookie
 from urllib.parse import urlparse, parse_qs, unquote
@@ -37,6 +38,7 @@ except ModuleNotFoundError:
         os.execv(os.path.join(VENV, 'bin', 'python'), [os.path.join(VENV, 'bin', 'python'), os.path.abspath(__file__), *sys.argv[1:]])
     sys.exit('psycopg is missing: run ./setup.sh first')
 from server.db import Store, as_json, db_name
+from server.games import Games
 
 SERVED = ('/web/', '/assets/', '/worlds/')      # the folders served as files
 SETTINGS = {'/saves/admin.json': 'admin', '/saves/monsters.json': 'monsters'}
@@ -59,10 +61,11 @@ next_id = [1]
 
 
 class Peer:
-    def __init__(self, sock, name):
+    def __init__(self, sock, name, who='', group='', owner=False):
         self.sock, self.name, self.lock = sock, name, threading.Lock()
         self.id = next_id[0]
         next_id[0] += 1
+        self.who, self.group, self.owner = who, group, owner    # server/games.py: the player, its room, may start a game
 
     def send(self, message):
         data = json.dumps(message, separators=(',', ':')).encode()
@@ -73,6 +76,20 @@ class Peer:
                 self.sock.sendall(head + data)
         except OSError:
             pass
+
+
+def peers_of(group):
+    """the Peers of every world of a room (group: its code; '' without a room)"""
+    with rooms_lock:
+        return [p for key, peers in rooms.items() if group_of(key) == group for p in peers]
+
+
+def group_of(key):
+    """the room of a network room: '<code>/<world>' -> code; '<world>' (no room) -> ''"""
+    return key.split('/', 1)[0] if '/' in key else ''
+
+
+games = Games(peers_of)
 
 
 def hash_password(password, salt):
@@ -329,17 +346,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.wfile.flush()
         self.close_connection = True
         room = query.get('room', ['?'])[0]
-        me = Peer(self.connection, self.user() or query.get('name', [''])[0][:24])
+        group = group_of(room)
+        # who may start a game (server/games.py): the owner of the room; on this computer, any page
+        owner = 'Cf-Connecting-Ip' not in self.headers or bool(group and self.user() and (store.room(group) or {}).get('owner') == self.user())
+        me = Peer(self.connection, self.user() or query.get('name', [''])[0][:24], self.user() or 'tab:' + query.get('who', [''])[0][:40], group, owner)
         me.name = me.name or f'Player {me.id}'
         with rooms_lock:
             peers = rooms.setdefault(room, [])
             others = list(peers)
             peers.append(me)
         print(f'[net] {me.name} (#{me.id}) joins {room}: {len(others) + 1} player(s)', flush=True)
-        me.send({'t': 'welcome', 'id': me.id, 'name': me.name, 'host': (others or [me])[0].id,
-                 'peers': [{'id': p.id, 'name': p.name} for p in others]})
+        me.send({'t': 'welcome', 'id': me.id, 'name': me.name, 'who': me.who, 'owner': me.owner, 'host': (others or [me])[0].id,
+                 'peers': [{'id': p.id, 'name': p.name, 'who': p.who} for p in others]})
         for p in others:
-            p.send({'t': 'join', 'id': me.id, 'name': me.name})
+            p.send({'t': 'join', 'id': me.id, 'name': me.name, 'who': me.who})
+        games.welcome(me)
         try:
             while True:
                 frame = read_frame(self.rfile)
@@ -356,6 +377,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 except ValueError:
                     continue
                 if message.get('t') == 'ping':
+                    continue
+                if str(message.get('t', '')).startswith('g-'):
+                    games.message(me, message)
                     continue
                 message['from'] = me.id
                 to = message.pop('to', None)

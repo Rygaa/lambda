@@ -180,7 +180,8 @@ The worlds:
   around it, and a small boat at the shore. Walk to the boat: it takes the human to `beach` (recipe `portals`, section 2).
 - `beach`: where the boat lands: the ocean on the south, a beach with one line of palms, then a dirt path north between
   two rows of oaks, past 10 Aibatts (level 1), to Chichi's house at its end, under the mountains. Chichi stands in
-  front of it and gives the quest "Too many Aibatts" (recipe `npcs`, section "Quests" below). Behind her house, a
+  front of it: near her, E opens the Game modes window (section "Game modes" below), with a button for her quest "Too
+  many Aibatts" (recipe `npcs`, section "Quests" below). Behind her house, a
   smaller path goes to a cave mouth in the mountain (`building/cave-mouth`): it opens `cave`. The human arrives on
   the sand next to the boat; the boat takes it back to `kame-island`.
 - `cave`: the mine in the mountain, where the Aibatts come from (references: Pixel Mines Kit, Petixel Mines, Solaria
@@ -190,6 +191,11 @@ The worlds:
   from torches, the lanterns of the mine frames and the glowing crystals (section 6, lamps), and daylight falls at
   the entrance (one clearing). Small Aibatts and Aibatts in the rooms. Walk back south out of the tunnel to go out to
   `beach`.
+- `night-forest`: the world of the game mode Day Night (section "Game modes" below). 48 wide, at night (`"night": 1`):
+  mountains on the north, west and east, the ocean and a beach on the south. A forest of pines, firs and a few oaks,
+  a dirt path from the beach to the middle, and 4 clearings. 5 crates to check (one in each clearing, one at the end
+  of the path) and 6 traps (on the path and in the clearings). The players start on the beach, the monster in the
+  north.
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
@@ -277,6 +283,32 @@ title and its step are shown at the top left. A portal takes them along (`portal
   Chichi then says that they all come from the cave behind her house, led by the Captain Aibatt: defeat it in `cave`,
   then come back to her.
 
+### Game modes
+
+Near Chichi, E opens the Game modes window (`web/systems/game.js`; a person with `"modes": true` in `npcs.json`). It
+lists the modes, with a Start button, and a button that opens her talk. Only the owner of the room can start (on this
+computer, any page); the server keeps the round of the room (`server/games.py`, not saved in the database). It takes
+every player of the room, in any of its worlds (at least 2), picks one at random to be the monster, and sends them all
+to the world of the mode. Each page keeps where it was and its player, and goes back there after the round, as it was
+(the room save in the world of the mode keeps that place too). A page that opens the world of a mode with no round for
+it goes back.
+
+Day Night (`night-forest`):
+
+- The monster has a sword; F or a click hits, and 3 blows kill a player. It sees a small circle around itself, and a
+  dot at the side of the screen for each flashlight that is on out of sight.
+- A player cannot attack. F turns its flashlight on and off: a ring of light in front of it, which everyone sees.
+  Near a crate, it holds E for 3 s to check it.
+- A trap (a red ring) stops anyone who walks on it, the monster or a player, for 5 s; it works again 20 s after.
+- No skills, transformation or potions, and no names over the other players (they would show where they hide).
+- The players win when the 5 crates are checked; the monster wins when every player is dead. A dead player lies there
+  and watches. The banner says who won, and 6 s later everyone goes back. A player gone from the room for 45 s is dead;
+  the monster gone for 45 s: the players win.
+
+The recipe of the world of a mode has `"game"`: `mode`, `checks` (the crates, [[x, z], ...]: put a crate prop there),
+`traps` ([[x, z], ...]), `monster` (its start), `players` (their starts, one per player), `back` (`{ world, char }`:
+where a page with no kept place goes back).
+
 ## 2. A recipe
 
 A world is a JSON file in `worlds/`. The code reads it, makes the shapes with math (`web/gen/builders/`), and places
@@ -306,6 +338,9 @@ The fields of a world:
 - `pavement`: how the `pavement` paint looks: `tiles` (grey slabs, default) or `bricks` (brown bricks, each row half
   a brick off the one before, like the streets of Flarine).
 - `rays`: the strength of the light rays, 0 to 1 (default 1).
+- `night`: how dark, 0 (day, default) to 1: the world and the people are dark and blue, and only the rings of the
+  lamps (and of the flashlights of a game mode) show their colours (`web/render/shaders.js` uNight).
+- `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).
 - `ground`: paints on the grass (section 5).

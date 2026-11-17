@@ -1,0 +1,39 @@
+{
+  "name": "Night forest: the world of the game mode Day Night (systems/game.js). A small dark forest closed by mountains on the north, west and east, and by a beach on the south; 5 crates to check and 6 traps",
+  "seed": 23,
+  "size": 48,
+  "start": [0, 13],
+  "rays": 0,
+  "clouds": "few",
+  "night": 1,
+  "borders": {
+    "north": "terrain/mountain/medium",
+    "west": "terrain/mountain/medium",
+    "east": "terrain/mountain/medium",
+    "south": "water/ocean/medium"
+  },
+  "clearings": {
+    "at": [[-10, -6.5], [10, -7.5], [-10, 7.5], [10, 7.5]],
+    "radius": [4.4, 4.8]
+  },
+  "ground": [
+    { "paint": "sand", "beach": 6 },
+    { "paint": "dirt", "path": [[0, 12], [-1, 6], [1, 0], [0, -4]], "width": 1.4 }
+  ],
+  "props": [
+    { "asset": "building/crates/small", "at": [[-10, -9, 0.4], [10, -10, -0.3], [0, -3, 0], [-10, 5, 1.1], [10, 5, -0.8]] },
+    { "asset": "plant/pine/medium", "amount": "some", "spacing": 3.2, "avoid": "clearings", "on": "grass", "palette": ["pine"] },
+    { "asset": "plant/fir/medium", "amount": "some", "spacing": 2.8, "avoid": "clearings", "on": "grass", "palette": ["pine"] },
+    { "asset": "plant/oak/small", "amount": "few", "spacing": 3.4, "avoid": "clearings", "on": "grass", "palette": ["pine", "green"] },
+    { "asset": "plant/bush/medium", "amount": "some", "avoid": "clearings", "on": "grass", "palette": ["pine"] },
+    { "asset": "rock/round/small", "count": 8, "on": "sand", "gap": 0.6, "palette": ["sand", "grey"] }
+  ],
+  "game": {
+    "mode": "daynight",
+    "checks": [[-10, -9], [10, -10], [0, -3], [-10, 5], [10, 5]],
+    "traps": [[-10, -3], [10, -4], [1, 1], [-0.8, 7], [-10, 10.5], [10, 10.5]],
+    "monster": [0, -12],
+    "players": [[-4, 13], [-2, 13.5], [0, 13], [2, 13.5], [4, 13], [-6, 12.5], [6, 12.5], [-1, 11.5]],
+    "back": { "world": "beach", "char": [-0.4, -9.6] }
+  }
+}

@@ -42,10 +42,10 @@ export const Blast = defineComponent('Blast', () => ({
 // lib/character.js dress, in its outfit), where it is now and where its last message said it is (goal: x, y, z, rot),
 // its clip and the time in it, dead (lies down), its HP, level, outfit, the skill step it plays now (act); worn: the
 // outfit and look its body is made in; busy: its body is being made; next: the new body, made; el: its name and HP bar
-// over its head
+// over its head; who: its player for the game modes (systems/game.js); light: its flashlight is on
 export const Peer = defineComponent('Peer', () => ({
   id: 0, name: '', group: null, meshes: [], clips: null, fps: 15, foot: 0, x: 0, y: 0, z: 0, rot: 0, goal: null, state: 'idle', t: 0,
-  dead: false, hp: 1, max: 1, level: 1, outfit: null, worn: '', act: null, busy: false, next: null, el: null,
+  dead: false, hp: 1, max: 1, level: 1, outfit: null, worn: '', act: null, busy: false, next: null, el: null, who: '', light: false,
 }));
 
 // the transformation of the human (lib/form.js, systems/transform.js, skills.json transform): phase null (as it is),

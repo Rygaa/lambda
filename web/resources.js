@@ -147,6 +147,13 @@ export const createNpcs = (json) => ({ ...json, bakes: new Map(), placed: false 
 
 // the quests (assets/quests/quests.json, systems/quests.js): quest id -> { step, count } while it runs or is done;
 // talk: the person the human talks to now (an id of npcs.json), or null
+// the game modes (systems/game.js, server/games.py): round: the round of the room the server sent (null: none); who,
+// owner: this page on the server (its player, it may start a round); inbox: the messages of the server and of the other
+// players for the game; menu: the Game modes window is open; light: the flashlight is on; stuck: seconds a trap holds
+// the human still; noAttack: the human cannot attack (a player of Day Night)
+export const Game = 'Game';
+export const createGame = () => ({ round: null, who: '', owner: false, inbox: [], menu: false, light: false, stuck: 0, noAttack: false });
+
 export const Quests = 'Quests';
 export const createQuests = (json) => ({ quests: json.quests, state: {}, talk: null, version: 0 });
 

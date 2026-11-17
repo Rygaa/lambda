@@ -1,11 +1,12 @@
 // The people who do not fight (recipe "npcs", assets/character/npc/npcs.json, lib/npc.js). Each one stands at its
 // place playing its idle clip, its name over its head, and stops walkers. When the human comes near (TALK), it turns
-// to the human and its name says "E: talk"; the E key (or a click on its name) opens the talk (systems/quests.js).
+// to the human and its name says "E: talk"; the E key (or a click on its name) opens the talk (systems/quests.js), or
+// for a person with "modes" (Chichi) the Game modes window (systems/game.js).
 // When the look changes, it gets the meshes of the new look once they are made.
 import * as THREE from 'three';
 import { query, getComponent, getResource, spawn } from '../ecs/world.js';
 import { Npc, Player, Blocker } from '../components.js';
-import { Settings, Time, Gpu, Tops, Input, Npcs, Quests } from '../resources.js';
+import { Settings, Time, Gpu, Tops, Input, Npcs, Quests, Game } from '../resources.js';
 import { groundAt } from '../lib/walk.js';
 import { showFrame } from '../lib/bake.js';
 import { bakeNpc, npcLook, FPS } from '../lib/npc.js';
@@ -48,7 +49,7 @@ export function npcSystem(world) {
     const at = toScreen(world, n.x, y + n.height + 0.25, n.z);
     if (at) n.el.style.transform = `translate(${at[0]}px, ${at[1]}px)`;
     n.el.classList.toggle('near', n.near);
-    if (n.near && input.pressed.some(({ key }) => key.toLowerCase() === 'e')) getResource(world, Quests).talk = n.id;
+    if (n.near && input.pressed.some(({ key }) => key.toLowerCase() === 'e')) talk(world, n.id);
   }
 }
 
@@ -62,11 +63,17 @@ function place(world, { id, x, z, rot }, baked, drawn) {
   const el = document.createElement('div');
   el.className = 'npc';
   el.innerHTML = `<b>${who.name}</b><span>E: talk</span>`;
-  el.addEventListener('click', () => { getResource(world, Quests).talk = id; });
+  el.addEventListener('click', () => talk(world, id));
   document.getElementById('hud').append(el);
   spawn(world, [Npc, { id, name: who.name, group, meshes: drawn.meshes, clips: drawn.clips, look: drawn.look, fps: FPS,
     foot: -box.min.y * k, height: (box.max.y - box.min.y) * k, x, z, rot, home: rot, el }],
   [Blocker, { x, z, r: 0.3, h: 1.2 }]);
+}
+
+// a person with "modes" (npcs.json) opens the Game modes window (systems/game.js), which can open the talk; else the talk
+function talk(world, id) {
+  if (getResource(world, Npcs).people[id].modes) getResource(world, Game).menu = id;
+  else getResource(world, Quests).talk = id;
 }
 
 function restyle(world, n) {

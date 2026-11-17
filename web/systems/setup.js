@@ -40,6 +40,7 @@ export function setupGpuSystem(world) {
     uLamps: { value: Array.from({ length: S.LAMPS }, () => new THREE.Vector4(0, 0, 0, 0)) },
     uLampCol: { value: Array.from({ length: S.LAMPS }, () => new THREE.Vector4(0, 0, 0, 0)) },
     uNoLamp: { value: -1 },
+    uNight: { value: settings.land.night ?? 0 },
   };
 
   const SM = Math.min(4096, renderer.capabilities.maxTextureSize);

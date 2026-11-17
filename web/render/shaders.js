@@ -360,7 +360,29 @@ void main() {
 }
 `;
 
-export const FINE_FRAG = COMMON + /* glsl */ `
+export const LAMPS = 24;       // the lamps the post pass takes (the nearest to the camera)
+// night (uNight, recipe "night"): how much a lamp lights the point P (0: dark, else the band of its strongest ring, as
+// in the post pass), so the bodies are dark like the world and get their colours back in the rings
+const NIGHT_LIT = /* glsl */ `
+uniform float uNight;
+uniform vec4 uLamps[${LAMPS}];
+uniform vec4 uLampCol[${LAMPS}];
+float lampLit(vec3 P) {
+  float lit = 0.0;
+  for (int i = 0; i < ${LAMPS}; i++) {
+    if (uLamps[i].w <= 0.0) continue;
+    float k = 1.0 - length(P - uLamps[i].xyz) / uLamps[i].w;
+    if (k <= 0.0) continue;
+    lit = max(lit, k > 0.66 ? 0.34 : k > 0.36 ? 0.18 : 0.07);
+  }
+  return lit;
+}
+vec3 atNight(vec3 col, vec3 P) {
+  if (uNight <= 0.0) return col;
+  return mix(col, mix(col * vec3(0.025, 0.035, 0.075), col, clamp(lampLit(P) * 2.6, 0.0, 1.0)), uNight);
+}
+`;
+export const FINE_FRAG = COMMON + NIGHT_LIT + /* glsl */ `
 uniform sampler2D uMap;
 uniform sampler2D tNorm;   // the G-buffer: view normal, linear depth
 uniform vec2 uOffset;
@@ -387,7 +409,7 @@ void main() {
   if (t.a < uCut) discard;
   float lum = dot(t.rgb, vec3(0.3, 0.59, 0.11));
   vec3 a = pow(mix(t.rgb, vec3(1.0, 0.74, 0.16) * (0.55 + 0.95 * smoothstep(0.02, 0.35, lum)), uGold), vec3(2.2));
-  vec3 col = lv > 0.09 ? a : a * mix(vec3(0.52, 0.56, 0.74), vec3(0.98, 0.8, 0.58), uGlow);
+  vec3 col = atNight(lv > 0.09 ? a : a * mix(vec3(0.52, 0.56, 0.74), vec3(0.98, 0.8, 0.58), uGlow), vW);
   outColor = vec4(pow(col, vec3(1.0 / 2.2)), 1.0);
 }
 `;
@@ -582,7 +604,6 @@ void main() {
 }
 `;
 
-export const LAMPS = 24;       // the lamps the post pass takes (the nearest to the camera)
 export function postFrag(pal) {
   return COMMON + paletteGlsl(pal) + `const int LAMPS = ${LAMPS};\n` + /* glsl */ `
 uniform sampler2D tData;
@@ -601,6 +622,7 @@ uniform float uTime;
 uniform vec4 uLamps[LAMPS];    // lamps (systems/clouds.js lampSystem): x, y, z, radius (0: none)
 uniform vec4 uLampCol[LAMPS];  // ... their colour (linear) and strength
 uniform float uNoLamp;         // the stone row lamps do not light (the dark over a cave), or -1
+uniform float uNight;          // 0 day, 1 night: the world is dark and blue, the lamps show it in their rings
 out vec4 outColor;
 
 const ivec2 O4[4] = ivec2[](ivec2(1, 0), ivec2(-1, 0), ivec2(0, 1), ivec2(0, -1));
@@ -743,8 +765,12 @@ void main() {
   vec3 P = uCamPos + uViewR * ndc.x * uHalf.x + uViewU * ndc.y * uHalf.y + uViewF * d;
   // lamps: flat rings of their colour around them (3 bands, a 1px checker where two bands meet), the strongest
   // lamp wins, so the rings stay flat like the palette bands
+  // night: the world is dark and blue; in the rings of a lamp it gets its colours back (3 bands, like the glow)
+  vec3 day = col;
+  if (uNight > 0.0) col = mix(col, col * vec3(0.025, 0.035, 0.075), uNight);
   if (d > 0.0 && !(isMid(mid, 2.0) > 0.5 && abs(D.w - uNoLamp) < 0.5)) {
     vec3 glow = vec3(0.0);
+    float lit = 0.0;
     float chk = mod(float(p.x + p.y), 2.0) - 0.5;
     for (int i = 0; i < LAMPS; i++) {
       if (uLamps[i].w <= 0.0) continue;
@@ -753,7 +779,9 @@ void main() {
       float band = k > 0.66 ? 0.34 : k > 0.36 ? 0.18 : 0.07;
       vec3 c = uLampCol[i].rgb * band * uLampCol[i].a;
       if (dot(c, vec3(1.0)) > dot(glow, vec3(1.0))) glow = c;
+      lit = max(lit, band);
     }
+    col = mix(col, day, clamp(lit * 2.6, 0.0, 1.0) * uNight);
     col += glow;
   }
   float len = max(0.0, (uVolTop - P.y) / (-uViewF.y));

@@ -26,12 +26,14 @@ export function cloudSystem(world) {
   });
 }
 
-// The lamps (systems/setup.js gpu.lamps): the nearest to the camera go to the post pass (render/shaders.js LAMPS);
-// a flame flickers (its rings grow and shrink a little)
+// The lamps (systems/setup.js gpu.lamps) and the lamps that move (gpu.moving: the flashlights and traps of a game,
+// systems/game.js, set each frame): the nearest to the camera go to the post pass (render/shaders.js LAMPS); a lamp
+// that moves comes first. A flame flickers (its rings grow and shrink a little)
 export function lampSystem(world) {
   const gpu = getResource(world, Gpu), u = gpu.shared, t = getResource(world, Time).now / 1000;
   const rig = query(world, [CameraRig])[0], at = rig === undefined ? [0, 0, 0] : getComponent(world, rig, CameraRig).target;
-  const near = (gpu.lamps ?? []).map((l) => [Math.hypot(l.x - at[0], l.z - at[2]), l]).sort((a, b) => a[0] - b[0]);
+  const near = [...(gpu.moving ?? []).map((l) => [-1, l]),
+    ...(gpu.lamps ?? []).map((l) => [Math.hypot(l.x - at[0], l.z - at[2]), l]).sort((a, b) => a[0] - b[0])];
   u.uLamps.value.forEach((v, i) => {
     const l = near[i]?.[1];
     if (!l) { v.set(0, 0, 0, 0); return; }

@@ -22,11 +22,13 @@
 //   kill   the host: the monster m died of your blow       blow   the host: the monster m hits you
 //   spawn  a guest asks the host for a monster (its admin menu): type, x, z, rot
 //   welcome, join, leave: the server (who is here, who comes and goes, who is the host)
+//   state also has light (its flashlight is on); pvp: the monster of Day Night hits you (systems/game.js); game,
+//   g-error: the server, the round of the room (server/games.py); g-...: to the server (toServer)
 import { params } from '../lib/address.js';
 import * as THREE from 'three';
 import { query, getComponent, getResource, sendEvent, spawn, destroyEntity, added } from '../ecs/world.js';
 import { Player, Peer, Monster, Health, Stats, Skills, Blast } from '../components.js';
-import { Net, Gpu, Time, Bestiary, Wardrobe, Skillbook, Settings, runsMonsters } from '../resources.js';
+import { Net, Gpu, Time, Bestiary, Wardrobe, Skillbook, Settings, Game, runsMonsters } from '../resources.js';
 import { MonsterBlow } from '../events.js';
 import { strike, killed } from './combat.js';
 import { dress, unitScale, ONCE } from '../lib/character.js';
@@ -49,12 +51,27 @@ export function setupNetSystem(world) {
   // next to the page (../net), so a server under a path (game.aissabenfodda.ca/game_01/) gets it too
   const path = new URL('../net', location.href).pathname;
   net.url = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}${path}?room=${encodeURIComponent(room)}`
-    + `&name=${encodeURIComponent(settings.room?.name ?? params.get('name') ?? '')}`;
+    + `&name=${encodeURIComponent(settings.room?.name ?? params.get('name') ?? '')}&who=${tabId()}`;
   net.el = document.createElement('div');
   net.el.id = 'net';
   document.body.append(net.el);
   net.role = 'wait';
   connect(net);
+}
+
+// the player of this tab for the game modes when it has no account (server/games.py): kept while the tab lives, so it
+// is the same player after a reload into another world
+function tabId() {
+  try {
+    let id = sessionStorage.getItem('lambda-who');
+    if (!id) sessionStorage.setItem('lambda-who', id = Math.random().toString(36).slice(2, 12));
+    return id;
+  } catch { return Math.random().toString(36).slice(2, 12); }
+}
+
+// a message to the server itself (the game modes: g-...), even when this page is alone in its world
+export function toServer(net, msg) {
+  if (net.ws?.readyState === WebSocket.OPEN && net.id) net.ws.send(JSON.stringify(msg));
 }
 
 // a new connection; until the server says who is here, a page that plays alone goes on alone
@@ -91,6 +108,7 @@ function receive(world, net, msg) {
     case 'welcome': {
       const was = net.role;
       Object.assign(net, { id: msg.id, name: msg.name, host: msg.host, role: msg.host === msg.id ? 'host' : 'guest', outfitSent: null });
+      Object.assign(getResource(world, Game), { who: msg.who, owner: msg.owner, welcomed: getResource(world, Time).now });
       // a guest makes no monster of the world recipe: the host sends them. Back after playing alone, it drops its own
       if (net.role === 'guest') {
         b.requests = [];
@@ -100,10 +118,12 @@ function receive(world, net, msg) {
           net.monsters.clear(); net.asked.clear(); net.gone.clear();
         }
       }
-      for (const { id, name } of msg.peers) addPeer(world, net, id, name);
+      for (const { id, name, who } of msg.peers) addPeer(world, net, id, name, who);
       break;
     }
-    case 'join': addPeer(world, net, msg.id, msg.name); net.outfitSent = null; break;   // it needs the outfit
+    case 'join': addPeer(world, net, msg.id, msg.name, msg.who); net.outfitSent = null; break;   // it needs the outfit
+    // the game modes (systems/game.js): the round of the room, a refused start, a blow of the monster
+    case 'game': case 'g-error': case 'pvp': getResource(world, Game).inbox.push(msg); break;
     case 'leave':
       removePeer(world, net, msg.id);
       net.host = msg.host;
@@ -121,7 +141,7 @@ function receive(world, net, msg) {
       if (!peer) break;
       peer.goal = { x: msg.x, y: msg.y, z: msg.z, rot: msg.rot };
       if (peer.state !== msg.state || Math.abs(peer.t - msg.tt) > 0.25) peer.t = msg.tt;
-      Object.assign(peer, { state: msg.state, dead: msg.dead, hp: msg.hp, max: msg.max, level: msg.level, act: msg.act });
+      Object.assign(peer, { state: msg.state, dead: msg.dead, hp: msg.hp, max: msg.max, level: msg.level, act: msg.act, light: !!msg.light });
       if (msg.outfit) peer.outfit = msg.outfit;
       break;
     case 'blast': {
@@ -201,7 +221,7 @@ function removeMonster(world, net, e, m) {
 }
 
 // ------------------------------------------------------------------ the other players
-function addPeer(world, net, id, name) {
+function addPeer(world, net, id, name, who = '') {
   if (net.peers.has(id)) return;
   const el = document.createElement('div');
   el.className = 'mbar peer';
@@ -209,7 +229,7 @@ function addPeer(world, net, id, name) {
   document.getElementById('hud').append(el);
   const group = new THREE.Group();
   getResource(world, Gpu).scene.add(group);
-  const e = spawn(world, [Peer, { id, name, group, el }]);
+  const e = spawn(world, [Peer, { id, name, group, el, who }]);
   net.peers.set(id, e);
   unitScale(world).then(({ k, box }) => {
     const p = getComponent(world, e, Peer);
@@ -269,8 +289,8 @@ function drawPeer(world, p) {
   p.group.position.set(p.x, p.y + p.foot, p.z);
   p.group.rotation.y = p.rot;
   gpu.bodiesDirty = true;
-  // its name, level and HP over its head
-  const at = toScreen(world, p.x, p.y + 1.35, p.z);
+  // its name, level and HP over its head (not at night: it would show where it hides)
+  const at = getResource(world, Settings).land.night ? null : toScreen(world, p.x, p.y + 1.35, p.z);
   p.el.hidden = !at;
   if (!at) return;
   p.el.style.transform = `translate(${at[0]}px, ${at[1]}px)`;
@@ -299,7 +319,7 @@ export function netSendSystem(world) {
       net.sentAt = now;
       const h = getComponent(world, human, Health), outfit = getResource(world, Wardrobe).outfit, worn = JSON.stringify(outfit);
       const msg = { t: 'state', x: round(p.x), y: round(p.y ?? 0), z: round(p.z), rot: round(p.rot), state: p.state, tt: round(p.t),
-        dead: p.dead > 0, hp: Math.ceil(h.hp), max: h.max, level: getComponent(world, human, Stats).level, act };
+        dead: p.dead > 0, hp: Math.ceil(h.hp), max: h.max, level: getComponent(world, human, Stats).level, act, light: getResource(world, Game).light };
       // the outfit only when it changed, or for a player who came
       if (worn !== net.outfitSent) { msg.outfit = outfit; net.outfitSent = worn; }
       net.outbox.push(msg);

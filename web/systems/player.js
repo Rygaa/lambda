@@ -15,7 +15,7 @@
 import * as THREE from 'three';
 import { query, getComponent, getResource, sendEvent } from '../ecs/world.js';
 import { Player, CameraRig, Health, Skills, Form } from '../components.js';
-import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe, Craters, Skillbook } from '../resources.js';
+import { Input, Settings, Time, Gpu, BlockGrid, Tuning, Tops, Wardrobe, Craters, Skillbook, Game } from '../resources.js';
 import { Swing } from '../events.js';
 import { free, groundAt as groundOf, LEDGE } from '../lib/walk.js';
 import { slideRound } from '../lib/footprints.js';
@@ -40,6 +40,8 @@ export function playerSystem(world) {
   const pressed = (k) => input.pressed.some(({ key }) => key.toLowerCase() === k);
   // the ground under its centre: the terrain (or a hole in it), or the top of a rock or a building
   const craters = getResource(world, Craters), groundAt = (x, z) => groundOf(terrain, tops, x, z, craters);
+  // a game (systems/game.js): a trap holds it still; a player of Day Night does not attack
+  const game = getResource(world, Game), held = game?.stuck > 0;
   for (const e of query(world, [Player, Health])) {
     const p = getComponent(world, e, Player), health = getComponent(world, e, Health);
     // a skill, or the power-up of the transformation (systems/transform.js), plays its clip instead
@@ -61,7 +63,7 @@ export function playerSystem(world) {
     // attack1End...) starts the next hit at once
     // kind: attack (sword hits, with any weapon) or punch (no weapon), kept until the hits stop
     const start = (hit) => { a.hit = hit; a.end = 0; a.left = clipTime(a.kind + hit); a.queued = false; a.struck = false; };
-    if (alive && !skill && (pressed('click') || pressed('f'))) {
+    if (alive && !skill && !held && !game?.noAttack && (pressed('click') || pressed('f'))) {
       if (a.hit) a.queued = true;
       else if (a.end) start((a.end % HITS[a.kind]) + 1);
       else if (!j.air && !j.crouch) { a.kind = outfit.weapon ? 'attack' : 'punch'; start(1); }
@@ -81,7 +83,7 @@ export function playerSystem(world) {
     if (down('down')) mv.sub(groundFwd);
     if (down('right')) mv.add(R);
     if (down('left')) mv.sub(R);
-    const moving = alive && !skill && mv.lengthSq() > 0, running = input.keys.has('shift');
+    const moving = alive && !skill && !held && mv.lengthSq() > 0, running = input.keys.has('shift');
     // transformed, it goes faster (skills.json transform speed)
     const speed = (running ? tuning.runSpeed : tuning.walkSpeed) * (form?.phase === 'on' ? getResource(world, Skillbook).transform.speed : 1);
 
@@ -103,7 +105,7 @@ export function playerSystem(world) {
 
     // up and down. Space: it crouches on the ground first (jumpStart), then leaves the ground
     const ground = groundAt(p.x, p.z);
-    if (alive && !skill && !a.hit && !j.air && !j.crouch && pressed(' ')) { j.crouch = clipTime('jumpStart'); a.end = 0; }
+    if (alive && !skill && !held && !a.hit && !j.air && !j.crouch && pressed(' ')) { j.crouch = clipTime('jumpStart'); a.end = 0; }
     if (j.crouch > 0) {
       p.y = ground;
       j.crouch = Math.max(0, j.crouch - dt);

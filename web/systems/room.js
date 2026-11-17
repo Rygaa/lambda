@@ -1,11 +1,12 @@
 // The room (lib/room.js, web/serve.py): at the top right, under the network text, the name of the room, a button that
 // copies its link for a friend, and Home (back to the home page, web/home.html). In a room, the page writes the player
 // of its account (portals.js playerData, with its world and where it stands) every SAVE ms, when it closes and before
-// Home, so it comes back there.
+// Home, so it comes back there. In the world of a game mode it saves where the player goes back after the round.
 import { query, getComponent, getResource } from '../ecs/world.js';
 import { Player } from '../components.js';
 import { Settings, Time } from '../resources.js';
 import { playerData } from './portals.js';
+import { backFrom } from './game.js';
 import { roomLink, HOME } from '../lib/room.js';
 
 const SAVE = 10000;   // ms between two saves
@@ -47,7 +48,10 @@ function save(world, closing) {
   if (!room || human === undefined) return Promise.resolve();
   const p = getComponent(world, human, Player);
   if (!p.group) return Promise.resolve();   // not in the world yet
-  const data = { ...playerData(world, human), world: getResource(world, Settings).worldName, x: round(p.x), z: round(p.z) };
+  // in the world of a game mode (systems/game.js): the player as it was before the round, where it goes back after it
+  const back = getResource(world, Settings).land.game ? backFrom(world) : null;
+  const data = back ? { ...back.data, world: back.world, x: back.char[0], z: back.char[1] }
+    : { ...playerData(world, human), world: getResource(world, Settings).worldName, x: round(p.x), z: round(p.z) };
   const url = `../rooms/${room.id}`, body = JSON.stringify(data);
   if (closing && navigator.sendBeacon(url, body)) return Promise.resolve();
   return fetch(url, { method: 'POST', body, keepalive: closing }).catch(() => {});
