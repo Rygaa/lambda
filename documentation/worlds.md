@@ -351,14 +351,19 @@ The fields of a world:
 - `burn`: `true`: the button at the top (or B) sets fire to the nearest object that can burn, voxel by voxel
   (`web/systems/burn.js`). Each voxel has a material (`assets/materials.json`, by the role of its part, or the palette of
   a stone part: the wooden crates) and a state: normal, heating (red), burning, embers, burnt (black), ash, gone. A
-  material says if it burns, how easily it catches fire, how long it burns and glows, what is left (`char`: it stays
-  black, the wood; `gone`: it turns to ash and is gone, the leaves) and if it falls when nothing is under it. The fire
-  goes from voxel to voxel only where they touch. It can die out by itself: a voxel may resist (`resists`), each voxel
-  keeps only part of the strength of the fire that lit it (`keeps`), and a fire too weak gives no heat. A burning
-  object sets fire to an object less than 2 units away (more often when closer and stronger), and that fire is weaker:
-  a forest fire gets weaker from tree to tree, and a clearing, a path or water stops it. Rain (the second button) puts
-  the burning voxels out (they stay black) and slows the fire.
-  A voxel that falls (the leaves) that is not joined, voxel by voxel, to the wood or the ground falls and crumbles, so
+  material says if it burns, how easily it catches fire, how long it burns and glows, and what is left (`char`: it stays
+  black, the wood; `gone`: it turns to ash and is gone where it is, the leaves). A burning voxel heats the voxels next
+  to it (most the one above, least the one under it) and the voxels over it up to 5 high (hot air goes up), so the fire
+  climbs in tongues. A light wind (one direction for every world) makes it spread faster with the wind, leans the hot
+  air and the flames, and carries the embers and the flakes of ash. Each object is dry in some places and wet in others:
+  dry patches catch first, wet ones resist. A heated voxel that does not catch fire cools down again. The fire can die
+  out by itself: a voxel may resist (`resists`), each voxel keeps only part of the strength of the fire that lit it
+  (`keeps`), and a fire too weak gives no heat. A burning object sends a spark to an object less than 2 units away (more
+  often when closer, stronger and with the wind), and where it lands a weaker fire starts: a forest fire gets weaker from
+  tree to tree, and a clearing, a path or water stops it. Rain (the second button) puts the burning voxels out (they
+  stay black) and slows the fire.
+  A piece of leaves that is no longer joined, voxel by voxel, to the wood or the ground falls as one piece (a small one
+  slower) and breaks up where it lands: what burns burns on a little, green leaves fall apart, the rest crumbles. So
   nothing floats.
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).

@@ -223,9 +223,9 @@ export function flames(world, x, y, z, r, h, n) {
 }
 
 // one cube of a tree that burns voxel by voxel (systems/burn.js): fire that rises (rise), or ash and embers that fall.
-// hex: its colour '#rrggbb'
-export function burnCube(world, x, y, z, size, hex, life, vx, vy, vz, rise) {
-  getResource(world, Ki).sparks.push({ x, y, z, vx, vy, vz, size, color: colorOf(world)(hex), life, rise });
+// hex: its colour '#rrggbb'; sway: world units a second it swings from side to side (a flake of ash that drifts down)
+export function burnCube(world, x, y, z, size, hex, life, vx, vy, vz, rise, sway = 0) {
+  getResource(world, Ki).sparks.push({ x, y, z, vx, vy, vz, size, color: colorOf(world)(hex), life, rise, sway, ph: Math.random() * 6.3 });
 }
 
 // a ball bursts: n cubes of its colours fly away from (x, y, z)
@@ -243,6 +243,7 @@ function sparks(world, ki, dt, put) {
     s.life -= dt;
     if (!s.rise) s.vy -= GRAVITY * dt;
     s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt;
+    if (s.sway) { s.x += Math.sin(s.life * 4 + s.ph) * s.sway * dt; s.z += Math.cos(s.life * 3 + s.ph) * s.sway * dt; }
     if (s.life <= 0 || s.y < heightAt(terrain, s.x, s.z) - 0.6) return false;
     put(s.x, s.y, s.z, s.life < 0.25 ? Math.max(0.02, s.size * (s.life / 0.25)) : s.size, s.color);
     return true;
