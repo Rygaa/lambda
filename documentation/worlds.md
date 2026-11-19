@@ -202,6 +202,8 @@ The worlds:
 - `burn-test`: a small forest (oaks, pines, a fir, a bush), wooden crates with a barrel, and a rock, to try the voxel
   fire (`"burn": true`): the first button at the top, or B, sets fire to the nearest object that can burn; the fire
   jumps from tree to tree and gets weaker; the second button turns the rain on or off. The rock does not burn.
+- `burn-forest`: the same fire in a bigger forest (40 units: 34 oaks, 26 pines, 18 firs, 16 bushes, 3 crates, 6 rocks)
+  with 3 clearings; you start in a clearing. B again sets fire to the nearest object that did not burn.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),

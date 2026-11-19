@@ -1,0 +1,49 @@
+{
+  "name": "Burn forest: a bigger forest (oaks, pines, firs, bushes, crates) with 3 clearings, to try the voxel fire on many trees (systems/burn.js): the button at the top, or B, sets fire to the nearest; the fire jumps from tree to tree, gets weaker, and a clearing can stop it; the rain button puts it out",
+  "seed": 23,
+  "size": 40,
+  "clouds": "none",
+  "rays": 0,
+  "burn": true,
+  "clearings": {
+    "count": 3,
+    "radius": [
+      2.6,
+      3.4
+    ]
+  },
+  "props": [
+    {
+      "asset": "plant/oak/medium",
+      "count": 34,
+      "spacing": 2.3,
+      "avoid": "clearings"
+    },
+    {
+      "asset": "plant/pine/medium",
+      "count": 26,
+      "spacing": 2.0,
+      "avoid": "clearings"
+    },
+    {
+      "asset": "plant/fir/medium",
+      "count": 18,
+      "spacing": 2.0,
+      "avoid": "clearings"
+    },
+    {
+      "asset": "plant/bush/medium",
+      "count": 16,
+      "avoid": "clearings"
+    },
+    {
+      "asset": "building/crates/small",
+      "count": 3,
+      "avoid": "clearings"
+    },
+    {
+      "asset": "rock/round/small",
+      "count": 6
+    }
+  ]
+}
