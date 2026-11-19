@@ -200,10 +200,12 @@ The worlds:
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
 - `burn-test`: a small forest (oaks, pines, a fir, a bush), wooden crates with a barrel, and a rock, to try the voxel
-  fire (`"burn": true`): the first button at the top, or B, sets fire to the nearest object that can burn; the fire
-  jumps from tree to tree and gets weaker; the second button turns the rain on or off. The rock does not burn.
+  fire (`"burn": true`, all dry): the first button at the top, or B, sets fire to the nearest object that can burn; a
+  burning tree heats the trees near it and they catch fire; the second button turns the rain on or off. The rock does
+  not burn.
 - `burn-forest`: the same fire in a bigger forest (40 units: 34 oaks, 26 pines, 18 firs, 16 bushes, 3 crates, 6 rocks)
-  with 3 clearings; you start in a clearing. B again sets fire to the nearest object that did not burn.
+  with 3 clearings; you start in a clearing. About 30% of the objects are wet (`"burn": { "wet": 0.3 }`). B again sets
+  fire to the nearest object that is not burning.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),
@@ -350,23 +352,22 @@ The fields of a world:
 - `rays`: the strength of the light rays, 0 to 1 (default 1).
 - `night`: how dark, 0 (day, default) to 1: the world and the people are dark and blue, and only the rings of the
   lamps (and of the flashlights of a game mode) show their colours (`web/render/shaders.js` uNight).
-- `burn`: `true`: the button at the top (or B) sets fire to the nearest object that can burn, voxel by voxel
-  (`web/systems/burn.js`). Each voxel has a material (`assets/materials.json`, by the role of its part, or the palette of
-  a stone part: the wooden crates) and a state: normal, heating (red), burning, embers, burnt (black), ash, gone. A
-  material says if it burns, how easily it catches fire, how long it burns and glows, and what is left (`char`: it stays
-  black, the wood; `gone`: it turns to ash and is gone where it is, the leaves). A burning voxel heats the voxels next
-  to it (most the one above, least the one under it) and the voxels over it up to 5 high (hot air goes up), so the fire
-  climbs in tongues. A light wind (one direction for every world) makes it spread faster with the wind, leans the hot
-  air and the flames, and carries the embers and the flakes of ash. Each object is dry in some places and wet in others:
-  dry patches catch first, wet ones resist. A heated voxel that does not catch fire cools down again. The fire can die
-  out by itself: a voxel may resist (`resists`), each voxel keeps only part of the strength of the fire that lit it
-  (`keeps`), and a fire too weak gives no heat. A burning object sends a spark to an object less than 2 units away (more
-  often when closer, stronger and with the wind), and where it lands a weaker fire starts: a forest fire gets weaker from
-  tree to tree, and a clearing, a path or water stops it. Rain (the second button) puts the burning voxels out (they
-  stay black) and slows the fire.
+- `burn`: `true` or `{ "wet": 0.3 }`: the button at the top (or B) sets fire to the nearest object that can burn, voxel by
+  voxel (`web/systems/burn.js`, `web/systems/fireSim.js`). Each voxel has a material (`assets/materials.json`, by the
+  role of its part, or the palette of a stone part: the wooden crates) and a temperature, water and fuel. One model
+  decides everything: a voxel gives heat to the voxels next to it (most up, least down), and a flame heats their outside
+  much more than their inside; the hot air over a burning voxel heats the first voxel above it across a gap; a voxel
+  must dry first, then catches fire at the ignite temperature of its material; it burns while it has fuel (faster with
+  more open faces: the inside only smoulders), glows as embers at the end, then stays black (the wood) or turns to ash
+  and is gone (the leaves). A dry tree that catches fire burns fully. A burning object heats the objects near it (more
+  when more of it burns and the gap is small), so a dry tree near a big fire catches, a wet one or one across a
+  clearing does not; sparks fly to show that heat. `wet`: about this part of the objects (always the same ones) have 20
+  times the water. Rain (the second button) wets and cools every voxel: the fire goes out. A light wind leans the hot
+  air, makes the fire spread a little faster with it, and carries the embers and the flakes of ash.
   A piece of leaves that is no longer joined, voxel by voxel, to the wood or the ground falls as one piece (a small one
-  slower) and breaks up where it lands: what burns burns on a little, green leaves fall apart, the rest crumbles. So
-  nothing floats.
+  slower). After a short drop onto the object (a canopy that sinks onto its trunk) it rests there; after a real fall it
+  breaks up where it lands: what burns burns on, green leaves fall apart, the rest crumbles. So
+  nothing floats. The voxels of an object are made by a worker (`web/lib/fireWorker.js`) before the heat reaches it.
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).

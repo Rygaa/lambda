@@ -1,10 +1,12 @@
 {
-  "name": "Burn forest: a bigger forest (oaks, pines, firs, bushes, crates) with 3 clearings, to try the voxel fire on many trees (systems/burn.js): the button at the top, or B, sets fire to the nearest; the fire jumps from tree to tree, gets weaker, and a clearing can stop it; the rain button puts it out",
+  "name": "Burn forest: a bigger forest (oaks, pines, firs, bushes, crates) with 3 clearings, to try the voxel fire on many trees (systems/burn.js, systems/fireSim.js): the button at the top, or B, sets fire to the nearest; a burning tree heats the trees near it; about 30% of the trees are wet and hardly catch fire, and a clearing stops it; the rain button puts it out",
   "seed": 23,
   "size": 40,
   "clouds": "none",
   "rays": 0,
-  "burn": true,
+  "burn": {
+    "wet": 0.3
+  },
   "clearings": {
     "count": 3,
     "radius": [

@@ -79,6 +79,7 @@ export function buildRecipe(cache, recipe, map = null) {
   b.rays = recipe.rays ?? 1;     // strength of the god rays (0 = none)
   b.night = recipe.night ?? 0;   // how dark: 0 day, 1 night (only the lamps and flashlights show the world)
   b.burn = !!recipe.burn;       // B near a tree sets it on fire, voxel by voxel (systems/burn.js)
+  b.burnWet = recipe.burn?.wet ?? 0;   // "burn": { "wet": 0.3 }: about this part of the objects are wet (green): they hardly catch fire
   b.game = recipe.game ?? null;  // a world of a game mode (systems/game.js): its boxes, traps and starts
   b.pavement = recipe.pavement ?? 'tiles';    // how the pavement paint looks: tiles or bricks
   if (!['tiles', 'bricks'].includes(b.pavement)) bad('world', `pavement "${b.pavement}" (use tiles or bricks)`);

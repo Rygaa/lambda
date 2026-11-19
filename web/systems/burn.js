@@ -1,32 +1,23 @@
-// Objects that burn voxel by voxel (a world with "burn": true, like worlds/burn-test.json: the button at the top, or B).
-// An object becomes voxels of the fire (PX voxels of the look each, lib/voxels.js lookOf). Each voxel has a material
-// (assets/materials.json: by the role of its part, or the palette of a stone part) that says what fire does to it, and a
-// state (STATE):
-//   normal   it does not burn (and a material that does not burn stays so: stone, water)
-//   heating  the fire near it heats it: it turns red; with enough heat it catches fire; with less it cools down again
-//   burning  red, yellow, orange; it gives heat to the voxels next to it (most to the one above, least to the one under
-//            it, more to the one the wind blows to) and some to the ones 2 away; hot air goes up, so it also heats the
-//            voxels over it up to CLIMB high (leaning with the wind): the fire climbs in tongues
-//   embers   about half of them glow, then go dark
-//   burnt    black. A material with after "char" stays so (the wood)
-//   ash      (after "gone") grey, it shrinks
-//   gone     (after "gone") nothing, where it was: the voxels it hid show
-// Each part of an object is dry in some places and wet in others (patches of PATCH voxels): a dry voxel catches fire
-// sooner, a wet one needs more heat and resists more. A fire can die out by itself: a voxel with enough heat may resist
-// (material resists: it does not catch fire this time, loses its heat and needs more next time); each voxel keeps only
-// part of the strength of the fire that lit it (material keeps), and a fire too weak (under MIN_POWER) gives no heat.
-// A burning object sends a spark to an object that can burn near it (a gap under JUMP_MAX), more often when the gap is
-// small, the fire strong and the wind blows that way; where the spark lands a weaker fire starts (JUMP_KEEP): so a forest
-// fire gets weaker from tree to tree, and a clearing, a path or water stops it. Rain (the second button) puts the
-// burning voxels out (they stay black), and the fire gives less heat and jumps less.
-// A piece of voxels of a material that is gone at the end (the leaves) that is no longer joined, voxel by voxel, to a
-// material that stays (the wood) or to the ground falls as one piece, faster and faster, and breaks up where it lands
-// (what burns there burns on a little). The fire starts at the voxel nearest to the human. The voxels are one instanced
-// mesh in the G-buffer (render/shaders.js BURN_VERT, BURN_FRAG); the post pass colours them by their heat (burnColor).
-// The leaves (sprites) go when the voxel under them catches fire. Cubes of fire rise from the voxels that burn
-// (systems/blasts.js burnCube), embers rise and flakes of ash drift down with the wind, and one lamp of the fire lights
-// around it (systems/clouds.js lampSystem). When nothing burns any more, what is left stays (the black wood, the stone;
-// it still stops a walker).
+// Objects that burn voxel by voxel (a world with "burn": true or { "wet": 0.3 }, like worlds/burn-test.json and
+// worlds/burn-forest.json: the button at the top, or B). An object becomes voxels of the fire (PX voxels of the look
+// each, lib/voxels.js lookOf). Each voxel has a material (assets/materials.json: by the role of its part, or the palette
+// of a stone part) and a temperature, water and fuel: systems/fireSim.js steps the fire (heat, water, fuel, rain; the
+// states normal, heating, burning, embers, burnt, ash, gone). This file:
+//   - the fire worker (lib/fireWorker.js) makes the voxels of an object away from the page, and their water: a wet
+//     object (a part `wet` of the objects of the world, by a hash of its place) has WET_WATER times the water of its
+//     materials, and the water changes a little in patches of PATCH voxels;
+//   - B or the button lights the voxels around the point of the object nearest to the human (MATCH cells);
+//   - a burning object heats the objects near it (radiate): by how many of its outside voxels burn and the gap to that
+//     object, on the TARGET_CELLS outside voxels of it that face the fire. So a dry tree near a big fire catches, a wet
+//     tree or one across a clearing does not. Sparks fly to show that heat (they decide nothing);
+//   - a piece of voxels of a material that is gone at the end (the leaves) no longer joined, voxel by voxel, to a material
+//     that stays (the wood) or to the ground falls as one piece (a small one slower); a short drop onto the object (a
+//     canopy that sinks onto its trunk) rests there, a real fall breaks up where it lands;
+//   - draws the voxels (one instanced mesh in the G-buffer, render/shaders.js BURN_VERT, BURN_FRAG; the post pass colours
+//     them by their heat, burnColor), the leaf clumps (one goes when the voxel under it catches fire), the cubes of fire,
+//     embers and flakes of ash in the wind (systems/blasts.js burnCube) and the lamp of the fire (systems/clouds.js).
+// When nothing changes any more, what is left stays (the black wood, the stone; it still stops a walker); an object that
+// was only warmed and never caught fire goes back to how it was.
 import * as THREE from 'three';
 import { query, getComponent, hasComponent, getResource } from '../ecs/world.js';
 import { Prop, SceneObject, Player, Transform, CameraRig } from '../components.js';
@@ -34,54 +25,45 @@ import { Gpu, Settings, Input, Time } from '../resources.js';
 import * as S from '../render/shaders.js';
 import { shaderMaterial } from '../render/materials.js';
 import { paletteNames } from '../gen/palettes.js';
-import { voxelize, decodeNormal } from '../lib/voxelCore.js';
-import { lookOf, triangles, oneSided } from '../lib/voxels.js';
+import { lookOf, triangles } from '../lib/voxels.js';
 import { burnCube } from './blasts.js';
+import * as Fire from './fireSim.js';
 
-export const STATE = { normal: 0, heating: 1, burning: 2, embers: 3, burnt: 4, ash: 5, gone: 6 };
+export const { STATE } = Fire;
 const { normal: NORMAL, heating: HEATING, burning: BURNING, embers: EMBERS, burnt: BURNT, ash: ASH, gone: GONE } = STATE;
 
 const PX = 2;            // a voxel of the fire: PX voxels of the look on each side
-const HEAT = 4;          // heat a burning voxel gives a voxel next to it, a second (at 1 it catches fire, about)
-const UP = 2.5, SIDE = 1, DOWN = 0.7;   // ... times this, by where that voxel is
-const INNER = 0.3;       // a voxel hidden inside the shape takes this much of the heat: the fire runs over the outside, and
-                         // the inside burns after, once the voxels over it are gone (else it goes up through the inside
-                         // first and the whole outside catches fire at once)
-const FAR = 0.35;        // ... and the voxels 2 away (to the sides and under it) get this much of it, so a voxel heats
-                         // (turns red) before the fire reaches it
-const CLIMB = 5;         // hot air goes up: a burning voxel also heats the voxels over it, up to this many voxels high...
-const CLIMB_HEAT = 0.9;  // ... the one 2 over it UP times this much of the heat, and less higher up (divided by the height - 1)
-const PATCH = 4;         // voxels: the size of the dry and wet patches of an object
-const COOL = 0.35;       // a heated voxel loses this part of its heat a second (it cools down when the fire near it goes)
+const H = 1 / Fire.STEP; // seconds of one step of the fire
+const MATCH = 3;         // cells: B lights the voxels this near the point
+const PATCH = 4;         // voxels: the size of the patches where the water changes
+const PATCH_WATER = 0.3; // ... from 1 - this to 1 + this times the water of the material
+const WET_WATER = 20;    // a wet object has this many times the water of its materials
+const RADIATE_EVERY = 0.25;  // seconds between two times the burning objects heat the objects near them
+const RADIATE = 0.05;    // degrees a second an outside burning voxel gives a voxel of an object near it, at a gap of 0...
+const GAP0 = 1.5;        // ... divided by 1 + (gap / this)², gap in world units from the fire to the edge of that object
+const HEAT_RANGE = 4;    // world units: no heat further than this
+const TARGET_CELLS = 40; // the outside voxels of that object that get the heat (the ones nearest to the fire)
+const WAKE_HEAT = 20;    // degrees: an object gets its voxels of the fire once this much heat came to it
+const RED_FROM = 120;    // degrees: a heated voxel starts to turn red here (red at its ignite temperature)
 const WIND = [0.92, 0.39];   // where the wind blows to (x, z in the world; the rain slants the same way)
-const WIND_SPREAD = 0.6; // the fire spreads 1 + this as fast to the voxel the wind blows to, 1 - this to the one against it
-const WIND_LEAN = 0.3;   // the hot air over a fire moves this many voxels with the wind for each voxel up
 const WIND_SPEED = 0.5;  // world units a second: the fire cubes, the embers and the flakes of ash go with the wind
 const FLAKE_FALL = 0.4;  // world units a second: a flake of ash drifts down this fast
-const JOIN_EVERY = 0.15;  // seconds: which voxels are still joined to the wood or the ground is looked at again (when one went)
+const JOIN_EVERY = 0.15; // seconds: which voxels are still joined to the wood or the ground is looked at again (when one went)
 const GRAVITY = 9;       // world units a second, a second: a piece that falls
+const REST_DROP = 8;     // cells: a piece that drops less than this onto the object (not the ground) rests there
 const FALL_MAX = 1.2;    // world units a second: a piece falls at most this fast times 1 + the cube root of its voxels
-const MIN_POWER = 0.2;    // a burning voxel weaker than this gives no heat
-const JUMP_MAX = 2;      // world units: a burning object sets fire to an object at most this far (from a burning voxel to
-                         // the edge of that object)
-const JUMP_RATE = 0.8;   // times a second it does, at a gap of 0 and full strength (less with a bigger gap, a weaker fire)
-const JUMP_KEEP = 0.65;  // the strength the new fire keeps
-const JUMP_EVERY = 0.25; // seconds between two looks for an object to jump to
-const SPARK_TIME = 0.7;  // seconds the spark of a fire that jumps flies to the object it sets fire to
-const RAIN_HEAT = 0.35;  // in the rain a burning voxel gives this much of its heat
-const RAIN_OUT = 0.6;    // ... and goes out (it stays black) this many times a second
-const RAIN_JUMP = 0.2;   // ... and a fire jumps this much as often
+const SPARK_TIME = 0.7;  // seconds a spark flies
 const RAIN_DROPS = 320;  // drops of rain a second
-const SHADOW_EVERY = 0.3;   // seconds: the shadow of a burning object is drawn again
+const RAIN_RADIATE = 0.3;    // in the rain a fire heats the objects near it this much
+const SHADOW_EVERY = 0.3;    // seconds: the shadow of a burning object is drawn again
 const FIRE = ['#fff2a0', '#ffc040', '#ff8a20', '#e04a10'];
 const LAMP = new THREE.Color(1, 0.42, 0.08);
 
 // assets/materials.json: name -> material (with its defaults), and which material a part has
 const json = await fetch(new URL('../../assets/materials.json', import.meta.url)).then((r) => r.json());
 const MATERIALS = Object.entries(json.materials).map(([name, m]) => ({
-  name, burns: !!m.burns, catches: m.catches ?? 0, burnTime: m.burnTime ?? 0, emberTime: m.emberTime ?? 0,
-  after: m.after ?? 'char', charTime: m.after === 'gone' ? m.charTime ?? 0 : Infinity, stays: (m.after ?? 'char') !== 'gone',
-  resists: m.resists ?? 0, keeps: m.keeps ?? 1,
+  name, burns: !!m.burns, ignite: m.ignite ?? Infinity, flame: m.flame ?? 0, fuel: m.fuel ?? 0, water: m.water ?? 0, conduct: m.conduct ?? 0,
+  after: m.after ?? 'char', charTime: (m.after ?? 'char') === 'gone' ? m.charTime ?? 0 : Infinity, stays: (m.after ?? 'char') !== 'gone',
 }));
 const byName = new Map(MATERIALS.map((m, i) => [m.name, i]));
 
@@ -95,8 +77,15 @@ function materialOf({ mesh, role }) {
 const canBurn = (so) => so.meshes.some((p) => MATERIALS[materialOf(p)]?.burns);
 
 const fires = new Map();    // object entity -> its fire
-let shadowIn = 0, jumpIn = 0;
-const sparks = [];          // sparks of fires that jump, on their way: { e, from, to, t, power }
+fires.ms = [];              // (the tests) milliseconds of the fire, the last frames
+const heatIn = new Map();   // object entity without voxels of the fire -> heat that came to it (degrees)
+fires.heatIn = heatIn;      // (the tests)
+const sparks = [];          // sparks on their way (they only show the heat): { from, to, t }
+const ready = new Map();    // object entity -> its voxels from the fire worker (lib/fireWorker.js), not used yet
+const making = new Map();   // job id -> the object entity the worker makes the voxels of
+const lights = [];          // fires to light once the voxels of their object are ready: { e, at, near }
+let worker = null, jobs = 0;
+let shadowIn = 0, radiateIn = 0;
 let bar = null, button = null, rainButton = null, clicked = false;   // the buttons of a burn world (top of the screen)
 let rain = false;           // it rains (the rain button)
 
@@ -125,8 +114,8 @@ function showButton(world) {
     document.body.append(bar);
   }
   rainButton.textContent = rain ? 'Rain: on' : 'Rain: off';
-  const left = query(world, [Prop, SceneObject]).some((e) => !fires.has(e) && canBurn(getComponent(world, e, SceneObject)));
-  const state = [...fires.values()].some((f) => !f.done) || sparks.length ? 'fire' : left ? 'some' : 'gone';
+  const left = query(world, [Prop, SceneObject]).some((e) => !fires.get(e)?.burnt && canBurn(getComponent(world, e, SceneObject)));
+  const state = lights.length || [...fires.values()].some((f) => !f.done && f.burnt) ? 'fire' : left ? 'some' : 'gone';
   if (button.dataset.state === state) return;
   button.dataset.state = state;
   button.textContent = { some: 'Set fire to the nearest (B)', fire: 'Burning…', gone: 'Grow it all back' }[state];
@@ -145,18 +134,31 @@ export function burnSystem(world) {
   const dt = Math.min(0.05, getResource(world, Time).dt);
   if (rain) rainDrops(world, dt);
   flySparks(world, dt);
-  if (!fires.size) return;
-  let burning = false;
-  for (const [entity, fire] of fires) {
-    if (!hasComponent(world, entity, SceneObject)) { drop(fire); fires.delete(entity); continue; }
-    if (fire.done) { for (const mesh of fire.hidden) mesh.visible = false; continue; }   // what is left
-    step(fire, dt);
-    draw(world, fire, gpu);
-    burning = true;
-    if (!fire.live && !fire.pieces.length && !fire.breaking.length) { cool(fire); draw(world, fire, gpu); fire.done = true; gpu.shadowsDirty = true; }
+  for (let i = lights.length - 1; i >= 0; i--) {
+    const l = lights[i];
+    if (!hasComponent(world, l.e, SceneObject)) { lights.splice(i, 1); continue; }
+    if (fires.has(l.e) || ready.has(l.e)) { lights.splice(i, 1); ignite(world, l.e, l.at, l.near); }
   }
-  if (burning && (jumpIn -= dt) <= 0) { jumpIn = JUMP_EVERY; jumps(world); }
-  if (burning && (shadowIn -= dt) <= 0) { shadowIn = SHADOW_EVERY; gpu.shadowsDirty = true; }
+  if (!fires.size) return;
+  const t0 = performance.now();
+  let changing = false;
+  for (const [entity, f] of fires) {
+    if (!hasComponent(world, entity, SceneObject)) { drop(f); fires.delete(entity); continue; }
+    if (f.done) { for (const mesh of f.hidden) mesh.visible = false; continue; }   // what is left
+    for (f.acc += dt; f.acc >= H; f.acc -= H) { Fire.step(f, H, rain); went(f); }
+    fall(f, dt);
+    draw(world, f, gpu);
+    changing = true;
+    if (f.awakeN || f.pieces.length || f.breaking.length || f.cut) continue;   // (cut: joined is looked at once more)
+    // nothing changes any more: what is left stays; an object only warmed goes back to how it was
+    if (!f.burnt) { forget(f); fires.delete(entity); continue; }
+    f.done = true;
+    gpu.shadowsDirty = true;
+  }
+  if (changing && (radiateIn -= dt) <= 0) { radiateIn = RADIATE_EVERY; radiate(world); }
+  if (changing && (shadowIn -= dt) <= 0) { shadowIn = SHADOW_EVERY; gpu.shadowsDirty = true; }
+  fires.ms.push(performance.now() - t0);
+  if (fires.ms.length > 600) fires.ms.shift();
 }
 
 // rain: drops fall fast around the camera
@@ -186,50 +188,79 @@ function reach(so) {
   return (so.reach = r);
 }
 
-// a fire died out: the voxels it heated but did not light cool down
-function cool(f) {
-  for (let c = 0; c < f.n; c++) if (f.state[c] === HEATING) { f.state[c] = NORMAL; f.heat[c] = 0; }
+// the voxels that went in the last step: they hide, the ones they hid show, and some leave a flake of ash
+function went(f) {
+  for (const c of f.goneNow) {
+    f.cut = true;
+    if (f.slot[c] >= 0 && f.bits.length < 60 && Math.random() < 0.04) f.bits.push({ c, kind: 'flake' });
+    hide(f, c);
+    for (const o of Fire.offsets(f)) { const d = f.grid[f.at[c] + o]; if (d >= 0) show(f, d); }
+  }
+  f.goneNow.length = 0;
 }
 
-// a burning object sets fire to the objects that can burn near it: for each, the burning voxel nearest to it (over the
-// ground), the gap to its edge, and a chance by the gap and the strength of that voxel
-function jumps(world) {
-  const v = new THREE.Vector3(), targets = [];
+// the burning objects heat the objects that can burn near them: by how many of their outside voxels burn and the gap
+function radiate(world) {
+  const targets = [];
   for (const e of query(world, [Prop, Transform, SceneObject])) {
-    if (fires.has(e) || sparks.some((s) => s.e === e) || !canBurn(getComponent(world, e, SceneObject))) continue;
+    const so = getComponent(world, e, SceneObject);
+    if (!canBurn(so)) continue;
     const t = getComponent(world, e, Transform);
-    targets.push({ e, x: t.x, z: t.z, r: reach(getComponent(world, e, SceneObject)) });
+    targets.push({ e, x: t.x, z: t.z, r: reach(so) });
   }
-  if (!targets.length) return;
-  for (const f of [...fires.values()]) {
-    if (f.done) continue;
-    const g = f.so.group.matrixWorld;
+  const v = new THREE.Vector3();
+  for (const [source, f] of [...fires]) {
+    if (f.done || !f.burning) continue;
+    // its outside burning voxels: how many, and up to 300 of them (where they are in the world)
+    const pts = [];
+    let out = 0;
+    for (let i = 0; i < f.awakeN; i++) {
+      const c = f.awake[i];
+      if (!f.burn[c] || f.slot[c] < 0) continue;
+      out++;
+      if (pts.length < 300) pts.push(c);
+      else if (Math.random() < 300 / out) pts[Math.floor(Math.random() * 300)] = c;
+    }
+    if (!out) continue;
+    const g = f.so.group.matrixWorld, at = pts.map((c) => cellPos(f, c, new THREE.Vector3()).applyMatrix4(g));
     for (const t of targets) {
-      if (fires.has(t.e) || sparks.some((s) => s.e === t.e)) continue;
-      let gap = Infinity, power = 0;
-      const at = new THREE.Vector3();
-      for (let i = 0; i < f.live; i++) {
-        const c = f.active[i];
-        if (f.state[c] !== BURNING || f.power[c] < MIN_POWER) continue;
-        cellPos(f, c, v).applyMatrix4(g);
-        const d = Math.hypot(v.x - t.x, v.z - t.z) - t.r;
-        if (d < gap) { gap = d; power = f.power[c]; at.copy(v); }
+      if (t.e === source) continue;
+      let gap = Infinity, from = null;
+      for (const p of at) {
+        const d = Math.hypot(p.x - t.x, p.z - t.z) - t.r;
+        if (d < gap) { gap = d; from = p; }
       }
-      if (gap >= JUMP_MAX) continue;
-      // more often when the wind blows from the fire to that object
-      const dx = t.x - at.x, dz = t.z - at.z, dl = Math.hypot(dx, dz) || 1;
-      const wind = Math.max(0.2, 1 + WIND_SPREAD * (dx * WIND[0] + dz * WIND[1]) / dl);
-      const rate = JUMP_RATE * power * (1 - Math.max(0, gap) / JUMP_MAX) * wind * (rain ? RAIN_JUMP : 1);
-      if (Math.random() >= 1 - Math.exp(-rate * JUMP_EVERY)) continue;
-      // a spark flies from that voxel to the side of the object that faces it
-      const to = new THREE.Vector3(t.x - (dx / dl) * t.r * 0.6, Math.max(0.3, at.y), t.z - (dz / dl) * t.r * 0.6);
-      sparks.push({ e: t.e, from: at.clone(), to, t: 0, power: power * JUMP_KEEP });
+      if (gap >= HEAT_RANGE) continue;
+      prepare(world, t.e);   // its voxels, made before the heat is enough
+      const flux = RADIATE * out / (1 + (Math.max(0, gap) / GAP0) ** 2) * (rain ? RAIN_RADIATE : 1), heat = flux * RADIATE_EVERY;
+      let tf = fires.get(t.e);
+      if (!tf) {
+        const sum = (heatIn.get(t.e) ?? 0) + heat;
+        heatIn.set(t.e, sum);
+        if (sum < WAKE_HEAT || !(tf = fireOf(world, t.e))) continue;
+        heatIn.delete(t.e);
+      }
+      tf.done = false;
+      // its outside voxels nearest to the fire get the heat
+      const local = tf.so.group.worldToLocal(from.clone()), near = [];   // [distance², cell], the nearest first
+      for (let s = 0, step = Math.max(1, Math.floor(tf.count / 2000)); s < tf.count; s += step) {   // (about 2000 of them)
+        const c = tf.cellAt[s], d = cellPos(tf, c, v).distanceToSquared(local);
+        if (near.length === TARGET_CELLS && d >= near[TARGET_CELLS - 1][0]) continue;
+        let i = near.length < TARGET_CELLS ? near.length : TARGET_CELLS - 1;
+        while (i > 0 && near[i - 1][0] > d) { near[i] = near[i - 1]; i--; }
+        near[i] = [d, c];
+      }
+      for (const [, c] of near) Fire.warm(tf, c, heat);
+      // sparks fly there: more for more heat
+      if (near.length && Math.random() < flux / 40) {
+        cellPos(tf, near[0][1], v).applyMatrix4(tf.so.group.matrixWorld);
+        sparks.push({ from: from.clone(), to: v.clone(), t: 0 });
+      }
     }
   }
 }
 
-// the sparks on their way: a glowing cube that flies in an arc and leaves a short trail; where it lands, the object
-// catches fire
+// the sparks on their way: a glowing cube that flies in an arc and leaves a short trail
 function flySparks(world, dt) {
   const v = new THREE.Vector3();
   for (let i = sparks.length - 1; i >= 0; i--) {
@@ -238,83 +269,123 @@ function flySparks(world, dt) {
     v.y += Math.sin(Math.PI * k) * 0.6;
     burnCube(world, v.x, v.y, v.z, 0.07, FIRE[Math.floor(Math.random() * 2)], 0.12, 0, 0, 0, true);
     if (Math.random() < 0.5) burnCube(world, v.x, v.y, v.z, 0.04, FIRE[2], 0.3 + Math.random() * 0.2, 0, 0.2, 0, true);
-    if (k < 1) continue;
-    sparks.splice(i, 1);
-    if (hasComponent(world, s.e, SceneObject)) ignite(world, s.e, s.to, s.power, true);
+    if (k >= 1) sparks.splice(i, 1);
   }
 }
 
-// B or the button: the nearest object that can burn (any distance) catches fire at the voxel nearest to the chest of
-// the human
+// B or the button: the nearest object that can burn and is not burning (any distance) catches fire at the voxel nearest
+// to the chest of the human (one with fuel left)
 function lightNearest(world) {
   const human = query(world, [Player])[0];
   if (human === undefined) return;
   const p = getComponent(world, human, Player);
-  let best = -1, bestD = Infinity;
+  const near = [];
   for (const e of query(world, [Prop, Transform, SceneObject])) {
-    if (fires.has(e) || !canBurn(getComponent(world, e, SceneObject))) continue;
-    const t = getComponent(world, e, Transform), d = Math.hypot(t.x - p.x, t.z - p.z);
-    if (d < bestD) { bestD = d; best = e; }
+    const f = fires.get(e);
+    if ((f && !f.done && f.burning) || !canBurn(getComponent(world, e, SceneObject))) continue;
+    const t = getComponent(world, e, Transform);
+    near.push([Math.hypot(t.x - p.x, t.z - p.z), e]);
   }
-  if (best < 0) return;
-  ignite(world, best, new THREE.Vector3(p.x, (p.group?.position.y ?? 0) + 0.6, p.z), 1, false);
+  near.sort((a, b) => a[0] - b[0]);
+  const chest = new THREE.Vector3(p.x, (p.group?.position.y ?? 0) + 0.6, p.z);
+  for (const [, e] of near) if (ignite(world, e, chest)) return;
 }
 
-// the object entity catches fire at the voxel that can burn nearest to the point at (world units), with this strength
-// (1: a new fire); near: the nearest voxel whatever its material (a fire that jumps), else the solid part first
-export function ignite(world, entity, at, power = 1, near = false) {
-  if (fires.has(entity)) return;
-  const so = getComponent(world, entity, SceneObject), settings = getResource(world, Settings), gpu = getResource(world, Gpu);
-  if (!canBurn(so)) return;
-  const size = (lookOf(world)?.world.size ?? 1 / settings.ppu) * PX;
-  const parts = so.meshes.filter((p) => p.role !== 'leaves' && p.role !== 'water');
-  const vol = partsVolume(parts, size);
-  if (!vol) return;
-  const [nx, ny, nz] = vol.n, grid = new Int32Array(nx * ny * nz).fill(-1);
-  let n = 0;
-  for (let k = 0; k < grid.length; k++) if (vol.data[k]) grid[k] = n++;
-  const fire = {
-    entity, so, size, nx, ny, nz, grid, n, done: false,
-    at: new Int32Array(n), xyz: new Int16Array(n * 3), mat: new Uint8Array(n), state: new Uint8Array(n), inner: new Uint8Array(n),
-    more: new Float32Array(n), heat: new Float32Array(n), need: new Float32Array(n), lit: new Float32Array(n).fill(-1),
-    slot: new Int32Array(n).fill(-1), cellAt: new Int32Array(n), count: 0, active: new Int32Array(n), live: 0,
-    joined: new Uint8Array(n).fill(1), cut: true, joinIn: 0,
-    power: new Float32Array(n), src: new Float32Array(n), out: new Uint8Array(n),
-    loose: new Uint8Array(n), off: new Float32Array(n), jitter: new Float32Array(n), dry: new Float32Array(n),
-    warm: new Int32Array(n), warmN: 0, piece: new Int32Array(n), pieces: [], pieceId: 0, breaks: new Float32Array(n), breaking: [],
-    mid: new Float32Array(n), row: new Float32Array(n), hidden: parts.map(({ mesh }) => mesh), sprites: [], bits: [],
-  };
-  const dryAt = patches(Math.floor(Math.random() * 1e9));
-  const nrm = new Float32Array(n * 3), dec = [0, 0, 0];
-  const looks = parts.map((p) => ({ mat: materialOf(p), mid: p.mesh.material.uniforms.uMid?.value ?? 4, row: p.mesh.material.uniforms.uPal?.value ?? 0 }));
-  for (let k = 0; k < grid.length; k++) {
-    const c = grid[k];
-    if (c < 0) continue;
-    const l = looks[vol.data[k] - 1];
-    fire.at[c] = k;
-    fire.xyz.set([k % nx, Math.floor(k / nx) % ny, Math.floor(k / (nx * ny))], c * 3);
-    fire.mat[c] = l.mat;
-    fire.mid[c] = l.mid;
-    fire.row[c] = l.row;
-    // dry: from 0.5 (a wet patch: it takes half the heat, needs more and resists more) to 1.5 (a dry patch)
-    const dry = Math.min(1, Math.max(0, (dryAt(fire.xyz[c * 3], fire.xyz[c * 3 + 1], fire.xyz[c * 3 + 2]) - 0.5) * 1.8 + 0.5));
-    fire.dry[c] = 0.5 + dry;
-    fire.need[c] = (0.6 + 0.9 * (1 - dry)) * (0.85 + Math.random() * 0.3);
-    fire.jitter[c] = Math.random();
-    const code = vol.normals?.[k] ?? 0;
-    if (code) nrm.set(decodeNormal(code, dec), c * 3);   // 0: it was filled in (inside the shape)
+// the object entity catches fire at the voxel with fuel nearest to the point at (world units): its voxels in MATCH
+// cells around it burn. near: the nearest voxel whatever its material, else the solid part first. -> it caught fire
+export function ignite(world, entity, at, near = false) {
+  const f = fires.get(entity) ?? fireOf(world, entity);
+  if (!f) {
+    // its voxels are not made yet: it catches fire when they are
+    if (!canBurn(getComponent(world, entity, SceneObject))) return false;
+    if (!lights.some((l) => l.e === entity)) lights.push({ e: entity, at: at.clone(), near });
+    return true;
   }
-  fire.min = vol.min;
-  // a material that is gone at the end: not all its voxels at the same time
-  for (let c = 0; c < n; c++) if (mat(fire, c).after === 'gone') fire.more[c] = Math.random() * 0.6;
+  const first = firstCell(f, f.so.group.worldToLocal(at.clone()), near);
+  if (first < 0) return false;
+  const [x, y, z] = [f.xyz[first * 3], f.xyz[first * 3 + 1], f.xyz[first * 3 + 2]];
+  for (let c = 0; c < f.n; c++) {
+    const dx = f.xyz[c * 3] - x, dy = f.xyz[c * 3 + 1] - y, dz = f.xyz[c * 3 + 2] - z;
+    if (dx * dx + dy * dy + dz * dz <= MATCH * MATCH) Fire.light(f, c);
+  }
+  f.done = false;
+  return true;
+}
+
+// the fire worker makes the voxels of an object (once), with their water: a wet object (a part `wet` of the objects of
+// the world, by a hash of its place, so a world always has the same wet objects) has WET_WATER times the water of its
+// materials, and the water changes a little in patches
+function prepare(world, entity) {
+  if (fires.has(entity) || ready.has(entity) || [...making.values()].includes(entity)) return;
+  const so = getComponent(world, entity, SceneObject), settings = getResource(world, Settings);
+  if (!canBurn(so)) return;
+  const parts = so.meshes.filter((p) => p.role !== 'leaves' && p.role !== 'water');
+  const t = getComponent(world, entity, Transform), hash = Math.abs(Math.sin(t.x * 12.9898 + t.z * 78.233) * 43758.5453) % 1;
+  const wet = hash < (settings.land.burnWet ?? 0) ? WET_WATER : 1, size = (lookOf(world)?.world.size ?? 1 / settings.ppu) * PX;
+  if (!worker) {
+    worker = new Worker(new URL('../lib/fireWorker.js', import.meta.url), { type: 'module' });
+    worker.onmessage = ({ data }) => {
+      const job = making.get(data.id);
+      making.delete(data.id);
+      if (data.count) ready.set(job.entity, { ...data, ...job });
+    };
+  }
+  const canopy = byName.get(json.parts.canopy);
+  const sent = parts.map((p) => {
+    const { p: P, nrm } = triangles(p.mesh.userData.shape ?? p.mesh.geometry, p.mesh.matrix), m = MATERIALS[materialOf(p)];
+    return { p: P, nrm, stays: m.stays, water: m.water, leaves: materialOf(p) === canopy };
+  });
+  // the leaf clumps (sprites): where each is, in the units of the object
+  const clumps = [], spots = [], v = new THREE.Vector3();
+  for (const { mesh, role } of so.meshes) {
+    if (role !== 'leaves') continue;
+    const pos = mesh.geometry.getAttribute('iPos');
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrix);
+      clumps.push(v.x, v.y, v.z);
+      spots.push({ mesh, i });
+    }
+  }
+  const id = jobs++, at = Float32Array.from(clumps);
+  making.set(id, { entity, parts, size, wet: wet > 1, spots });
+  worker.postMessage({ id, size, parts: sent, wet, seed: Math.floor(hash * 1e9), patch: PATCH, patchWater: PATCH_WATER, clumps: at },
+    [...sent.flatMap((m) => [m.p.buffer, m.nrm.buffer]), at.buffer]);
+}
+
+// the fire of an object, from its voxels the worker made: their materials, water and fuel, the mesh that shows them in
+// place of the object, and its leaf clumps. null: not made yet (they are asked for), or nothing of it burns
+function fireOf(world, entity) {
+  if (fires.has(entity)) return fires.get(entity);
+  const d = ready.get(entity);
+  if (!d) { prepare(world, entity); return null; }
+  ready.delete(entity);
+  const so = getComponent(world, entity, SceneObject), gpu = getResource(world, Gpu), { parts, size, count: n } = d;
+  const [nx, ny, nz] = d.n;
+  const f = {
+    entity, so, size, nx, ny, nz, grid: d.grid, n, done: false, acc: 0, materials: MATERIALS, wet: d.wet,
+    at: d.at, xyz: d.xyz, mat: new Uint8Array(n), jitter: new Float32Array(n), min: d.min, nrm: d.nrm, held: d.held,
+    slot: new Int32Array(n).fill(-1), cellAt: new Int32Array(n), count: 0, moved: new Uint8Array(n), dirty: new Int32Array(n), dirtyN: 0,
+    joined: new Uint8Array(n).fill(1), cut: false, joinIn: 0, loose: new Uint8Array(n), off: new Float32Array(n),
+    piece: new Int32Array(n), pieces: [], pieceId: 0, breaks: new Float32Array(n), breaking: [],
+    mid: new Float32Array(n), row: new Float32Array(n), hidden: parts.map(({ mesh }) => mesh), sprites: [], clumpsOf: [], bits: [],
+  };
+  const looks = parts.map((p) => ({ mat: materialOf(p), mid: p.mesh.material.uniforms.uMid?.value ?? 4, row: p.mesh.material.uniforms.uPal?.value ?? 0 }));
+  for (let c = 0; c < n; c++) {
+    const l = looks[d.part[c]];
+    f.mat[c] = l.mat;
+    f.mid[c] = l.mid;
+    f.row[c] = l.row;
+    f.jitter[c] = Math.random();
+  }
+  const w = new THREE.Vector3(WIND[0], 0, WIND[1]).transformDirection(so.group.matrixWorld.clone().invert());
+  Fire.makeFire(f, (c) => d.water[c], w.x, w.z);
   // the mesh: room for every voxel; only the ones that show are drawn (the first `count`)
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  fire.nrmAttr = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3);
-  fire.matAttr = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3);
-  fire.matAttr.setUsage(THREE.DynamicDrawUsage);
-  geometry.setAttribute('iNrm', fire.nrmAttr);
-  geometry.setAttribute('iMat', fire.matAttr);
-  fire.nrm = nrm;
+  f.nrmAttr = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3);
+  f.matAttr = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3);
+  f.matAttr.setUsage(THREE.DynamicDrawUsage);
+  geometry.setAttribute('iNrm', f.nrmAttr);
+  geometry.setAttribute('iMat', f.matAttr);
   const mesh = new THREE.InstancedMesh(geometry, shaderMaterial(gpu.shared, S.BURN_VERT, S.BURN_FRAG), n);
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.frustumCulled = false;
@@ -322,114 +393,37 @@ export function ignite(world, entity, at, power = 1, near = false) {
   mesh.count = 0;
   so.group.add(mesh);
   so.group.updateMatrixWorld(true);
-  fire.mesh = mesh;
-  windOf(fire);
+  f.mesh = mesh;
   // the voxels that show: the ones next to an empty cell
-  for (let c = 0; c < n; c++) if (open(fire, fire.at[c])) show(fire, c); else fire.inner[c] = 1;
+  for (const c of d.shown) show(f, c);
   // the leaf clumps: their own copy of the sprites, each goes with the voxel of the canopy under it
-  const canopy = byName.get(json.parts.canopy);
-  for (const { mesh: leaves, role } of so.meshes) {
-    if (role !== 'leaves') continue;
-    leaves.geometry = leaves.geometry.clone();
-    const pos = leaves.geometry.getAttribute('iPos'), v = new THREE.Vector3();
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i).applyMatrix4(leaves.matrix);
-      fire.sprites.push({ attr: pos, i, cell: nearestCell(fire, v, canopy) });
-    }
-  }
-  // the first voxel, and the ones around it
-  const first = firstCell(fire, so.group.worldToLocal(at.clone()), near);
-  if (first < 0) return drop(fire);
-  for (const c of [first, ...neighbours(fire, first)]) if (c >= 0) { fire.src[c] = power; light(fire, c); }
-  fires.set(entity, fire);
+  for (const { mesh } of d.spots) if (!mesh.userData.burnCopy) { mesh.geometry = mesh.geometry.clone(); mesh.userData.burnCopy = true; }
+  d.spots.forEach(({ mesh, i }, s) => {
+    const attr = mesh.geometry.getAttribute('iPos'), cell = d.clumpAt[s];
+    // (y0: its height in the mesh; per: mesh units a world unit up, so it can go down with its voxel when that falls)
+    const sp = { attr, i, cell, y0: attr.getY(i), cy: cell >= 0 ? f.xyz[cell * 3 + 1] : 0, per: 1 / (mesh.matrix.elements[5] || 1) };
+    f.sprites.push(sp);
+    if (cell >= 0) (f.clumpsOf[cell] ??= []).push(sp);
+  });
+  draw(world, f, gpu);
+  fires.set(entity, f);
   window.__burn = fires;   // for the tests
+  return f;
 }
 
-// the voxels of the parts of an object, filled: each part alone (filled as one shape, so its inside takes its own
-// material: in one volume the inside of the leaves next to the trunk took the colour of the trunk, a branch that is not
-// there), then all in one grid (the grid starts at 0 in the units of the object for every part); where they meet, a
-// material that stays wins (the trunk goes on inside the leaves). -> { min, n, data (part + 1, 0: empty),
-// normals } like voxelize, or null
-function partsVolume(parts, size) {
-  const vols = parts.map(({ mesh }) => voxelize([{ tris: oneSided(triangles(mesh.userData.shape ?? mesh.geometry, mesh.matrix)), color: 0 }],
-    size, { normals: true, fill: true, view: [0, 1, 0] }));
-  const some = vols.filter(Boolean);
-  if (!some.length) return null;
-  const min = [0, 1, 2].map((a) => Math.min(...some.map((v) => v.min[a])));
-  const n = [0, 1, 2].map((a) => Math.max(...some.map((v) => v.min[a] + v.n[a])) - min[a]);
-  const data = new Uint32Array(n[0] * n[1] * n[2]), normals = new Uint16Array(data.length);
-  const holds = (c) => (MATERIALS[materialOf(parts[c])]?.stays ? 1 : 0);
-  const order = parts.map((_, c) => c).sort((a, b) => holds(a) - holds(b));
-  for (const c of order) {
-    const v = vols[c];
-    if (!v) continue;
-    const [vx, vy, vz] = v.n, [ox, oy, oz] = [0, 1, 2].map((a) => v.min[a] - min[a]);
-    for (let z = 0; z < vz; z++) for (let y = 0; y < vy; y++) for (let x = 0; x < vx; x++) {
-      const k = x + vx * (y + vy * z);
-      if (!v.data[k]) continue;
-      const K = x + ox + n[0] * (y + oy + n[1] * (z + oz));
-      data[K] = c + 1;
-      normals[K] = v.normals[k];
-    }
-  }
-  return { min, n, data, normals };
-}
-
-// the wind in the units of the object (it may be turned): how much heat goes to each of the 6 voxels next to a burning
-// one (more to the one the wind blows to), and the voxels over it that the hot air heats (leaning with the wind)
-function windOf(f) {
-  const w = new THREE.Vector3(WIND[0], 0, WIND[1]).transformDirection(f.so.group.matrixWorld.clone().invert());
-  f.weight = [SIDE * (1 + WIND_SPREAD * w.x), SIDE * (1 - WIND_SPREAD * w.x), UP, DOWN, SIDE * (1 + WIND_SPREAD * w.z), SIDE * (1 - WIND_SPREAD * w.z)];
-  f.climb = [];
-  for (let h = 2; h <= CLIMB; h++) {
-    const dx = Math.round(h * WIND_LEAN * w.x), dz = Math.round(h * WIND_LEAN * w.z);
-    f.climb.push({ dx, dy: h, dz, o: dx + h * f.nx + dz * f.nx * f.ny, w: (UP * CLIMB_HEAT) / (h - 1) });
-  }
-}
-
-// smooth noise from 0 to 1 that changes over about PATCH voxels (the dry and wet patches): a function of a cell
-function patches(seed) {
-  const hash = (x, y, z) => {
-    let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1440662683) ^ seed;
-    h = Math.imul(h ^ (h >>> 13), 1274126177);
-    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-  };
-  const ease = (t) => t * t * (3 - 2 * t), lerp = (a, b, t) => a + (b - a) * t;
-  return (x, y, z) => {
-    x /= PATCH; y /= PATCH; z /= PATCH;
-    const X = Math.floor(x), Y = Math.floor(y), Z = Math.floor(z), u = ease(x - X), v = ease(y - Y), w = ease(z - Z);
-    const at = (i, j, k) => hash(X + i, Y + j, Z + k);
-    return lerp(lerp(lerp(at(0, 0, 0), at(1, 0, 0), u), lerp(at(0, 1, 0), at(1, 1, 0), u), v),
-      lerp(lerp(at(0, 0, 1), at(1, 0, 1), u), lerp(at(0, 1, 1), at(1, 1, 1), u), v), w);
-  };
+// an object that was only warmed: its voxels go and it shows as it was
+function forget(f) {
+  drop(f);
+  for (const mesh of f.hidden) mesh.visible = true;
 }
 
 // ------------------------------------------------------------------ the voxels
-const offsets = (f) => [1, -1, f.nx, -f.nx, f.nx * f.ny, -f.nx * f.ny];
 const mat = (f, c) => MATERIALS[f.mat[c]];
-const total = (f, c) => { const m = mat(f, c); return m.burnTime + m.emberTime + m.charTime + f.more[c]; };
-const emberOf = (f, c) => mat(f, c).emberTime * (0.6 + 0.8 * f.jitter[c]);   // some embers glow longer than others
-
-function neighbours(f, c) {
-  const k = f.at[c];
-  return offsets(f).map((o) => f.grid[k + o]);
-}
 
 // a cell of the grid next to an empty one (the grid has an empty border, so k + o is always in it)
 function open(f, k) {
-  for (const o of offsets(f)) { const d = f.grid[k + o]; if (d < 0 || f.state[d] === GONE) return true; }
+  for (const o of Fire.offsets(f)) { const d = f.grid[k + o]; if (d < 0 || f.state[d] === GONE) return true; }
   return false;
-}
-
-// a voxel catches fire (if its material burns and it did not yet), with the strength of the fire that lit it (src)
-// times what its material keeps
-function light(f, c) {
-  if (f.state[c] > HEATING || !mat(f, c).burns) return;
-  f.power[c] = f.src[c] * mat(f, c).keeps;
-  f.state[c] = BURNING;
-  f.lit[c] = 0;
-  f.heat[c] = f.need[c];
-  f.active[f.live++] = c;
 }
 
 function show(f, c) {
@@ -437,8 +431,16 @@ function show(f, c) {
   const s = f.count++;
   f.slot[c] = s;
   f.cellAt[s] = c;
+  mark(f, s);
   f.nrmAttr.array.set(f.nrm.subarray(c * 3, c * 3 + 3), s * 3);
   f.nrmAttr.needsUpdate = true;
+}
+
+// a slot of the mesh whose voxel changed (a new one, it moved): its place, size and colour are written at the next draw
+function mark(f, s) {
+  if (f.moved[s]) return;
+  f.moved[s] = 1;
+  f.dirty[f.dirtyN++] = s;
 }
 
 function hide(f, c) {
@@ -448,91 +450,19 @@ function hide(f, c) {
   if (moved !== c) {
     f.cellAt[s] = moved;
     f.slot[moved] = s;
+    mark(f, s);
     f.nrmAttr.array.copyWithin(s * 3, last * 3, last * 3 + 3);
     f.nrmAttr.needsUpdate = true;
   }
   f.slot[c] = -1;
 }
 
-// the state of a voxel that caught fire, by the seconds since (and its material)
-function stateAt(f, c, t) {
-  const m = mat(f, c);
-  if (f.out[c]) return BURNT;   // the rain put it out
-  if (t < m.burnTime) return BURNING;
-  if (t < m.burnTime + emberOf(f, c)) return EMBERS;
-  if (t >= total(f, c)) return GONE;
-  // black, then grey ash for the end of its time
-  return m.after === 'gone' && t >= total(f, c) - (total(f, c) - m.burnTime - emberOf(f, c)) * 0.45 ? ASH : BURNT;
-}
-
-// the fire moves on: the heated voxels cool a little; the burning voxels heat the ones near them; each voxel that caught
-// fire goes from state to state
-function step(f, dt) {
-  const offs = offsets(f), born = [], wet = rain ? RAIN_HEAT : 1, out = 1 - Math.exp(-RAIN_OUT * dt), keepHeat = Math.exp(-COOL * dt);
-  let w = 0;
-  for (let i = 0; i < f.warmN; i++) {
-    const c = f.warm[i];
-    if (f.state[c] !== HEATING) continue;
-    if ((f.heat[c] *= keepHeat) < 0.03) { f.heat[c] = 0; f.state[c] = NORMAL; continue; }   // cold again
-    f.warm[w++] = c;
-  }
-  f.warmN = w;
-  let keep = 0;
-  for (let i = 0; i < f.live; i++) {
-    const c = f.active[i], t = (f.lit[c] += dt);
-    let s = (f.state[c] = stateAt(f, c, t));
-    // the rain puts a burning voxel out (not one that already broke up on the ground)
-    if (rain && s === BURNING && !f.loose[c] && Math.random() < out) { f.out[c] = 1; s = f.state[c] = BURNT; }
-    if (f.out[c]) continue;   // put out: black, it does not change any more
-    if (s === BURNING && f.power[c] >= MIN_POWER) {
-      const k = f.at[c], x = f.xyz[c * 3], y = f.xyz[c * 3 + 1], z = f.xyz[c * 3 + 2], pw = f.power[c] * wet;
-      // the 6 next to it, and the ones 2 away to the sides and under it
-      for (let j = 0; j < 12; j++) {
-        if (j === 8) continue;   // 2 over it: the hot air (below)
-        if (j >= 6) {   // 2 away: still in the grid?
-          const a = (j - 6) >> 1, q = f.xyz[c * 3 + a] + ((j - 6) & 1 ? -2 : 2);
-          if (q < 0 || q >= [f.nx, f.ny, f.nz][a]) continue;
-        }
-        heatUp(f, c, f.grid[k + (j < 6 ? offs[j] : offs[j - 6] * 2)], f.weight[j % 6] * (j < 6 ? 1 : FAR) * pw * dt, born);
-      }
-      // the hot air: the voxels over it, leaning with the wind
-      for (const u of f.climb) {
-        if (y + u.dy >= f.ny || x + u.dx < 0 || x + u.dx >= f.nx || z + u.dz < 0 || z + u.dz >= f.nz) continue;
-        heatUp(f, c, f.grid[k + u.o], u.w * pw * dt, born);
-      }
-    }
-    if (s === GONE) {
-      f.cut = true;
-      if (f.slot[c] >= 0 && f.bits.length < 60 && Math.random() < 0.04) f.bits.push({ c, kind: 'flake' });   // a flake of ash
-      hide(f, c);
-      for (const o of offs) { const d = f.grid[f.at[c] + o]; if (d >= 0) { show(f, d); f.inner[d] = 0; } }   // it is outside now
-    } else if (s === BURNT && mat(f, c).after === 'char' && t >= mat(f, c).burnTime + mat(f, c).emberTime * 1.4) {
-      // black for good: it does not change any more
-    } else f.active[keep++] = c;
-  }
-  f.live = keep;
-  for (const c of born) light(f, c);
-  fall(f, dt);
-}
-
-// the burning voxel c gives heat to the voxel d (by this much, before what d takes of it: its material, dry or wet, inside
-// or outside); with enough heat d catches fire (born), or it resists: it loses its heat and needs more next time
-function heatUp(f, c, d, much, born) {
-  if (d < 0 || f.state[d] > HEATING || !mat(f, d).burns) return;
-  if (f.state[d] === NORMAL) { f.state[d] = HEATING; f.warm[f.warmN++] = d; }
-  f.heat[d] += HEAT * much * mat(f, d).catches * f.dry[d] * (f.inner[d] ? INNER : 1);
-  if (f.power[c] > f.src[d]) f.src[d] = f.power[c];
-  if (f.heat[d] < f.need[d]) return;
-  // a wet voxel resists more often
-  if (Math.random() < mat(f, d).resists * (2.5 - f.dry[d] * 1.5)) { f.heat[d] = 0; f.need[d] *= 1.6; } else born.push(d);
-}
-
 // the pieces that fall: each one as one piece, faster and faster, until a voxel of it lands on the ground or on a voxel
 // that is not of a piece; there it breaks up. off: how far it fell since its cells (drawn lower by that much); it moves
 // down a cell each time it passes one
 function fall(f, dt) {
-  const { grid, nx } = f, offs = offsets(f), floor = Math.max(1, Math.ceil(-f.min[1] - 0.5));
-  if (f.cut && ((f.joinIn -= dt) <= 0 || !f.live)) {   // (at once when nothing else changes, so the fire does not end first)
+  const { grid, nx } = f, offs = Fire.offsets(f), floor = Math.max(1, Math.ceil(-f.min[1] - 0.5));
+  if (f.cut && ((f.joinIn -= dt) <= 0 || !f.awakeN)) {   // (at once when nothing else changes, so the fire does not end first)
     join(f, floor); f.cut = false; f.joinIn = JOIN_EVERY;
   }
   breakUp(f, dt);
@@ -543,18 +473,23 @@ function fall(f, dt) {
     p.vel = Math.min(p.vel + GRAVITY * dt, FALL_MAX * (1 + Math.cbrt(p.cells.length)));
     p.off += p.vel * dt;
     while (p.off >= f.size) {
-      // under it: the ground or a voxel that stays (it lands), or a piece that falls too (it waits on it)
-      let under = 0;
+      // under it: the ground or a voxel (it lands), or a piece that falls too (it waits on it)
+      let under = 0, ground = false;
       for (const c of p.cells) {
-        if (f.xyz[c * 3 + 1] <= floor) { under = 2; break; }
+        if (f.xyz[c * 3 + 1] <= floor) { under = 2; ground = true; break; }
         const d = grid[f.at[c] - nx];
         if (d < 0 || f.state[d] === GONE || f.piece[d] === p.id) continue;
         under = f.piece[d] ? Math.max(under, 1) : 2;
         if (under === 2) break;
       }
-      if (under === 2) { land(f, p); return false; }
+      if (under === 2) {
+        // a short drop onto the object (a canopy that sinks onto its trunk): it rests there; else it breaks up
+        if (!ground && p.drop < REST_DROP) rest(f, p); else land(f, p);
+        return false;
+      }
       if (under === 1) { p.off = f.size * 0.99; break; }
       p.off -= f.size;
+      p.drop++;
       // one cell down, the bottom ones first (the cells are from the bottom up)
       for (const c of p.cells) { const k = f.at[c]; if (grid[k] === c) grid[k] = -1; grid[k - nx] = c; f.at[c] = k - nx; f.xyz[c * 3 + 1]--; }
       // the voxels next to the cells it left show
@@ -564,32 +499,53 @@ function fall(f, dt) {
         for (const o of offs) { const d = grid[k + o]; if (d >= 0 && f.piece[d] !== p.id) show(f, d); }
       }
     }
-    for (const c of p.cells) f.off[c] = p.off;
+    for (const c of p.cells) { f.off[c] = p.off; if (f.slot[c] >= 0) mark(f, f.slot[c]); moveClumps(f, c); }
     return true;
   });
 }
 
-// a piece landed: it breaks up. What burns burns on there (a little: it does not join the rest again); green leaves
-// fall apart (they shrink and are gone, not all at once); the rest crumbles to ash; and some of it flies off in bits
+// a piece sank a little onto the object: it rests there, as it is, and is joined again
+function rest(f, p) {
+  for (const c of p.cells) {
+    f.off[c] = 0;
+    f.piece[c] = 0;
+    if (f.slot[c] >= 0) mark(f, f.slot[c]);
+    moveClumps(f, c);
+  }
+  f.cut = true;
+}
+
+// the leaf clumps of a voxel that fell go down with it
+function moveClumps(f, c) {
+  for (const sp of f.clumpsOf[c] ?? []) {
+    if (sp.gone) continue;
+    sp.attr.setY(sp.i, sp.y0 - ((sp.cy - f.xyz[c * 3 + 1]) * f.size + f.off[c]) * sp.per);
+    sp.attr.needsUpdate = true;
+  }
+}
+
+// a piece landed: it breaks up. What burns burns on there (it does not join the rest again); green leaves fall apart
+// (they shrink and are gone, not all at once); the rest crumbles to ash; and some of it flies off in bits
 function land(f, p) {
   for (const c of p.cells) {
     f.off[c] = 0;
     f.piece[c] = 0;
     f.loose[c] = 1;
     show(f, c);
-    if (f.state[c] === BURNING && !f.out[c]) continue;
+    mark(f, f.slot[c]);
+    if (f.burn[c]) continue;
     const s = f.out[c] ? BURNT : f.state[c];
     if (s < BURNING) { f.breaks[c] = 0.3 + Math.random() * 1.5; f.breaking.push(c); }
-    else crumble(f, c);
+    else Fire.crumble(f, c);
     if (f.slot[c] < 0 || f.bits.length >= 120 || Math.random() > 0.25) continue;
     f.bits.push({ c, kind: 'bit', color: s < BURNING ? '#4a7a3c' : s === EMBERS ? '#ff7a20' : s === ASH ? '#6a6460' : '#2a2422' });
-    if (s < BURNING) f.breaks[c] = 0.001; else f.lit[c] = total(f, c);   // it is that bit now
+    if (s < BURNING) f.breaks[c] = 0.001; else Fire.crumble(f, c, 0.001);   // it is that bit now
   }
 }
 
 // the green leaves of a piece that landed: each shrinks and is gone at its time (unless it caught fire: then it burns)
 function breakUp(f, dt) {
-  const offs = offsets(f);
+  const offs = Fire.offsets(f);
   f.breaking = f.breaking.filter((c) => {
     if (f.state[c] >= BURNING) { f.breaks[c] = 0; return false; }
     if ((f.breaks[c] -= dt) > 0) return true;
@@ -597,29 +553,22 @@ function breakUp(f, dt) {
     f.state[c] = GONE;
     f.cut = true;
     hide(f, c);
-    for (const o of offs) { const d = f.grid[f.at[c] + o]; if (d >= 0) { show(f, d); f.inner[d] = 0; } }
+    for (const o of offs) { const d = f.grid[f.at[c] + o]; if (d >= 0) show(f, d); }
     return false;
   });
 }
 
-// a voxel breaks up: grey ash in about a second, then gone (one that did not burn, or that the rain put out, goes back
-// to the voxels that change); from now on it is not joined to anything
-function crumble(f, c) {
-  f.loose[c] = 1;
-  if (f.state[c] < BURNING || f.out[c]) { f.out[c] = 0; f.lit[c] = 0; f.state[c] = ASH; f.active[f.live++] = c; }
-  f.lit[c] = Math.max(f.lit[c], total(f, c) - (0.5 + Math.random() * 0.9));
-}
-
 // which voxels are joined, voxel by voxel (the 6 next to each), to a voxel of a material that stays (the wood, stone) or
-// to the ground (a voxel that broke up on the ground is not joined again); the others make pieces that fall (each the
-// voxels joined to one another), their cells from the bottom up
+// to the ground (a voxel that broke up on the ground is not joined again), or are a bit that the shape itself holds
+// (held: joined to nothing from the start, lib/fireWorker.js); the others make pieces that fall (each the voxels joined
+// to one another), their cells from the bottom up
 function join(f, floor) {
-  const { grid, n } = f, offs = offsets(f), stack = new Int32Array(n);
+  const { grid, n } = f, offs = Fire.offsets(f), stack = new Int32Array(n);
   const free = (c) => f.state[c] !== GONE && !f.loose[c] && !f.piece[c];
   let top = 0;
   f.joined.fill(0);
   for (let c = 0; c < n; c++) {
-    if (!free(c) || (!mat(f, c).stays && f.xyz[c * 3 + 1] > floor)) continue;
+    if (!free(c) || (!mat(f, c).stays && f.xyz[c * 3 + 1] > floor && !f.held[c])) continue;
     f.joined[c] = 1;
     stack[top++] = c;
   }
@@ -646,57 +595,64 @@ function join(f, floor) {
       }
     }
     cells.sort((a, b) => f.xyz[a * 3 + 1] - f.xyz[b * 3 + 1]);
-    f.pieces.push({ id, cells, vel: 0, off: 0 });
+    f.pieces.push({ id, cells, vel: 0, off: 0, drop: 0 });
   }
 }
 
 // the heat of a voxel for the post pass (render/shaders.js burnColor), and its size (it shrinks as ash), by its state
 function heatOf(f, c, now) {
-  const s = f.state[c], t = f.lit[c], m = mat(f, c), j = f.jitter[c];
+  const s = f.state[c], m = mat(f, c), j = f.jitter[c];
   if (s < BURNING && f.breaks[c] > 0) return [0, Math.min(1, f.breaks[c] / 0.4)];   // green, falling apart: it shrinks
   if (s === NORMAL) return [0, 1];
-  if (f.out[c]) return [0.8, 1];   // put out by the rain: black
-  if (s === HEATING) return [0.22 * Math.min(1, f.heat[c] / f.need[c]), 1];
+  if (s === HEATING) return [0.22 * Math.min(1, Math.max(0, (f.T[c] - RED_FROM) / (m.ignite - RED_FROM))), 1];
   if (s === BURNING) {
     // each voxel its own colour (red, yellow, orange), and it flickers
-    const k = t / m.burnTime, flick = 0.07 * Math.sin(now * (9 + j * 7) + j * 40);
+    const k = 1 - f.F[c] / m.fuel, flick = 0.07 * Math.sin(now * (9 + j * 7) + j * 40);
     return [Math.min(0.495, Math.max(0.251, 0.25 + 0.25 * (k * 0.65 + j * 0.35) + flick)), 1];
   }
-  const e = emberOf(f, c);
   // embers: about half the voxels glow; the others are black at once
-  if (s === EMBERS) return [j < 0.55 ? 0.79 : 0.5 + 0.3 * ((t - m.burnTime) / e), 1];
-  if (m.after === 'char') return [0.8, 1];
-  const k = Math.min(1, (t - m.burnTime - e) / Math.max(0.05, total(f, c) - m.burnTime - e));
+  if (s === EMBERS) return [j < 0.55 ? 0.79 : 0.5 + 0.3 * (1 - f.F[c] / (m.fuel * Fire.EMBER)), 1];
+  if (f.out[c] || f.left[c] < 0) return [0.8, 1];   // black (the wood, or put out by the rain)
+  // black, then grey ash that shrinks, then gone
+  const k = Math.min(1, Math.max(0, 1 - f.left[c] / (m.charTime * (0.8 + 0.4 * j))));
   return [0.8 + 0.2 * k, k < 0.75 ? 1 : 1 - (k - 0.75) * 2.8];
 }
 
 function draw(world, f, gpu) {
   const now = performance.now() / 1000, M = f.mesh.instanceMatrix.array, A = f.matAttr.array, size = f.size;
   const [mx, my, mz] = f.min, nxy = f.nx * f.ny;
-  for (let s = 0; s < f.count; s++) {
-    const c = f.cellAt[s], k = f.at[c], [h, scale] = heatOf(f, c, now);
-    const x = k % f.nx, y = Math.floor(k / f.nx) % f.ny, z = Math.floor(k / nxy), e = size * scale, o = s * 16;
+  // a slot: its colour, and its place and size when it moved or is not at its full size
+  const put = (s, place) => {
+    const c = f.cellAt[s], [h, scale] = heatOf(f, c, now);
+    A[s * 3] = f.mid[c]; A[s * 3 + 1] = f.row[c]; A[s * 3 + 2] = h;
+    if (!place && scale === 1) return;
+    const k = f.at[c], x = k % f.nx, y = Math.floor(k / f.nx) % f.ny, z = Math.floor(k / nxy), e = size * scale, o = s * 16;
     M[o] = e; M[o + 1] = M[o + 2] = M[o + 3] = M[o + 4] = 0; M[o + 5] = e; M[o + 6] = M[o + 7] = M[o + 8] = M[o + 9] = 0;
     M[o + 10] = e; M[o + 11] = 0;
     M[o + 12] = (x + mx + 0.5) * size; M[o + 13] = (y + my + 0.5) * size - (size - e) * 0.5 - f.off[c]; M[o + 14] = (z + mz + 0.5) * size; M[o + 15] = 1;
-    A[s * 3] = f.mid[c]; A[s * 3 + 1] = f.row[c]; A[s * 3 + 2] = h;
-  }
+  };
+  // only what can change: the slots that moved, the voxels that are awake (systems/fireSim.js), the green ones that fall
+  // apart. A voxel asleep looks the same from frame to frame
+  for (let i = 0; i < f.dirtyN; i++) { const s = f.dirty[i]; f.moved[s] = 0; if (s < f.count) put(s, true); }
+  f.dirtyN = 0;
+  for (let i = 0; i < f.awakeN; i++) { const s = f.slot[f.awake[i]]; if (s >= 0) put(s, false); }
+  for (const c of f.breaking) if (f.slot[c] >= 0) put(f.slot[c], false);
   f.mesh.count = f.count;
   f.mesh.instanceMatrix.needsUpdate = true;
   f.matAttr.needsUpdate = true;
   for (const mesh of f.hidden) mesh.visible = false;
 
-  // the leaf clumps over a voxel that caught fire (or has most of the heat it needs, or falls) go
+  // the leaf clumps over a voxel that caught fire (or broke up) go; a voxel only heated keeps its clumps, and one that
+  // falls takes them with it
   for (const sp of f.sprites) {
     if (sp.gone || sp.cell < 0) continue;
     const c = sp.cell;
-    if (f.state[c] < BURNING && f.heat[c] < f.need[c] * 0.6 && !f.piece[c] && !f.loose[c]) continue;
+    if (f.state[c] < BURNING && !f.loose[c]) continue;
     sp.gone = true;
     sp.attr.setX(sp.i, 1e5);
     sp.attr.needsUpdate = true;
   }
 
-  // the fire: cubes rise from voxels that burn and show; the lamp at their middle
   const g = f.so.group.matrixWorld, v = new THREE.Vector3(), mid = new THREE.Vector3();
   // flakes of ash drift down with the wind, swinging; the bits of a piece that broke up fly off
   for (const { c, kind, color } of f.bits.splice(0)) {
@@ -707,35 +663,31 @@ function draw(world, f, gpu) {
       burnCube(world, v.x, v.y, v.z, size, color, 0.4 + Math.random() * 0.4, Math.cos(a) * sp, 1 + Math.random() * 1.5, Math.sin(a) * sp, false);
     }
   }
-  let burning = 0;
-  for (let i = 0; i < f.live; i++) {
-    const c = f.active[i];
-    if (f.state[c] === BURNING) { burning++; cellPos(f, c, v); mid.add(v); }
+  // the burning voxels that show: the lamp at their middle, cubes of fire from some of them
+  const lit = [];
+  for (let i = 0; i < f.awakeN; i++) {
+    const c = f.awake[i];
+    if (f.state[c] === BURNING && f.slot[c] >= 0) { lit.push(c); cellPos(f, c, v); mid.add(v); }
   }
-  if (!burning) return;
-  mid.divideScalar(burning).applyMatrix4(g);
+  if (!lit.length) return;
+  mid.divideScalar(lit.length).applyMatrix4(g);
   // by day the lamp is faint (it would paint the whole object orange), at night it lights around it
-  const strength = Math.min(1, burning / 1500), night = getResource(world, Settings).land.night ?? 0;
+  const strength = Math.min(1, lit.length / 1500), night = getResource(world, Settings).land.night ?? 0;
   gpu.fireLamps.push({ x: mid.x, y: mid.y, z: mid.z, r: 1.6 + 2.6 * strength, color: LAMP, k: (0.15 + 0.4 * strength) * (0.35 + 0.65 * night), flicker: true, ph: f.entity });
-  const cubes = Math.min(30, Math.ceil(burning / 60));
+  const cubes = Math.min(30, Math.ceil(lit.length / 60));
   for (let i = 0; i < cubes; i++) {
-    const c = f.active[Math.floor(Math.random() * f.live)];
-    if (f.slot[c] < 0 || f.state[c] !== BURNING) continue;
-    cellPos(f, c, v).applyMatrix4(g);
+    cellPos(f, lit[Math.floor(Math.random() * lit.length)], v).applyMatrix4(g);
     const r = Math.random();
     // they rise and lean with the wind
     burnCube(world, v.x, v.y + size, v.z, size * (1 + Math.random() * 1.5), FIRE[Math.floor(r * r * FIRE.length)], 0.35 + Math.random() * 0.5,
       WIND[0] * WIND_SPEED + (Math.random() - 0.5) * 0.3, 0.6 + Math.random() * 1.2, WIND[1] * WIND_SPEED + (Math.random() - 0.5) * 0.3, true);
   }
   // embers rise from the fire with the hot air; flakes of ash drift down
-  if (Math.random() < Math.min(0.8, burning / 2000)) {
-    const c = f.active[Math.floor(Math.random() * f.live)];
-    if (f.slot[c] >= 0) {
-      cellPos(f, c, v).applyMatrix4(g);
-      if (Math.random() < 0.5) burnCube(world, v.x, v.y, v.z, size * 0.6, '#ff7a20', 0.8 + Math.random() * 0.8,
-        WIND[0] * WIND_SPEED, 0.8 + Math.random() * 0.6, WIND[1] * WIND_SPEED, true, 0.4);
-      else flake(world, v, size, '#3a3431');
-    }
+  if (Math.random() < Math.min(0.8, lit.length / 2000)) {
+    cellPos(f, lit[Math.floor(Math.random() * lit.length)], v).applyMatrix4(g);
+    if (Math.random() < 0.5) burnCube(world, v.x, v.y, v.z, size * 0.6, '#ff7a20', 0.8 + Math.random() * 0.8,
+      WIND[0] * WIND_SPEED, 0.8 + Math.random() * 0.6, WIND[1] * WIND_SPEED, true, 0.4);
+    else flake(world, v, size, '#3a3431');
   }
 }
 
@@ -752,15 +704,15 @@ function cellPos(f, c, out) {
   return out.set((k % f.nx + mx + 0.5) * f.size, (Math.floor(k / f.nx) % f.ny + my + 0.5) * f.size, (Math.floor(k / (f.nx * f.ny)) + mz + 0.5) * f.size);
 }
 
-// the first voxel to burn, for a fire lit at a point (units of the object): the nearest voxel that shows and can burn;
-// near: whatever its material, else the height counting 3 times, of a material that stays if there is one (the
-// trunk in front of the human, not a leaf over it); -1: none
+// the first voxel to burn, for a fire lit at a point (units of the object): the nearest voxel that shows, can burn and
+// has fuel; near: whatever its material, else the height counting 3 times, of a material that stays if there is one
+// (the trunk in front of the human, not a leaf over it); -1: none
 function firstCell(f, p, near) {
   const v = new THREE.Vector3();
   let best = -1, bestD = Infinity, solid = false;
   for (let s = 0; s < f.count; s++) {
     const c = f.cellAt[s], m = mat(f, c);
-    if (!m.burns || (solid && !m.stays)) continue;
+    if (!m.burns || f.F[c] <= 0 || f.burn[c] || (solid && !m.stays)) continue;
     cellPos(f, c, v);
     if (near) {
       const d = v.distanceToSquared(p);
@@ -769,30 +721,6 @@ function firstCell(f, p, near) {
     }
     const d = (v.x - p.x) ** 2 + 9 * (v.y - p.y) ** 2 + (v.z - p.z) ** 2;
     if ((m.stays && !solid) || d < bestD) { bestD = d; best = c; solid = m.stays; }
-  }
-  return best;
-}
-
-// the voxel of a material nearest to a point (units of the object): first in the cells around it, else among all; -1
-// when there is none
-function nearestCell(f, p, want) {
-  const [mx, my, mz] = f.min, s = f.size;
-  const gx = Math.floor(p.x / s) - mx, gy = Math.floor(p.y / s) - my, gz = Math.floor(p.z / s) - mz;
-  let best = -1, bestD = Infinity;
-  const R = 4;
-  for (let z = gz - R; z <= gz + R; z++) for (let y = gy - R; y <= gy + R; y++) for (let x = gx - R; x <= gx + R; x++) {
-    if (x < 0 || y < 0 || z < 0 || x >= f.nx || y >= f.ny || z >= f.nz) continue;
-    const c = f.grid[x + f.nx * (y + f.ny * z)];
-    if (c < 0 || f.mat[c] !== want) continue;
-    const d = (x - gx) ** 2 + (y - gy) ** 2 + (z - gz) ** 2;
-    if (d < bestD) { bestD = d; best = c; }
-  }
-  if (best >= 0) return best;
-  const v = new THREE.Vector3();
-  for (let c = 0; c < f.n; c++) {
-    if (f.mat[c] !== want) continue;
-    const d = cellPos(f, c, v).distanceToSquared(p);
-    if (d < bestD) { bestD = d; best = c; }
   }
   return best;
 }
