@@ -48,7 +48,6 @@ import { setupQuestSystem, questSystem } from './systems/quests.js';
 import { setupNetSystem, netSystem, netSendSystem } from './systems/net.js';
 import { setupRoomSystem, roomSystem } from './systems/room.js';
 import { setupGameSystem, gameSystem, gameHitSystem } from './systems/game.js';
-import { burnSystem } from './systems/burn.js';
 import { openRoom, accountInfo, HOME } from './lib/room.js';
 import { params, online } from './lib/address.js';
 import { START } from './lib/combat.js';
@@ -198,7 +197,7 @@ for (const s of [setupGpuSystem, setupUiSystem, setupHudSystem, setupAdminSystem
   addSystem(world, s, 'startup');
 for (const s of [
   inputSystem, timeSystem, netSystem, gameSystem,
-  outfitSystem, transformSystem, skillSystem, blastSystem, craterSystem, playerSystem, auraSystem, portalSystem, monsterSystem, combatSystem, gameHitSystem, netSendSystem, roomSystem, dropSystem, questSystem, npcSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem, burnSystem, lampSystem,
+  outfitSystem, transformSystem, skillSystem, blastSystem, craterSystem, playerSystem, auraSystem, portalSystem, monsterSystem, combatSystem, gameHitSystem, netSendSystem, roomSystem, dropSystem, questSystem, npcSystem, inventorySystem, cameraControlSystem, viewportSystem, cloudSystem, lampSystem,
   coverChunkSystem, meshSystem, voxelSystem, objectSystem, footprintSystem, groundCoverSystem, shadowSystem,
   cameraSnapSystem, viewSystem, renderSystem, hudSystem, adminSystem, loadingSystem,
 ]) addSystem(world, s);

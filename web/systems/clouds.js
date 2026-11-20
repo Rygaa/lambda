@@ -32,7 +32,7 @@ export function cloudSystem(world) {
 export function lampSystem(world) {
   const gpu = getResource(world, Gpu), u = gpu.shared, t = getResource(world, Time).now / 1000;
   const rig = query(world, [CameraRig])[0], at = rig === undefined ? [0, 0, 0] : getComponent(world, rig, CameraRig).target;
-  const near = [...(gpu.moving ?? []).map((l) => [-1, l]), ...(gpu.fireLamps ?? []).map((l) => [-1, l]),
+  const near = [...(gpu.moving ?? []).map((l) => [-1, l]),
     ...(gpu.lamps ?? []).map((l) => [Math.hypot(l.x - at[0], l.z - at[2]), l]).sort((a, b) => a[0] - b[0])];
   u.uLamps.value.forEach((v, i) => {
     const l = near[i]?.[1];

@@ -199,13 +199,6 @@ The worlds:
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
-- `burn-test`: a small forest (oaks, pines, a fir, a bush), wooden crates with a barrel, and a rock, to try the voxel
-  fire (`"burn": true`, all dry): the first button at the top, or B, sets fire to the nearest object that can burn; a
-  burning tree heats the trees near it and they catch fire; the second button turns the rain on or off. The rock does
-  not burn.
-- `burn-forest`: the same fire in a bigger forest (40 units: 34 oaks, 26 pines, 18 firs, 16 bushes, 3 crates, 6 rocks)
-  with 3 clearings; you start in a clearing. About 30% of the objects are wet (`"burn": { "wet": 0.3 }`). B again sets
-  fire to the nearest object that is not burning.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),
@@ -306,11 +299,8 @@ Day Night (`night-forest`):
   dot at the side of the screen for each flashlight that is on out of sight.
 - A player cannot attack. F turns its flashlight on and off: a ring of light in front of it, which everyone sees.
   Near a crate, it holds E for 3 s to check it.
-- The monster burns a tree: B near it, one every 10 s. It burns for 5 s (flames and an orange light every page shows),
-  then it is gone until the end of the round: no tree to hide behind (the props keep their entity: `land.props[i].entity`;
-  the server sends which ones burn).
 - Each player the monster kills gives it one disguise (R): for 20 s it wears the clothes of that player, with no sword
-  and no circle of its own. A blow or a burn ends it.
+  and no circle of its own. A blow ends it.
 - A trap (a red ring) stops anyone who walks on it, the monster or a player, for 5 s; it works again 20 s after.
 - No skills, transformation or potions, and no names over the other players (they would show where they hide).
 - The players win when the 5 crates are checked; the monster wins when every player is dead. A dead player lies there
@@ -352,22 +342,6 @@ The fields of a world:
 - `rays`: the strength of the light rays, 0 to 1 (default 1).
 - `night`: how dark, 0 (day, default) to 1: the world and the people are dark and blue, and only the rings of the
   lamps (and of the flashlights of a game mode) show their colours (`web/render/shaders.js` uNight).
-- `burn`: `true` or `{ "wet": 0.3 }`: the button at the top (or B) sets fire to the nearest object that can burn, voxel by
-  voxel (`web/systems/burn.js`, `web/systems/fireSim.js`). Each voxel has a material (`assets/materials.json`, by the
-  role of its part, or the palette of a stone part: the wooden crates) and a temperature, water and fuel. One model
-  decides everything: a voxel gives heat to the voxels next to it (most up, least down), and a flame heats their outside
-  much more than their inside; the hot air over a burning voxel heats the first voxel above it across a gap; a voxel
-  must dry first, then catches fire at the ignite temperature of its material; it burns while it has fuel (faster with
-  more open faces: the inside only smoulders), glows as embers at the end, then stays black (the wood) or turns to ash
-  and is gone (the leaves). A dry tree that catches fire burns fully. A burning object heats the objects near it (more
-  when more of it burns and the gap is small), so a dry tree near a big fire catches, a wet one or one across a
-  clearing does not. `wet`: about this part of the objects (always the same ones) have 20
-  times the water. Rain (the second button) wets and cools every voxel: the fire goes out. A light wind leans the hot
-  air, makes the fire spread a little faster with it, and carries the embers and the flakes of ash.
-  The leaves burn where they hang, as in a real tree: nothing falls as a block; burning leaves drop flakes of ash and
-  small embers. A leaf voxel no longer joined, voxel by voxel, to the wood or the ground hangs on 1 to 4 seconds (its
-  twig burns through); if it has not caught fire by then it lets go alone and flutters down, gone before it lands. So
-  nothing floats and no green piece lies on the ground. The voxels of an object are made by a worker (`web/lib/fireWorker.js`) before the heat reaches it.
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).

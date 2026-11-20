@@ -12,7 +12,7 @@ import { buildMap, FLYFF } from './map.js';
 export const AMOUNTS = { none: 0, few: 0.3, some: 1, many: 2.5, lots: 6 };
 const CLEARINGS = { none: 0, few: 2, some: 3, many: 4, lots: 4 };   // the shaders take at most 4
 
-const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'pavement', 'map', 'trees', 'plants', 'borders', 'islands', 'clearings', 'cliffs', 'cave', 'ground', 'props', 'objects', 'monsters', 'portals', 'npcs', 'night', 'game', 'burn'];
+const WORLD_FIELDS = ['name', 'seed', 'size', 'theme', 'start', 'clouds', 'rays', 'pavement', 'map', 'trees', 'plants', 'borders', 'islands', 'clearings', 'cliffs', 'cave', 'ground', 'props', 'objects', 'monsters', 'portals', 'npcs', 'night', 'game'];
 // recipe "clouds": how much of the ground their shadows cover -> the CloudLayer edges (lo, hi); cave: all of it, so
 // only the clearings are lit (pools of light)
 export const CLOUDS = { none: [9, 10], few: [0.14, 0.2], some: [-0.05, 0.02], cave: [-0.6, -0.3] };
@@ -78,8 +78,6 @@ export function buildRecipe(cache, recipe, map = null) {
   if (recipe.start) b.start = [recipe.start[0], 0.6, recipe.start[1]];
   b.rays = recipe.rays ?? 1;     // strength of the god rays (0 = none)
   b.night = recipe.night ?? 0;   // how dark: 0 day, 1 night (only the lamps and flashlights show the world)
-  b.burn = !!recipe.burn;       // B near a tree sets it on fire, voxel by voxel (systems/burn.js)
-  b.burnWet = recipe.burn?.wet ?? 0;   // "burn": { "wet": 0.3 }: about this part of the objects are wet (green): they hardly catch fire
   b.game = recipe.game ?? null;  // a world of a game mode (systems/game.js): its boxes, traps and starts
   b.pavement = recipe.pavement ?? 'tiles';    // how the pavement paint looks: tiles or bricks
   if (!['tiles', 'bricks'].includes(b.pavement)) bad('world', `pavement "${b.pavement}" (use tiles or bricks)`);

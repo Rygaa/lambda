@@ -12,14 +12,12 @@
 //   holds E HOLD seconds near a crate ("checks") to check it. Dead, it lies there and watches until the end;
 //   a trap ("traps", a red ring when it works) stops whoever walks on it (the server: TRAP_STUCK s, then it works again);
 //   no skills, transformation or potions there (only the keys of PLAY count).
-//   The monster burns a tree (B, near it, every BURN_EVERY s): it burns BURN s for every page (a flickering lamp and
-//   flames), then it is gone (its entity: its body, what stops a walker, its shadow) until the end of the round. Each
-//   player it kills gives it one disguise (R): for DISGUISE s it wears the outfit of that player, with no sword and no
-//   circle of its own; a blow or a burn ends it.
+//   Each player the monster kills gives it one disguise (R): for DISGUISE s it wears the outfit of that player, with no
+//   sword and no circle of its own; a blow ends it.
 //   The players win when every crate is checked, the monster when every player is dead: the banner says who, and
 //   OVER ms later every page goes back.
 // A page in the world of a mode with no round for it (the round is over, or it was not in it) goes back.
-import { query, getComponent, getResource, readEvents, sendEvent, destroyEntity } from '../ecs/world.js';
+import { query, getComponent, getResource, readEvents, sendEvent } from '../ecs/world.js';
 import { Player, Peer, Health } from '../components.js';
 import { Settings, Time, Net, Gpu, Input, Wardrobe, Quests, Npcs, Game, Tops } from '../resources.js';
 import { Swing, Damage } from '../events.js';
@@ -27,7 +25,6 @@ import { toServer } from './net.js';
 import { goTo, playerData } from './portals.js';
 import { groundAt } from '../lib/walk.js';
 import { toScreen } from '../lib/screen.js';
-import { flames } from './blasts.js';
 import * as THREE from 'three';
 
 export const MODES = [{
@@ -42,18 +39,14 @@ const TRAP = 0.6;        // world units: on a trap
 const OVER = 6000;       // ms the banner shows before the pages go back
 const NO_ROUND = 4000;   // ms after the server said hello: no round for this page, it goes back
 const BACK = 'lambda-game-back';
-const BURN = 5;          // seconds a tree burns before it is gone
-const BURN_EVERY = 10;   // seconds between two trees the monster burns (server/games.py BURN_EVERY)
-const BURN_NEAR = 2;     // world units: a tree this close can be burnt
 const DISGUISE = 20;     // seconds
-const TREE = /^plant\/(?!bush|leafy)/;   // the props that burn: trees, not bushes
 const PLAY = new Set(['click', 'f', 'e', 'escape', ' ', 'shift', 'w', 'a', 's', 'd', 'z', 'q', 'c', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']);
 const COLORS = { flash: new THREE.Color('#fff2c0'), self: new THREE.Color('#8090ff'), trap: new THREE.Color('#ff3020'),
-  crate: new THREE.Color('#50c0ff'), done: new THREE.Color('#50ff70'), fire: new THREE.Color('#ff8a30') };
+  crate: new THREE.Color('#50c0ff'), done: new THREE.Color('#50ff70') };
 
 let ui = null;
 const local = { placed: null, hold: null, asked: {}, traps: {}, overAt: 0, gone: false, stuckUntil: 0,
-  fires: {}, burnt: new Set(), burnAt: -1e9, dead: new Set(), charges: 0, victim: null, disguise: null, own: null };
+  dead: new Set(), charges: 0, victim: null, disguise: null, own: null };
 
 export function setupGameSystem(world) {
   const modes = document.createElement('div');
@@ -165,10 +158,6 @@ function round(world, r) {
     // this page walked on it, and the server says it holds this player
     if (t.who === g.who && t.stuck > 0 && local.asked[i] && now - local.asked[i] < 3000) { local.stuckUntil = now + t.stuck * 1000; delete local.asked[i]; }
   }
-  // the trees that burn: each burns until BURN s after it caught fire (one that burnt before this page came: gone now)
-  for (const [i, since] of Object.entries(r.burns ?? {})) {
-    if (!local.fires[i] && !local.burnt.has(+i)) local.fires[i] = { until: now + Math.max(0, BURN - since) * 1000 };
-  }
   // the monster: each player it killed since it came gives it a disguise, in the outfit of that player
   for (const q of r.players) {
     if (!q.dead || local.dead.has(q.who)) continue;
@@ -258,40 +247,12 @@ function play(world, g, rec, raw) {
     if (q.light && !q.dead && q.goal) { flash(q.x, q.z, q.rot, q.y); lights.push(q); }
   }
   if (monster && !local.disguise) lamp(p.x, p.z, 2.4, COLORS.self, 0.6);
-  // the trees that burn: a flickering lamp and flames, then the tree is gone
-  for (const [i, fire] of Object.entries(local.fires)) {
-    const tree = settings.land.props[i];
-    if (!tree) { delete local.fires[i]; continue; }
-    if (now < fire.until) {
-      const y = groundAt(settings.land.terrain, tops, tree.x, tree.z);
-      gpu.moving.push({ x: tree.x, y: y + 1.2, z: tree.z, r: 3.6, color: COLORS.fire, k: 0.8, flicker: true, ph: +i });
-      flames(world, tree.x, y, tree.z, 0.7, 2.6, 8);
-      continue;
-    }
-    delete local.fires[i];
-    local.burnt.add(+i);
-    if (tree.entity !== undefined) destroyEntity(world, tree.entity);
-    gpu.shadowsDirty = true;
-  }
   const ready = (i) => !local.traps[i] || local.traps[i].ready <= now;
   rec.traps.forEach(([x, z], i) => { if (ready(i)) lamp(x, z, 1.1, COLORS.trap, 0.9); });
   rec.checks.forEach(([x, z], i) => lamp(x, z, 1.3, r.checked.includes(i) ? COLORS.done : COLORS.crate, 0.5));
 
-  // the monster: B burns the tree next to it, R puts on a disguise; a disguise ends after DISGUISE s
-  let near = -1;
-  const burnLeft = Math.max(0, BURN_EVERY - (now - local.burnAt) / 1000);
+  // the monster: R puts on a disguise; a disguise ends after DISGUISE s
   if (monster && alive && !over) {
-    let best = BURN_NEAR;
-    settings.land.props.forEach((t, i) => {
-      if (!TREE.test(t.name) || local.burnt.has(i) || local.fires[i]) return;
-      const d = Math.hypot(t.x - p.x, t.z - p.z);
-      if (d < best) { best = d; near = i; }
-    });
-    if (raw.includes('b') && near >= 0 && !burnLeft) {
-      toServer(net, { t: 'g-burn', i: near });
-      local.burnAt = now;
-      if (local.disguise) undisguise(world);
-    }
     if (raw.includes('r') && local.charges > 0 && !local.disguise) {
       local.charges--;
       local.disguise = { name: local.victim.name, until: now + DISGUISE * 1000 };
@@ -321,7 +282,6 @@ function play(world, g, rec, raw) {
     if (local.hold && t >= HOLD) { toServer(net, { t: 'g-check', i }); local.hold = null; }
     if (i >= 0) hint = local.hold ? `Checking the crate... ${Math.min(100, Math.round((100 * t) / HOLD))}%` : 'Hold E to check the crate';
   }
-  if (monster && near >= 0 && !burnLeft) hint = 'Press B to burn the tree';
   if (g.stuck > 0) hint = `Caught in a trap! ${Math.ceil(g.stuck)}`;
   else if (!alive && !over) hint = 'You are dead. Watch the end of the round.';
   if (ui.hint.textContent !== hint) ui.hint.textContent = hint;
@@ -330,7 +290,7 @@ function play(world, g, rec, raw) {
   // the text at the top: who you are, the crates, the players alive
   const left = r.players.filter((q) => q.who !== r.monster && !q.dead).length, all = r.players.length - 1;
   const skills = !monster ? '' : local.disguise ? `<span>Disguised as ${local.disguise.name}: ${Math.ceil((local.disguise.until - now) / 1000)} s</span>`
-    : `<span>B burn a tree: ${burnLeft ? Math.ceil(burnLeft) + ' s' : 'ready'} · R disguise: ${local.charges}</span>`;
+    : `<span>R disguise: ${local.charges}</span>`;
   const text = `<b>Day Night</b><span>${monster ? 'You are the MONSTER: find them all' : 'You are a player: F flashlight, E check'}</span>${skills}`
     + `<span>Crates ${r.checked.length} / ${r.checks} · Players alive ${left} / ${all}</span>`;
   if (ui.hud.innerHTML !== text) ui.hud.innerHTML = text;

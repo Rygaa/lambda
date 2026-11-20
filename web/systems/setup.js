@@ -217,8 +217,7 @@ export function spawnWorldSystem(world) {
   const settings = getResource(world, Settings);
   const land = settings.land;
   spawn(world, [GroundPlane]);
-  // each prop keeps its entity (a tree a game burns: systems/game.js)
-  for (const p of land.props) p.entity = spawnProp(world, p);
+  for (const p of land.props) spawnProp(world, p);
   for (const { object, x, z, rot, y = null, k = 0 } of land.objects) spawn(world, [Decor, { object, x, z, rot, y, k }]);
   for (const g of land.glades) spawn(world, [Glade, { x: g.x, z: g.z, r: g.r, k: g.k }]);
   // the lamps: every object whose type shines (gen/assets.js "light"); the dark over a cave takes no light

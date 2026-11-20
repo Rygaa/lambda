@@ -280,27 +280,3 @@ function facesOf({ n, data, first: from = null, last: to = null }) {
   }
   return { first, counts, faces, cells };
 }
-
-// a sheet seen from both sides (gen/solids.js sheet: each triangle twice, one per side) has only its side facing up
-// left: else its two sides make two layers of cubes, and the top one gets the normal of the side under it (it looks
-// dark). Other triangles stay. tris: of triangles(), without uv
-export function oneSided({ p, nrm }) {
-  const key = (t, order) => order.map((c) => `${p[t + c * 3].toFixed(4)},${p[t + c * 3 + 1].toFixed(4)},${p[t + c * 3 + 2].toFixed(4)}`).join('|');
-  const seen = new Map();
-  for (let t = 0; t < p.length; t += 9) seen.set(key(t, [0, 1, 2]), t);
-  const drop = new Set();
-  for (let t = 0; t < p.length; t += 9) {
-    if (drop.has(t)) continue;
-    // the same corners turned the other way (any start)
-    const twin = [[0, 2, 1], [2, 1, 0], [1, 0, 2]].map((o) => seen.get(key(t, o))).find((u) => u !== undefined && u !== t);
-    if (twin === undefined) continue;
-    const ny = (q) => (p[q + 5] - p[q + 2]) * (p[q + 6] - p[q]) - (p[q + 3] - p[q]) * (p[q + 8] - p[q + 2]);
-    drop.add(ny(t) >= ny(twin) ? twin : t);
-  }
-  if (!drop.size) return { p, nrm, uv: null };
-  const keep = [];
-  for (let t = 0; t < p.length; t += 9) if (!drop.has(t)) keep.push(t);
-  const P = new Float32Array(keep.length * 9), N = new Float32Array(keep.length * 9);
-  keep.forEach((t, i) => { P.set(p.subarray(t, t + 9), i * 9); N.set(nrm.subarray(t, t + 9), i * 9); });
-  return { p: P, nrm: N, uv: null };
-}
