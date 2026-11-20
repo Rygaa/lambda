@@ -364,10 +364,10 @@ The fields of a world:
   clearing does not. `wet`: about this part of the objects (always the same ones) have 20
   times the water. Rain (the second button) wets and cools every voxel: the fire goes out. A light wind leans the hot
   air, makes the fire spread a little faster with it, and carries the embers and the flakes of ash.
-  A piece of leaves that is no longer joined, voxel by voxel, to the wood or the ground falls as one piece (a small one
-  slower). After a short drop onto the object (a canopy that sinks onto its trunk) it rests there; after a real fall it
-  breaks up where it lands: what burns burns on, green leaves fall apart, the rest crumbles. So
-  nothing floats. The voxels of an object are made by a worker (`web/lib/fireWorker.js`) before the heat reaches it.
+  The leaves burn where they hang, as in a real tree: nothing falls as a block; burning leaves drop flakes of ash and
+  small embers. A leaf voxel no longer joined, voxel by voxel, to the wood or the ground hangs on 1 to 4 seconds (its
+  twig burns through); if it has not caught fire by then it lets go alone and flutters down, gone before it lands. So
+  nothing floats and no green piece lies on the ground. The voxels of an object are made by a worker (`web/lib/fireWorker.js`) before the heat reaches it.
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).

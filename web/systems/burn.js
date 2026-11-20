@@ -10,9 +10,10 @@
 //   - a burning object heats the objects near it (radiate): by how many of its outside voxels burn and the gap to that
 //     object, on the TARGET_CELLS outside voxels of it that face the fire. So a dry tree near a big fire catches, a wet
 //     tree or one across a clearing does not;
-//   - a piece of voxels of a material that is gone at the end (the leaves) no longer joined, voxel by voxel, to a material
-//     that stays (the wood) or to the ground falls as one piece (a small one slower); a short drop onto the object (a
-//     canopy that sinks onto its trunk) rests there, a real fall breaks up where it lands;
+//   - the leaves burn where they hang (on twigs the voxels do not show), as in a real tree: nothing falls as a block. A
+//     leaf voxel no longer joined, voxel by voxel, to a material that stays (the wood) or to the ground hangs on a while
+//     (its twig burns through, HANG seconds); if it does not catch fire by then it lets go alone and flutters down as
+//     one small cube that is gone before it lands. Burning leaves drop ash flakes and small embers;
 //   - draws the voxels (one instanced mesh in the G-buffer, render/shaders.js BURN_VERT, BURN_FRAG; the post pass colours
 //     them by their heat, burnColor), the leaf clumps (one goes when the voxel under it catches fire), the cubes of fire,
 //     embers and flakes of ash in the wind (systems/blasts.js burnCube) and the lamp of the fire (systems/clouds.js).
@@ -24,7 +25,7 @@ import { Prop, SceneObject, Player, Transform, CameraRig } from '../components.j
 import { Gpu, Settings, Input, Time } from '../resources.js';
 import * as S from '../render/shaders.js';
 import { shaderMaterial } from '../render/materials.js';
-import { paletteNames } from '../gen/palettes.js';
+import { paletteNames, paletteTables } from '../gen/palettes.js';
 import { lookOf, triangles } from '../lib/voxels.js';
 import { burnCube } from './blasts.js';
 import * as Fire from './fireSim.js';
@@ -49,9 +50,10 @@ const WIND = [0.92, 0.39];   // where the wind blows to (x, z in the world; the 
 const WIND_SPEED = 0.5;  // world units a second: the fire cubes, the embers and the flakes of ash go with the wind
 const FLAKE_FALL = 0.4;  // world units a second: a flake of ash drifts down this fast
 const JOIN_EVERY = 0.15; // seconds: which voxels are still joined to the wood or the ground is looked at again (when one went)
-const GRAVITY = 9;       // world units a second, a second: a piece that falls
-const REST_DROP = 8;     // cells: a piece that drops less than this onto the object (not the ground) rests there
-const FALL_MAX = 1.2;    // world units a second: a piece falls at most this fast times 1 + the cube root of its voxels
+const HANG = [1, 4];      // seconds: a leaf voxel cut off hangs on from the first to the second, then lets go
+const LEAF_FALL = 0.5;   // world units a second: a leaf that let go flutters down this fast
+const FLAKE_CHANCE = 0.15;   // a leaf voxel that burnt out drops a flake of ash this often
+const EMBER_DROP = 6;    // embers a second that fall from 1000 outside burning leaf voxels
 const RAIN_DROPS = 320;  // drops of rain a second
 const RAIN_RADIATE = 0.3;    // in the rain a fire heats the objects near it this much
 const SHADOW_EVERY = 0.3;    // seconds: the shadow of a burning object is drawn again
@@ -143,10 +145,10 @@ export function burnSystem(world) {
     if (!hasComponent(world, entity, SceneObject)) { drop(f); fires.delete(entity); continue; }
     if (f.done) { for (const mesh of f.hidden) mesh.visible = false; continue; }   // what is left
     for (f.acc += dt; f.acc >= H; f.acc -= H) { Fire.step(f, H, rain); went(f); }
-    fall(f, dt);
-    draw(world, f, gpu);
+    hang(world, f, dt);
+    draw(world, f, gpu, dt);
     changing = true;
-    if (f.awakeN || f.pieces.length || f.breaking.length || f.cut) continue;   // (cut: joined is looked at once more)
+    if (f.awakeN || f.hanging.length || f.cut) continue;   // (cut: joined is looked at once more)
     // nothing changes any more: what is left stays; an object only warmed goes back to how it was
     if (!f.burnt) { forget(f); fires.delete(entity); continue; }
     f.done = true;
@@ -189,7 +191,7 @@ function reach(so) {
 function went(f) {
   for (const c of f.goneNow) {
     f.cut = true;
-    if (f.slot[c] >= 0 && f.bits.length < 60 && Math.random() < 0.04) f.bits.push({ c, kind: 'flake' });
+    if (f.slot[c] >= 0 && f.bits.length < 60 && Math.random() < FLAKE_CHANCE) f.bits.push({ c });
     hide(f, c);
     for (const o of Fire.offsets(f)) { const d = f.grid[f.at[c] + o]; if (d >= 0) show(f, d); }
   }
@@ -344,8 +346,7 @@ function fireOf(world, entity) {
     entity, so, size, nx, ny, nz, grid: d.grid, n, done: false, acc: 0, materials: MATERIALS, wet: d.wet,
     at: d.at, xyz: d.xyz, mat: new Uint8Array(n), jitter: new Float32Array(n), min: d.min, nrm: d.nrm, held: d.held,
     slot: new Int32Array(n).fill(-1), cellAt: new Int32Array(n), count: 0, moved: new Uint8Array(n), dirty: new Int32Array(n), dirtyN: 0,
-    joined: new Uint8Array(n).fill(1), cut: false, joinIn: 0, loose: new Uint8Array(n), off: new Float32Array(n),
-    piece: new Int32Array(n), pieces: [], pieceId: 0, breaks: new Float32Array(n), breaking: [],
+    joined: new Uint8Array(n).fill(1), cut: false, joinIn: 0, hangs: new Uint8Array(n), hanging: [],
     mid: new Float32Array(n), row: new Float32Array(n), hidden: parts.map(({ mesh }) => mesh), sprites: [], clumpsOf: [], bits: [],
   };
   const looks = parts.map((p) => ({ mat: materialOf(p), mid: p.mesh.material.uniforms.uMid?.value ?? 4, row: p.mesh.material.uniforms.uPal?.value ?? 0 }));
@@ -379,8 +380,7 @@ function fireOf(world, entity) {
   for (const { mesh } of d.spots) if (!mesh.userData.burnCopy) { mesh.geometry = mesh.geometry.clone(); mesh.userData.burnCopy = true; }
   d.spots.forEach(({ mesh, i }, s) => {
     const attr = mesh.geometry.getAttribute('iPos'), cell = d.clumpAt[s];
-    // (y0: its height in the mesh; per: mesh units a world unit up, so it can go down with its voxel when that falls)
-    const sp = { attr, i, cell, y0: attr.getY(i), cy: cell >= 0 ? f.xyz[cell * 3 + 1] : 0, per: 1 / (mesh.matrix.elements[5] || 1) };
+    const sp = { attr, i, cell };
     f.sprites.push(sp);
     if (cell >= 0) (f.clumpsOf[cell] ??= []).push(sp);
   });
@@ -436,100 +436,26 @@ function hide(f, c) {
   f.slot[c] = -1;
 }
 
-// the pieces that fall: each one as one piece, faster and faster, until a voxel of it lands on the ground or on a voxel
-// that is not of a piece; there it breaks up. off: how far it fell since its cells (drawn lower by that much); it moves
-// down a cell each time it passes one
-function fall(f, dt) {
-  const { grid, nx } = f, offs = Fire.offsets(f), floor = Math.max(1, Math.ceil(-f.min[1] - 0.5));
+// the leaf voxels cut off: each hangs on until its time, then, if it is not burning, lets go alone and flutters down (a
+// small cube of its colour that swings, leans with the wind and is gone in about 2 s); one burning waits until it burnt out
+function hang(world, f, dt) {
   if (f.cut && ((f.joinIn -= dt) <= 0 || !f.awakeN)) {   // (at once when nothing else changes, so the fire does not end first)
-    join(f, floor); f.cut = false; f.joinIn = JOIN_EVERY;
+    join(f, Math.max(1, Math.ceil(-f.min[1] - 0.5))); f.cut = false; f.joinIn = JOIN_EVERY;
   }
-  breakUp(f, dt);
-  f.pieces = f.pieces.filter((p) => {
-    p.cells = p.cells.filter((c) => f.state[c] !== GONE);
-    if (!p.cells.length) return false;
-    // the air holds a small piece back (a bit of a leaf drifts down, a big piece drops)
-    p.vel = Math.min(p.vel + GRAVITY * dt, FALL_MAX * (1 + Math.cbrt(p.cells.length)));
-    p.off += p.vel * dt;
-    while (p.off >= f.size) {
-      // under it: the ground or a voxel (it lands), or a piece that falls too (it waits on it)
-      let under = 0, ground = false;
-      for (const c of p.cells) {
-        if (f.xyz[c * 3 + 1] <= floor) { under = 2; ground = true; break; }
-        const d = grid[f.at[c] - nx];
-        if (d < 0 || f.state[d] === GONE || f.piece[d] === p.id) continue;
-        under = f.piece[d] ? Math.max(under, 1) : 2;
-        if (under === 2) break;
-      }
-      if (under === 2) {
-        // a short drop onto the object (a canopy that sinks onto its trunk): it rests there; else it breaks up
-        if (!ground && p.drop < REST_DROP) rest(f, p); else land(f, p);
-        return false;
-      }
-      if (under === 1) { p.off = f.size * 0.99; break; }
-      p.off -= f.size;
-      p.drop++;
-      // one cell down, the bottom ones first (the cells are from the bottom up)
-      for (const c of p.cells) { const k = f.at[c]; if (grid[k] === c) grid[k] = -1; grid[k - nx] = c; f.at[c] = k - nx; f.xyz[c * 3 + 1]--; }
-      // the voxels next to the cells it left show
-      for (const c of p.cells) {
-        const k = f.at[c] + nx;
-        if (grid[k] >= 0) continue;
-        for (const o of offs) { const d = grid[k + o]; if (d >= 0 && f.piece[d] !== p.id) show(f, d); }
-      }
+  const g = f.so.group.matrixWorld, v = new THREE.Vector3(), offs = Fire.offsets(f);
+  f.hanging = f.hanging.filter((h) => {
+    const c = h.c, s = f.state[c];
+    if (s === GONE) return false;
+    if ((h.t -= dt) > 0) return true;
+    if (f.burn[c] || (s >= BURNING && !f.out[c])) { h.t = 0.5; return true; }   // it burns where it is
+    if (f.slot[c] >= 0) {
+      cellPos(f, c, v).applyMatrix4(g);
+      const k = 0.7 + Math.random() * 0.6;
+      burnCube(world, v.x, v.y, v.z, f.size * 0.9, s >= BURNING ? '#2a2422' : leafColor(f, c), 1.6 + Math.random() * 0.8,
+        WIND[0] * WIND_SPEED * k, -LEAF_FALL * k, WIND[1] * WIND_SPEED * k, true, 0.7);
     }
-    for (const c of p.cells) { f.off[c] = p.off; if (f.slot[c] >= 0) mark(f, f.slot[c]); moveClumps(f, c); }
-    return true;
-  });
-}
-
-// a piece sank a little onto the object: it rests there, as it is, and is joined again
-function rest(f, p) {
-  for (const c of p.cells) {
-    f.off[c] = 0;
-    f.piece[c] = 0;
-    if (f.slot[c] >= 0) mark(f, f.slot[c]);
-    moveClumps(f, c);
-  }
-  f.cut = true;
-}
-
-// the leaf clumps of a voxel that fell go down with it
-function moveClumps(f, c) {
-  for (const sp of f.clumpsOf[c] ?? []) {
-    if (sp.gone) continue;
-    sp.attr.setY(sp.i, sp.y0 - ((sp.cy - f.xyz[c * 3 + 1]) * f.size + f.off[c]) * sp.per);
-    sp.attr.needsUpdate = true;
-  }
-}
-
-// a piece landed: it breaks up. What burns burns on there (it does not join the rest again); green leaves fall apart
-// (they shrink and are gone, not all at once); the rest crumbles to ash; and some of it flies off in bits
-function land(f, p) {
-  for (const c of p.cells) {
-    f.off[c] = 0;
-    f.piece[c] = 0;
-    f.loose[c] = 1;
-    show(f, c);
-    mark(f, f.slot[c]);
-    if (f.burn[c]) continue;
-    const s = f.out[c] ? BURNT : f.state[c];
-    if (s < BURNING) { f.breaks[c] = 0.3 + Math.random() * 1.5; f.breaking.push(c); }
-    else Fire.crumble(f, c);
-    if (f.slot[c] < 0 || f.bits.length >= 120 || Math.random() > 0.25) continue;
-    f.bits.push({ c, kind: 'bit', color: s < BURNING ? '#4a7a3c' : s === EMBERS ? '#ff7a20' : s === ASH ? '#6a6460' : '#2a2422' });
-    if (s < BURNING) f.breaks[c] = 0.001; else Fire.crumble(f, c, 0.001);   // it is that bit now
-  }
-}
-
-// the green leaves of a piece that landed: each shrinks and is gone at its time (unless it caught fire: then it burns)
-function breakUp(f, dt) {
-  const offs = Fire.offsets(f);
-  f.breaking = f.breaking.filter((c) => {
-    if (f.state[c] >= BURNING) { f.breaks[c] = 0; return false; }
-    if ((f.breaks[c] -= dt) > 0) return true;
-    f.breaks[c] = 0;
     f.state[c] = GONE;
+    f.burn[c] = 0;
     f.cut = true;
     hide(f, c);
     for (const o of offs) { const d = f.grid[f.at[c] + o]; if (d >= 0) show(f, d); }
@@ -537,13 +463,18 @@ function breakUp(f, dt) {
   });
 }
 
+// the colour of a leaf voxel: one of the middle colours of its canopy palette
+function leafColor(f, c) {
+  const ramp = paletteTables().canopy?.[f.row[c]];
+  return ramp ? ramp[1 + Math.floor(Math.random() * Math.min(3, ramp.length - 1))][1] : '#4a7a3c';
+}
+
 // which voxels are joined, voxel by voxel (the 6 next to each), to a voxel of a material that stays (the wood, stone) or
 // to the ground (a voxel that broke up on the ground is not joined again), or are a bit that the shape itself holds
-// (held: joined to nothing from the start, lib/fireWorker.js); the others make pieces that fall (each the voxels joined
-// to one another), their cells from the bottom up
+// (held: joined to nothing from the start, lib/fireWorker.js); the others hang (hang)
 function join(f, floor) {
   const { grid, n } = f, offs = Fire.offsets(f), stack = new Int32Array(n);
-  const free = (c) => f.state[c] !== GONE && !f.loose[c] && !f.piece[c];
+  const free = (c) => f.state[c] !== GONE && !f.hangs[c];
   let top = 0;
   f.joined.fill(0);
   for (let c = 0; c < n; c++) {
@@ -562,26 +493,14 @@ function join(f, floor) {
   }
   for (let c = 0; c < n; c++) {
     if (f.joined[c] || !free(c)) continue;
-    const id = ++f.pieceId, cells = [c];
-    f.piece[c] = id;
-    for (let i = 0; i < cells.length; i++) {
-      const k = f.at[cells[i]];
-      for (const o of offs) {
-        const d = grid[k + o];
-        if (d < 0 || f.joined[d] || !free(d)) continue;
-        f.piece[d] = id;
-        cells.push(d);
-      }
-    }
-    cells.sort((a, b) => f.xyz[a * 3 + 1] - f.xyz[b * 3 + 1]);
-    f.pieces.push({ id, cells, vel: 0, off: 0, drop: 0 });
+    f.hangs[c] = 1;
+    f.hanging.push({ c, t: HANG[0] + Math.random() * (HANG[1] - HANG[0]) });
   }
 }
 
 // the heat of a voxel for the post pass (render/shaders.js burnColor), and its size (it shrinks as ash), by its state
 function heatOf(f, c, now) {
   const s = f.state[c], m = mat(f, c), j = f.jitter[c];
-  if (s < BURNING && f.breaks[c] > 0) return [0, Math.min(1, f.breaks[c] / 0.4)];   // green, falling apart: it shrinks
   if (s === NORMAL) return [0, 1];
   if (s === HEATING) return [0.22 * Math.min(1, Math.max(0, (f.T[c] - RED_FROM) / (m.ignite - RED_FROM))), 1];
   if (s === BURNING) {
@@ -597,7 +516,7 @@ function heatOf(f, c, now) {
   return [0.8 + 0.2 * k, k < 0.75 ? 1 : 1 - (k - 0.75) * 2.8];
 }
 
-function draw(world, f, gpu) {
+function draw(world, f, gpu, dt = 0) {
   const now = performance.now() / 1000, M = f.mesh.instanceMatrix.array, A = f.matAttr.array, size = f.size;
   const [mx, my, mz] = f.min, nxy = f.nx * f.ny;
   // a slot: its colour, and its place and size when it moved or is not at its full size
@@ -608,40 +527,31 @@ function draw(world, f, gpu) {
     const k = f.at[c], x = k % f.nx, y = Math.floor(k / f.nx) % f.ny, z = Math.floor(k / nxy), e = size * scale, o = s * 16;
     M[o] = e; M[o + 1] = M[o + 2] = M[o + 3] = M[o + 4] = 0; M[o + 5] = e; M[o + 6] = M[o + 7] = M[o + 8] = M[o + 9] = 0;
     M[o + 10] = e; M[o + 11] = 0;
-    M[o + 12] = (x + mx + 0.5) * size; M[o + 13] = (y + my + 0.5) * size - (size - e) * 0.5 - f.off[c]; M[o + 14] = (z + mz + 0.5) * size; M[o + 15] = 1;
+    M[o + 12] = (x + mx + 0.5) * size; M[o + 13] = (y + my + 0.5) * size - (size - e) * 0.5; M[o + 14] = (z + mz + 0.5) * size; M[o + 15] = 1;
   };
-  // only what can change: the slots that moved, the voxels that are awake (systems/fireSim.js), the green ones that fall
-  // apart. A voxel asleep looks the same from frame to frame
+  // only what can change: the slots that moved, the voxels that are awake (systems/fireSim.js). A voxel asleep looks the
+  // same from frame to frame
   for (let i = 0; i < f.dirtyN; i++) { const s = f.dirty[i]; f.moved[s] = 0; if (s < f.count) put(s, true); }
   f.dirtyN = 0;
   for (let i = 0; i < f.awakeN; i++) { const s = f.slot[f.awake[i]]; if (s >= 0) put(s, false); }
-  for (const c of f.breaking) if (f.slot[c] >= 0) put(f.slot[c], false);
   f.mesh.count = f.count;
   f.mesh.instanceMatrix.needsUpdate = true;
   f.matAttr.needsUpdate = true;
   for (const mesh of f.hidden) mesh.visible = false;
 
-  // the leaf clumps over a voxel that caught fire (or broke up) go; a voxel only heated keeps its clumps, and one that
-  // falls takes them with it
+  // the leaf clumps over a voxel that caught fire (or let go) go; a voxel only heated keeps its clumps
   for (const sp of f.sprites) {
     if (sp.gone || sp.cell < 0) continue;
     const c = sp.cell;
-    if (f.state[c] < BURNING && !f.loose[c]) continue;
+    if (f.state[c] < BURNING) continue;
     sp.gone = true;
     sp.attr.setX(sp.i, 1e5);
     sp.attr.needsUpdate = true;
   }
 
   const g = f.so.group.matrixWorld, v = new THREE.Vector3(), mid = new THREE.Vector3();
-  // flakes of ash drift down with the wind, swinging; the bits of a piece that broke up fly off
-  for (const { c, kind, color } of f.bits.splice(0)) {
-    cellPos(f, c, v).applyMatrix4(g);
-    if (kind === 'flake') flake(world, v, size, Math.random() < 0.7 ? '#5a5450' : '#2a2422');
-    else {
-      const a = Math.random() * 6.3, sp = 0.4 + Math.random() * 0.9;
-      burnCube(world, v.x, v.y, v.z, size, color, 0.4 + Math.random() * 0.4, Math.cos(a) * sp, 1 + Math.random() * 1.5, Math.sin(a) * sp, false);
-    }
-  }
+  // flakes of ash drift down with the wind, swinging
+  for (const { c } of f.bits.splice(0)) flake(world, cellPos(f, c, v).applyMatrix4(g), size, Math.random() < 0.7 ? '#5a5450' : '#2a2422');
   // the burning voxels that show: the lamp at their middle, cubes of fire from some of them
   const lit = [];
   for (let i = 0; i < f.awakeN; i++) {
@@ -649,6 +559,13 @@ function draw(world, f, gpu) {
     if (f.state[c] === BURNING && f.slot[c] >= 0) { lit.push(c); cellPos(f, c, v); mid.add(v); }
   }
   if (!lit.length) return;
+  // small embers fall from the burning leaves, swinging, and go out on the way
+  const leafLit = lit.filter((c) => !mat(f, c).stays);
+  for (let k = EMBER_DROP * leafLit.length / 1000 * dt; leafLit.length && Math.random() < k; k--) {
+    cellPos(f, leafLit[Math.floor(Math.random() * leafLit.length)], v).applyMatrix4(g);
+    burnCube(world, v.x, v.y, v.z, size * 0.45, Math.random() < 0.5 ? '#ff7a20' : '#ffc040', 0.7 + Math.random() * 0.7,
+      WIND[0] * WIND_SPEED * 0.5, -(0.8 + Math.random() * 0.6), WIND[1] * WIND_SPEED * 0.5, true, 0.3);
+  }
   mid.divideScalar(lit.length).applyMatrix4(g);
   // by day the lamp is faint (it would paint the whole object orange), at night it lights around it
   const strength = Math.min(1, lit.length / 1500), night = getResource(world, Settings).land.night ?? 0;

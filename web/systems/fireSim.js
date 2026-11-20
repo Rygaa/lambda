@@ -1,4 +1,4 @@
-// The fire of an object, voxel by voxel (systems/burn.js makes the voxels, draws them and moves the pieces that fall).
+// The fire of an object, voxel by voxel (systems/burn.js makes the voxels, draws them and lets the cut-off leaves go).
 // One model: each voxel has a temperature (T, degrees), water (W, the degrees of heat it takes to dry it) and fuel
 // (F, seconds of burning in the open air). No other rule decides if the fire goes on.
 //   heat moves  a voxel gives heat to the 6 next to it, by how much hotter it is: most up, least down
@@ -101,16 +101,6 @@ export function warm(f, c, degrees) {
   wake(f, c);
 }
 
-// a voxel breaks up (it fell and landed): grey ash in about a second, then gone
-export function crumble(f, c, seconds = 0.5 + Math.random() * 0.9) {
-  f.burn[c] = 0;
-  f.out[c] = 0;
-  f.F[c] = 0;
-  f.left[c] = f.left[c] >= 0 ? Math.min(f.left[c], seconds) : seconds;
-  f.state[c] = ASH;
-  wake(f, c);
-}
-
 // the seconds a voxel of a material that is gone stays black and ash
 const charOf = (f, c) => f.materials[f.mat[c]].charTime * (0.8 + 0.4 * f.jitter[c]);
 
@@ -162,10 +152,9 @@ export function step(f, h, rain) {
       if (rain) W[c] += RAIN_WET * (air + 0.3) * h;
       if (W[c] > 0) W[c] = Math.max(0, W[c] - DRY_FLAME * (a + 0.1) * h);
       if (W[c] >= OUT_WATER) {
-        // out (steam). One that fell and broke up (loose, systems/burn.js) crumbles like the rest of its piece
+        // out (steam)
         T[c] = Math.min(T[c], BOIL);
-        if (f.loose?.[c]) crumble(f, c);
-        else { f.burn[c] = 0; f.out[c] = 1; state[c] = BURNT; }
+        f.burn[c] = 0; f.out[c] = 1; state[c] = BURNT;
       }
       else if ((F[c] -= a * h) <= 0) {
         // its fuel is gone
