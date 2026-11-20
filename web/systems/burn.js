@@ -9,7 +9,7 @@
 //   - B or the button lights the voxels around the point of the object nearest to the human (MATCH cells);
 //   - a burning object heats the objects near it (radiate): by how many of its outside voxels burn and the gap to that
 //     object, on the TARGET_CELLS outside voxels of it that face the fire. So a dry tree near a big fire catches, a wet
-//     tree or one across a clearing does not. Sparks fly to show that heat (they decide nothing);
+//     tree or one across a clearing does not;
 //   - a piece of voxels of a material that is gone at the end (the leaves) no longer joined, voxel by voxel, to a material
 //     that stays (the wood) or to the ground falls as one piece (a small one slower); a short drop onto the object (a
 //     canopy that sinks onto its trunk) rests there, a real fall breaks up where it lands;
@@ -52,7 +52,6 @@ const JOIN_EVERY = 0.15; // seconds: which voxels are still joined to the wood o
 const GRAVITY = 9;       // world units a second, a second: a piece that falls
 const REST_DROP = 8;     // cells: a piece that drops less than this onto the object (not the ground) rests there
 const FALL_MAX = 1.2;    // world units a second: a piece falls at most this fast times 1 + the cube root of its voxels
-const SPARK_TIME = 0.7;  // seconds a spark flies
 const RAIN_DROPS = 320;  // drops of rain a second
 const RAIN_RADIATE = 0.3;    // in the rain a fire heats the objects near it this much
 const SHADOW_EVERY = 0.3;    // seconds: the shadow of a burning object is drawn again
@@ -80,7 +79,6 @@ const fires = new Map();    // object entity -> its fire
 fires.ms = [];              // (the tests) milliseconds of the fire, the last frames
 const heatIn = new Map();   // object entity without voxels of the fire -> heat that came to it (degrees)
 fires.heatIn = heatIn;      // (the tests)
-const sparks = [];          // sparks on their way (they only show the heat): { from, to, t }
 const ready = new Map();    // object entity -> its voxels from the fire worker (lib/fireWorker.js), not used yet
 const making = new Map();   // job id -> the object entity the worker makes the voxels of
 const lights = [];          // fires to light once the voxels of their object are ready: { e, at, near }
@@ -133,7 +131,6 @@ export function burnSystem(world) {
   gpu.fireLamps = [];
   const dt = Math.min(0.05, getResource(world, Time).dt);
   if (rain) rainDrops(world, dt);
-  flySparks(world, dt);
   for (let i = lights.length - 1; i >= 0; i--) {
     const l = lights[i];
     if (!hasComponent(world, l.e, SceneObject)) { lights.splice(i, 1); continue; }
@@ -251,25 +248,7 @@ function radiate(world) {
         near[i] = [d, c];
       }
       for (const [, c] of near) Fire.warm(tf, c, heat);
-      // sparks fly there: more for more heat
-      if (near.length && Math.random() < flux / 40) {
-        cellPos(tf, near[0][1], v).applyMatrix4(tf.so.group.matrixWorld);
-        sparks.push({ from: from.clone(), to: v.clone(), t: 0 });
-      }
     }
-  }
-}
-
-// the sparks on their way: a glowing cube that flies in an arc and leaves a short trail
-function flySparks(world, dt) {
-  const v = new THREE.Vector3();
-  for (let i = sparks.length - 1; i >= 0; i--) {
-    const s = sparks[i], k = Math.min(1, (s.t += dt) / SPARK_TIME);
-    v.lerpVectors(s.from, s.to, k);
-    v.y += Math.sin(Math.PI * k) * 0.6;
-    burnCube(world, v.x, v.y, v.z, 0.07, FIRE[Math.floor(Math.random() * 2)], 0.12, 0, 0, 0, true);
-    if (Math.random() < 0.5) burnCube(world, v.x, v.y, v.z, 0.04, FIRE[2], 0.3 + Math.random() * 0.2, 0, 0.2, 0, true);
-    if (k >= 1) sparks.splice(i, 1);
   }
 }
 

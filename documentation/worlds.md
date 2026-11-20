@@ -361,7 +361,7 @@ The fields of a world:
   more open faces: the inside only smoulders), glows as embers at the end, then stays black (the wood) or turns to ash
   and is gone (the leaves). A dry tree that catches fire burns fully. A burning object heats the objects near it (more
   when more of it burns and the gap is small), so a dry tree near a big fire catches, a wet one or one across a
-  clearing does not; sparks fly to show that heat. `wet`: about this part of the objects (always the same ones) have 20
+  clearing does not. `wet`: about this part of the objects (always the same ones) have 20
   times the water. Rain (the second button) wets and cools every voxel: the fire goes out. A light wind leans the hot
   air, makes the fire spread a little faster with it, and carries the embers and the flakes of ash.
   A piece of leaves that is no longer joined, voxel by voxel, to the wood or the ground falls as one piece (a small one
