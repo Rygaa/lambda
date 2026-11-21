@@ -199,6 +199,9 @@ The worlds:
 - `all-types`: every asset type in every size, in rows, with a mountain border, the ocean, a beach, and a dirt path.
 - `walk-test`: one object of each of the first types, in a row.
 - `tree-types`: one tree of each type in a row, with no light beams, to compare their shapes.
+- `burn-test`: one tree of each type in 2 rows (oak, birch, fruit, willow, cypress; pine, fir, palm, leafy, bush) and 3
+  oaks in a row near the start, to try the voxel fire (`"burn": true`, the wind blows to +x): the button at the top, or
+  B, sets fire to the nearest tree; a burning tree can light the trees near it, more often downwind.
 - `rock-types`: 3 rocks of each rock type, one row per type, with no light beams.
 - `flyff-objects`: the 30 FlyFF decor objects of `assets/objects`, in 5 rows.
 - `combat`: a small meadow with 9 monsters in 3 groups (4 Aibatt level 1, 3 Mushpang level 3, 2 Burudeng level 5),
@@ -342,6 +345,17 @@ The fields of a world:
 - `rays`: the strength of the light rays, 0 to 1 (default 1).
 - `night`: how dark, 0 (day, default) to 1: the world and the people are dark and blue, and only the rings of the
   lamps (and of the flashlights of a game mode) show their colours (`web/render/shaders.js` uNight).
+- `burn`: `true`: the button at the top (or B) sets fire to the nearest tree, voxel by voxel (`web/systems/fire.js`).
+  A tree that catches fire burns to the end. Its wood (the trunk; a stone part with a wood palette: the palm trunk, the
+  crates) burns slowly and stays black; its leaves catch fire fast, burn fast, and are gone where they are. When the
+  fire starts, the time each voxel catches fire is found once (fire goes up faster, down slower, and faster with the
+  wind), and the time each leaf voxel goes: only after every leaf voxel it holds (the ones whose shortest way to the
+  wood or the ground goes through it) is gone. So the leaves are a ball of fire that shrinks back onto the wood, and
+  nothing floats, whatever the shape of the tree. A tree whose leaves burn lights each tree near it with a chance each
+  second: more when it is near, more downwind, less against the wind. The times are found by the fire worker
+  (`web/lib/fireWorker.js`, `web/lib/fireTimes.js`), so the game does not stop when a tree catches fire.
+- `wind`: `{ "dir": 0, "speed": 0.5 }`: where the wind blows to (degrees: 0 = +x, 90 = +z) and how strong (0.5 = full).
+  It leans the flames, the embers and the ash, and the fire spreads faster with it (default: no wind).
 - `game`: the world of a game mode (section "Game modes").
 - `borders`: what closes each side (section 4).
 - `islands`: islands cut out of the ocean (section 4).

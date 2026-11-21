@@ -1,0 +1,145 @@
+{
+  "name": "Burn test: one tree of each type (2 rows) and 3 oaks in a row, to try the voxel fire (systems/fire.js): the button at the top, or B, sets fire to the nearest; a burning tree can light the trees near it, more downwind (the wind blows to +x)",
+  "seed": 5,
+  "size": 24,
+  "start": [
+    0,
+    3
+  ],
+  "clouds": "none",
+  "rays": 0,
+  "burn": true,
+  "wind": {
+    "dir": 0,
+    "speed": 0.5
+  },
+  "clearings": {
+    "count": 1,
+    "radius": [
+      9,
+      9
+    ]
+  },
+  "props": [
+    {
+      "asset": "plant/oak/medium",
+      "at": [
+        [
+          -8,
+          -5,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/birch/medium",
+      "at": [
+        [
+          -4,
+          -5,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/fruit/medium",
+      "at": [
+        [
+          0,
+          -5,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/willow/medium",
+      "at": [
+        [
+          4,
+          -5,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/cypress/medium",
+      "at": [
+        [
+          8,
+          -5,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/pine/medium",
+      "at": [
+        [
+          -8,
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/fir/medium",
+      "at": [
+        [
+          -4,
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/palm/large",
+      "at": [
+        [
+          0,
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/leafy/medium",
+      "at": [
+        [
+          4,
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/bush/medium",
+      "at": [
+        [
+          8,
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "asset": "plant/oak/medium",
+      "at": [
+        [
+          -2.6,
+          5,
+          0
+        ],
+        [
+          0,
+          5,
+          1.2
+        ],
+        [
+          2.6,
+          5,
+          2.1
+        ]
+      ]
+    }
+  ]
+}

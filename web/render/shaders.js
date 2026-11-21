@@ -172,6 +172,41 @@ void main() {
 }
 `;
 
+// a tree that burns (systems/fire.js): one instance a voxel of it (instanceMatrix: its place and size), drawn into the
+// G-buffer like the trunk and the canopy. Its heat (0..1) goes in the fraction of its material id: the post pass turns
+// it red, then glowing, then black, then grey (burnColor)
+export const BURN_VERT = /* glsl */ `
+in vec3 iNrm;     // the normal of the surface it comes from (0: it was inside the shape: the normals of its faces)
+in vec3 iMat;     // material id (3 trunk, 4 canopy), palette row, heat
+out vec3 vW;
+out vec3 vN;
+out float vDepth;
+flat out vec3 vMat;
+void main() {
+  vec4 w = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  vW = w.xyz;
+  vN = normalize(mat3(modelMatrix) * (dot(iNrm, iNrm) > 0.25 ? iNrm : normal));
+  vMat = iMat;
+  vec4 v = viewMatrix * w;
+  vDepth = -v.z;
+  gl_Position = projectionMatrix * v;
+}
+`;
+export const BURN_FRAG = COMMON + GBUF_OUT + /* glsl */ `
+in vec3 vW; in vec3 vN; in float vDepth;
+flat in vec3 vMat;
+void main() {
+  if (vW.y < uClipY) discard;
+  vec3 N = normalize(vN);
+  bool leaf = vMat.x > 3.5;
+  float ndl = dot(N, uSunL), lv;
+  if (leaf) lv = (ndl * 0.5 + 0.5) * (0.78 + 0.22 * cloudLight(vW)) - 0.10;      // as CANOPY_FRAG
+  else lv = ndl > 0.0 ? ndl * cloudLight(vW) * shadowHard(vW + N * 0.02) : 0.0;  // as SOLID_FRAG
+  gData = vec4(lv, vMat.x + clamp(vMat.z, 0.0, 1.0) * 0.45, leaf ? 1.0 : N.y, vMat.y);
+  gNorm = vec4(leaf ? vec3(0.0) : normalize(mat3(viewMatrix) * N), vDepth);
+}
+`;
+
 // stones, pillars, trunks: N.L * shadow, flat faces, outlines in post
 export const SOLID_FRAG = COMMON + GBUF_OUT + /* glsl */ `
 uniform float uMid;
@@ -688,6 +723,32 @@ vec3 waterColor(ivec2 p, ivec2 hi, vec3 W, float lv, float shore, float row, flo
   return col;
 }
 
+// a voxel of a tree that burns (systems/fire.js), by its heat h: 0..0.25 it turns red, 0.25..0.5 it burns (red,
+// yellow, orange), 0.5..0.8 its embers go dark, 0.8..1 black char, then grey ash. col: its colour (changed); -> the
+// light it gives (added after the night, so it shines in the dark)
+vec3 burnColor(float h, float lv, inout vec3 col) {
+  float lit = lv > 0.09 ? 1.0 : 0.72;
+  vec3 coal = vec3(0.022, 0.017, 0.015) * lit;
+  if (h < 0.25) {
+    float k = h / 0.25;
+    col = mix(col, vec3(0.34, 0.035, 0.01) * lit, k * 0.9);
+    return vec3(0.55, 0.05, 0.0) * k * k * 0.45;
+  }
+  if (h < 0.5) {
+    float k = (h - 0.25) / 0.25;
+    col = coal;
+    return k < 0.45 ? mix(vec3(0.85, 0.1, 0.01), vec3(1.0, 0.78, 0.28), k / 0.45)
+                    : mix(vec3(1.0, 0.78, 0.28), vec3(1.0, 0.3, 0.02), (k - 0.45) / 0.55);
+  }
+  if (h < 0.8) {
+    float k = (h - 0.5) / 0.3;
+    col = coal;
+    return mix(vec3(0.8, 0.16, 0.01), vec3(0.0), smoothstep(0.0, 1.0, k));
+  }
+  col = mix(coal, vec3(0.2, 0.19, 0.18) * lit, smoothstep(0.55, 1.0, (h - 0.8) / 0.2));
+  return vec3(0.0);
+}
+
 vec3 linToSrgb(vec3 c) {
   c = clamp(c, 0.0, 1.0);
   return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
@@ -726,6 +787,9 @@ void main() {
   }
   vec3 col = baseColor(lv, mid, up, D.w);
   float lit = lv > 0.09 ? 1.0 : 0.0;
+  // a tree that burns (systems/fire.js): its heat is the fraction of its material id (else 0)
+  float heat = clamp((mid - floor(mid + 0.5)) / 0.45, 0.0, 1.0);
+  vec3 fire = heat > 0.0 ? burnColor(heat, lv, col) : vec3(0.0);
 
   // 1px outlines: depth edges + convex normal edges (4-neighbour kernel)
   float dsum = 0.0, nsum = 0.0;
@@ -784,6 +848,7 @@ void main() {
     col = mix(col, day, clamp(lit * 2.6, 0.0, 1.0) * uNight);
     col += glow;
   }
+  col += fire;
   float len = max(0.0, (uVolTop - P.y) / (-uViewF.y));
   for (int i = 0; i < 64; i++) {
     if (i >= uRaySteps) break;
